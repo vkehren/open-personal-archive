@@ -1,0 +1,10 @@
+{
+  "requiredDocuments": [
+    {
+      "id": "OPA_AuthenticationProvider_Google",
+      "name": "Google",
+      "displayOrder": 100,
+      "isDefault": true
+    }
+  ]
+}

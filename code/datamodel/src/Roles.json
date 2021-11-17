@@ -1,0 +1,34 @@
+{
+  "requiredDocuments": [
+    {
+      "id": "OPA_Role_Owner",
+      "name": "Owner",
+      "displayOrder": 100,
+      "isDefault": false
+    },
+    {
+      "id": "OPA_Role_Administrator",
+      "name": "Administrator",
+      "displayOrder": 200,
+      "isDefault": false
+    },
+    {
+      "id": "OPA_Role_Editor",
+      "name": "Editor",
+      "displayOrder": 300,
+      "isDefault": false
+    },
+    {
+      "id": "OPA_Role_Viewer",
+      "name": "Viewer",
+      "displayOrder": 400,
+      "isDefault": false
+    },
+    {
+      "id": "OPA_Role_Guest",
+      "name": "Guest",
+      "displayOrder": 500,
+      "isDefault": true
+    }
+  ]
+}
