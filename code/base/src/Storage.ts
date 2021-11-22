@@ -144,7 +144,6 @@ export class CollectionDescriptor<T extends BT.IDocument, F> extends Object impl
 
   /**
     * Casts and returns typed document.
-    * Casts and
     * @param {unknown} document The untyped document to cast.
     * @return {T} The typed document.
     */
