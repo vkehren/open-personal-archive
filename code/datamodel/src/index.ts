@@ -31,11 +31,11 @@ OpaDbDescriptor.TimeZones = TimeZone.CollectionDescriptor;
 OpaDbDescriptor.TimeZoneGroups = TimeZoneGroup.CollectionDescriptor;
 OpaDbDescriptor.Users = User.CollectionDescriptor;
 
-export {IArchive} from "./Archive";
-export {IAuthenticationProvider} from "./AuthenticationProvider";
+export {IArchive, createInstance as createArchive, SingletonId as ArchiveId} from "./Archive";
+export {IAuthenticationProvider, AuthenticationProvider_GoogleId, AuthenticationProvider_RequiredIds} from "./AuthenticationProvider"; // eslint-disable-line camelcase
 export {ILocale} from "./Locale";
-export {IOpaSystem} from "./OpaSystem";
-export {IRole} from "./Role";
+export {IOpaSystem, createInstance as createSystem, SingletonId as OpaSystemId} from "./OpaSystem";
+export {IRole, Role_OwnerId, Role_AdministratorId, Role_EditorId, Role_ViewerId, Role_GuestId, Role_RequiredIds} from "./Role"; // eslint-disable-line camelcase
 export {ITimeZone} from "./TimeZone";
 export {ITimeZoneGroup} from "./TimeZoneGroup";
-export {IUser} from "./User";
+export {IUser, createArchiveOwner, getUserByFirebaseAuthUserId, User_OwnerId} from "./User"; // eslint-disable-line camelcase

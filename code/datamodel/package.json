@@ -1,5 +1,13 @@
 {
   "name": "open-personal-archive-data-model",
+  "version": "1.0.0",
+  "description": "This library contains the types, interfaces, and factory functions for data types specific to the Open Personal Archive™ (OPA) system.",
+  "main": "lib/datamodel/src/index.js",
+  "types": "lib/datamodel/src/index.d.ts",
+  "files": ["lib"],
+  "license": "MIT",
+  "keywords": ["personal", "archive"],
+  "author": "Open Personal Archive™",
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
     "build": "tsc",
@@ -8,9 +16,8 @@
   "engines": {
     "node": "14"
   },
-  "license": "MIT",
-  "main": "lib/datamodel/src/index.js",
   "dependencies": {
+    "firebase-admin": "^10.0.0",
     "jest-get-type": "^27.3.1"
   },
   "devDependencies": {
@@ -22,7 +29,6 @@
     "eslint": "^7.6.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-import": "^2.22.0",
-    "firebase": "^9.4.1",
     "jest": "^27.3.1",
     "typescript": "^4.4.4"
   },
