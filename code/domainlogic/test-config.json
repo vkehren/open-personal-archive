@@ -1,0 +1,16 @@
+{
+  "timeout": 60000,
+  "use_emulators": false,
+  "test_cloud": {
+    "uses_emulators": false,
+    "project_id_for_admin": "[YOUR_FIREBASE_PROJECT_NAME_HERE]",
+    "path_to_credential": "../functions/open-personal-archive-firebase-adminsdk-credential.json"
+  },
+  "test_emulators": {
+    "uses_emulators": true,
+    "project_id_for_admin": "opa-emulated-tests",
+    "project_id": "opa-emulated-tests",
+    "auth_emu_host": "localhost:9099",
+    "firestore_emu_host": "localhost:8080"
+  }
+}
