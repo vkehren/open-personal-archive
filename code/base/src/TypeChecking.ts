@@ -1,3 +1,4 @@
+import * as BT from "./BaseTypes";
 import * as JGT from "jest-get-type";
 import * as VC from "./ValueChecking";
 
@@ -179,4 +180,14 @@ export function isNumber(value: unknown): boolean {
  */
 export function isBoolean(value: unknown): boolean {
   return (JGT.getType(value) == BooleanType);
+}
+
+/**
+ * Checks whether a given argument is of generic type T or not by applying a type guard (see https://www.typescriptlang.org/docs/handbook/advanced-types.html).
+ * @param {unknown} value The value to check.
+ * @param {BT.GuardFunc<T>} guardFunc The guard function to apply.
+ * @return {boolean} The result of checking.
+ */
+export function isOfType<T>(value: unknown, guardFunc: BT.GuardFunc<T>): value is T {
+  return guardFunc(value as T);
 }

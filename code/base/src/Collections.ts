@@ -1,5 +1,6 @@
 import * as BT from "./BaseTypes";
 import * as TC from "./TypeChecking";
+import * as VC from "./ValueChecking";
 
 // export const name = "Collections";
 
@@ -24,4 +25,33 @@ export function createMapFromArray<K, V>(array: Array<V>, keyGetterFunc: BT.Gett
     map.set(key, element);
   }
   return map;
+}
+
+/**
+ * Takes in a container object and returns an array of values of type T contained in that object.
+ * @param {unknown} container The container object.
+ * @param {BT.GuardFunc<T>} guardFunc The guard function to apply to check type T.
+ * @return {Array<ICollectionDescriptor>} The list of contained values of type T.
+ */
+export function getCollectionFromObject<T>(container: unknown, guardFunc: BT.GuardFunc<T>): Array<T> {
+  const result: Array<T> = [];
+  if (TC.isNullishOrEmpty(container)) {
+    return result;
+  }
+  if (!TC.isObject(container)) {
+    return result;
+  }
+
+  const containerDict = (container as BT.IDictionary<T>);
+  const ownPropertyKeys = VC.getOwnPropertyKeys(container);
+
+  for (let i = 0; i < ownPropertyKeys.length; i++) {
+    const key = ownPropertyKeys[i];
+    const value = containerDict[key];
+
+    if (!TC.isNullish(value) && TC.isOfType(value, guardFunc)) {
+      result.push(value);
+    }
+  }
+  return result;
 }

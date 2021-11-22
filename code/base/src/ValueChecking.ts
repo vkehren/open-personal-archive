@@ -66,6 +66,18 @@ export function isWhitespace(value: string, includeEmptyAsWhitespace: boolean = 
 }
 
 /**
+ * Gets the property keys specified directly on an object.
+ * @param {unknown} obj The incoming object.
+ * @return {Array<string | symbol>} The property keys for the object.
+ */
+export function getOwnPropertyKeys(obj: unknown): Array<string | symbol> {
+  const ownNames = Object.getOwnPropertyNames(obj);
+  const ownSymbols = Object.getOwnPropertySymbols(obj);
+  const ownCombined = (ownNames as Array<string | symbol>).concat(ownSymbols);
+  return ownCombined;
+}
+
+/**
  * Gets a boolean from an uptyped value (i.e. a value of type "unknown").
  * @param {unknown} untypedValue The incoming value.
  * @param {boolean | undefined} defaultTypedValue The default value to use when the incoming value is null or undefined.
