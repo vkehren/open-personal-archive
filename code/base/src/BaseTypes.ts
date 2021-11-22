@@ -1,11 +1,20 @@
 // export const name = "BaseTypes";
 
 export type GetterFunc<T, V> = (value: T, propName?: string | symbol) => V;
+export type GuardFunc<T> = (value: T) => boolean;
 export type ComparisonFunc<T> = (item1: T, item2: T) => number; // NOTE: (item1 < item2) => -1, (item1 == item2) => 0, else 1
 export type MappingFunc<T1, T2> = (item: T1) => T2;
 
+export interface IDocument {
+  id: string,
+}
+
+export interface ICollection {
+  [key: string | symbol]: unknown;
+}
+
 export interface IDictionary<T> {
-  [key: string]: T;
+  [key: string | symbol]: T;
 }
 
 export interface ILocalizable<T> {
@@ -17,7 +26,6 @@ export interface IGeoPoint {
   readonly latitude: number;
   readonly longitude: number;
   isEqual(other: IGeoPoint): boolean;
-  toJSON(): Object; // eslint-disable-line @typescript-eslint/ban-types
 }
 
 export interface ITimestamp {
@@ -25,7 +33,6 @@ export interface ITimestamp {
   readonly nanoseconds: number;
   isEqual(other: ITimestamp): boolean;
   toDate(): Date;
-  toJSON(): Object; // eslint-disable-line @typescript-eslint/ban-types
   toMillis(): number;
   toString(): string;
   valueOf(): string;

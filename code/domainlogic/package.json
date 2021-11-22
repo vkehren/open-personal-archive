@@ -1,9 +1,9 @@
 {
-  "name": "open-personal-archive-base",
+  "name": "open-personal-archive-domain-logic",
   "version": "1.0.0",
-  "description": "This library contains various types, interfaces, classes and functions that are necessary for implementing the Open Personal Archive™ (OPA) system.",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "description": "This library contains domain logic that implements server-side functionality for the Open Personal Archive™ (OPA) system.",
+  "main": "lib/domainlogic/src/index.js",
+  "types": "lib/domainlogic/src/index.d.ts",
   "files": ["lib"],
   "license": "MIT",
   "keywords": ["personal", "archive"],
@@ -11,7 +11,7 @@
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
     "build": "tsc",
-    "test": "jest"
+    "test": "mocha -r ts-node/register 'src/**/*.ts'"
   },
   "engines": {
     "node": "14"
@@ -21,15 +21,20 @@
     "jest-get-type": "^27.3.1"
   },
   "devDependencies": {
+    "@babel/helper-validator-identifier": "^7.15.7",
     "@babel/preset-env": "^7.16.0",
     "@babel/preset-typescript": "^7.16.0",
-    "@types/jest": "^27.0.2",
+    "@types/chai": "^4.2.22",
+    "@types/mocha": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^3.10.1",
     "@typescript-eslint/parser": "^3.10.1",
+    "chai": "^4.3.4",
     "eslint": "^7.6.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-import": "^2.22.0",
-    "jest": "^27.3.1",
+    "mocha": "^9.1.3",
+    "node-fetch": "^3.1.0",
+    "ts-node": "^10.4.0",
     "typescript": "^4.4.4"
   },
   "private": true

@@ -1,4 +1,4 @@
-import {Timestamp} from "firebase/firestore";
+import * as admin from "firebase-admin";
 import * as TR from "./TimeRange";
 import {TimeRange} from "./TimeRange";
 
@@ -8,11 +8,11 @@ export const name = "TimeRangeTests";
 export const Date_Early = new Date(2, 1, 2);
 export const Date_Middle = new Date(2021, 11, 15);
 export const Date_Late = new Date(9998, 12, 30);
-export const Timestamp_MIN = new Timestamp(TR.Timestamp_Seconds_MIN, TR.Timestamp_Nanoseconds_MIN);
-export const Timestamp_MAX = new Timestamp(TR.Timestamp_Seconds_MAX, TR.Timestamp_Nanoseconds_MAX);
-export const Timestamp_Early = Timestamp.fromDate(Date_Early);
-export const Timestamp_Middle = Timestamp.fromDate(Date_Middle);
-export const Timestamp_Late = Timestamp.fromDate(Date_Late);
+export const Timestamp_MIN = new admin.firestore.Timestamp(TR.Timestamp_Seconds_MIN, TR.Timestamp_Nanoseconds_MIN);
+export const Timestamp_MAX = new admin.firestore.Timestamp(TR.Timestamp_Seconds_MAX, TR.Timestamp_Nanoseconds_MAX);
+export const Timestamp_Early = admin.firestore.Timestamp.fromDate(Date_Early);
+export const Timestamp_Middle = admin.firestore.Timestamp.fromDate(Date_Middle);
+export const Timestamp_Late = admin.firestore.Timestamp.fromDate(Date_Late);
 
 // VALID TEST CASES:
 export const TimeRange_MIN = new TimeRange(Timestamp_MIN);

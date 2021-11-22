@@ -4,12 +4,11 @@ import * as CollectionData from "./TimeZoneGroups.json";
 const SingularName = "TimeZoneGroup";
 const PluralName = "TimeZoneGroups";
 const IsSingleton = false;
-const IsNestedCollection = false;
 const RequiredDocuments: Array<ITimeZoneGroup> = CollectionData.requiredDocuments;
 
-export const CollectionDescriptor = new OPA.CollectionDescriptor<ITimeZoneGroup>(SingularName, PluralName, IsSingleton, IsNestedCollection, RequiredDocuments);
+export const CollectionDescriptor = new OPA.CollectionDescriptor<ITimeZoneGroup, void>(SingularName, PluralName, IsSingleton, null, RequiredDocuments);
 
-export interface ITimeZoneGroup {
+export interface ITimeZoneGroup extends OPA.IDocument {
   readonly id: string;
   readonly name: string;
   readonly abbreviation: string;
