@@ -3,6 +3,7 @@
     {
       "id": "OPA_AuthenticationProvider_Google",
       "name": "Google",
+      "externalId": "google.com",
       "displayOrder": 100,
       "isDefault": true
     }
