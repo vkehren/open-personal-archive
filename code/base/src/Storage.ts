@@ -1,12 +1,12 @@
 import * as admin from "firebase-admin";
 import * as BT from "./BaseTypes";
 import * as FB from "./Firebase";
+import * as QR from "./Queries";
 import * as TC from "./TypeChecking";
 
 // export const name = "Storage";
 
 export const CollectionDescriptors: BT.IDictionary<ICollectionDescriptor> = {};
-export const Default_DocumentId_PropertyName = "id"; // eslint-disable-line camelcase
 
 export interface INestedCollectionStep {
   readonly distanceFromRoot: number;
@@ -23,7 +23,6 @@ export interface ICollectionDescriptor {
   readonly parentCollectionDescriptor: ICollectionDescriptor | null;
   getCollection(db: admin.firestore.Firestore, pathFromRoot?: Array<INestedCollectionStep>): admin.firestore.CollectionReference<admin.firestore.DocumentData>;
   getCollectionGroup(db: admin.firestore.Firestore): admin.firestore.CollectionGroup<admin.firestore.DocumentData>;
-  getDocumentForId(db: admin.firestore.Firestore, id: string | null | undefined): Promise<BT.IDocument | null>;
 }
 
 export interface ITypedCollectionDescriptor<T extends BT.IDocument> extends ICollectionDescriptor {
@@ -31,8 +30,11 @@ export interface ITypedCollectionDescriptor<T extends BT.IDocument> extends ICol
   castTo(document: unknown): T;
   getTypedCollection(db: admin.firestore.Firestore, pathFromRoot?: Array<INestedCollectionStep>): admin.firestore.CollectionReference<T>;
   getTypedCollectionGroup(db: admin.firestore.Firestore): admin.firestore.CollectionGroup<T>;
-  getTypedDocumentForId(db: admin.firestore.Firestore, id: string | null | undefined): Promise<T | null>;
-  loadRequiredDocuments(db: admin.firestore.Firestore, eraseExistingDocs: boolean, documentIdPropertyName?: string, pathFromRoot?: Array<INestedCollectionStep>): Promise<void>;
+  loadRequiredDocuments(db: admin.firestore.Firestore, eraseExistingDocs: boolean, pathFromRoot?: Array<INestedCollectionStep>): Promise<void>;
+}
+
+export interface ITypedQueryableCollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet<T>> extends ITypedCollectionDescriptor<T>, ICollectionDescriptor { // eslint-disable-line max-len
+  readonly queries: Q;
 }
 
 export interface ITypedFactoryCollectionDescriptor<T extends BT.IDocument, F> extends ITypedCollectionDescriptor<T>, ICollectionDescriptor {
@@ -40,13 +42,17 @@ export interface ITypedFactoryCollectionDescriptor<T extends BT.IDocument, F> ex
   readonly createInstance: F;
 }
 
+export interface ITypedQueryableFactoryCollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet<T>, F> extends ITypedFactoryCollectionDescriptor<T, F>, ITypedQueryableCollectionDescriptor<T, Q>, ITypedCollectionDescriptor<T>, ICollectionDescriptor { // eslint-disable-line max-len
+}
+
 /** Class providing consistent, type-safe values for use in queries. */
-export class CollectionDescriptor<T extends BT.IDocument, F> extends Object implements ITypedFactoryCollectionDescriptor<T, F>, ITypedCollectionDescriptor<T>, ICollectionDescriptor {
+export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet<T>, F> implements ITypedQueryableFactoryCollectionDescriptor<T, Q, F>, ITypedFactoryCollectionDescriptor<T, F>, ITypedQueryableCollectionDescriptor<T, Q>, ITypedCollectionDescriptor<T>, ICollectionDescriptor { // eslint-disable-line max-len
   private _singularName: string;
   private _pluralName: string;
   private _isSingleton: boolean;
   private _parentCollectionDescriptor: ICollectionDescriptor | null;
   private _requiredDocuments: Array<T>;
+  private _queries: Q;
   private _factoryFunction: F | null;
 
   /**
@@ -63,13 +69,12 @@ export class CollectionDescriptor<T extends BT.IDocument, F> extends Object impl
     * @param {string} singularName The name for a single document of the type T.
     * @param {string} pluralName The name for multiple documents of the type T.
     * @param {boolean} isSingleton Whether the collection is ONLY allowed to contain a single document of type T or not.
+    * @param {QR.QuerySetConstructor<Q, T>} [querySetConstructor] The function that constructs the object containing the set of queries useful for reading and editing document instances of type T.
     * @param {ICollectionDescriptor | null} [parentCollectionDescriptor=null] The descriptor of the parent collection, if one exists.
     * @param {Array<T>} [requiredDocuments=[]] The list of documents that must exist in a valid installation of the system.
     * @param {F} [factoryFunction=null] The factory function that creates a document instance of type T.
     */
-  constructor(singularName: string, pluralName: string, isSingleton: boolean, parentCollectionDescriptor: ICollectionDescriptor | null = null, requiredDocuments: Array<T> = [], factoryFunction: F | null = null) { // eslint-disable-line max-len
-    super();
-
+  constructor(singularName: string, pluralName: string, isSingleton: boolean, querySetConstructor: QR.QuerySetConstructor<Q, T>, parentCollectionDescriptor: ICollectionDescriptor | null = null, requiredDocuments: Array<T> = [], factoryFunction: F | null = null) { // eslint-disable-line max-len
     let rootDescriptor = parentCollectionDescriptor;
     while (!TC.isNullish(rootDescriptor)) {
       if (rootDescriptor == this) {
@@ -83,6 +88,7 @@ export class CollectionDescriptor<T extends BT.IDocument, F> extends Object impl
     this._isSingleton = isSingleton;
     this._parentCollectionDescriptor = parentCollectionDescriptor;
     this._requiredDocuments = requiredDocuments;
+    this._queries = querySetConstructor(this);
     this._factoryFunction = factoryFunction;
   }
 
@@ -148,11 +154,11 @@ export class CollectionDescriptor<T extends BT.IDocument, F> extends Object impl
     * @return {T} The typed document.
     */
   castTo(document: unknown): T {
-    if (TC.isNullish(document)) {
-      throw new Error("A valid document (i.e. non-undefined AND non-null) must be supplied for casting.");
-    }
+    const typedDocument = (document as (T | null | undefined));
+    FB.assertDocumentIsValid(typedDocument);
 
-    return (document as T);
+    const typedDocumentNonNull = TC.convertNonNullish(typedDocument);
+    return typedDocumentNonNull;
   }
 
   /**
@@ -162,9 +168,7 @@ export class CollectionDescriptor<T extends BT.IDocument, F> extends Object impl
     * @return {admin.firestore.CollectionReference<admin.firestore.DocumentData>} The corresponding collection reference.
     */
   getCollection(db: admin.firestore.Firestore, pathFromRoot: Array<INestedCollectionStep> = []): admin.firestore.CollectionReference<admin.firestore.DocumentData> {
-    if (TC.isNullish(db)) {
-      throw new Error("A valid Firebase Firestore database must be supplied.");
-    }
+    FB.assertFirestoreIsNotNullish(db);
 
     if (!this.isNestedCollection) {
       return db.collection(this.collectionName);
@@ -197,9 +201,7 @@ export class CollectionDescriptor<T extends BT.IDocument, F> extends Object impl
     * @return {admin.firestore.CollectionGroup<admin.firestore.DocumentData>} The corresponding collection group.
     */
   getCollectionGroup(db: admin.firestore.Firestore): admin.firestore.CollectionGroup<admin.firestore.DocumentData> {
-    if (TC.isNullish(db)) {
-      throw new Error("A valid Firebase Firestore database must be supplied.");
-    }
+    FB.assertFirestoreIsNotNullish(db);
 
     if (!this.isNestedCollection) {
       // LATER: Consider throwing an Error here to force client code to use CollectionReference
@@ -207,17 +209,6 @@ export class CollectionDescriptor<T extends BT.IDocument, F> extends Object impl
     }
 
     return db.collectionGroup(this.collectionName);
-  }
-
-  /**
-   * Gets a Document by that Document's ID.
-   * @param {Firestore} db The Firestore Database to read from.
-   * @param {string | null | undefined} id The ID for the Document within the OPA system.
-   * @return {Promise<BT.IDocument | null>} The Document corresponding to the ID, or null if none exists.
-   */
-  async getDocumentForId(db: admin.firestore.Firestore, id: string | null | undefined): Promise<BT.IDocument | null> {
-    const typedDocument = await this.getTypedDocumentForId(db, id);
-    return typedDocument;
   }
 
   /**
@@ -244,35 +235,13 @@ export class CollectionDescriptor<T extends BT.IDocument, F> extends Object impl
   }
 
   /**
-   * Gets a Document by that Document's ID.
-   * @param {Firestore} db The Firestore Database to read from.
-   * @param {string | null | undefined} id The ID for the Document within the OPA system.
-   * @return {Promise<T | null>} The Document corresponding to the ID, or null if none exists.
-   */
-  async getTypedDocumentForId(db: admin.firestore.Firestore, id: string | null | undefined): Promise<T | null> {
-    if (TC.isNullish(db)) {
-      throw new Error("The Firestore DB must NOT be null.");
-    }
-    if (TC.isNullish(id)) {
-      return null;
-    }
-
-    const collectionRef = this.getTypedCollection(db);
-    const documentRef = collectionRef.doc(id as string);
-    const documentSnap = await documentRef.get();
-    const document = documentSnap.data();
-    return (!TC.isNullish(document)) ? (document as T) : null;
-  }
-
-  /**
     * Loads the required document instances into the Firebase Firestore collection corresponding to the document type.
     * @param {Firestore} db The Firebase Firestore database.
     * @param {boolean} eraseExistingDocs Whether to erase the existing documents in the collection before loading the currently required documents.
-    * @param {string} [documentIdPropertyName=Default_DocumentId_PropertyName] The property name to use to obtain the ID of the document instance.
     * @param {Array<INestedCollectionStep>} [pathFromRoot=[]] The path to the nested collection from the root of the database.
     * @return {Promise<void>} A Promise containing an empty result.
     */
-  async loadRequiredDocuments(db: admin.firestore.Firestore, eraseExistingDocs: boolean, documentIdPropertyName: string = Default_DocumentId_PropertyName, pathFromRoot: Array<INestedCollectionStep> = []): Promise<void> { // eslint-disable-line max-len
+  async loadRequiredDocuments(db: admin.firestore.Firestore, eraseExistingDocs: boolean, pathFromRoot: Array<INestedCollectionStep> = []): Promise<void> { // eslint-disable-line max-len
     const collectionRef = this.getTypedCollection(db, pathFromRoot);
 
     if (eraseExistingDocs) {
@@ -281,11 +250,18 @@ export class CollectionDescriptor<T extends BT.IDocument, F> extends Object impl
 
     for (let i = 0; i < this.requiredDocuments.length; i++) {
       const requiredDocument = this.requiredDocuments[i];
-      const requiredDocumentAsCollection = ((requiredDocument as unknown) as BT.ICollection);
-      const documentId = (requiredDocumentAsCollection[documentIdPropertyName] as string);
+      const documentId = requiredDocument.id;
       const documentRef = collectionRef.doc(documentId);
       await documentRef.set(requiredDocument, {merge: true});
     }
+  }
+
+  /**
+    * The set of queries useful for reading and editing document instances of type T.
+    * @type {Q}
+    */
+  get queries(): Q {
+    return this._queries;
   }
 
   /**

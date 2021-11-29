@@ -2,27 +2,75 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as OPA from "../../base/src";
 import * as OpaDm from "../../datamodel/src";
+import {OpaDbDescriptor as OpaDb} from "../../datamodel/src";
 import {Application} from "../../domainlogic/src";
+import * as UTL from "./Utilities";
 
 export const isInstalled = functions.https.onCall(async (data, context) => { // eslint-disable-line @typescript-eslint/no-unused-vars
   try {
-    const db = admin.firestore();
+    const firebaseAdminApp = admin.app();
+    const dataStorageState = await UTL.getDataStorageStateForFirebaseApp(firebaseAdminApp);
+    const authenticationState = await UTL.getAuthenticationStateForContextAndApp(context, firebaseAdminApp);
 
-    const authenticationContext = (context) ? context.auth : null;
-    const firebaseAuthUserId = (authenticationContext) ? authenticationContext.uid : null;
+    const firebaseAuthUserId = (!OPA.isNullish(authenticationState)) ? OPA.convertNonNullish(authenticationState).firebaseAuthUserId : null;
     const isUserAuthenticated = (!OPA.isNullishOrWhitespace(firebaseAuthUserId));
-    const user = await OpaDm.getUserByFirebaseAuthUserId(db, firebaseAuthUserId);
 
-    const isInstalled = await Application.isInstalled(db);
+    const isInstalled = await Application.isInstalled(dataStorageState);
     const message = (isInstalled) ? "The OPA system is installed." : "The OPA system is NOT currently installed.";
-    let data: unknown = {isInstalled};
 
-    if (isUserAuthenticated && ((user?.assignedRoleId == OpaDm.Role_OwnerId) || (user?.assignedRoleId == OpaDm.Role_AdministratorId))) {
-      const usesFunctionsEmulator = (OPA.getBoolean(process.env.FUNCTIONS_EMULATOR) == true);
-      const usesAuthenticationEmulator = (!OPA.isNullishOrWhitespace(process.env.FIREBASE_AUTH_EMULATOR_HOST));
-      const usesFirestoreEmulator = (!OPA.isNullishOrWhitespace(process.env.FIRESTORE_EMULATOR_HOST));
-      const usesStorageEmulator = (!OPA.isNullishOrWhitespace(process.env.STORAGE_EMULATOR_HOST));
-      data = {isInstalled, usesFunctionsEmulator, usesAuthenticationEmulator, usesFirestoreEmulator, usesStorageEmulator};
+    let archive: OpaDm.IArchive | null = null;
+    let locale: OpaDm.ILocale | null = null;
+    let data: unknown = {isInstalled, isAuthenticated: false, isAuthorized: false};
+
+    if (isInstalled) {
+      archive = await OpaDb.Archive.queries.getById(dataStorageState.db, OpaDm.ArchiveId);
+      OPA.assertNonNullish(archive, "The Archive of the installation must not be null.");
+      const archiveNonNull = OPA.convertNonNullish(archive);
+
+      locale = await OpaDb.Locales.queries.getById(dataStorageState.db, archiveNonNull.defaultLocaleId);
+      OPA.assertNonNullish(locale, "The default Locale for the Archive must not be null.");
+      const localeNonNull = OPA.convertNonNullish(locale);
+
+      const archiveName = OPA.getLocalizedText(archiveNonNull.name, localeNonNull.optionName);
+      data = Object.assign(data, {archiveName: archiveName});
+    }
+
+    if (isUserAuthenticated) {
+      const firebaseAuthUserIdNonNull = OPA.convertNonNullish(firebaseAuthUserId);
+      const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(dataStorageState.db, firebaseAuthUserIdNonNull);
+
+      if (OPA.isNullish(user)) {
+        // NOTE: This error case must not be fatal here, but should be handled elsewhere
+        data = Object.assign(data, {isAuthenticated: true, firebaseAuthUserId: firebaseAuthUserIdNonNull, isAuthorized: false});
+      } else {
+        const userNonNull = OPA.convertNonNullish(user);
+
+        if (!OPA.isNullish(archive)) {
+          locale = await OpaDb.Locales.queries.getById(dataStorageState.db, userNonNull.localeId);
+          OPA.assertNonNullish(locale, "The Locale for the User must not be null.");
+          const localeNonNull = OPA.convertNonNullish(locale);
+
+          const archiveNonNull = OPA.convertNonNullish(archive);
+          const archiveName = OPA.getLocalizedText(archiveNonNull.name, localeNonNull.optionName);
+          data = Object.assign(data, {archiveName: archiveName});
+        }
+
+        const userIsAuthorized = (userNonNull.approvalState == OpaDm.ApprovalStates.approved);
+        const userId = userNonNull.id;
+        const displayName = (userNonNull.preferredName) ? userNonNull.preferredName : userNonNull.firstName;
+        const accessRequests = await OpaDb.AccessRequests.queries.getAllForUserId(dataStorageState.db, userId);
+        const numberOfAccessRequests = accessRequests.length;
+
+        data = Object.assign(data, {isAuthenticated: true, firebaseAuthUserId: firebaseAuthUserIdNonNull, isAuthorized: userIsAuthorized, userId: userNonNull.id, displayName: displayName, numberOfAccessRequests: numberOfAccessRequests}); // eslint-disable-line max-len
+
+        if ((userNonNull.assignedRoleId == OpaDm.Role_OwnerId) || (userNonNull.assignedRoleId == OpaDm.Role_AdministratorId)) {
+          const usesFunctionsEmulator = (OPA.getBoolean(process.env.FUNCTIONS_EMULATOR) == true);
+          const usesAuthenticationEmulator = (!OPA.isNullishOrWhitespace(process.env.FIREBASE_AUTH_EMULATOR_HOST));
+          const usesFirestoreEmulator = (!OPA.isNullishOrWhitespace(process.env.FIRESTORE_EMULATOR_HOST));
+          const usesStorageEmulator = (!OPA.isNullishOrWhitespace(process.env.STORAGE_EMULATOR_HOST));
+          data = Object.assign(data, {usesFunctionsEmulator, usesAuthenticationEmulator, usesFirestoreEmulator, usesStorageEmulator});
+        }
+      }
     }
 
     return OPA.getSuccessResult(message, data);
@@ -31,17 +79,12 @@ export const isInstalled = functions.https.onCall(async (data, context) => { // 
   }
 });
 
-
-// export async function getInstallationScreenDisplayModel(): Promise<IInstallationScreenDisplayModel> {
-
 export const getInstallationScreenDisplayModel = functions.https.onCall(async (data, context) => { // eslint-disable-line @typescript-eslint/no-unused-vars
   try {
-    const db = admin.firestore();
+    const firebaseAdminApp = admin.app();
+    const callState = await UTL.getCallStateForFirebaseContextAndApp(context, firebaseAdminApp);
 
-    const authenticationContext = (context) ? context.auth : null;
-    const firebaseAuthUserId = (authenticationContext) ? authenticationContext.uid : null;
-
-    const displayModel = await Application.getInstallationScreenDisplayModel(db, firebaseAuthUserId);
+    const displayModel = await Application.getInstallationScreenDisplayModel(callState);
 
     return OPA.getSuccessResult("", displayModel);
   } catch (error) {
@@ -49,17 +92,62 @@ export const getInstallationScreenDisplayModel = functions.https.onCall(async (d
   }
 });
 
-export const performInstall = functions.https.onCall(async (data, context) => { // eslint-disable-line @typescript-eslint/no-unused-vars
+export const performInstall = functions.https.onCall(async (data, context) => {
   try {
-    throw new Error("NOT IMPLEMENTED!");
+    const firebaseAdminApp = admin.app();
+    const callState = await UTL.getCallStateForFirebaseContextAndApp(context, firebaseAdminApp);
+
+    const archiveName = (data.query.archiveName) ? data.query.archiveName : undefined;
+    OPA.assertNonNullishOrWhitespace(archiveName, "The Archive name must not be blank.");
+    const archiveDescription = (data.query.archiveDescription) ? data.query.archiveDescription : undefined;
+    OPA.assertNonNullishOrWhitespace(archiveDescription, "The Archive description must not be blank.");
+    const pathToStorageFolder = (data.query.pathToStorageFolder) ? data.query.pathToStorageFolder : undefined;
+    OPA.assertNonNullishOrWhitespace(pathToStorageFolder, "The Archive storage path must not be blank.");
+    const defaultLocaleId = (data.query.defaultLocaleId) ? data.query.defaultLocaleId : undefined;
+    OPA.assertNonNullishOrWhitespace(defaultLocaleId, "The Archive default locale must not be blank.");
+    const defaultTimeZoneGroupId = (data.query.defaultTimeZoneGroupId) ? data.query.defaultTimeZoneGroupId : undefined;
+    OPA.assertNonNullishOrWhitespace(defaultTimeZoneGroupId, "The Archive default time zone group must not be blank.");
+    // const defaultTimeZoneId = (data.query.defaultTimeZoneId) ? data.query.defaultTimeZoneId : undefined;
+    // OPA.assertNonNullishOrWhitespace(defaultTimeZoneId, "The Archive default time zone must not be blank.");
+    const ownerFirstName = (data.query.ownerFirstName) ? data.query.ownerFirstName : "";
+    const ownerLastName = (data.query.ownerLastName) ? data.query.ownerLastName : "";
+    const installResult = await Application.performInstall(callState.dataStorageState, callState.authenticationState, archiveName, archiveDescription, pathToStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, ownerFirstName, ownerLastName); // eslint-disable-line max-len
+
+    return OPA.getSuccessResult("", installResult);
   } catch (error) {
     return OPA.getFailureResult(error as Error);
   }
 });
 
-export const performUninstall = functions.https.onCall(async (data, context) => { // eslint-disable-line @typescript-eslint/no-unused-vars
+export const updateInstallationSettings = functions.https.onCall(async (data, context) => {
   try {
-    throw new Error("NOT IMPLEMENTED!");
+    const firebaseAdminApp = admin.app();
+    const callState = await UTL.getCallStateForFirebaseContextAndApp(context, firebaseAdminApp);
+
+    const archiveName = (data.query.archiveName) ? data.query.archiveName : undefined;
+    const archiveDescription = (data.query.archiveDescription) ? data.query.archiveDescription : undefined;
+    const defaultLocaleId = (data.query.defaultLocaleId) ? data.query.defaultLocaleId : undefined;
+    const defaultTimeZoneGroupId = (data.query.defaultTimeZoneGroupId) ? data.query.defaultTimeZoneGroupId : undefined;
+    const defaultTimeZoneId = (data.query.defaultTimeZoneId) ? data.query.defaultTimeZoneId : undefined;
+    await Application.updateInstallationSettings(callState, archiveName, archiveDescription, defaultLocaleId, defaultTimeZoneGroupId, defaultTimeZoneId);
+
+    const displayModel = await Application.getInstallationScreenDisplayModel(callState);
+
+    return OPA.getSuccessResult("", displayModel);
+  } catch (error) {
+    return OPA.getFailureResult(error as Error);
+  }
+});
+
+export const performUninstall = functions.https.onCall(async (data, context) => {
+  try {
+    const firebaseAdminApp = admin.app();
+    const callState = await UTL.getCallStateForFirebaseContextAndApp(context, firebaseAdminApp);
+
+    const doBackupFirst = OPA.convertNonNullish(OPA.getBoolean(data.query.doBackupFirst, true));
+    const uninstallResult = await Application.performUninstall(callState.dataStorageState, callState.authenticationState, callState.authorizationState, doBackupFirst);
+
+    return OPA.getSuccessResult("", uninstallResult);
   } catch (error) {
     return OPA.getFailureResult(error as Error);
   }

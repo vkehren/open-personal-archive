@@ -7,9 +7,17 @@ const PluralName = "Archives";
 const IsSingleton = true;
 export const SingletonId = "OPA_Archive";
 
-export const CollectionDescriptor = new OPA.CollectionDescriptor<IArchive, void>(SingularName, PluralName, IsSingleton, null, []);
+export interface IArchivePartial {
+  name?: OPA.ILocalizable<string>;
+  description?: OPA.ILocalizable<string>;
+  defaultLocaleId?: string;
+  defaultTimeZoneGroupId?: string;
+  defaultTimeZoneId?: string;
+  userIdForLatestUpdate?: string;
+  dateOfLatestUpdate?: UTL.DateShim;
+}
 
-export interface IArchive extends OPA.IDocument {
+export interface IArchive extends OPA.IDocument, IArchivePartial {
   readonly id: string;
   name: OPA.ILocalizable<string>;
   description: OPA.ILocalizable<string>;
@@ -34,7 +42,7 @@ export interface IArchive extends OPA.IDocument {
   * @param {ITimeZoneGroup} defaultTimeZoneGroup The default TimeZoneGroup to use for the Archive.
   * @return {IArchive} The new document instance.
   */
-export function createInstance(name: string, description: string, pathToStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): IArchive {
+export function createSingleton(name: string, description: string, pathToStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): IArchive {
   const now = UTL.now();
   const names: OPA.ILocalizable<string> = {en: name};
   names[defaultLocale.optionName] = name;
@@ -57,3 +65,6 @@ export function createInstance(name: string, description: string, pathToStorageF
   };
   return document;
 }
+
+export type QuerySet = OPA.QuerySet<IArchive>;
+export const CollectionDescriptor = new OPA.CollectionDescriptor<IArchive, QuerySet, void>(SingularName, PluralName, IsSingleton, (cd) => new OPA.QuerySet(cd), null, []);

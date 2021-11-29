@@ -188,6 +188,68 @@ export function isBoolean(value: unknown): boolean {
  * @param {BT.GuardFunc<T>} guardFunc The guard function to apply.
  * @return {boolean} The result of checking.
  */
-export function isOfType<T>(value: unknown, guardFunc: BT.GuardFunc<T>): value is T {
+export function isOf<T>(value: unknown, guardFunc: BT.GuardFunc<T>): value is T {
+  if (isNullish(value)) {
+    throw new Error("The value to check the type of must not be null or undefined.");
+  }
   return guardFunc(value as T);
+}
+
+/**
+ * Converts a value of unknown type to a value of type T.
+ * @param {unknown} value The value to convert.
+ * @param {BT.GuardFunc<T> | undefined} [guardFunc=undefined] The optional guard function to apply.
+ * @return {T} The result of conversion.
+ */
+export function convertTo<T>(value: unknown, guardFunc: BT.GuardFunc<T> | undefined = undefined): T {
+  if (isNullish(value)) {
+    throw new Error("The value to convert must NOT be null or undefined.");
+  }
+  if (!isNullish(guardFunc)) {
+    if (!isOf<T>(value, convertNonNullish(guardFunc))) {
+      throw new Error("The value provided must be of type T.");
+    }
+  }
+  return (value as T);
+}
+
+/**
+ * Converts a nullish-able value of type T to a non-nullish value.
+ * @param {T | null | undefined} value The value to convert.
+ * @param {T | undefined} [defaultValue=undefined] The optional default value. If not specifed, providing a nullish value for the value will cause error.
+ * @return {T} The result of conversion.
+ */
+export function convertNonNullish<T>(value: T | null | undefined, defaultValue: T | undefined = undefined): T {
+  if (isNullish(value)) {
+    if (isNullish(defaultValue)) {
+      throw new Error("The value to convert must NOT be null or undefined, unless a default value is provided.");
+    } else {
+      value = defaultValue;
+    }
+  }
+  return (value as T);
+}
+
+/**
+ * Asserts that a value is NOT nullish.
+ * @param {unknown} value The value to check.
+ * @param {string} [message="A non-null value must be provided."] The message to display on failure of assertion.
+ * @return {void}
+ */
+export function assertNonNullish(value: unknown, message = "A non-null value must be provided."): void {
+  if (isNullish(value)) {
+    throw new Error(message);
+  }
+}
+
+/**
+ * Asserts that a value is NOT nullish or whitespace.
+ * @param {unknown} value The value to check.
+ * @param {string} [message="A non-null, non-whitespace value must be provided."] The message to display on failure of assertion.
+ * @return {void}
+ */
+export function assertNonNullishOrWhitespace(value: unknown, message = "A non-null, non-whitespace value must be provided."): void {
+  if (isNullishOrWhitespace(value)) {
+    throw new Error(message);
+  }
 }

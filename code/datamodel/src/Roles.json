@@ -3,30 +3,35 @@
     {
       "id": "OPA_Role_Owner",
       "name": "Owner",
+      "type": "owner",
       "displayOrder": 100,
       "isDefault": false
     },
     {
       "id": "OPA_Role_Administrator",
       "name": "Administrator",
+      "type": "administrator",
       "displayOrder": 200,
       "isDefault": false
     },
     {
       "id": "OPA_Role_Editor",
       "name": "Editor",
+      "type": "editor",
       "displayOrder": 300,
       "isDefault": false
     },
     {
       "id": "OPA_Role_Viewer",
       "name": "Viewer",
+      "type": "viewer",
       "displayOrder": 400,
       "isDefault": false
     },
     {
       "id": "OPA_Role_Guest",
       "name": "Guest",
+      "type": "guest",
       "displayOrder": 500,
       "isDefault": true
     }

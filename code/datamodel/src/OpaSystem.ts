@@ -6,8 +6,6 @@ const PluralName = "OpaSystems";
 const IsSingleton = true;
 export const SingletonId = "OPA_OpaSystem";
 
-export const CollectionDescriptor = new OPA.CollectionDescriptor<IOpaSystem, void>(SingularName, PluralName, IsSingleton, null, []);
-
 export interface IOpaSystem extends OPA.IDocument {
   readonly id: string;
   applicationVersion: string;
@@ -22,7 +20,7 @@ export interface IOpaSystem extends OPA.IDocument {
   * @param {string} schemaVersion The version of the OPA database schema.
   * @return {IOpaSystem} The new document instance.
   */
-export function createInstance(applicationVersion: string, schemaVersion: string): IOpaSystem {
+export function createSingleton(applicationVersion: string, schemaVersion: string): IOpaSystem {
   const now = UTL.now();
   const document: IOpaSystem = {
     id: SingletonId,
@@ -33,3 +31,6 @@ export function createInstance(applicationVersion: string, schemaVersion: string
   };
   return document;
 }
+
+export type QuerySet = OPA.QuerySet<IOpaSystem>;
+export const CollectionDescriptor = new OPA.CollectionDescriptor<IOpaSystem, QuerySet, void>(SingularName, PluralName, IsSingleton, (cd) => new OPA.QuerySet(cd), null, []);

@@ -6,8 +6,6 @@ const PluralName = "Locales";
 const IsSingleton = false;
 const RequiredDocuments: Array<ILocale> = CollectionData.requiredDocuments;
 
-export const CollectionDescriptor = new OPA.CollectionDescriptor<ILocale, void>(SingularName, PluralName, IsSingleton, null, RequiredDocuments);
-
 export interface ILocale extends OPA.IDocument {
   readonly id: string;
   readonly optionName: string;
@@ -16,3 +14,6 @@ export interface ILocale extends OPA.IDocument {
   readonly displayOrder: number;
   readonly isDefault: boolean;
 }
+
+export type QuerySet = OPA.QuerySet<ILocale>;
+export const CollectionDescriptor = new OPA.CollectionDescriptor<ILocale, QuerySet, void>(SingularName, PluralName, IsSingleton, (cd) => new OPA.QuerySet(cd), null, RequiredDocuments);
