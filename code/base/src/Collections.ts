@@ -31,9 +31,10 @@ export function createMapFromArray<K, V>(array: Array<V>, keyGetterFunc: BT.Gett
  * Takes in a container object and returns an array of values of type T contained in that object.
  * @param {unknown} container The container object.
  * @param {BT.GuardFunc<T>} guardFunc The guard function to apply to check type T.
+ * @param {BT.FilterFunc<T> | undefined} [filterFunc=undefined] The filter function to apply to include results.
  * @return {Array<ICollectionDescriptor>} The list of contained values of type T.
  */
-export function getCollectionFromObject<T>(container: unknown, guardFunc: BT.GuardFunc<T>): Array<T> {
+export function getCollectionFromObject<T>(container: unknown, guardFunc: BT.GuardFunc<T>, filterFunc: BT.FilterFunc<T> | undefined = undefined): Array<T> {
   const result: Array<T> = [];
   if (TC.isNullishOrEmpty(container)) {
     return result;
@@ -49,8 +50,15 @@ export function getCollectionFromObject<T>(container: unknown, guardFunc: BT.Gua
     const key = ownPropertyKeys[i];
     const value = containerDict[key];
 
-    if (!TC.isNullish(value) && TC.isOfType(value, guardFunc)) {
-      result.push(value);
+    if (!TC.isNullish(value) && TC.isOf<T>(value, guardFunc)) {
+      if (TC.isNullish(filterFunc)) {
+        result.push(value);
+      } else {
+        const filterFuncNonNull = TC.convertTo<BT.FilterFunc<T>>(filterFunc);
+        if (filterFuncNonNull(value)) {
+          result.push(value);
+        }
+      }
     }
   }
   return result;

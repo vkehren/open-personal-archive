@@ -2,9 +2,11 @@
 
 export type GetterFunc<T, V> = (value: T, propName?: string | symbol) => V;
 export type GuardFunc<T> = (value: T) => boolean;
+export type FilterFunc<T> = (value: T) => boolean;
 export type ComparisonFunc<T> = (item1: T, item2: T) => number; // NOTE: (item1 < item2) => -1, (item1 == item2) => 0, else 1
 export type MappingFunc<T1, T2> = (item: T1) => T2;
 
+export const IDocument_DocumentId_PropertyName = "id"; // eslint-disable-line camelcase
 export interface IDocument {
   id: string,
 }

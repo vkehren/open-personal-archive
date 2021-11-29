@@ -1,7 +1,6 @@
 import * as TC from "./TypeChecking";
 
 // export const name = "ValueChecking";
-const WhitespaceRegExp = /\s/gu;
 
 /**
  * @constant
@@ -62,7 +61,7 @@ export function isWhitespace(value: string, includeEmptyAsWhitespace: boolean = 
   if (includeEmptyAsWhitespace && isEmpty(value)) {
     return true;
   }
-  return WhitespaceRegExp.test(value);
+  return (value.trim().length <= 0);
 }
 
 /**
@@ -111,5 +110,29 @@ export function getBoolean(untypedValue: unknown, defaultTypedValue: boolean | u
     return defaultTypedValue;
   } else {
     return null;
+  }
+}
+
+/**
+ * Asserts that a value is true.
+ * @param {boolean} value The value to check.
+ * @param {string} [message="The value expected to be true was actually false."] The message to display on failure of assertion.
+ * @return {void}
+ */
+export function assertIsTrue(value: boolean, message = "The value expected to be true was actually false."): void {
+  if (!value) {
+    throw new Error(message);
+  }
+}
+
+/**
+ * Asserts that a value is false.
+ * @param {boolean} value The value to check.
+ * @param {string} [message="The value expected to be false was actually true."] The message to display on failure of assertion.
+ * @return {void}
+ */
+export function assertIsFalse(value: boolean, message = "The value expected to be false was actually true."): void {
+  if (value) {
+    throw new Error(message);
   }
 }

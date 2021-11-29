@@ -35,10 +35,12 @@ export function setFirebaseToUseCloud(credential: string): void {
   if (originalProcessEnv.GOOGLE_APPLICATION_CREDENTIALS == undefined) {
     originalProcessEnv.GOOGLE_APPLICATION_CREDENTIALS = process.env.GOOGLE_APPLICATION_CREDENTIALS;
   }
-  if (originalProcessEnv.GCLOUD_PROJECT != undefined) {
-    process.env.GCLOUD_PROJECT = originalProcessEnv.GCLOUD_PROJECT;
+  if ((originalProcessEnv.GCP_PROJECT != undefined) || (originalProcessEnv.GCLOUD_PROJECT != undefined)) {
+    process.env.GCP_PROJECT = originalProcessEnv.GCP_PROJECT;
+    process.env.GCLOUD_PROJECT = originalProcessEnv.GCLOUD_PROJECT; // deprecated (see https://cloud.google.com/functions/docs/configuring/env-var#runtime_environment_variables_set_automatically)
     process.env.FIREBASE_AUTH_EMULATOR_HOST = originalProcessEnv.FIREBASE_AUTH_EMULATOR_HOST;
     process.env.FIRESTORE_EMULATOR_HOST = originalProcessEnv.FIRESTORE_EMULATOR_HOST;
+    process.env.STORAGE_EMULATOR_HOST = originalProcessEnv.STORAGE_EMULATOR_HOST;
   }
   process.env.GOOGLE_APPLICATION_CREDENTIALS = credential;
 }
@@ -48,20 +50,25 @@ export function setFirebaseToUseCloud(credential: string): void {
  * @param {string} projectId The project ID (can be any valid Firebase project ID).
  * @param {string} authenticationHost The address and port of the authentication emulator host.
  * @param {string} firestoreHost The address and port of the firestore emulator host.
+ * @param {string} storageHost The address and port of the storage emulator host.
  * @return {void}
  */
-export function setFirebaseToUseEmulators(projectId: string, authenticationHost: string, firestoreHost: string): void {
-  if (originalProcessEnv.GCLOUD_PROJECT == undefined) {
-    originalProcessEnv.GCLOUD_PROJECT = process.env.GCLOUD_PROJECT;
+export function setFirebaseToUseEmulators(projectId: string, authenticationHost: string, firestoreHost: string, storageHost: string): void {
+  if ((originalProcessEnv.GCP_PROJECT == undefined) || (originalProcessEnv.GCLOUD_PROJECT == undefined)) {
+    originalProcessEnv.GCP_PROJECT = process.env.GCP_PROJECT;
+    originalProcessEnv.GCLOUD_PROJECT = process.env.GCLOUD_PROJECT; // deprecated (see https://cloud.google.com/functions/docs/configuring/env-var#runtime_environment_variables_set_automatically)
     originalProcessEnv.FIREBASE_AUTH_EMULATOR_HOST = process.env.FIREBASE_AUTH_EMULATOR_HOST;
     originalProcessEnv.FIRESTORE_EMULATOR_HOST = process.env.FIRESTORE_EMULATOR_HOST;
+    originalProcessEnv.STORAGE_EMULATOR_HOST = process.env.STORAGE_EMULATOR_HOST;
   }
   if (originalProcessEnv.GOOGLE_APPLICATION_CREDENTIALS != undefined) {
     process.env.GOOGLE_APPLICATION_CREDENTIALS = originalProcessEnv.GOOGLE_APPLICATION_CREDENTIALS;
   }
-  process.env.GCLOUD_PROJECT = projectId;
+  process.env.GCP_PROJECT = projectId;
+  process.env.GCLOUD_PROJECT = projectId; // deprecated (see https://cloud.google.com/functions/docs/configuring/env-var#runtime_environment_variables_set_automatically)
   process.env.FIREBASE_AUTH_EMULATOR_HOST = authenticationHost;
   process.env.FIRESTORE_EMULATOR_HOST = firestoreHost;
+  process.env.STORAGE_EMULATOR_HOST = storageHost;
 }
 
 /**
@@ -86,15 +93,79 @@ export function convertFromFirestoreDocument<T>(snapshot: FirebaseFirestore.Quer
 }
 
 /**
+ * Asserts that the Firebase Firestore database is NOT nullish.
+ * @param {Firestore | null | undefined} db The Firebase Firestore database.
+ * @param {string} [message=default] The message to display on failure of assertion.
+ * @return {void}
+ */
+export function assertFirestoreIsNotNullish(db: admin.firestore.Firestore | null | undefined, message = "A valid Firebase Firestore database must be provided."): void {
+  if (TC.isNullish(db)) {
+    throw new Error(message);
+  }
+}
+
+/**
+ * Asserts that the Firebase Firestore document and its corresponding ID is NOT nullish.
+ * @param {T | null | undefined} document The Firebase Firestore document.
+ * @param {string} [invalidDocMessage=default] The message to display on failure of document assertion.
+ * @param {string} [invalidIdMessage=default] The message to display on failure of ID property assertion.
+ * @return {void}
+ */
+export function assertDocumentIsValid<T extends BT.IDocument>(document: T | null | undefined, invalidDocMessage = "A valid document must be provided.", invalidIdMessage = "A valid document ID must be provided."): void { // eslint-disable-line max-len
+  if (TC.isNullish(document)) {
+    throw new Error(invalidDocMessage);
+  }
+
+  const documentNonNull = TC.convertNonNullish(document);
+  assertIdentifierIsValid(documentNonNull.id, invalidIdMessage);
+}
+
+/**
+ * Asserts that the Firebase Firestore document ID is NOT nullish.
+ * @param {string | null | undefined} id The Firebase Firestore document ID.
+ * @param {string} [message=default] The message to display on failure of assertion.
+ * @return {void}
+ */
+export function assertIdentifierIsValid<T extends BT.IDocument>(id: string | null | undefined, message = "A valid document ID must be provided."): void {
+  if (TC.isNullishOrWhitespace(id)) {
+    throw new Error(message);
+  }
+}
+
+/**
+ * Asserts that the Open Personal Archive™ (OPA) system is installed.
+ * @param {boolean} isInstalled Whether the OPA system is installed or not.
+ * @param {string} [message=default] The message to display on failure of assertion.
+ * @return {boolean} Whether the OPA system is installed or not.
+ */
+export function assertOpaIsInstalled(isInstalled: boolean, message = "The Open Personal Archive™ (OPA) system is not currently installed."): boolean {
+  if (!isInstalled) {
+    throw new Error(message);
+  }
+  return isInstalled;
+}
+
+/**
+ * Asserts that the Open Personal Archive™ (OPA) system is NOT installed.
+ * @param {boolean} isInstalled Whether the OPA system is installed or not.
+ * @param {string} [message=default] The message to display on failure of assertion.
+ * @return {boolean} Whether the OPA system is installed or not.
+ */
+export function assertOpaIsNotInstalled(isInstalled: boolean, message = "The Open Personal Archive™ (OPA) system has already been installed."): boolean {
+  if (isInstalled) {
+    throw new Error(message);
+  }
+  return isInstalled;
+}
+
+/**
  * Deletes all documents from a Firebase Firestore collection within the given DB.
  * @param {Firestore} db The Firebase Firestore database.
  * @param {string} collectionName The collection name to clear.
  * @return {Promise<void>}
  */
 export async function clearFirestoreCollectionInDb(db: admin.firestore.Firestore, collectionName: string): Promise<void> {
-  if (TC.isNullish(db)) {
-    throw new Error("A valid Firebase Firestore database must be provided.");
-  }
+  assertFirestoreIsNotNullish(db);
 
   const collectionRef = db.collection(collectionName);
   return await clearFirestoreCollection(collectionRef);
