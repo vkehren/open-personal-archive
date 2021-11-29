@@ -1,47 +1,51 @@
-import * as admin from "firebase-admin";
 import * as OPA from "../../base/src";
 import * as OpaDm from "../../datamodel/src";
-import {createArchive, createSystem, IAuthenticationProvider, IArchive, ILocale, ITimeZoneGroup, IUser, OpaDbDescriptor as OpaDb} from "../../datamodel/src";
+import {createArchive, createSystem, getAuthorizationData, IArchivePartial, IAuthorizationData, ILocale, ITimeZoneGroup, OpaDbDescriptor as OpaDb} from "../../datamodel/src";
 import * as SchemaConfig from "../../datamodel/package.json";
 import * as ApplicationConfig from "../package.json";
 
 export interface IInstallationScreenDisplayModel {
-  readonly firebaseProjectName: string;
-  readonly isInstalled: boolean;
+  readonly authorizationData: IAuthorizationData;
   archiveName: string;
   archiveDescription: string;
   pathToStorageFolder: string;
   validLocales: Array<ILocale>;
-  selectedLocale: ILocale;
+  selectedLocale: ILocale | null;
   validTimeZoneGroups: Array<ITimeZoneGroup>;
-  selectedTimeZoneGroup: ITimeZoneGroup;
+  selectedTimeZoneGroup: ITimeZoneGroup | null;
 }
 
 /**
  * Determines whether the Open Personal Archive™ (OPA) system is currently installed.
- * @param {Firestore} db The Firestore Database to read from.
+ * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
  * @return {Promise<boolean>} Whether the OPA system is installed.
  */
-export async function isInstalled(db: admin.firestore.Firestore): Promise<boolean> {
-  if (OPA.isNullish(db)) {
-    throw new Error("The Firestore DB must NOT be null.");
-  }
+export async function isInstalled(dataStorageState: OpaDm.IDataStorageState): Promise<boolean> {
+  OPA.assertNonNullish(dataStorageState, "The Data Storage State must not be null.");
+  OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
-  const system = await OpaDb.OpaSystem.getTypedDocumentForId(db, OpaDm.OpaSystemId);
+  const db = dataStorageState.db;
+  const system = await OpaDb.OpaSystem.queries.getById(db, OpaDm.OpaSystemId);
   return (!OPA.isNullish(system));
 }
 
 /**
  * Gets the screen display model for the Open Personal Archive™ (OPA) installation screen.
- * @param {Firestore} db The Firestore Database to read from.
- * @param {string | null | undefined} [firebaseAuthUserId=undefined] The ID for the current User within the Firebase Authentication system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
  * @return {Promise<InstallationScreenDisplayModel>}
  */
-export async function getInstallationScreenDisplayModel(db: admin.firestore.Firestore, firebaseAuthUserId: string | null | undefined = undefined): Promise<IInstallationScreenDisplayModel> {
-  const hasBeenInstalled = await isInstalled(db);
-  const displayModel: IInstallationScreenDisplayModel = {
-    firebaseProjectName: admin.app().name,
-    isInstalled: hasBeenInstalled,
+export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallState): Promise<IInstallationScreenDisplayModel> {
+  OPA.assertNonNullish(callState, "The Call State must not be null.");
+  OPA.assertNonNullish(callState.dataStorageState, "The Data Storage State must not be null.");
+  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+
+  // NOTE: First handle case where OPA is NOT installed
+  const firebaseProjectId = callState.dataStorageState.projectId;
+  const usesFirebaseEmulators = callState.dataStorageState.usesEmulators;
+  const isOpaSystemInstalled = await isInstalled(callState.dataStorageState);
+
+  const defaultDisplayModel: IInstallationScreenDisplayModel = {
+    authorizationData: {firebaseProjectId, usesFirebaseEmulators, isOpaSystemInstalled, userData: null, roleData: null},
     archiveName: "(a name for the archive)",
     archiveDescription: "(a description for the archive)",
     pathToStorageFolder: "./",
@@ -51,75 +55,86 @@ export async function getInstallationScreenDisplayModel(db: admin.firestore.Fire
     selectedTimeZoneGroup: OpaDb.TimeZoneGroups.requiredDocuments.filter((value: ITimeZoneGroup) => value.isDefault)[0],
   };
 
-  if (!hasBeenInstalled) {
-    return displayModel;
+  if (!isOpaSystemInstalled) {
+    return defaultDisplayModel;
   }
 
-  const currentUser = await OpaDb.Users.getTypedDocumentForId(db, firebaseAuthUserId);
-  if (OPA.isNullish(currentUser)) {
-    throw new Error("The current User must be authenticated.");
-  }
+  // NOTE: Handle case where OPA is installed
+  OPA.assertNonNullish(callState.archiveState, "The Archive State must not be null.");
+  OPA.assertNonNullish(callState.authenticationState, "The Authentication State must not be null.");
+  OPA.assertNonNullish(callState.authorizationState, "The Authorization State must not be null.");
 
-  const currentUserNonNull = ((currentUser as unknown) as IUser);
-  if (currentUserNonNull.id != OpaDm.User_OwnerId) {
-    throw new Error("Only the Archive Owner is allowed to change the Archive configuration.");
-  }
+  const dataStorageStateNonNull = OPA.convertNonNullish(callState.dataStorageState);
+  const archiveStateNonNull = OPA.convertNonNullish(callState.archiveState);
+  const authorizationStateNonNull = OPA.convertNonNullish(callState.authorizationState);
+  const authorizedRoleIds = [OpaDm.Role_OwnerId, OpaDm.Role_AdministratorId];
 
-  const archive = await OpaDb.Archive.getTypedDocumentForId(db, OpaDm.ArchiveId);
-  if (OPA.isNullish(archive)) {
-    throw new Error("The Archive does not exist.");
-  }
+  authorizationStateNonNull.assertUserApproved();
+  authorizationStateNonNull.assertRoleAllowed(authorizedRoleIds);
 
-  const archiveNonNull = ((archive as unknown) as IArchive);
+  const db = callState.dataStorageState.db;
+  const archiveNonNull = archiveStateNonNull.archive;
+  const localeNonNull = authorizationStateNonNull.locale;
+  const localeToUse = localeNonNull.optionName;
+
   const localeSnaps = await OpaDb.Locales.getTypedCollection(db).get();
   const locales = localeSnaps.docs.map((localeSnap) => localeSnap.data());
-  const selectedLocales = locales.filter((locale) => (locale.id == archiveNonNull.defaultLocaleId));
+  let selectedLocales = locales.filter((locale) => (locale.id == archiveNonNull.defaultLocaleId));
   const timeZoneGroupSnaps = await OpaDb.TimeZoneGroups.getTypedCollection(db).get();
   const timeZoneGroups = timeZoneGroupSnaps.docs.map((timeZoneGroupSnap) => timeZoneGroupSnap.data());
-  const selectedTimeZoneGroups = timeZoneGroups.filter((timeZoneGroup) => (timeZoneGroup.id == archiveNonNull.defaultTimeZoneGroupId));
+  let selectedTimeZoneGroups = timeZoneGroups.filter((timeZoneGroup) => (timeZoneGroup.id == archiveNonNull.defaultTimeZoneGroupId));
 
-  if (selectedLocales.length != 1) {
-    throw new Error("The selected Locale could not be found.");
+  if (selectedLocales.length < 1) {
+    selectedLocales = locales.filter((locale) => locale.isDefault);
   }
-  if (selectedTimeZoneGroups.length != 1) {
-    throw new Error("The selected TimeZoneGroup could not be found.");
+  if (selectedTimeZoneGroups.length < 1) {
+    selectedTimeZoneGroups = timeZoneGroups.filter((timeZoneGroup) => timeZoneGroup.isDefault);
   }
+  const selectedLocale = (selectedLocales.length > 0) ? selectedLocales[0] : null;
+  const selectedTimeZoneGroup = (selectedTimeZoneGroups.length > 0) ? selectedTimeZoneGroups[0] : null;
 
-  const selectedLocale = selectedLocales[0];
-  const selectedTimeZoneGroup = selectedTimeZoneGroups[0];
-
-  displayModel.archiveName = OPA.getLocalizedText(archiveNonNull.name, selectedLocale.optionName);
-  displayModel.archiveDescription = OPA.getLocalizedText(archiveNonNull.description, selectedLocale.optionName);
-  displayModel.pathToStorageFolder = archiveNonNull.pathToStorageFolder;
-  displayModel.validLocales = locales;
-  displayModel.selectedLocale = selectedLocale;
-  displayModel.validTimeZoneGroups = timeZoneGroups;
-  displayModel.selectedTimeZoneGroup = selectedTimeZoneGroup;
+  // LATER: Pass IAuthorizationState to getAuthorizationData(...) and include locale and timezone for User
+  const displayModel: IInstallationScreenDisplayModel = {
+    authorizationData: getAuthorizationData(dataStorageStateNonNull, archiveStateNonNull, authorizationStateNonNull),
+    archiveName: OPA.getLocalizedText(archiveNonNull.name, localeToUse),
+    archiveDescription: OPA.getLocalizedText(archiveNonNull.description, localeToUse),
+    pathToStorageFolder: archiveNonNull.pathToStorageFolder,
+    validLocales: locales,
+    selectedLocale: selectedLocale,
+    validTimeZoneGroups: timeZoneGroups,
+    selectedTimeZoneGroup: selectedTimeZoneGroup,
+  };
   return displayModel;
 }
 
 /**
  * Installs the Open Personal Archive™ (OPA) system by creating the necessary data in the Firestore DB.
- * @param {Firestore} db The Firestore Database to read from.
+ * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
+ * @param {OpaDm.IAuthenticationState} authenticationState The Firebase Authentication state for the User.
  * @param {string} archiveName The name of the Archive.
  * @param {string} archiveDescription A description of the Archive.
  * @param {string} pathToStorageFolder The path to the root folder for storing files in Firebase Storage.
  * @param {string} defaultLocaleId The ID of the default Locale for the Archive.
  * @param {string} defaultTimeZoneGroupId The ID of the default TimeZoneGroup for the Archive.
- * @param {string} ownerFirebaseAuthUserId The Firebase UUID for the owner of the Archive.
- * @param {string} ownerGoogleAccount The Google account (aka GMail address) of the owner of the Archive.
  * @param {string} ownerFirstName The first name of the owner of the Archive.
  * @param {string} ownerLastName The last name of the owner of the Archive.
  * @return {Promise<void>}
  */
-export async function performInstall(db: admin.firestore.Firestore, archiveName: string, archiveDescription: string, pathToStorageFolder: string, defaultLocaleId: string, defaultTimeZoneGroupId: string, ownerFirebaseAuthUserId: string, ownerGoogleAccount: string, ownerFirstName: string, ownerLastName: string): Promise<void> { // eslint-disable-line max-len
-  if (OPA.isNullish(db)) {
-    throw new Error("The Firestore DB must NOT be null.");
-  }
+export async function performInstall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState, archiveName: string, archiveDescription: string, pathToStorageFolder: string, defaultLocaleId: string, defaultTimeZoneGroupId: string, ownerFirstName: string, ownerLastName: string): Promise<void> { // eslint-disable-line max-len
+  OPA.assertNonNullish(dataStorageState, "The Data Storage State must not be null.");
+  OPA.assertNonNullish(authenticationState, "The Authentication State must not be null.");
+  OPA.assertFirestoreIsNotNullish(dataStorageState.db);
+  OPA.assertIdentifierIsValid(authenticationState.firebaseAuthUserId);
+  OPA.assertNonNullishOrWhitespace(authenticationState.providerId, "The Authentication Provider ID for the User's account must not be null.");
+  OPA.assertNonNullishOrWhitespace(authenticationState.email, "The email account of the User must not be null.");
 
-  if (await isInstalled(db)) {
-    throw new Error("The Open Personal Archive™ (OPA) system has already been installed. Please un-install before re-installing.");
-  }
+  const db = dataStorageState.db;
+  const ownerFirebaseAuthUserId = authenticationState.firebaseAuthUserId;
+  const externalAuthProviderId = authenticationState.providerId;
+  const ownerAccountName = authenticationState.email;
+  const hasBeenInstalled = await isInstalled(dataStorageState);
+
+  OPA.assertOpaIsNotInstalled(hasBeenInstalled, "The Open Personal Archive™ (OPA) system has already been installed. Please un-install before re-installing.");
 
   // 1) Create the OpaSystem document
   const system = createSystem(ApplicationConfig.version, SchemaConfig.version);
@@ -154,20 +169,20 @@ export async function performInstall(db: admin.firestore.Firestore, archiveName:
   await OpaDb.TimeZoneGroups.loadRequiredDocuments(db, eraseExistingData);
 
   // 3) Create the User document for the Owner of the Archive
-  const authProviderGoogle = await OpaDb.AuthProviders.getTypedDocumentForId(db, OpaDm.AuthenticationProvider_GoogleId);
-  const localeDefault = await OpaDb.Locales.getTypedDocumentForId(db, defaultLocaleId);
-  const timeZoneGroupDefault = await OpaDb.TimeZoneGroups.getTypedDocumentForId(db, defaultTimeZoneGroupId);
-  const roleOwner = await OpaDb.Roles.getTypedDocumentForId(db, OpaDm.Role_OwnerId);
+  const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(db, externalAuthProviderId);
+  const localeDefault = await OpaDb.Locales.queries.getById(db, defaultLocaleId);
+  const timeZoneGroupDefault = await OpaDb.TimeZoneGroups.queries.getById(db, defaultTimeZoneGroupId);
+  const roleOwner = await OpaDb.Roles.queries.getById(db, OpaDm.Role_OwnerId);
 
-  if (OPA.isNullish(authProviderGoogle) || OPA.isNullish(localeDefault) || OPA.isNullish(timeZoneGroupDefault) || OPA.isNullish(roleOwner)) {
+  if (OPA.isNullish(authProvider) || OPA.isNullish(localeDefault) || OPA.isNullish(timeZoneGroupDefault) || OPA.isNullish(roleOwner)) {
     throw new Error("Required data could not be created.");
   }
 
-  const authProviderGoogleNonNull = ((authProviderGoogle as unknown) as IAuthenticationProvider);
-  const localeDefaultNonNull = ((localeDefault as unknown) as ILocale);
-  const timeZoneGroupDefaultNonNull = ((timeZoneGroupDefault as unknown) as ITimeZoneGroup);
+  const authProviderNonNull = OPA.convertNonNullish(authProvider);
+  const localeDefaultNonNull = OPA.convertNonNullish(localeDefault);
+  const timeZoneGroupDefaultNonNull = OPA.convertNonNullish(timeZoneGroupDefault);
 
-  const userOwner = OpaDm.createArchiveOwner(ownerFirebaseAuthUserId, authProviderGoogleNonNull, ownerGoogleAccount, localeDefaultNonNull, timeZoneGroupDefaultNonNull, ownerFirstName, ownerLastName);
+  const userOwner = OpaDm.createArchiveOwner(ownerFirebaseAuthUserId, authProviderNonNull, ownerAccountName, localeDefaultNonNull, timeZoneGroupDefaultNonNull, ownerFirstName, ownerLastName);
   const userCollectionRef = OpaDb.Users.getTypedCollection(db);
   const userOwnerDocumentRef = userCollectionRef.doc(userOwner.id);
   await userOwnerDocumentRef.set(userOwner, {merge: true});
@@ -180,14 +195,104 @@ export async function performInstall(db: admin.firestore.Firestore, archiveName:
 }
 
 /**
+ * Updates the Open Personal Archive™ (OPA) installation settings.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string | undefined} archiveName The name of the Archive, if it was updated.
+ * @param {string | undefined} archiveDescription A description of the Archive, if it was updated.
+ * @param {string | undefined} defaultLocaleId The ID of the default Locale for the Archive, if it was updated.
+ * @param {string | undefined} defaultTimeZoneGroupId The ID of the default TimeZoneGroup for the Archive, if it was updated.
+ * @param {string | undefined} defaultTimeZoneId The ID of the default TimeZone for the Archive, if it was updated.
+ * @return {Promise<void>}
+ */
+export async function updateInstallationSettings(callState: OpaDm.ICallState, archiveName: string | undefined, archiveDescription: string | undefined, defaultLocaleId: string | undefined, defaultTimeZoneGroupId: string | undefined, defaultTimeZoneId: string | undefined): Promise<void> { // eslint-disable-line max-len
+  OPA.assertNonNullish(callState, "The Call State must not be null.");
+  OPA.assertNonNullish(callState.dataStorageState, "The Data Storage State must not be null.");
+  OPA.assertNonNullish(callState.authenticationState, "The Authentication State must not be null.");
+  OPA.assertNonNullish(callState.authorizationState, "The Authorization State must not be null.");
+  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+  OPA.assertIdentifierIsValid(callState.authenticationState.firebaseAuthUserId);
+
+  const db = callState.dataStorageState.db;
+  const isInstalled = (!OPA.isNullish(callState.archiveState));
+
+  OPA.assertOpaIsInstalled(isInstalled);
+
+  const authorizationStateNonNull = OPA.convertNonNullish(callState.authorizationState);
+  const authorizedRoleIds = [OpaDm.Role_OwnerId, OpaDm.Role_AdministratorId];
+
+  authorizationStateNonNull.assertUserApproved();
+  authorizationStateNonNull.assertRoleAllowed(authorizedRoleIds);
+
+  const currentUserNonNull = authorizationStateNonNull.user;
+  const currentLocaleNonNull = authorizationStateNonNull.locale;
+
+  const archive = await OpaDb.Archive.queries.getById(db, OpaDm.ArchiveId);
+  OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
+  const archiveNonNull = OPA.convertNonNullish(archive);
+
+  const localeToUse = currentLocaleNonNull.optionName;
+  let hasUpdate = false;
+  const archivePartial: IArchivePartial = {};
+  if ((archiveName) && (archiveNonNull.name[localeToUse] != archiveName)) {
+    archivePartial.name = {...archiveNonNull.name};
+    archivePartial.name[localeToUse] = archiveName;
+    hasUpdate = true;
+  }
+  if ((archiveDescription) && (archiveNonNull.description[localeToUse] != archiveDescription)) {
+    archivePartial.description = {...archiveNonNull.description};
+    archivePartial.description[localeToUse] = archiveDescription;
+    hasUpdate = true;
+  }
+  // LATER: Consider allowing change to root storage folder if no files have been added yet
+  if ((defaultLocaleId) && (archiveNonNull.defaultLocaleId != defaultLocaleId)) {
+    archivePartial.defaultLocaleId = defaultLocaleId;
+    hasUpdate = true;
+  }
+  if ((defaultTimeZoneGroupId) && (archiveNonNull.defaultTimeZoneGroupId != defaultTimeZoneGroupId)) {
+    archivePartial.defaultTimeZoneGroupId = defaultTimeZoneGroupId;
+    hasUpdate = true;
+  }
+  if ((defaultTimeZoneId) && (archiveNonNull.defaultTimeZoneId != defaultTimeZoneId)) {
+    archivePartial.defaultTimeZoneId = defaultTimeZoneId;
+    hasUpdate = true;
+  }
+  if (hasUpdate) {
+    archivePartial.userIdForLatestUpdate = currentUserNonNull.id;
+    archivePartial.dateOfLatestUpdate = OpaDm.now();
+  }
+
+  if (OPA.isEmpty(archivePartial)) {
+    throw new Error("No updated information was provided.");
+  }
+
+  const archiveRef = OpaDb.Archive.getTypedCollection(db).doc(archiveNonNull.id);
+  await archiveRef.set(archivePartial, {merge: true});
+}
+
+/**
  * Uninstalls the Open Personal Archive™ (OPA) system by clearing the data in the Firestore DB.
- * @param {Firestore} db The Firestore Database to read from.
+ * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
+ * @param {OpaDm.IAuthenticationState} authenticationState The Firebase Authentication state for the User.
+ * @param {OpaDm.IAuthorizationState | null | undefined} authorizationState The OPA Authorization state for the User.
  * @param {boolean} [doBackupFirst=false] Whether to backup the data before deleting it (NOT IMPLEMENTED YET).
  * @return {Promise<void>}
  */
-export async function performUninstall(db: admin.firestore.Firestore, doBackupFirst = false): Promise<void> {
-  if (OPA.isNullish(db)) {
-    throw new Error("The Firestore DB must NOT be null.");
+export async function performUninstall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState, authorizationState: OpaDm.IAuthorizationState | null | undefined, doBackupFirst = false): Promise<void> { // eslint-disable-line max-len
+  OPA.assertNonNullish(dataStorageState, "The Data Storage State must not be null.");
+  OPA.assertNonNullish(authenticationState, "The Authentication State must not be null.");
+  OPA.assertFirestoreIsNotNullish(dataStorageState.db);
+
+  const db = dataStorageState.db;
+  const owner = await OpaDb.Users.queries.getById(db, OpaDm.User_OwnerId);
+
+  if (!OPA.isNullish(owner)) {
+    OPA.assertNonNullish(authorizationState, "The Authorization State must not be null.");
+
+    const authorizationStateNonNull = OPA.convertNonNullish(authorizationState);
+    const authorizedRoleIds = [OpaDm.Role_OwnerId];
+
+    authorizationStateNonNull.assertUserApproved();
+    authorizationStateNonNull.assertRoleAllowed(authorizedRoleIds);
   }
 
   if (doBackupFirst) {
@@ -195,9 +300,9 @@ export async function performUninstall(db: admin.firestore.Firestore, doBackupFi
     throw new Error("Backup of existing Archive data has not been implemented yet.");
   }
 
-  const collectionDescriptors = OPA.getCollectionFromObject<OPA.ICollectionDescriptor>(OpaDb, (colDesc) => !OPA.isUndefined(colDesc.isNestedCollection));
-  for (let i = 0; i < collectionDescriptors.length; i++) {
-    const colDesc = collectionDescriptors[i];
+  // LATER: If necessary, iterate over specific Documents and delete contents of nested Collections
+  for (let i = 0; i < OpaDb.RootCollections.length; i++) {
+    const colDesc = OpaDb.RootCollections[i];
     await OPA.clearFirestoreCollectionInDb(db, colDesc.collectionName);
   }
 }
