@@ -1,5 +1,7 @@
 # Open Personal Archive™
 
+<img src="code/webapp/images/OpenPersonalArchive_Small_Logo.png" width="500" />
+
 We created Open Personal Archive™ to address the pressing needs of Original Researchers of Primary Source Material as they perform research and prepare to use their research in publications. Such researchers commonly generate terabytes (TBs) of files while performing research activities, later facing the daunting challenge of sifting through this information to use it as evidence in publications via direct citations, while often wishing to retain control over who is allowed to actually access the underlying resources.
 
 To empower researchers to search, use, and cite their own research more effectively, we designed Open Personal Archive™ to offer the following benefits:
