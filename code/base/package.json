@@ -1,6 +1,6 @@
 {
   "name": "open-personal-archive-base",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "This library contains various types, interfaces, classes and functions that are necessary for implementing the Open Personal Archive™ (OPA) system.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -10,6 +10,7 @@
   "author": "Open Personal Archive™",
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
+    "prebuild": "node -p \"'export const NAME = ' + JSON.stringify(require('./package.json').name) + ';\\n' + 'export const VERSION = ' + JSON.stringify(require('./package.json').version) + ';\\n' + 'export const BUILD_DATE = ' + JSON.stringify((new Date()).toISOString()) + ';'\" > src/PackageInfo.ts",
     "build": "tsc",
     "test": "jest"
   },
@@ -17,7 +18,7 @@
     "node": ">=14"
   },
   "dependencies": {
-    "firebase-admin": "^11.7.0",
+    "@google-cloud/firestore": "^6.6.0",
     "jest-get-type": "^27.3.1"
   },
   "devDependencies": {

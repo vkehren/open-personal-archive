@@ -1,4 +1,4 @@
-import * as admin from "firebase-admin";
+import * as firestore from "@google-cloud/firestore";
 import * as BT from "./BaseTypes";
 import * as FB from "./Firebase";
 import * as ST from "./Storage";
@@ -10,8 +10,8 @@ export type QuerySetConstructor<Q extends IQuerySet<T>, T extends BT.IDocument> 
 
 export interface IQuerySet<T extends BT.IDocument> {
   readonly collectionDescriptor: ST.ITypedCollectionDescriptor<T>;
-  getById(db: admin.firestore.Firestore, id: string): Promise<T | null>;
-  getAll(db: admin.firestore.Firestore, pathFromRoot?: Array<ST.INestedCollectionStep> | undefined): Promise<Array<T>>;
+  getById(db: firestore.Firestore, id: string): Promise<T | null>;
+  getAll(db: firestore.Firestore, pathFromRoot?: Array<ST.INestedCollectionStep> | undefined): Promise<Array<T>>;
 }
 
 /** Base class for providing queries for a collection. */
@@ -40,11 +40,11 @@ export class QuerySet<T extends BT.IDocument> implements IQuerySet<T> {
    * @param {string} id The ID for the Document within the OPA system.
    * @return {Promise<T | null>} The Document corresponding to the ID, or null if none exists.
    */
-  async getById(db: admin.firestore.Firestore, id: string): Promise<T | null> {
+  async getById(db: firestore.Firestore, id: string): Promise<T | null> {
     FB.assertFirestoreIsNotNullish(db);
     FB.assertIdentifierIsValid(id);
 
-    let documentSnap: admin.firestore.DocumentSnapshot<T> | null = null;
+    let documentSnap: firestore.DocumentSnapshot<T> | null = null;
 
     if (this.collectionDescriptor.isNestedCollection) {
       const collectionGroup = this.collectionDescriptor.getTypedCollectionGroup(db);
@@ -73,7 +73,7 @@ export class QuerySet<T extends BT.IDocument> implements IQuerySet<T> {
    * @param {Array<ST.INestedCollectionStep> | undefined} [pathFromRoot=undefined] The path to the nested Collection from the root of the database.
    * @return {Promise<Array<T>>} The list of Documents in the Collection.
    */
-  async getAll(db: admin.firestore.Firestore, pathFromRoot?: Array<ST.INestedCollectionStep> | undefined): Promise<Array<T>> {
+  async getAll(db: firestore.Firestore, pathFromRoot?: Array<ST.INestedCollectionStep> | undefined): Promise<Array<T>> {
     FB.assertFirestoreIsNotNullish(db);
 
     if (TC.isNullish(pathFromRoot) && this.collectionDescriptor.isNestedCollection) {

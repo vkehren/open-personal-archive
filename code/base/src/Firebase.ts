@@ -1,4 +1,4 @@
-import * as admin from "firebase-admin";
+import * as firestore from "@google-cloud/firestore";
 import * as BT from "./BaseTypes";
 import * as TC from "./TypeChecking";
 
@@ -75,9 +75,9 @@ export function setFirebaseToUseEmulators(projectId: string, authenticationHost:
 /**
  * Converts a typed document to a Firestore document.
  * @param {T} document The typed document.
- * @return {admin.firestore.DocumentData}
+ * @return {firestore.DocumentData}
  */
-export function convertToFirestoreDocument<T extends admin.firestore.DocumentData>(document: T): admin.firestore.DocumentData {
+export function convertToFirestoreDocument<T extends firestore.DocumentData>(document: T): firestore.DocumentData {
   // LATER: If necessary, add hook to intercept specific property values for purpose of changing type
   const result = {...document};
   return result;
@@ -85,10 +85,10 @@ export function convertToFirestoreDocument<T extends admin.firestore.DocumentDat
 
 /**
  * Converts from a Firestore snapshot to a typed document.
- * @param {FirebaseFirestore.QueryDocumentSnapshot | FirebaseFirestore.DocumentSnapshot} snapshot The Firebase Firestore snapshot.
+ * @param {firestore.QueryDocumentSnapshot | firestore.DocumentSnapshot} snapshot The Firebase Firestore snapshot.
  * @return {T}
  */
-export function convertFromFirestoreDocument<T>(snapshot: FirebaseFirestore.QueryDocumentSnapshot | FirebaseFirestore.DocumentSnapshot): T {
+export function convertFromFirestoreDocument<T>(snapshot: firestore.QueryDocumentSnapshot | firestore.DocumentSnapshot): T {
   const result = (snapshot.data() as T);
   return result;
 }
@@ -99,7 +99,7 @@ export function convertFromFirestoreDocument<T>(snapshot: FirebaseFirestore.Quer
  * @param {string} [message=default] The message to display on failure of assertion.
  * @return {void}
  */
-export function assertFirestoreIsNotNullish(db: admin.firestore.Firestore | null | undefined, message = "A valid Firebase Firestore database must be provided."): void {
+export function assertFirestoreIsNotNullish(db: firestore.Firestore | null | undefined, message = "A valid Firebase Firestore database must be provided."): void {
   if (TC.isNullish(db)) {
     throw new Error(message);
   }
@@ -165,7 +165,7 @@ export function assertOpaIsNotInstalled(isInstalled: boolean, message = "The Ope
  * @param {string} collectionName The collection name to clear.
  * @return {Promise<void>}
  */
-export async function clearFirestoreCollectionInDb(db: admin.firestore.Firestore, collectionName: string): Promise<void> {
+export async function clearFirestoreCollectionInDb(db: firestore.Firestore, collectionName: string): Promise<void> {
   assertFirestoreIsNotNullish(db);
 
   const collectionRef = db.collection(collectionName);
@@ -177,13 +177,13 @@ export async function clearFirestoreCollectionInDb(db: admin.firestore.Firestore
  * @param {CollectionReference<DocumentData>} collectionRef The Firebase Firestore collection.
  * @return {Promise<void>}
  */
-export async function clearFirestoreCollection(collectionRef: admin.firestore.CollectionReference<admin.firestore.DocumentData>): Promise<void> {
+export async function clearFirestoreCollection(collectionRef: firestore.CollectionReference<firestore.DocumentData>): Promise<void> {
   if (TC.isNullish(collectionRef)) {
     throw new Error("A valid Firebase Firestore collection must be provided.");
   }
 
   const bulkWriter = collectionRef.firestore.bulkWriter();
-  bulkWriter.onWriteError((error) => {
+  bulkWriter.onWriteError((error: firestore.BulkWriterError) => {
     if (error.failedAttempts < BULK_WRITER_MAX_RETRY_ATTEMPTS) {
       return true;
     } else {
