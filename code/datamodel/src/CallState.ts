@@ -1,13 +1,13 @@
 import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../base/src";
 import * as UTL from "./Utilities";
-import {IArchive} from "./Archive";
-import {ILocale} from "./Locale";
-import {IOpaSystem} from "./OpaSystem";
-import {IRole} from "./Role";
-import {ITimeZone} from "./TimeZone";
-import {ITimeZoneGroup} from "./TimeZoneGroup";
-import {IUser} from "./User";
+import {IArchive} from "./doctypes/Archive";
+import {ILocale} from "./doctypes/Locale";
+import {IOpaSystem} from "./doctypes/OpaSystem";
+import {IRole} from "./doctypes/Role";
+import {ITimeZone} from "./doctypes/TimeZone";
+import {ITimeZoneGroup} from "./doctypes/TimeZoneGroup";
+import {IUser} from "./doctypes/User";
 
 export interface IDataStorageState {
   appName: string;

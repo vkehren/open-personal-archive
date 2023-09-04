@@ -1,13 +1,13 @@
 import * as OPA from "../../base/src";
-import * as AccessRequest from "./AccessRequest";
-import * as Archive from "./Archive";
-import * as AuthProvider from "./AuthenticationProvider";
-import * as Locale from "./Locale";
-import * as OpaSystem from "./OpaSystem";
-import * as Role from "./Role";
-import * as TimeZone from "./TimeZone";
-import * as TimeZoneGroup from "./TimeZoneGroup";
-import * as User from "./User";
+import * as AccessRequest from "./doctypes/AccessRequest";
+import * as Archive from "./doctypes/Archive";
+import * as AuthProvider from "./doctypes/AuthenticationProvider";
+import * as Locale from "./doctypes/Locale";
+import * as OpaSystem from "./doctypes/OpaSystem";
+import * as Role from "./doctypes/Role";
+import * as TimeZone from "./doctypes/TimeZone";
+import * as TimeZoneGroup from "./doctypes/TimeZoneGroup";
+import * as User from "./doctypes/User";
 
 export const name = "open-personal-archive-data-model";
 export const schemaVersion = "0.0.0.1";
@@ -44,14 +44,14 @@ DbDescriptor.RootCollections = OPA.getCollectionFromObject<OPA.ICollectionDescri
 DbDescriptor.NestedCollections = OPA.getCollectionFromObject<OPA.ICollectionDescriptor>(DbDescriptor, (colDesc) => (!OPA.isNullish(colDesc.collectionName)), (colDesc) => (colDesc.isNestedCollection));
 export const OpaDbDescriptor = OPA.convertTo<IOpaDbDescriptor>(DbDescriptor);
 
-export {IAccessRequest, IAccessRequestPartial} from "./AccessRequest";
-export {IArchive, IArchivePartial, createSingleton as createArchive, SingletonId as ArchiveId} from "./Archive";
-export {IAuthenticationProvider, AuthenticationProvider_GoogleId, AuthenticationProvider_RequiredIds} from "./AuthenticationProvider"; // eslint-disable-line camelcase
+export {IAccessRequest, IAccessRequestPartial} from "./doctypes/AccessRequest";
+export {IArchive, IArchivePartial, createSingleton as createArchive, SingletonId as ArchiveId} from "./doctypes/Archive";
+export {IAuthenticationProvider, AuthenticationProvider_GoogleId, AuthenticationProvider_RequiredIds} from "./doctypes/AuthenticationProvider"; // eslint-disable-line camelcase
 export {AuthorizationState, IArchiveState, IAuthenticationState, IAuthorizationState, ICallState, IDataStorageState} from "./CallState";
-export {ILocale} from "./Locale";
-export {IOpaSystem, createSingleton as createSystem, SingletonId as OpaSystemId} from "./OpaSystem";
-export {IRole, Role_OwnerId, Role_AdministratorId, Role_EditorId, Role_ViewerId, Role_GuestId, Role_RequiredIds} from "./Role"; // eslint-disable-line camelcase
-export {ITimeZone} from "./TimeZone";
-export {ITimeZoneGroup} from "./TimeZoneGroup";
-export {IUser, IUserPartial, createArchiveOwner, User_OwnerId} from "./User"; // eslint-disable-line camelcase
+export {ILocale} from "./doctypes/Locale";
+export {IOpaSystem, createSingleton as createSystem, SingletonId as OpaSystemId} from "./doctypes/OpaSystem";
+export {IRole, Role_OwnerId, Role_AdministratorId, Role_EditorId, Role_ViewerId, Role_GuestId, Role_RequiredIds} from "./doctypes/Role"; // eslint-disable-line camelcase
+export {ITimeZone} from "./doctypes/TimeZone";
+export {ITimeZoneGroup} from "./doctypes/TimeZoneGroup";
+export {IUser, IUserPartial, createArchiveOwner, User_OwnerId} from "./doctypes/User"; // eslint-disable-line camelcase
 export {ApprovalState, ApprovalStates, DateShim, getAuthorizationData, IAuthorizationData, IRoleAuthorizationData, IUserAuthorizationData, now, RoleType, RoleTypes} from "./Utilities";

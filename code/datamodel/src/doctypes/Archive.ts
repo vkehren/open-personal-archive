@@ -1,5 +1,5 @@
-import * as OPA from "../../base/src";
-import * as UTL from "./Utilities";
+import * as OPA from "../../../base/src";
+import * as UTL from "../Utilities";
 import {ILocale} from "./Locale";
 import {ITimeZoneGroup} from "./TimeZoneGroup";
 import {IUser} from "./User";

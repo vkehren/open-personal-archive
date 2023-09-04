@@ -1,5 +1,5 @@
-import * as OPA from "../../base/src";
-import * as UTL from "./Utilities";
+import * as OPA from "../../../base/src";
+import * as UTL from "../Utilities";
 
 const SingularName = "OpaSystem";
 const PluralName = "OpaSystems";

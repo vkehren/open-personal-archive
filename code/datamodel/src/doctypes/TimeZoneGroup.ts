@@ -1,4 +1,4 @@
-import * as OPA from "../../base/src";
+import * as OPA from "../../../base/src";
 import * as CollectionData from "./TimeZoneGroups.json";
 
 const SingularName = "TimeZoneGroup";

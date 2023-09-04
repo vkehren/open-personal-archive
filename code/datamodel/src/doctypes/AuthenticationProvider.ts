@@ -1,5 +1,5 @@
 import * as firestore from "@google-cloud/firestore";
-import * as OPA from "../../base/src";
+import * as OPA from "../../../base/src";
 import * as CollectionData from "./AuthenticationProviders.json";
 
 const SingularName = "AuthenticationProvider";

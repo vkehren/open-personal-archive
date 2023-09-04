@@ -1,6 +1,6 @@
 import * as firestore from "@google-cloud/firestore";
-import * as OPA from "../../base/src";
-import * as UTL from "./Utilities";
+import * as OPA from "../../../base/src";
+import * as UTL from "../Utilities";
 import {IAuthenticationProvider} from "./AuthenticationProvider";
 import {ILocale} from "./Locale";
 import {IRole, Role_OwnerId} from "./Role"; // eslint-disable-line camelcase
