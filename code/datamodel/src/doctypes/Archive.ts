@@ -1,5 +1,5 @@
 import * as OPA from "../../../base/src";
-import * as UTL from "../Utilities";
+import * as BT from "../BaseTypes";
 import {ILocale} from "./Locale";
 import {ITimeZoneGroup} from "./TimeZoneGroup";
 import {IUser} from "./User";
@@ -16,7 +16,7 @@ export interface IArchivePartial {
   defaultTimeZoneGroupId?: string;
   defaultTimeZoneId?: string;
   userIdForLatestUpdate?: string;
-  dateOfLatestUpdate?: UTL.DateShim;
+  dateOfLatestUpdate?: BT.DateShim;
 }
 
 export interface IArchive extends OPA.IDocument, IArchivePartial {
@@ -29,9 +29,9 @@ export interface IArchive extends OPA.IDocument, IArchivePartial {
   defaultTimeZoneGroupId: string;
   defaultTimeZoneId: string;
   readonly userIdForCreation: string;
-  readonly dateOfCreation: UTL.DateShim;
+  readonly dateOfCreation: BT.DateShim;
   userIdForLatestUpdate: string;
-  dateOfLatestUpdate: UTL.DateShim;
+  dateOfLatestUpdate: BT.DateShim;
 }
 
 /**
@@ -45,7 +45,7 @@ export interface IArchive extends OPA.IDocument, IArchivePartial {
   * @return {IArchive} The new document instance.
   */
 export function createSingleton(name: string, description: string, pathToStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): IArchive {
-  const now = UTL.now();
+  const now = BT.now();
   const names: OPA.ILocalizable<string> = {en: name};
   names[defaultLocale.optionName] = name;
   const descriptions: OPA.ILocalizable<string> = {en: name};

@@ -1,6 +1,6 @@
 import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../../base/src";
-import * as UTL from "../Utilities";
+import * as BT from "../BaseTypes";
 import {IAuthenticationProvider} from "./AuthenticationProvider";
 import {ILocale} from "./Locale";
 import {IRole, Role_OwnerId} from "./Role"; // eslint-disable-line camelcase
@@ -20,11 +20,11 @@ export interface IUserPartial {
   lastName?: string;
   preferredName?: string | null;
   recentQueries?: Array<string>;
-  dateOfCreation?: UTL.DateShim;
-  dateOfLatestUpdate?: UTL.DateShim;
-  approvalState?: UTL.ApprovalState;
+  dateOfCreation?: BT.DateShim;
+  dateOfLatestUpdate?: BT.DateShim;
+  approvalState?: BT.ApprovalState;
   userIdOfApprover?: string | null;
-  dateOfApproval?: UTL.DateShim | null;
+  dateOfApproval?: BT.DateShim | null;
 }
 
 export interface IUser extends OPA.IDocument, IUserPartial {
@@ -42,11 +42,11 @@ export interface IUser extends OPA.IDocument, IUserPartial {
   readonly requestedCitationIds: Array<string>,
   readonly viewableCitationIds: Array<string>;
   recentQueries: Array<string>;
-  dateOfCreation: UTL.DateShim;
-  dateOfLatestUpdate: UTL.DateShim;
-  approvalState: UTL.ApprovalState;
+  dateOfCreation: BT.DateShim;
+  dateOfLatestUpdate: BT.DateShim;
+  approvalState: BT.ApprovalState;
   userIdOfApprover: string | null;
-  dateOfApproval: UTL.DateShim | null;
+  dateOfApproval: BT.DateShim | null;
 }
 
 /**
@@ -64,7 +64,7 @@ export interface IUser extends OPA.IDocument, IUserPartial {
   * @return {IUser} The new document instance.
   */
 function createInstance(id: string, firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, assignedRole: IRole, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): IUser { // eslint-disable-line max-len
-  const now = UTL.now();
+  const now = BT.now();
   const document: IUser = {
     id: id,
     firebaseAuthUserId: firebaseAuthUserId,
@@ -82,7 +82,7 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     recentQueries: ([] as Array<string>),
     dateOfCreation: now,
     dateOfLatestUpdate: now,
-    approvalState: UTL.ApprovalStates.pending,
+    approvalState: BT.ApprovalStates.pending,
     userIdOfApprover: null,
     dateOfApproval: null,
   };
@@ -102,7 +102,7 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
   * @return {IUser} The new document instance.
   */
 export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): IUser { // eslint-disable-line max-len
-  const now = UTL.now();
+  const now = BT.now();
   const document: IUser = {
     id: User_OwnerId,
     firebaseAuthUserId: firebaseAuthUserId,
@@ -120,7 +120,7 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     recentQueries: ([] as Array<string>),
     dateOfCreation: now,
     dateOfLatestUpdate: now,
-    approvalState: UTL.ApprovalStates.approved,
+    approvalState: BT.ApprovalStates.approved,
     userIdOfApprover: User_OwnerId,
     dateOfApproval: now,
   };

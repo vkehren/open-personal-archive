@@ -1,6 +1,6 @@
 import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../base/src";
-import * as UTL from "./Utilities";
+import * as BT from "./BaseTypes";
 import {IArchive} from "./doctypes/Archive";
 import {ILocale} from "./doctypes/Locale";
 import {IOpaSystem} from "./doctypes/OpaSystem";
@@ -125,7 +125,7 @@ export class AuthorizationState implements IAuthorizationState {
     * @return {boolean} Whether the current User's account has been approved.
     */
   isUserApproved(): boolean {
-    return (this._user.approvalState == UTL.ApprovalStates.approved);
+    return (this._user.approvalState == BT.ApprovalStates.approved);
   }
 
   /**

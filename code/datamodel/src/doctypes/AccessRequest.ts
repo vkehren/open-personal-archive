@@ -1,6 +1,6 @@
 import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../../base/src";
-import * as UTL from "../Utilities";
+import * as BT from "../BaseTypes";
 import {ILocale} from "./Locale";
 import {IUser} from "./User";
 
@@ -11,11 +11,11 @@ const IsSingleton = false;
 export interface IAccessRequestPartial {
   message?: OPA.ILocalizable<string>;
   userIdForLatestUpdate?: string;
-  dateOfLatestUpdate?: UTL.DateShim;
+  dateOfLatestUpdate?: BT.DateShim;
   hasBeenViewed?: boolean;
-  approvalState?: UTL.ApprovalState;
+  approvalState?: BT.ApprovalState;
   userIdOfApprover?: string | null;
-  dateOfApproval?: UTL.DateShim | null;
+  dateOfApproval?: BT.DateShim | null;
 }
 
 export interface IAccessRequest extends OPA.IDocument, IAccessRequestPartial {
@@ -26,13 +26,13 @@ export interface IAccessRequest extends OPA.IDocument, IAccessRequestPartial {
   readonly isSpecificToCitation: boolean;
   readonly citationId: string | null;
   readonly userIdForCreation: string;
-  readonly dateOfCreation: UTL.DateShim;
+  readonly dateOfCreation: BT.DateShim;
   userIdForLatestUpdate: string;
-  dateOfLatestUpdate: UTL.DateShim;
+  dateOfLatestUpdate: BT.DateShim;
   hasBeenViewed: boolean;
-  approvalState: UTL.ApprovalState;
+  approvalState: BT.ApprovalState;
   userIdOfApprover: string | null;
-  dateOfApproval: UTL.DateShim | null;
+  dateOfApproval: BT.DateShim | null;
 }
 
 /**
@@ -47,7 +47,7 @@ export interface IAccessRequest extends OPA.IDocument, IAccessRequestPartial {
   * @return {IAccessRequest} The new document instance.
   */
 function createInstance(currentUser: IUser, currentLocale: ILocale, id: string, archiveId: string, userIdOfRequestor: string, message: string, citationId: string | null = null): IAccessRequest { // eslint-disable-line max-len
-  const now = UTL.now();
+  const now = BT.now();
   const messages: OPA.ILocalizable<string> = {en: message};
   messages[currentLocale.optionName] = message;
   const isSpecificToCitation = (!OPA.isNullishOrWhitespace(citationId));
@@ -64,7 +64,7 @@ function createInstance(currentUser: IUser, currentLocale: ILocale, id: string, 
     userIdForLatestUpdate: currentUser.id,
     dateOfLatestUpdate: now,
     hasBeenViewed: false,
-    approvalState: UTL.ApprovalStates.pending,
+    approvalState: BT.ApprovalStates.pending,
     userIdOfApprover: null,
     dateOfApproval: null,
   };

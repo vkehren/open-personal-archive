@@ -1,5 +1,5 @@
 import * as OPA from "../../../base/src";
-import * as UTL from "../Utilities";
+import * as BT from "../BaseTypes";
 
 const SingularName = "OpaSystem";
 const PluralName = "OpaSystems";
@@ -10,8 +10,8 @@ export interface IOpaSystem extends OPA.IDocument {
   readonly id: string;
   applicationVersion: string;
   schemaVersion: string;
-  readonly dateOfInstallation: UTL.DateShim;
-  dateOfLatestUpgrade: UTL.DateShim;
+  readonly dateOfInstallation: BT.DateShim;
+  dateOfLatestUpgrade: BT.DateShim;
 }
 
 /**
@@ -21,7 +21,7 @@ export interface IOpaSystem extends OPA.IDocument {
   * @return {IOpaSystem} The new document instance.
   */
 export function createSingleton(applicationVersion: string, schemaVersion: string): IOpaSystem {
-  const now = UTL.now();
+  const now = BT.now();
   const document: IOpaSystem = {
     id: SingletonId,
     applicationVersion: applicationVersion,
