@@ -1,3 +1,5 @@
+import * as firestore from "@google-cloud/firestore";
+
 // export const name = "BaseTypes";
 
 export type GetterFunc<T, V> = (value: T, propName?: string | symbol) => V;
@@ -5,11 +7,6 @@ export type GuardFunc<T> = (value: T) => boolean;
 export type FilterFunc<T> = (value: T) => boolean;
 export type ComparisonFunc<T> = (item1: T, item2: T) => number; // NOTE: (item1 < item2) => -1, (item1 == item2) => 0, else 1
 export type MappingFunc<T1, T2> = (item: T1) => T2;
-
-export const IDocument_DocumentId_PropertyName = "id"; // eslint-disable-line camelcase
-export interface IDocument {
-  id: string,
-}
 
 export interface ICollection {
   [key: string | symbol]: unknown;
@@ -75,4 +72,46 @@ export interface ITimeRangeCollection {
   get(index: number | string | ITimestamp): ITimeRange | undefined;
   split(timestamp: ITimestamp): ITimeRangeSplitResult;
   merge(timestamp: ITimestamp): ITimeRangeMergeResult;
+}
+
+// NOTE: The types and interfaces below are useful for creating typed Firebase Firestore Documents
+
+/**
+ * Use this Date type while issue with Firebase Firestore Timestamps is still unresolved (see https://github.com/jloosli/node-firestore-import-export/issues/46)
+ * @type
+ */
+export type DateToUse = Date;
+/**
+ * Use this Date now() function while issue with Firebase Firestore Timestamps is still unresolved (see https://github.com/jloosli/node-firestore-import-export/issues/46)
+ * @constant
+ * @type {function}
+ */
+export const nowToUse = (): DateToUse => firestore.Timestamp.now().toDate();
+
+export const IDocument_DocumentId_PropertyName = "id"; // eslint-disable-line camelcase
+export const IDocument_Creatable_DateOfCreation_PropertyName = "dateOfCreation"; // eslint-disable-line camelcase
+export const IDocument_Creatable_ByUser_UserIdOfCreator_PropertyName = "userIdOfCreator"; // eslint-disable-line camelcase
+export const IDocument_Creatable_ByNullableUser_UserIdOfCreator_PropertyName = "userIdOfCreator"; // eslint-disable-line camelcase
+export const IDocument_Archivable_IsArchived_PropertyName = "isArchived"; // eslint-disable-line camelcase
+export const IDocument_Archivable_DateOfArchival_PropertyName = "dateOfArchival"; // eslint-disable-line camelcase
+export const IDocument_Archivable_ByUser_UserIdOfArchiver_PropertyName = "userIdOfArchiver"; // eslint-disable-line camelcase
+
+export interface IDocument {
+  id: string,
+}
+export interface IDocument_Creatable extends IDocument {
+  readonly dateOfCreation: DateToUse;
+}
+export interface IDocument_Creatable_ByUser extends IDocument, IDocument_Creatable {
+  readonly userIdOfCreator: string;
+}
+export interface IDocument_Creatable_ByNullableUser extends IDocument, IDocument_Creatable {
+  readonly userIdOfCreator: string | null;
+}
+export interface IDocument_Archivable extends IDocument {
+  readonly isArchived: boolean;
+  readonly dateOfArchival: DateToUse | null;
+}
+export interface IDocument_Archivable_ByUser extends IDocument, IDocument_Archivable {
+  readonly userIdOfArchiver: string | null;
 }
