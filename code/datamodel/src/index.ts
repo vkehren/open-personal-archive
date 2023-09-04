@@ -3,7 +3,7 @@ import * as AccessRequest from "./doctypes/AccessRequest";
 import * as Archive from "./doctypes/Archive";
 import * as AuthProvider from "./doctypes/AuthenticationProvider";
 import * as Locale from "./doctypes/Locale";
-import * as OpaSystem from "./doctypes/OpaSystem";
+import * as OpaSystem from "./doctypes/Application";
 import * as Role from "./doctypes/Role";
 import * as TimeZone from "./doctypes/TimeZone";
 import * as TimeZoneGroup from "./doctypes/TimeZoneGroup";
@@ -49,7 +49,7 @@ export {IArchive, IArchivePartial, createSingleton as createArchive, SingletonId
 export {IAuthenticationProvider, AuthenticationProvider_GoogleId, AuthenticationProvider_RequiredIds} from "./doctypes/AuthenticationProvider"; // eslint-disable-line camelcase
 export {AuthorizationState, IArchiveState, IAuthenticationState, IAuthorizationState, ICallState, IDataStorageState} from "./CallState";
 export {ILocale} from "./doctypes/Locale";
-export {IOpaSystem, createSingleton as createSystem, SingletonId as OpaSystemId} from "./doctypes/OpaSystem";
+export {IOpaSystem, createSingleton as createSystem, SingletonId as OpaSystemId} from "./doctypes/Application";
 export {IRole, Role_OwnerId, Role_AdministratorId, Role_EditorId, Role_ViewerId, Role_GuestId, Role_RequiredIds} from "./doctypes/Role"; // eslint-disable-line camelcase
 export {ITimeZone} from "./doctypes/TimeZone";
 export {ITimeZoneGroup} from "./doctypes/TimeZoneGroup";

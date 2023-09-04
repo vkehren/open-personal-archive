@@ -3,7 +3,7 @@ import * as OPA from "../../base/src";
 import * as BT from "./BaseTypes";
 import {IArchive} from "./doctypes/Archive";
 import {ILocale} from "./doctypes/Locale";
-import {IOpaSystem} from "./doctypes/OpaSystem";
+import {IOpaSystem} from "./doctypes/Application";
 import {IRole} from "./doctypes/Role";
 import {ITimeZone} from "./doctypes/TimeZone";
 import {ITimeZoneGroup} from "./doctypes/TimeZoneGroup";
