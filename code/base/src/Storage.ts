@@ -14,6 +14,30 @@ export interface INestedCollectionStep {
   readonly documentId: string;
 }
 
+export interface IPropertyIndexDescriptor {
+  indexCollectionName: string;
+  indexedCollectionName: string;
+  indexedPropertyName: string;
+  getDocumentId(propertyValue: any): string;
+  getDocumentPath(propertyValue: any): string;
+}
+export const getPropertyIndexDocumentId = (propertyIndex: IPropertyIndexDescriptor, propertyValue: any): string => (propertyIndex.indexedCollectionName + "/" + propertyIndex.indexedPropertyName + "/" + propertyValue);
+export const getPropertyIndexDocumentPath = (propertyIndex: IPropertyIndexDescriptor, propertyValue: any): string => (propertyIndex.indexCollectionName + "/" + getPropertyIndexDocumentId(propertyIndex, propertyValue));
+
+/**
+ * Constructs a Property Index Descriptor object for the given arguments.
+ * @param {string} indexCollectionName The name of the collection that contains the indices.
+ * @param {string} indexedCollectionName The name of the collection that is being indexed.
+ * @param {string} indexedPropertyName The name of the property that is being indexed.
+ * @return {IPropertyIndexDescriptor} The resulting Property Index Descriptor.
+ */
+export function createPropertyIndexDescriptor(indexCollectionName: string, indexedCollectionName: string, indexedPropertyName: string): IPropertyIndexDescriptor {
+  const propertyIndex: IPropertyIndexDescriptor = {indexCollectionName, indexedCollectionName, indexedPropertyName, getDocumentId: (propertyValue: any) => (""), getDocumentPath: (propertyValue: any) => ("")};
+  propertyIndex.getDocumentId = (propertyValue: any) => getPropertyIndexDocumentId(propertyIndex, propertyValue);
+  propertyIndex.getDocumentPath = (propertyValue: any) => getPropertyIndexDocumentPath(propertyIndex, propertyValue);
+  return propertyIndex;
+}
+
 export interface ICollectionDescriptor {
   readonly singularName: string;
   readonly pluralName: string;
@@ -21,6 +45,7 @@ export interface ICollectionDescriptor {
   readonly isNestedCollection: boolean;
   readonly collectionName: string;
   readonly parentCollectionDescriptor: ICollectionDescriptor | null;
+  readonly propertyIndices: Array<IPropertyIndexDescriptor>;
   getCollection(db: admin.firestore.Firestore, pathFromRoot?: Array<INestedCollectionStep>): admin.firestore.CollectionReference<admin.firestore.DocumentData>;
   getCollectionGroup(db: admin.firestore.Firestore): admin.firestore.CollectionGroup<admin.firestore.DocumentData>;
 }
@@ -51,6 +76,7 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
   private _pluralName: string;
   private _isSingleton: boolean;
   private _parentCollectionDescriptor: ICollectionDescriptor | null;
+  private _propertyIndices: Array<IPropertyIndexDescriptor>;
   private _requiredDocuments: Array<T>;
   private _queries: Q;
   private _factoryFunction: F | null;
@@ -87,6 +113,7 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
     this._pluralName = pluralName;
     this._isSingleton = isSingleton;
     this._parentCollectionDescriptor = parentCollectionDescriptor;
+    this._propertyIndices = [];
     this._requiredDocuments = requiredDocuments;
     this._queries = querySetConstructor(this);
     this._factoryFunction = factoryFunction;
@@ -138,6 +165,14 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
     */
   get parentCollectionDescriptor(): ICollectionDescriptor | null {
     return this._parentCollectionDescriptor;
+  }
+
+  /**
+    * The property indices defined for the collection.
+    * @type {Array<IPropertyIndexDescriptor>}
+    */
+  get propertyIndices(): Array<IPropertyIndexDescriptor> {
+    return this._propertyIndices;
   }
 
   /**

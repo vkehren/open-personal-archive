@@ -3,6 +3,7 @@ import * as BT from "./BaseTypes";
 import * as TC from "./TypeChecking";
 
 // export const name = "Firebase";
+export const BULK_WRITER_MAX_RETRY_ATTEMPTS = 4;
 
 /**
  * Converts a Firebase key to a Firebase credential.
@@ -76,7 +77,7 @@ export function setFirebaseToUseEmulators(projectId: string, authenticationHost:
  * @param {T} document The typed document.
  * @return {admin.firestore.DocumentData}
  */
-export function convertToFirestoreDocument<T>(document: T): admin.firestore.DocumentData {
+export function convertToFirestoreDocument<T extends admin.firestore.DocumentData>(document: T): admin.firestore.DocumentData {
   // LATER: If necessary, add hook to intercept specific property values for purpose of changing type
   const result = {...document};
   return result;
@@ -181,9 +182,25 @@ export async function clearFirestoreCollection(collectionRef: admin.firestore.Co
     throw new Error("A valid Firebase Firestore collection must be provided.");
   }
 
-  const docSnapshots = await collectionRef.listDocuments();
-  for (let j = 0; j < docSnapshots.length; j++) {
-    const docSnapshot = docSnapshots[j];
-    await docSnapshot.delete();
+  const bulkWriter = collectionRef.firestore.bulkWriter();
+  bulkWriter.onWriteError((error) => {
+    if (error.failedAttempts < BULK_WRITER_MAX_RETRY_ATTEMPTS) {
+      return true;
+    } else {
+      console.log("Failed write at document: ", error.documentRef.path);
+      return false;
+    }
+  });
+
+  try {
+    const docSnapshots = await collectionRef.listDocuments();
+    for (let j = 0; j < docSnapshots.length; j++) {
+      const docSnapshot = docSnapshots[j];
+      // NOTE: Calling "await docSnapshot.delete();" does NOT perform recursive deletion
+      const docData = await docSnapshot.get();
+      await collectionRef.firestore.recursiveDelete(docData.ref, bulkWriter);
+    }
+  } finally {
+    await bulkWriter.close();
   }
 }
