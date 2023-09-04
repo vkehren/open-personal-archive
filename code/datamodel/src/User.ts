@@ -1,8 +1,10 @@
-import * as admin from "firebase-admin";
+import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../base/src";
 import * as UTL from "./Utilities";
-import {Role_OwnerId} from "./Role"; // eslint-disable-line camelcase
-import {IAuthenticationProvider, ILocale, IRole, ITimeZoneGroup} from ".";
+import {IAuthenticationProvider} from "./AuthenticationProvider";
+import {ILocale} from "./Locale";
+import {IRole, Role_OwnerId} from "./Role"; // eslint-disable-line camelcase
+import {ITimeZoneGroup} from "./TimeZoneGroup";
 
 const SingularName = "User";
 const PluralName = "Users";
@@ -148,7 +150,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     * @param {Firestore} db The Firestore Database to read from.
     * @return {Promise<IUser>} The User corresponding to the UUID, or null if none exists.
     */
-  async getArchiveOwner(db: admin.firestore.Firestore): Promise<IUser> {
+  async getArchiveOwner(db: firestore.Firestore): Promise<IUser> {
     OPA.assertFirestoreIsNotNullish(db);
 
     const owner = await this.getById(db, User_OwnerId);
@@ -164,7 +166,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     * @param {string} firebaseAuthUserId The ID for the User within the Firebase Authentication system.
     * @return {Promise<IUser | null>} The User corresponding to the UUID, or null if none exists.
     */
-  async getByFirebaseAuthUserId(db: admin.firestore.Firestore, firebaseAuthUserId: string): Promise<IUser | null> {
+  async getByFirebaseAuthUserId(db: firestore.Firestore, firebaseAuthUserId: string): Promise<IUser | null> {
     OPA.assertFirestoreIsNotNullish(db);
     OPA.assertIdentifierIsValid(firebaseAuthUserId, "A valid Firebase Auth User ID must be provided.");
 

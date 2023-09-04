@@ -1,4 +1,4 @@
-import * as admin from "firebase-admin";
+import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../base/src";
 import * as CollectionData from "./AuthenticationProviders.json";
 
@@ -41,7 +41,7 @@ export class AuthenticationProviderQuerySet extends OPA.QuerySet<IAuthentication
     * @param {string} externalId The ID for the Authentication Provider that is provided by the corresponding Provider.
     * @return {Promise<IAuthenticationProvider | null>} The User corresponding to the UUID, or null if none exists.
     */
-  async getByExternalAuthProviderId(db: admin.firestore.Firestore, externalId: string): Promise<IAuthenticationProvider | null> {
+  async getByExternalAuthProviderId(db: firestore.Firestore, externalId: string): Promise<IAuthenticationProvider | null> {
     OPA.assertFirestoreIsNotNullish(db);
     OPA.assertIdentifierIsValid(externalId, "A valid external Authentication Provider ID must be provided.");
 

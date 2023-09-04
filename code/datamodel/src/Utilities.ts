@@ -1,10 +1,10 @@
-import * as admin from "firebase-admin";
+import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../base/src";
 import {IArchiveState, IAuthorizationState, IDataStorageState} from "./CallState";
 
 // NOTE: To overcome known issue with storing Firebase Firestore Timestamps, for now, just use JavaScript Dates (see https://github.com/jloosli/node-firestore-import-export/issues/46)
 export type DateShim = Date;
-export const now = (): DateShim => admin.firestore.Timestamp.now().toDate();
+export const now = (): DateShim => firestore.Timestamp.now().toDate();
 // LATER: Submit bug to Firebase via GitHub specifically explaining that @google-cloud\firestore\build\src\serializer.js fails to recognize valid Timestamps at line 319
 
 export type RoleType = "owner" | "administrator" | "editor" | "viewer" | "guest";

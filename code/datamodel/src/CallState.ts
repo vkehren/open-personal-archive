@@ -1,14 +1,20 @@
-import * as admin from "firebase-admin";
+import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../base/src";
 import * as UTL from "./Utilities";
-import {IArchive, ILocale, IOpaSystem, IRole, ITimeZone, ITimeZoneGroup, IUser} from ".";
+import {IArchive} from "./Archive";
+import {ILocale} from "./Locale";
+import {IOpaSystem} from "./OpaSystem";
+import {IRole} from "./Role";
+import {ITimeZone} from "./TimeZone";
+import {ITimeZoneGroup} from "./TimeZoneGroup";
+import {IUser} from "./User";
 
 export interface IDataStorageState {
   appName: string;
   projectId: string;
   usesAdminAccess: boolean;
   usesEmulators: boolean;
-  db: admin.firestore.Firestore;
+  db: firestore.Firestore;
   // LATER: Add storage
 }
 

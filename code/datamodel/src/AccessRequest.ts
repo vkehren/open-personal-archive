@@ -1,7 +1,8 @@
-import * as admin from "firebase-admin";
+import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../base/src";
 import * as UTL from "./Utilities";
-import {ILocale, IUser} from ".";
+import {ILocale} from "./Locale";
+import {IUser} from "./User";
 
 const SingularName = "AccessRequest";
 const PluralName = "AccessRequests";
@@ -94,7 +95,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     * @param {string} userId The ID for the relevant User within the OPA system.
     * @return {Promise<Array<IAccessRequest>>} The list of Access Requests that correspond to the relevant User.
     */
-  async getAllForUserId(db: admin.firestore.Firestore, userId: string): Promise<Array<IAccessRequest>> {
+  async getAllForUserId(db: firestore.Firestore, userId: string): Promise<Array<IAccessRequest>> {
     OPA.assertFirestoreIsNotNullish(db);
     OPA.assertIdentifierIsValid(userId, "A valid OPA User ID must be provided.");
 

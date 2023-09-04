@@ -1,6 +1,8 @@
 import * as OPA from "../../base/src";
 import * as UTL from "./Utilities";
-import {ILocale, ITimeZoneGroup, IUser} from ".";
+import {ILocale} from "./Locale";
+import {ITimeZoneGroup} from "./TimeZoneGroup";
+import {IUser} from "./User";
 
 const SingularName = "Archive";
 const PluralName = "Archives";
