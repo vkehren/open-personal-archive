@@ -1,6 +1,6 @@
 import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../base/src";
-import {IArchiveState, IAuthorizationState, IDataStorageState} from "./CallState";
+import {IArchiveState, IAuthorizationState, IDataStorageState} from "./CallStateTypes";
 
 // NOTE: To overcome known issue with storing Firebase Firestore Timestamps, for now, just use JavaScript Dates (see https://github.com/jloosli/node-firestore-import-export/issues/46)
 export type DateShim = Date;

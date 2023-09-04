@@ -47,7 +47,7 @@ export const OpaDbDescriptor = OPA.convertTo<IOpaDbDescriptor>(DbDescriptor);
 export {IAccessRequest, IAccessRequestPartial} from "./doctypes/AccessRequest";
 export {IArchive, IArchivePartial, createSingleton as createArchive, SingletonId as ArchiveId} from "./doctypes/Archive";
 export {IAuthenticationProvider, AuthenticationProvider_GoogleId, AuthenticationProvider_RequiredIds} from "./doctypes/AuthenticationProvider"; // eslint-disable-line camelcase
-export {AuthorizationState, IArchiveState, IAuthenticationState, IAuthorizationState, ICallState, IDataStorageState} from "./CallState";
+export {AuthorizationState, IArchiveState, IAuthenticationState, IAuthorizationState, ICallState, IDataStorageState} from "./CallStateTypes";
 export {ILocale} from "./doctypes/Locale";
 export {IOpaSystem, createSingleton as createSystem, SingletonId as OpaSystemId} from "./doctypes/Application";
 export {IRole, Role_OwnerId, Role_AdministratorId, Role_EditorId, Role_ViewerId, Role_GuestId, Role_RequiredIds} from "./doctypes/Role"; // eslint-disable-line camelcase
