@@ -3,7 +3,7 @@ import * as AccessRequest from "./doctypes/AccessRequest";
 import * as Archive from "./doctypes/Archive";
 import * as AuthProvider from "./doctypes/AuthenticationProvider";
 import * as Locale from "./doctypes/Locale";
-import * as OpaSystem from "./doctypes/Application";
+import * as Application from "./doctypes/Application";
 import * as Role from "./doctypes/Role";
 import * as TimeZone from "./doctypes/TimeZone";
 import * as TimeZoneGroup from "./doctypes/TimeZoneGroup";
@@ -21,7 +21,7 @@ export interface IOpaDbDescriptor extends OPA.ICollection {
   readonly Archive: OPA.ITypedQueryableCollectionDescriptor<Archive.IArchive, Archive.QuerySet>;
   readonly AuthProviders: OPA.ITypedQueryableCollectionDescriptor<AuthProvider.IAuthenticationProvider, AuthProvider.AuthenticationProviderQuerySet>;
   readonly Locales: OPA.ITypedQueryableCollectionDescriptor<Locale.ILocale, Locale.QuerySet>;
-  readonly OpaSystem: OPA.ITypedQueryableCollectionDescriptor<OpaSystem.IOpaSystem, OpaSystem.QuerySet>;
+  readonly Application: OPA.ITypedQueryableCollectionDescriptor<Application.IApplication, Application.QuerySet>;
   readonly Roles: OPA.ITypedQueryableCollectionDescriptor<Role.IRole, Role.QuerySet>;
   readonly TimeZones: OPA.ITypedQueryableCollectionDescriptor<TimeZone.ITimeZone, TimeZone.QuerySet>;
   readonly TimeZoneGroups: OPA.ITypedQueryableCollectionDescriptor<TimeZoneGroup.ITimeZoneGroup, TimeZoneGroup.QuerySet>;
@@ -35,7 +35,7 @@ DbDescriptor.AccessRequests = AccessRequest.CollectionDescriptor;
 DbDescriptor.Archive = Archive.CollectionDescriptor;
 DbDescriptor.AuthProviders = AuthProvider.CollectionDescriptor;
 DbDescriptor.Locales = Locale.CollectionDescriptor;
-DbDescriptor.OpaSystem = OpaSystem.CollectionDescriptor;
+DbDescriptor.Application = Application.CollectionDescriptor;
 DbDescriptor.Roles = Role.CollectionDescriptor;
 DbDescriptor.TimeZones = TimeZone.CollectionDescriptor;
 DbDescriptor.TimeZoneGroups = TimeZoneGroup.CollectionDescriptor;
@@ -49,7 +49,7 @@ export {IArchive, IArchivePartial, createSingleton as createArchive, SingletonId
 export {IAuthenticationProvider, AuthenticationProvider_GoogleId, AuthenticationProvider_RequiredIds} from "./doctypes/AuthenticationProvider"; // eslint-disable-line camelcase
 export {AuthorizationState, IArchiveState, IAuthenticationState, IAuthorizationState, ICallState, IDataStorageState} from "./CallStateTypes";
 export {ILocale} from "./doctypes/Locale";
-export {IOpaSystem, createSingleton as createSystem, SingletonId as OpaSystemId} from "./doctypes/Application";
+export {IApplication, createSingleton as createApplication, SingletonId as ApplicationId} from "./doctypes/Application";
 export {IRole, Role_OwnerId, Role_AdministratorId, Role_EditorId, Role_ViewerId, Role_GuestId, Role_RequiredIds} from "./doctypes/Role"; // eslint-disable-line camelcase
 export {ITimeZone} from "./doctypes/TimeZone";
 export {ITimeZoneGroup} from "./doctypes/TimeZoneGroup";

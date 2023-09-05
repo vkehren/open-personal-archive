@@ -1,6 +1,6 @@
 import * as OPA from "../../base/src";
 import * as OpaDm from "../../datamodel/src";
-import {createArchive, createSystem, getAuthorizationData, IArchivePartial, IAuthorizationData, ILocale, ITimeZoneGroup, OpaDbDescriptor as OpaDb} from "../../datamodel/src";
+import {createArchive, createApplication, getAuthorizationData, IArchivePartial, IAuthorizationData, ILocale, ITimeZoneGroup, OpaDbDescriptor as OpaDb} from "../../datamodel/src";
 import * as SchemaConfig from "../../datamodel/package.json";
 import * as ApplicationConfig from "../package.json";
 
@@ -20,13 +20,13 @@ export interface IInstallationScreenDisplayModel {
  * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
  * @return {Promise<boolean>} Whether the OPA system is installed.
  */
-export async function isInstalled(dataStorageState: OpaDm.IDataStorageState): Promise<boolean> {
+export async function isSystemInstalled(dataStorageState: OpaDm.IDataStorageState): Promise<boolean> {
   OPA.assertNonNullish(dataStorageState, "The Data Storage State must not be null.");
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
   const db = dataStorageState.db;
-  const system = await OpaDb.OpaSystem.queries.getById(db, OpaDm.OpaSystemId);
-  return (!OPA.isNullish(system));
+  const application = await OpaDb.Application.queries.getById(db, OpaDm.ApplicationId);
+  return (!OPA.isNullish(application));
 }
 
 /**
@@ -42,10 +42,10 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
   // NOTE: First handle case where OPA is NOT installed
   const firebaseProjectId = callState.dataStorageState.projectId;
   const usesFirebaseEmulators = callState.dataStorageState.usesEmulators;
-  const isOpaSystemInstalled = await isInstalled(callState.dataStorageState);
+  const isSystemCurrentlyInstalled = await isSystemInstalled(callState.dataStorageState);
 
   const defaultDisplayModel: IInstallationScreenDisplayModel = {
-    authorizationData: {firebaseProjectId, usesFirebaseEmulators, isOpaSystemInstalled, userData: null, roleData: null},
+    authorizationData: {firebaseProjectId, usesFirebaseEmulators, isSystemInstalled: isSystemCurrentlyInstalled, userData: null, roleData: null},
     archiveName: "(a name for the archive)",
     archiveDescription: "(a description for the archive)",
     pathToStorageFolder: "./",
@@ -55,7 +55,7 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
     selectedTimeZoneGroup: OpaDb.TimeZoneGroups.requiredDocuments.filter((value: ITimeZoneGroup) => value.isDefault)[0],
   };
 
-  if (!isOpaSystemInstalled) {
+  if (!isSystemCurrentlyInstalled) {
     return defaultDisplayModel;
   }
 
@@ -132,15 +132,15 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   const ownerFirebaseAuthUserId = authenticationState.firebaseAuthUserId;
   const externalAuthProviderId = authenticationState.providerId;
   const ownerAccountName = authenticationState.email;
-  const hasBeenInstalled = await isInstalled(dataStorageState);
+  const isSystemCurrentlyInstalled = await isSystemInstalled(dataStorageState);
 
-  OPA.assertOpaIsNotInstalled(hasBeenInstalled, "The Open Personal Archive™ (OPA) system has already been installed. Please un-install before re-installing.");
+  OPA.assertSystemIsNotInstalled(isSystemCurrentlyInstalled, "The Open Personal Archive™ (OPA) system has already been installed. Please un-install before re-installing.");
 
-  // 1) Create the OpaSystem document
-  const system = createSystem(ApplicationConfig.version, SchemaConfig.version);
-  const systemCollectionRef = OpaDb.OpaSystem.getTypedCollection(db);
-  const systemDocumentRef = systemCollectionRef.doc(system.id);
-  await systemDocumentRef.set(system, {merge: true});
+  // 1) Create the Application document
+  const application = createApplication(ApplicationConfig.version, SchemaConfig.version);
+  const applicationCollectionRef = OpaDb.Application.getTypedCollection(db);
+  const applicationDocumentRef = applicationCollectionRef.doc(application.id);
+  await applicationDocumentRef.set(application, {merge: true});
 
   // 2) Load required data
   const requiredAuthProviderIds = OpaDm.AuthenticationProvider_RequiredIds;
@@ -213,9 +213,9 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
   OPA.assertIdentifierIsValid(callState.authenticationState.firebaseAuthUserId);
 
   const db = callState.dataStorageState.db;
-  const isInstalled = (!OPA.isNullish(callState.archiveState));
+  const isSystemCurrentlyInstalled = (!OPA.isNullish(callState.archiveState));
 
-  OPA.assertOpaIsInstalled(isInstalled);
+  OPA.assertSystemIsInstalled(isSystemCurrentlyInstalled);
 
   const authorizationStateNonNull = OPA.convertNonNullish(callState.authorizationState);
   const authorizedRoleIds = [OpaDm.Role_OwnerId, OpaDm.Role_AdministratorId];

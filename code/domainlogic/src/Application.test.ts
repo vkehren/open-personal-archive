@@ -5,7 +5,7 @@ import chaiAsPromised from "chai-as-promised";
 chai.use(chaiAsPromised);
 import * as OPA from "../../base/src";
 import * as OpaDm from "../../datamodel/src";
-import {createSystem, OpaDbDescriptor as OpaDb} from "../../datamodel/src";
+import {createApplication, OpaDbDescriptor as OpaDb} from "../../datamodel/src";
 import * as Application from "./Application";
 import * as Authorization from "./Authorization";
 import * as SchemaConfig from "../../datamodel/package.json";
@@ -59,8 +59,8 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     admin.initializeApp(initializeArgs);
     dataStorageState.db = admin.firestore();
 
-    const isInstalled = await Application.isInstalled(dataStorageState);
-    if (isInstalled) {
+    const isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    if (isSystemInstalled) {
       const owner = await OpaDb.Users.queries.getById(dataStorageState.db, OpaDm.User_OwnerId);
 
       if (OPA.isNullish(owner)) {
@@ -75,39 +75,39 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     // LATER: Consider terminating DB, deleting App, and re-creating App
   });
 
-  test("checks that isInstalled(...) works properly", async () => {
-    let isInstalled = await Application.isInstalled(dataStorageState);
-    expect(isInstalled).equals(false);
+  test("checks that isSystemInstalled(...) works properly", async () => {
+    let isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    expect(isSystemInstalled).equals(false);
 
-    const system = createSystem(ApplicationConfig.version, SchemaConfig.version);
-    const systemCollectionRef = OpaDb.OpaSystem.getTypedCollection(dataStorageState.db);
-    const systemDocumentRef = systemCollectionRef.doc(system.id);
-    await systemDocumentRef.set(system, {merge: true});
+    const application = createApplication(ApplicationConfig.version, SchemaConfig.version);
+    const applicationCollectionRef = OpaDb.Application.getTypedCollection(dataStorageState.db);
+    const applicationDocumentRef = applicationCollectionRef.doc(application.id);
+    await applicationDocumentRef.set(application, {merge: true});
 
-    isInstalled = await Application.isInstalled(dataStorageState);
-    expect(isInstalled).equals(true);
+    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    expect(isSystemInstalled).equals(true);
   });
 
   test("checks that performUninstall(...) works properly", async () => {
-    let isInstalled = await Application.isInstalled(dataStorageState);
-    expect(isInstalled).equals(false);
+    let isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    expect(isSystemInstalled).equals(false);
 
-    let system = createSystem(ApplicationConfig.version, SchemaConfig.version);
-    let systemCollectionRef = OpaDb.OpaSystem.getTypedCollection(dataStorageState.db);
-    let systemDocumentRef = systemCollectionRef.doc(system.id);
-    await systemDocumentRef.set(system, {merge: true});
+    let application = createApplication(ApplicationConfig.version, SchemaConfig.version);
+    let applicationCollectionRef = OpaDb.Application.getTypedCollection(dataStorageState.db);
+    let applicationDocumentRef = applicationCollectionRef.doc(application.id);
+    await applicationDocumentRef.set(application, {merge: true});
 
-    isInstalled = await Application.isInstalled(dataStorageState);
-    expect(isInstalled).equals(true);
+    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    expect(isSystemInstalled).equals(true);
 
     // NOTE: Since no Archive Owner exists in the current data, the following call should complete successfully
     await Application.performUninstall(dataStorageState, authenticationState, null, false);
 
-    isInstalled = await Application.isInstalled(dataStorageState);
-    expect(isInstalled).equals(false);
+    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    expect(isSystemInstalled).equals(false);
 
-    const systems = await OpaDb.OpaSystem.queries.getAll(dataStorageState.db);
-    expect(systems.length).equals(0);
+    const applications = await OpaDb.Application.queries.getAll(dataStorageState.db);
+    expect(applications.length).equals(0);
     const authProviders = await OpaDb.AuthProviders.queries.getAll(dataStorageState.db);
     expect(authProviders.length).equals(0);
     const roles = await OpaDb.Roles.queries.getAll(dataStorageState.db);
@@ -123,15 +123,15 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     const archives = await OpaDb.Archive.queries.getAll(dataStorageState.db);
     expect(archives.length).equals(0);
 
-    system = createSystem(ApplicationConfig.version, SchemaConfig.version);
-    systemCollectionRef = OpaDb.OpaSystem.getTypedCollection(dataStorageState.db);
-    systemDocumentRef = systemCollectionRef.doc(system.id);
-    await systemDocumentRef.set(system, {merge: true});
+    application = createApplication(ApplicationConfig.version, SchemaConfig.version);
+    applicationCollectionRef = OpaDb.Application.getTypedCollection(dataStorageState.db);
+    applicationDocumentRef = applicationCollectionRef.doc(application.id);
+    await applicationDocumentRef.set(application, {merge: true});
 
     const authProvider = OpaDb.AuthProviders.requiredDocuments[0];
     const authProviderCollectionRef = OpaDb.AuthProviders.getTypedCollection(dataStorageState.db);
     const authProviderDocumentRef = authProviderCollectionRef.doc(authProvider.id);
-    await authProviderDocumentRef.set(system, {merge: true});
+    await authProviderDocumentRef.set(application, {merge: true});
 
     const role = OpaDb.Roles.requiredDocuments.filter((value) => (value.type == OpaDm.RoleTypes.owner))[0];
     const roleCollectionRef = OpaDb.Roles.getTypedCollection(dataStorageState.db);
@@ -178,8 +178,8 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     const userDocumentRef = userCollectionRef.doc(owner.id);
     await userDocumentRef.set(owner, {merge: true});
 
-    isInstalled = await Application.isInstalled(dataStorageState);
-    expect(isInstalled).equals(true);
+    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    expect(isSystemInstalled).equals(true);
 
     const authorizationState = await Authorization.readAuthorizationState(dataStorageState, ownerFirebaseAuthUserId);
     // NOTE: Since an Archive Owner exists in the current data, the following call should throw an Error
@@ -187,35 +187,35 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     // NOTE: Since we pass the Archive Owner's Authorization State, the following call should complete successfully
     await Application.performUninstall(dataStorageState, authenticationState, authorizationState, false);
 
-    isInstalled = await Application.isInstalled(dataStorageState);
-    expect(isInstalled).equals(false);
+    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    expect(isSystemInstalled).equals(false);
 
     // NOTE: Since the System is no longer installed, this call should succeed
     await Application.performUninstall(dataStorageState, authenticationState, null, false);
 
-    isInstalled = await Application.isInstalled(dataStorageState);
-    expect(isInstalled).equals(false);
+    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    expect(isSystemInstalled).equals(false);
 
     // NOTE: Since the System is no longer installed, this call should also succeed
     await Application.performUninstall(dataStorageState, authenticationState, authorizationState, false);
 
-    isInstalled = await Application.isInstalled(dataStorageState);
-    expect(isInstalled).equals(false);
+    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    expect(isSystemInstalled).equals(false);
   });
 
   test("checks that performInstall(...) works properly", async () => {
-    let isInstalled = await Application.isInstalled(dataStorageState);
-    expect(isInstalled).equals(false);
+    let isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    expect(isSystemInstalled).equals(false);
 
     await Application.performInstall(dataStorageState, authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
       "OPA_Locale_bn_IN", "OPA_TimeZoneGroup_IST_+05:30", "Fake", "Account");
 
-    isInstalled = await Application.isInstalled(dataStorageState);
-    expect(isInstalled).equals(true);
+    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    expect(isSystemInstalled).equals(true);
 
     // LATER: Extract these checks into a isCorrupted(...) function that checks install data is valid or not
-    const systems = await OpaDb.OpaSystem.queries.getAll(dataStorageState.db);
-    expect(systems.length).equals(1);
+    const applications = await OpaDb.Application.queries.getAll(dataStorageState.db);
+    expect(applications.length).equals(1);
     const authProviders = await OpaDb.AuthProviders.queries.getAll(dataStorageState.db);
     expect(authProviders.length).equals(OpaDb.AuthProviders.requiredDocuments.length).equals(1);
     const roles = await OpaDb.Roles.queries.getAll(dataStorageState.db);

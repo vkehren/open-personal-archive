@@ -139,7 +139,7 @@ export function assertIdentifierIsValid<T extends BT.IDocument>(id: string | nul
  * @param {string} [message=default] The message to display on failure of assertion.
  * @return {boolean} Whether the OPA system is installed or not.
  */
-export function assertOpaIsInstalled(isInstalled: boolean, message = "The Open Personal Archive™ (OPA) system is not currently installed."): boolean {
+export function assertSystemIsInstalled(isInstalled: boolean, message = "The Open Personal Archive™ (OPA) system is not currently installed."): boolean {
   if (!isInstalled) {
     throw new Error(message);
   }
@@ -152,7 +152,7 @@ export function assertOpaIsInstalled(isInstalled: boolean, message = "The Open P
  * @param {string} [message=default] The message to display on failure of assertion.
  * @return {boolean} Whether the OPA system is installed or not.
  */
-export function assertOpaIsNotInstalled(isInstalled: boolean, message = "The Open Personal Archive™ (OPA) system has already been installed."): boolean {
+export function assertSystemIsNotInstalled(isInstalled: boolean, message = "The Open Personal Archive™ (OPA) system has already been installed."): boolean {
   if (isInstalled) {
     throw new Error(message);
   }

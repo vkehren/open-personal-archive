@@ -25,18 +25,18 @@ export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataSt
   let archiveState: OpaDm.IArchiveState | undefined = undefined;
 
   // NOTE: Create Archive State
-  const opaSystem = await OpaDb.OpaSystem.queries.getById(db, OpaDm.OpaSystemId);
+  const application = await OpaDb.Application.queries.getById(db, OpaDm.ApplicationId);
   const archive = await OpaDb.Archive.queries.getById(db, OpaDm.ArchiveId);
-  let opaSystemNonNull = ((null as unknown) as OpaDm.IOpaSystem);
+  let applicationNonNull = ((null as unknown) as OpaDm.IApplication);
   let archiveNonNull = ((null as unknown) as OpaDm.IArchive);
 
-  if (!OPA.isNullish(opaSystem)) {
+  if (!OPA.isNullish(application)) {
     OPA.assertDocumentIsValid(archive, "The Archive object must exist.");
 
-    opaSystemNonNull = OPA.convertNonNullish(opaSystem);
+    applicationNonNull = OPA.convertNonNullish(application);
     archiveNonNull = OPA.convertNonNullish(archive);
 
-    archiveState = {system: opaSystemNonNull, archive: archiveNonNull};
+    archiveState = {application: applicationNonNull, archive: archiveNonNull};
     hasArchiveState = true;
   }
 

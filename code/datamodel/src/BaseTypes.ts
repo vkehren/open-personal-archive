@@ -43,7 +43,7 @@ export interface IRoleAuthorizationData {
 export interface IAuthorizationData {
   readonly firebaseProjectId: string;
   readonly usesFirebaseEmulators: boolean;
-  readonly isOpaSystemInstalled: boolean;
+  readonly isSystemInstalled: boolean;
   readonly userData: IUserAuthorizationData | null;
   readonly roleData: IRoleAuthorizationData | null;
 }
@@ -64,7 +64,7 @@ export function getAuthorizationData(dataStorageState: IDataStorageState, archiv
     const authorizationData: IAuthorizationData = {
       firebaseProjectId: dataStorageState.projectId,
       usesFirebaseEmulators: dataStorageState.usesEmulators,
-      isOpaSystemInstalled: (!OPA.isNullish(archiveState.archive)),
+      isSystemInstalled: (!OPA.isNullish(archiveState.archive)),
       userData: null,
       roleData: null,
     };
@@ -118,7 +118,7 @@ export function getAuthorizationData(dataStorageState: IDataStorageState, archiv
   const authorizationData: IAuthorizationData = {
     firebaseProjectId: dataStorageState.projectId,
     usesFirebaseEmulators: dataStorageState.usesEmulators,
-    isOpaSystemInstalled: (!OPA.isNullish(archiveState.archive)),
+    isSystemInstalled: (!OPA.isNullish(archiveState.archive)),
     userData: userData,
     roleData: roleData,
   };
