@@ -54,4 +54,4 @@ export {IRole, Role_OwnerId, Role_AdministratorId, Role_EditorId, Role_ViewerId,
 export {ITimeZone} from "./doctypes/TimeZone";
 export {ITimeZoneGroup} from "./doctypes/TimeZoneGroup";
 export {IUser, IUserPartial, createArchiveOwner, User_OwnerId} from "./doctypes/User"; // eslint-disable-line camelcase
-export {ApprovalState, ApprovalStates, DateShim, getAuthorizationData, IAuthorizationData, IRoleAuthorizationData, IUserAuthorizationData, now, RoleType, RoleTypes} from "./BaseTypes";
+export {DefaultIndexCollection, DefaultLocale, localizableStringConstructor, ApprovalState, ApprovalStates, DateShim, getAuthorizationData, IAuthorizationData, IRoleAuthorizationData, IUserAuthorizationData, now, RoleType, RoleTypes} from "./BaseTypes";

@@ -2,6 +2,16 @@ import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../base/src";
 import {IArchiveState, IAuthorizationState, IDataStorageState} from "./CallStateTypes";
 
+export const DefaultIndexCollection = "Indices";
+export const DefaultLocale = ("en" as string);
+export const localizableStringConstructor = function (desiredValue: string | null, defaultValue: string, locale = DefaultLocale): OPA.ILocalizable<string> {
+  OPA.assertNonNullishOrWhitespace(locale);
+  const localizableString = ({} as any);
+  localizableString[locale] = (!OPA.isNullishOrWhitespace(desiredValue) ? OPA.convertNonNullish(desiredValue) : defaultValue);
+  localizableString[DefaultLocale] = localizableString[locale];
+  return localizableString;
+};
+
 // NOTE: To overcome known issue with storing Firebase Firestore Timestamps, for now, just use JavaScript Dates (see https://github.com/jloosli/node-firestore-import-export/issues/46)
 export type DateShim = Date;
 export const now = (): DateShim => firestore.Timestamp.now().toDate();
