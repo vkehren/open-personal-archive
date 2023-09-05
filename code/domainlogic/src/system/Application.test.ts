@@ -6,8 +6,8 @@ chai.use(chaiAsPromised);
 import * as OPA from "../../../base/src";
 import * as OpaDm from "../../../datamodel/src";
 import {createApplication, OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
+import * as CSU from "../CallStateUtilities";
 import * as Application from "./Application";
-import * as Authorization from "../Authorization";
 import * as SchemaInfo from "../../../datamodel/src/PackageInfo";
 import * as ApplicationInfo from "../PackageInfo";
 import * as TestConfig from "../../test-config.json";
@@ -67,7 +67,7 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
         // NOTE: Passing a valid value for "authorizationState" only matters if the Archive Owner actually exists
         await Application.performUninstall(dataStorageState, authenticationState, null, doBackup);
       } else {
-        const authorizationState = await Authorization.readAuthorizationState(dataStorageState, OPA.convertNonNullish(owner).firebaseAuthUserId);
+        const authorizationState = await CSU.readAuthorizationStateForFirebaseAuthUser(dataStorageState, OPA.convertNonNullish(owner).firebaseAuthUserId);
         await Application.performUninstall(dataStorageState, authenticationState, authorizationState, doBackup);
       }
     }
@@ -181,7 +181,7 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
     expect(isSystemInstalled).equals(true);
 
-    const authorizationState = await Authorization.readAuthorizationState(dataStorageState, ownerFirebaseAuthUserId);
+    const authorizationState = await CSU.readAuthorizationStateForFirebaseAuthUser(dataStorageState, ownerFirebaseAuthUserId);
     // NOTE: Since an Archive Owner exists in the current data, the following call should throw an Error
     expect(Application.performUninstall(dataStorageState, authenticationState, null, false)).to.be.rejectedWith(Error);
     // NOTE: Since we pass the Archive Owner's Authorization State, the following call should complete successfully
