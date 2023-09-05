@@ -5,6 +5,9 @@ const SingularName = "Locale";
 const PluralName = "Locales";
 const IsSingleton = false;
 const RequiredDocuments: Array<ILocale> = CollectionData.requiredDocuments;
+const DefaultDocument = (RequiredDocuments.find((v) => v.isDefault) as ILocale | undefined);
+export const DefaultLocaleId = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNonNullish(DefaultDocument).id : "OPA_Locale_en_US";
+export const DefaultLocale = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNonNullish(DefaultDocument).optionName : "en-US";
 
 export interface ILocale extends OPA.IDocument {
   readonly id: string;

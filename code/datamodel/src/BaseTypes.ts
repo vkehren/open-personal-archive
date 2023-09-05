@@ -1,14 +1,14 @@
 import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../base/src";
 import {IArchiveState, IAuthorizationState, IDataStorageState} from "./CallStateTypes";
+import {DefaultLocale} from "./doctypes/Locale";
 
 export const DefaultIndexCollection = "Indices";
-export const DefaultLocale = ("en" as string);
 export const localizableStringConstructor = function (desiredValue: string | null, defaultValue: string, locale = DefaultLocale): OPA.ILocalizable<string> {
   OPA.assertNonNullishOrWhitespace(locale);
   const localizableString = ({} as any);
   localizableString[locale] = (!OPA.isNullishOrWhitespace(desiredValue) ? OPA.convertNonNullish(desiredValue) : defaultValue);
-  localizableString[DefaultLocale] = localizableString[locale];
+  localizableString[OPA.Default_Locale] = localizableString[locale]; // NOTE: The base library default locale is actually "en"
   return localizableString;
 };
 

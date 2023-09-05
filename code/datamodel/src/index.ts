@@ -48,10 +48,10 @@ export {IAccessRequest, IAccessRequestPartial} from "./doctypes/AccessRequest";
 export {IArchive, IArchivePartial, createSingleton as createArchive, SingletonId as ArchiveId} from "./doctypes/Archive";
 export {IAuthenticationProvider, AuthenticationProvider_GoogleId, AuthenticationProvider_RequiredIds} from "./doctypes/AuthenticationProvider"; // eslint-disable-line camelcase
 export {AuthorizationState, IArchiveState, IAuthenticationState, IAuthorizationState, ICallState, IDataStorageState} from "./CallStateTypes";
-export {ILocale} from "./doctypes/Locale";
+export {ILocale, DefaultLocaleId, DefaultLocale} from "./doctypes/Locale";
 export {IApplication, createSingleton as createApplication, SingletonId as ApplicationId} from "./doctypes/Application";
 export {IRole, Role_OwnerId, Role_AdministratorId, Role_EditorId, Role_ViewerId, Role_GuestId, Role_RequiredIds} from "./doctypes/Role"; // eslint-disable-line camelcase
 export {ITimeZone} from "./doctypes/TimeZone";
 export {ITimeZoneGroup} from "./doctypes/TimeZoneGroup";
 export {IUser, IUserPartial, createArchiveOwner, User_OwnerId} from "./doctypes/User"; // eslint-disable-line camelcase
-export {DefaultIndexCollection, DefaultLocale, localizableStringConstructor, ApprovalState, ApprovalStates, DateShim, getAuthorizationData, IAuthorizationData, IRoleAuthorizationData, IUserAuthorizationData, now, RoleType, RoleTypes} from "./BaseTypes";
+export {DefaultIndexCollection, localizableStringConstructor, ApprovalState, ApprovalStates, DateShim, getAuthorizationData, IAuthorizationData, IRoleAuthorizationData, IUserAuthorizationData, now, RoleType, RoleTypes} from "./BaseTypes";
