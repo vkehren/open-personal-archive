@@ -8,8 +8,8 @@ import * as OpaDm from "../../../datamodel/src";
 import {createApplication, OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
 import * as Application from "./Application";
 import * as Authorization from "../Authorization";
-import * as SchemaConfig from "../../../datamodel/package.json";
-import * as ApplicationConfig from "../../package.json";
+import * as SchemaInfo from "../../../datamodel/src/PackageInfo";
+import * as ApplicationInfo from "../PackageInfo";
 import * as TestConfig from "../../test-config.json";
 
 const useEmulators = TestConfig.use_emulators;
@@ -79,7 +79,7 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     let isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    const application = createApplication(ApplicationConfig.version, SchemaConfig.version);
+    const application = createApplication(ApplicationInfo.VERSION, SchemaInfo.VERSION);
     const applicationCollectionRef = OpaDb.Application.getTypedCollection(dataStorageState.db);
     const applicationDocumentRef = applicationCollectionRef.doc(application.id);
     await applicationDocumentRef.set(application, {merge: true});
@@ -92,7 +92,7 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     let isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    let application = createApplication(ApplicationConfig.version, SchemaConfig.version);
+    let application = createApplication(ApplicationInfo.VERSION, SchemaInfo.VERSION);
     let applicationCollectionRef = OpaDb.Application.getTypedCollection(dataStorageState.db);
     let applicationDocumentRef = applicationCollectionRef.doc(application.id);
     await applicationDocumentRef.set(application, {merge: true});
@@ -123,7 +123,7 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     const archives = await OpaDb.Archive.queries.getAll(dataStorageState.db);
     expect(archives.length).equals(0);
 
-    application = createApplication(ApplicationConfig.version, SchemaConfig.version);
+    application = createApplication(ApplicationInfo.VERSION, SchemaInfo.VERSION);
     applicationCollectionRef = OpaDb.Application.getTypedCollection(dataStorageState.db);
     applicationDocumentRef = applicationCollectionRef.doc(application.id);
     await applicationDocumentRef.set(application, {merge: true});

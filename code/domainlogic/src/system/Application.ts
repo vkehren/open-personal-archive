@@ -2,8 +2,8 @@ import * as OPA from "../../../base/src";
 import * as OpaDm from "../../../datamodel/src";
 import {createArchive, createApplication, IArchivePartial, ILocale, ITimeZoneGroup, OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
 import * as DMU from "../DisplayModelUtilities";
-import * as SchemaConfig from "../../../datamodel/package.json";
-import * as ApplicationConfig from "../../package.json";
+import * as SchemaInfo from "../../../datamodel/src/PackageInfo";
+import * as ApplicationInfo from "../PackageInfo";
 
 export interface IInstallationScreenDisplayModel {
   readonly authorizationData: DMU.IAuthorizationData;
@@ -138,7 +138,7 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   OPA.assertSystemIsNotInstalled(isSystemCurrentlyInstalled, "The Open Personal Archive™ (OPA) system has already been installed. Please un-install before re-installing.");
 
   // 1) Create the Application document
-  const application = createApplication(ApplicationConfig.version, SchemaConfig.version);
+  const application = createApplication(ApplicationInfo.VERSION, SchemaInfo.VERSION);
   const applicationCollectionRef = OpaDb.Application.getTypedCollection(db);
   const applicationDocumentRef = applicationCollectionRef.doc(application.id);
   await applicationDocumentRef.set(application, {merge: true});
