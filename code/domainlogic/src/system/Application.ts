@@ -60,12 +60,12 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
   }
 
   // NOTE: Handle case where OPA is installed
-  OPA.assertNonNullish(callState.archiveState, "The Archive State must not be null.");
+  OPA.assertNonNullish(callState.systemState, "The Archive State must not be null.");
   OPA.assertNonNullish(callState.authenticationState, "The Authentication State must not be null.");
   OPA.assertNonNullish(callState.authorizationState, "The Authorization State must not be null.");
 
   const dataStorageStateNonNull = OPA.convertNonNullish(callState.dataStorageState);
-  const archiveStateNonNull = OPA.convertNonNullish(callState.archiveState);
+  const systemStateNonNull = OPA.convertNonNullish(callState.systemState);
   const authorizationStateNonNull = OPA.convertNonNullish(callState.authorizationState);
   const authorizedRoleIds = [OpaDm.Role_OwnerId, OpaDm.Role_AdministratorId];
 
@@ -73,7 +73,7 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
   authorizationStateNonNull.assertRoleAllowed(authorizedRoleIds);
 
   const db = callState.dataStorageState.db;
-  const archiveNonNull = archiveStateNonNull.archive;
+  const archiveNonNull = systemStateNonNull.archive;
   const localeNonNull = authorizationStateNonNull.locale;
   const localeToUse = localeNonNull.optionName;
 
@@ -95,7 +95,7 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
 
   // LATER: Pass IAuthorizationState to getAuthorizationData(...) and include locale and timezone for User
   const displayModel: IInstallationScreenDisplayModel = {
-    authorizationData: getAuthorizationData(dataStorageStateNonNull, archiveStateNonNull, authorizationStateNonNull),
+    authorizationData: getAuthorizationData(dataStorageStateNonNull, systemStateNonNull, authorizationStateNonNull),
     archiveName: OPA.getLocalizedText(archiveNonNull.name, localeToUse),
     archiveDescription: OPA.getLocalizedText(archiveNonNull.description, localeToUse),
     pathToStorageFolder: archiveNonNull.pathToStorageFolder,
@@ -213,7 +213,7 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
   OPA.assertIdentifierIsValid(callState.authenticationState.firebaseAuthUserId);
 
   const db = callState.dataStorageState.db;
-  const isSystemCurrentlyInstalled = (!OPA.isNullish(callState.archiveState));
+  const isSystemCurrentlyInstalled = (!OPA.isNullish(callState.systemState));
 
   OPA.assertSystemIsInstalled(isSystemCurrentlyInstalled);
 

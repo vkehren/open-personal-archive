@@ -1,6 +1,6 @@
 import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../base/src";
-import {IArchiveState, IAuthorizationState, IDataStorageState} from "./CallStateTypes";
+import {ISystemState, IAuthorizationState, IDataStorageState} from "./CallStateTypes";
 import {DefaultLocale} from "./doctypes/Locale";
 
 export const DefaultIndexCollection = "Indices";
@@ -61,20 +61,20 @@ export interface IAuthorizationData {
 /**
     * Gets the Authorization data for the specified Archive, User, and Role.
     * @param {IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
-    * @param {IArchiveState} archiveState The state for the relevant Archive.
+    * @param {ISystemState} systemState The state for the relevant Archive.
     * @param {IAuthorizationState} authorizationState The state for the current User.
     * @return {IAuthorizationData} The corresponding Authorization data.
     */
-export function getAuthorizationData(dataStorageState: IDataStorageState, archiveState: IArchiveState, authorizationState: IAuthorizationState): IAuthorizationData {
-  if (OPA.isNullish(dataStorageState) || OPA.isNullish(archiveState) || OPA.isNullish(authorizationState)) {
-    throw new Error("The DataStorageState, ArchiveState, and AuthorizationState must not be null.");
+export function getAuthorizationData(dataStorageState: IDataStorageState, systemState: ISystemState, authorizationState: IAuthorizationState): IAuthorizationData {
+  if (OPA.isNullish(dataStorageState) || OPA.isNullish(systemState) || OPA.isNullish(authorizationState)) {
+    throw new Error("The DataStorageState, SystemState, and AuthorizationState must not be null.");
   }
 
   if (OPA.isNullish(authorizationState.user)) {
     const authorizationData: IAuthorizationData = {
       firebaseProjectId: dataStorageState.projectId,
       usesFirebaseEmulators: dataStorageState.usesEmulators,
-      isSystemInstalled: (!OPA.isNullish(archiveState.archive)),
+      isSystemInstalled: (!OPA.isNullish(systemState.archive)),
       userData: null,
       roleData: null,
     };
@@ -128,7 +128,7 @@ export function getAuthorizationData(dataStorageState: IDataStorageState, archiv
   const authorizationData: IAuthorizationData = {
     firebaseProjectId: dataStorageState.projectId,
     usesFirebaseEmulators: dataStorageState.usesEmulators,
-    isSystemInstalled: (!OPA.isNullish(archiveState.archive)),
+    isSystemInstalled: (!OPA.isNullish(systemState.archive)),
     userData: userData,
     roleData: roleData,
   };

@@ -1,9 +1,9 @@
 import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../base/src";
 import * as BT from "./BaseTypes";
+import {IApplication} from "./doctypes/Application";
 import {IArchive} from "./doctypes/Archive";
 import {ILocale} from "./doctypes/Locale";
-import {IApplication} from "./doctypes/Application";
 import {IRole} from "./doctypes/Role";
 import {ITimeZone} from "./doctypes/TimeZone";
 import {ITimeZoneGroup} from "./doctypes/TimeZoneGroup";
@@ -42,7 +42,7 @@ export interface IAuthorizationState {
   assertRoleDisallowed(disallowedRoleIds: Array<string>): void;
 }
 
-export interface IArchiveState {
+export interface ISystemState {
   readonly application: IApplication;
   readonly archive: IArchive;
 }
@@ -52,8 +52,8 @@ export interface ICallState {
   readonly authenticationState: IAuthenticationState;
   readonly hasAuthorizationState: boolean;
   readonly authorizationState?: IAuthorizationState;
-  readonly hasArchiveState: boolean;
-  readonly archiveState?: IArchiveState;
+  readonly hasSystemState: boolean;
+  readonly systemState?: ISystemState;
 }
 
 /** Class providing Authorization-related state and assertions. */

@@ -48,14 +48,14 @@ export async function requestUserAccess(callState: OpaDm.ICallState, message: st
   OPA.assertNonNullish(callState, "The Call State must not be null.");
   OPA.assertNonNullish(callState.dataStorageState, "The Data Storage State must not be null.");
   OPA.assertNonNullish(callState.authorizationState, "The Authorization State must not be null.");
-  OPA.assertNonNullish(callState.archiveState, "The Archive State must not be null.");
+  OPA.assertNonNullish(callState.systemState, "The System State must not be null.");
 
   const db = callState.dataStorageState.db;
   const authorizationStateNonNull = OPA.convertNonNullish(callState.authorizationState);
-  const archiveStateNonNull = OPA.convertNonNullish(callState.archiveState);
+  const systemStateNonNull = OPA.convertNonNullish(callState.systemState);
   const currentUser = authorizationStateNonNull.user;
   const currentLocale = authorizationStateNonNull.locale;
-  const archive = archiveStateNonNull.archive;
+  const archive = systemStateNonNull.archive;
 
   const newAccessRequestRef = OpaDb.AccessRequests.getTypedCollection(db).doc();
   const newAccessRequest = OpaDb.AccessRequests.createInstance(currentUser, currentLocale, newAccessRequestRef.id, archive.id, currentUser.id, message, citationId);

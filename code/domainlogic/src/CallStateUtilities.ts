@@ -21,10 +21,10 @@ export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataSt
   const db = dataStorageState.db;
   const firebaseAuthUserId = authenticationState.firebaseAuthUserId;
 
-  let hasArchiveState = false;
-  let archiveState: OpaDm.IArchiveState | undefined = undefined;
+  let hasSystemState = false;
+  let systemState: OpaDm.ISystemState | undefined = undefined;
 
-  // NOTE: Create Archive State
+  // NOTE: Create System State
   const application = await OpaDb.Application.queries.getById(db, OpaDm.ApplicationId);
   const archive = await OpaDb.Archive.queries.getById(db, OpaDm.ArchiveId);
   let applicationNonNull = ((null as unknown) as OpaDm.IApplication);
@@ -36,23 +36,22 @@ export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataSt
     applicationNonNull = OPA.convertNonNullish(application);
     archiveNonNull = OPA.convertNonNullish(archive);
 
-    archiveState = {application: applicationNonNull, archive: archiveNonNull};
-    hasArchiveState = true;
+    systemState = {application: applicationNonNull, archive: archiveNonNull};
+    hasSystemState = true;
   }
 
-  if (!hasArchiveState) {
+  if (!hasSystemState) {
     const callState: OpaDm.ICallState = {
       dataStorageState: dataStorageState,
       authenticationState: authenticationState,
       hasAuthorizationState: false,
       authorizationState: undefined,
-      hasArchiveState: false,
-      archiveState: undefined,
+      hasSystemState: false,
+      systemState: undefined,
     };
     return callState;
   }
 
-  // NOTE: Create Authorization State
   let user = await OpaDb.Users.queries.getByFirebaseAuthUserId(db, firebaseAuthUserId);
 
   if (OPA.isNullish(user)) {
@@ -86,7 +85,33 @@ export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataSt
     await newUserRef.set(newUser, {merge: true});
   }
 
-  user = await OpaDb.Users.queries.getByFirebaseAuthUserId(db, firebaseAuthUserId);
+  const authorizationState = await readAuthorizationStateForFirebaseAuthUser(dataStorageState, firebaseAuthUserId);
+
+  const callState: OpaDm.ICallState = {
+    dataStorageState: dataStorageState,
+    authenticationState: authenticationState,
+    hasAuthorizationState: true,
+    authorizationState: authorizationState,
+    hasSystemState: hasSystemState,
+    systemState: systemState,
+  };
+  return callState;
+}
+
+/**
+ * Reads the Authorization State for the specified Firebase Auth User in the Open Personal Archive™ (OPA) system..
+ * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
+ * @param {string} firebaseAuthUserId The Firebase Auth UUID for the User.
+ * @return {Promise<OpaDm.IAuthorizationState>}
+ */
+export async function readAuthorizationStateForFirebaseAuthUser(dataStorageState: OpaDm.IDataStorageState, firebaseAuthUserId: string): Promise<OpaDm.IAuthorizationState> {
+  OPA.assertNonNullish(dataStorageState, "The Data Storage State must not be null.");
+  OPA.assertFirestoreIsNotNullish(dataStorageState.db);
+  OPA.assertIdentifierIsValid(firebaseAuthUserId);
+
+  const db = dataStorageState.db;
+
+  const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(db, firebaseAuthUserId);
   OPA.assertDocumentIsValid(user, "The current User must be properly authenticated.");
   const userNonNull = OPA.convertNonNullish(user);
 
@@ -106,15 +131,6 @@ export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataSt
   OPA.assertDocumentIsValid(timeZone, "The current User must have a valid Time Zone.");
   const timeZoneNonNull = OPA.convertNonNullish(timeZone);
 
-  const authorizationState = new OpaDm.AuthorizationState(userNonNull, roleNonNull, localeNonNull, timeZoneGroupNonNull, timeZoneNonNull);
-
-  const callState: OpaDm.ICallState = {
-    dataStorageState: dataStorageState,
-    authenticationState: authenticationState,
-    hasAuthorizationState: true,
-    authorizationState: authorizationState,
-    hasArchiveState: hasArchiveState,
-    archiveState: archiveState,
-  };
-  return callState;
+  const result = new OpaDm.AuthorizationState(userNonNull, roleNonNull, localeNonNull, timeZoneGroupNonNull, timeZoneNonNull);
+  return result;
 }
