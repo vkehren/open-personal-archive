@@ -1,13 +1,14 @@
-import * as functions from "firebase-functions";
+import {onCall} from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import * as OPA from "../../../base/src";
 import {AccessRequests} from "../../../domainlogic/src";
 import * as UTL from "../Utilities";
 
-export const requestUserAccess = functions.https.onCall(async (data, context) => { // eslint-disable-line @typescript-eslint/no-unused-vars
+export const requestUserAccess = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   try {
     const firebaseAdminApp = admin.app();
-    const callState = await UTL.getCallStateForFirebaseContextAndApp(context, firebaseAdminApp);
+    const data = request.data;
+    const callState = await UTL.getCallStateForFirebaseContextAndApp(request, firebaseAdminApp);
 
     const message = (data.query.message) ? data.query.message : undefined;
     OPA.assertNonNullishOrWhitespace(message, "The Access Request message must not be blank.");

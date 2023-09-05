@@ -1,4 +1,4 @@
-import * as functions from "firebase-functions";
+import {onCall} from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import * as OPA from "../../../base/src";
 import * as OpaDm from "../../../datamodel/src";
@@ -6,11 +6,11 @@ import {OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
 import {Application} from "../../../domainlogic/src";
 import * as UTL from "../Utilities";
 
-export const isInstalled = functions.https.onCall(async (data, context) => { // eslint-disable-line @typescript-eslint/no-unused-vars
+export const isInstalled = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   try {
     const firebaseAdminApp = admin.app();
     const dataStorageState = await UTL.getDataStorageStateForFirebaseApp(firebaseAdminApp);
-    const authenticationState = await UTL.getAuthenticationStateForContextAndApp(context, firebaseAdminApp);
+    const authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, firebaseAdminApp);
 
     const firebaseAuthUserId = (!OPA.isNullish(authenticationState)) ? OPA.convertNonNullish(authenticationState).firebaseAuthUserId : null;
     const isUserAuthenticated = (!OPA.isNullishOrWhitespace(firebaseAuthUserId));
@@ -79,10 +79,10 @@ export const isInstalled = functions.https.onCall(async (data, context) => { // 
   }
 });
 
-export const getInstallationScreenDisplayModel = functions.https.onCall(async (data, context) => { // eslint-disable-line @typescript-eslint/no-unused-vars
+export const getInstallationScreenDisplayModel = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   try {
     const firebaseAdminApp = admin.app();
-    const callState = await UTL.getCallStateForFirebaseContextAndApp(context, firebaseAdminApp);
+    const callState = await UTL.getCallStateForFirebaseContextAndApp(request, firebaseAdminApp);
 
     const displayModel = await Application.getInstallationScreenDisplayModel(callState);
 
@@ -92,10 +92,11 @@ export const getInstallationScreenDisplayModel = functions.https.onCall(async (d
   }
 });
 
-export const performInstall = functions.https.onCall(async (data, context) => {
+export const performInstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   try {
     const firebaseAdminApp = admin.app();
-    const callState = await UTL.getCallStateForFirebaseContextAndApp(context, firebaseAdminApp);
+    const data = request.data;
+    const callState = await UTL.getCallStateForFirebaseContextAndApp(request, firebaseAdminApp);
 
     const archiveName = (data.query.archiveName) ? data.query.archiveName : undefined;
     OPA.assertNonNullishOrWhitespace(archiveName, "The Archive name must not be blank.");
@@ -119,10 +120,11 @@ export const performInstall = functions.https.onCall(async (data, context) => {
   }
 });
 
-export const updateInstallationSettings = functions.https.onCall(async (data, context) => {
+export const updateInstallationSettings = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   try {
     const firebaseAdminApp = admin.app();
-    const callState = await UTL.getCallStateForFirebaseContextAndApp(context, firebaseAdminApp);
+    const data = request.data;
+    const callState = await UTL.getCallStateForFirebaseContextAndApp(request, firebaseAdminApp);
 
     const archiveName = (data.query.archiveName) ? data.query.archiveName : undefined;
     const archiveDescription = (data.query.archiveDescription) ? data.query.archiveDescription : undefined;
@@ -139,10 +141,11 @@ export const updateInstallationSettings = functions.https.onCall(async (data, co
   }
 });
 
-export const performUninstall = functions.https.onCall(async (data, context) => {
+export const performUninstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   try {
     const firebaseAdminApp = admin.app();
-    const callState = await UTL.getCallStateForFirebaseContextAndApp(context, firebaseAdminApp);
+    const data = request.data;
+    const callState = await UTL.getCallStateForFirebaseContextAndApp(request, firebaseAdminApp);
 
     const doBackupFirst = OPA.convertNonNullish(OPA.getBoolean(data.query.doBackupFirst, true));
     const uninstallResult = await Application.performUninstall(callState.dataStorageState, callState.authenticationState, callState.authorizationState, doBackupFirst);
