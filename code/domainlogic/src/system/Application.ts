@@ -1,8 +1,8 @@
-import * as OPA from "../../base/src";
-import * as OpaDm from "../../datamodel/src";
-import {createArchive, createApplication, getAuthorizationData, IArchivePartial, IAuthorizationData, ILocale, ITimeZoneGroup, OpaDbDescriptor as OpaDb} from "../../datamodel/src";
-import * as SchemaConfig from "../../datamodel/package.json";
-import * as ApplicationConfig from "../package.json";
+import * as OPA from "../../../base/src";
+import * as OpaDm from "../../../datamodel/src";
+import {createArchive, createApplication, getAuthorizationData, IArchivePartial, IAuthorizationData, ILocale, ITimeZoneGroup, OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
+import * as SchemaConfig from "../../../datamodel/package.json";
+import * as ApplicationConfig from "../../package.json";
 
 export interface IInstallationScreenDisplayModel {
   readonly authorizationData: IAuthorizationData;
