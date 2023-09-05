@@ -1,4 +1,5 @@
 import {onCall} from "firebase-functions/v2/https";
+import * as logger from "firebase-functions/logger";
 import * as admin from "firebase-admin";
 import * as OPA from "../../../base/src";
 import {AccessRequests} from "../../../domainlogic/src";
@@ -6,6 +7,7 @@ import * as UTL from "../Utilities";
 
 export const requestUserAccess = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   try {
+    logger.info("requestUserAccess()", {structuredData: true});
     const firebaseAdminApp = admin.app();
     const data = request.data;
     const callState = await UTL.getCallStateForFirebaseContextAndApp(request, firebaseAdminApp);

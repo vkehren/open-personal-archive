@@ -1,4 +1,5 @@
 import {onCall} from "firebase-functions/v2/https";
+import * as logger from "firebase-functions/logger";
 import * as admin from "firebase-admin";
 import * as OPA from "../../../base/src";
 import * as OpaDm from "../../../datamodel/src";
@@ -8,6 +9,7 @@ import * as UTL from "../Utilities";
 
 export const isInstalled = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   try {
+    logger.info("isInstalled()", {structuredData: true});
     const firebaseAdminApp = admin.app();
     const dataStorageState = await UTL.getDataStorageStateForFirebaseApp(firebaseAdminApp);
     const authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, firebaseAdminApp);
@@ -81,6 +83,7 @@ export const isInstalled = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (
 
 export const getInstallationScreenDisplayModel = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   try {
+    logger.info("getInstallationScreenDisplayModel()", {structuredData: true});
     const firebaseAdminApp = admin.app();
     const callState = await UTL.getCallStateForFirebaseContextAndApp(request, firebaseAdminApp);
 
@@ -94,6 +97,7 @@ export const getInstallationScreenDisplayModel = onCall({region: OPA.FIREBASE_DE
 
 export const performInstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   try {
+    logger.info("performInstall()", {structuredData: true});
     const firebaseAdminApp = admin.app();
     const data = request.data;
     const callState = await UTL.getCallStateForFirebaseContextAndApp(request, firebaseAdminApp);
@@ -122,6 +126,7 @@ export const performInstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, asyn
 
 export const updateInstallationSettings = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   try {
+    logger.info("updateInstallationSettings()", {structuredData: true});
     const firebaseAdminApp = admin.app();
     const data = request.data;
     const callState = await UTL.getCallStateForFirebaseContextAndApp(request, firebaseAdminApp);
@@ -143,6 +148,7 @@ export const updateInstallationSettings = onCall({region: OPA.FIREBASE_DEFAULT_R
 
 export const performUninstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   try {
+    logger.info("performUninstall()", {structuredData: true});
     const firebaseAdminApp = admin.app();
     const data = request.data;
     const callState = await UTL.getCallStateForFirebaseContextAndApp(request, firebaseAdminApp);
