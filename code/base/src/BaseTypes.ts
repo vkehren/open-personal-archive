@@ -88,70 +88,96 @@ export type DateToUse = Date;
  */
 export const nowToUse = (): DateToUse => firestore.Timestamp.now().toDate();
 
+// IDocument
 export const IDocument_DocumentId_PropertyName = "id"; // eslint-disable-line camelcase
-export const IDocument_Creatable_DateOfCreation_PropertyName = "dateOfCreation"; // eslint-disable-line camelcase
-export const IDocument_Creatable_ByUser_UserIdOfCreator_PropertyName = "userIdOfCreator"; // eslint-disable-line camelcase
-export const IDocument_Creatable_ByNullableUser_UserIdOfCreator_PropertyName = "userIdOfCreator"; // eslint-disable-line camelcase
-export const IDocument_Upgradeable_HasBeenUpgraded_PropertyName = "hasBeenUpgraded"; // eslint-disable-line camelcase
-export const IDocument_Upgradeable_DateOfLatestUpgraded_PropertyName = "dateOfLatestUpgraded"; // eslint-disable-line camelcase
-export const IDocument_Upgradeable_ByUser_UserIdOfLatestUpgrader_PropertyName = "userIdOfLatestUpgrader"; // eslint-disable-line camelcase
-export const IDocument_Updateable_HasBeenUpdated_PropertyName = "hasBeenUpdated"; // eslint-disable-line camelcase
-export const IDocument_Updateable_DateOfLatestUpdate_PropertyName = "dateOfLatestUpdate"; // eslint-disable-line camelcase
-export const IDocument_Updateable_ByUser_UserIdOfLatestUpdater_PropertyName = "userIdOfLatestUpdater"; // eslint-disable-line camelcase
-export const IDocument_Archivable_IsArchived_PropertyName = "isArchived"; // eslint-disable-line camelcase
-export const IDocument_Archivable_DateOfArchival_PropertyName = "dateOfArchival"; // eslint-disable-line camelcase
-export const IDocument_Archivable_ByUser_UserIdOfArchiver_PropertyName = "userIdOfArchiver"; // eslint-disable-line camelcase
-export const IDocument_Viewable_HasBeenViewed_PropertyName = "hasBeenViewed"; // eslint-disable-line camelcase
-export const IDocument_Viewable_DateOfViewing_PropertyName = "dateOfViewing"; // eslint-disable-line camelcase
-export const IDocument_Viewable_ByUser_UserIdOfViewer_PropertyName = "userIdOfViewer"; // eslint-disable-line camelcase
-export const IDocument_Approvable_ApprovalState_PropertyName = "approvalState"; // eslint-disable-line camelcase
-export const IDocument_Approvable_DateOfApproval_PropertyName = "dateOfApproval"; // eslint-disable-line camelcase
-export const IDocument_Approvable_ByUser_UserIdOfApprover_PropertyName = "userIdOfApprover"; // eslint-disable-line camelcase
-
 export interface IDocument {
   id: string,
 }
-export interface IDocument_Creatable extends IDocument {
+
+// ICreatable
+export const ICreatable_DateOfCreation_PropertyName = "dateOfCreation"; // eslint-disable-line camelcase
+export interface ICreatable {
+  // NOTE: Do not include "hasBeenCreated" because any object that exists has been created
   readonly dateOfCreation: DateToUse;
 }
-export interface IDocument_Creatable_ByUser extends IDocument, IDocument_Creatable {
+export const ICreatable_ByUser_UserIdOfCreator_PropertyName = "userIdOfCreator"; // eslint-disable-line camelcase
+export interface ICreatable_ByUser extends ICreatable {
   readonly userIdOfCreator: string;
 }
-export interface IDocument_Creatable_ByNullableUser extends IDocument, IDocument_Creatable {
+export const ICreatable_ByNullableUser_UserIdOfCreator_PropertyName = "userIdOfCreator"; // eslint-disable-line camelcase
+export interface ICreatable_ByNullableUser extends ICreatable {
   readonly userIdOfCreator: string | null;
 }
-export interface IDocument_Upgradeable extends IDocument {
+export interface IDocument_Creatable extends IDocument, ICreatable { }
+export interface IDocument_Creatable_ByUser extends IDocument_Creatable, ICreatable_ByUser { }
+export interface IDocument_Creatable_ByNullableUser extends IDocument_Creatable, ICreatable_ByNullableUser { }
+
+// IUpgradeable
+export const IUpgradeable_HasBeenUpgraded_PropertyName = "hasBeenUpgraded"; // eslint-disable-line camelcase
+export const IUpgradeable_DateOfLatestUpgraded_PropertyName = "dateOfLatestUpgraded"; // eslint-disable-line camelcase
+export interface IUpgradeable {
   readonly hasBeenUpgraded: boolean;
   readonly dateOfLatestUpgraded: DateToUse | null;
 }
-export interface IDocument_Upgradeable_ByUser extends IDocument, IDocument_Upgradeable {
+export const IUpgradeable_ByUser_UserIdOfLatestUpgrader_PropertyName = "userIdOfLatestUpgrader"; // eslint-disable-line camelcase
+export interface IUpgradeable_ByUser extends IUpgradeable {
   readonly userIdOfLatestUpgrader: string | null;
 }
-export interface IDocument_Updateable extends IDocument {
+export interface IDocument_Upgradeable extends IDocument, IUpgradeable { }
+export interface IDocument_Upgradeable_ByUser extends IDocument_Upgradeable, IUpgradeable_ByUser { }
+
+// IUpdateable
+export const IUpdateable_HasBeenUpdated_PropertyName = "hasBeenUpdated"; // eslint-disable-line camelcase
+export const IUpdateable_DateOfLatestUpdate_PropertyName = "dateOfLatestUpdate"; // eslint-disable-line camelcase
+export interface IUpdateable {
   readonly hasBeenUpdated: boolean;
   readonly dateOfLatestUpdate: DateToUse | null;
 }
-export interface IDocument_Updateable_ByUser extends IDocument, IDocument_Updateable {
+export const IUpdateable_ByUser_UserIdOfLatestUpdater_PropertyName = "userIdOfLatestUpdater"; // eslint-disable-line camelcase
+export interface IUpdateable_ByUser extends IUpdateable {
   readonly userIdOfLatestUpdater: string | null;
 }
-export interface IDocument_Archivable extends IDocument {
+export interface IDocument_Updateable extends IDocument, IUpdateable { }
+export interface IDocument_Updateable_ByUser extends IDocument_Updateable, IUpdateable_ByUser { }
+
+// IArchivable
+export const IArchivable_IsArchived_PropertyName = "isArchived"; // eslint-disable-line camelcase
+export const IArchivable_DateOfArchival_PropertyName = "dateOfArchival"; // eslint-disable-line camelcase
+export interface IArchivable {
   readonly isArchived: boolean;
   readonly dateOfArchival: DateToUse | null;
 }
-export interface IDocument_Archivable_ByUser extends IDocument, IDocument_Archivable {
+export const IArchivable_ByUser_UserIdOfArchiver_PropertyName = "userIdOfArchiver"; // eslint-disable-line camelcase
+export interface IArchivable_ByUser extends IArchivable {
   readonly userIdOfArchiver: string | null;
 }
-export interface IDocument_Viewable extends IDocument {
+export interface IDocument_Archivable extends IDocument, IArchivable { }
+export interface IDocument_Archivable_ByUser extends IDocument_Archivable, IArchivable_ByUser { }
+
+// IViewable
+export const IViewable_HasBeenViewed_PropertyName = "hasBeenViewed"; // eslint-disable-line camelcase
+export const IViewable_DateOfViewing_PropertyName = "dateOfViewing"; // eslint-disable-line camelcase
+export interface IViewable {
   readonly hasBeenViewed: boolean;
   readonly dateOfViewing: DateToUse | null;
 }
-export interface IDocument_Viewable_ByUser extends IDocument, IDocument_Viewable {
+export const IViewable_ByUser_UserIdOfViewer_PropertyName = "userIdOfViewer"; // eslint-disable-line camelcase
+export interface IViewable_ByUser extends IViewable {
   readonly userIdOfViewer: string | null;
 }
-export interface IDocument_Approvable<T> extends IDocument {
+export interface IDocument_Viewable extends IDocument, IViewable { }
+export interface IDocument_Viewable_ByUser extends IDocument_Viewable, IViewable_ByUser { }
+
+// IApprovable
+export const IApprovable_ApprovalState_PropertyName = "approvalState"; // eslint-disable-line camelcase
+export const IApprovable_DateOfApproval_PropertyName = "dateOfApproval"; // eslint-disable-line camelcase
+export interface IApprovable<T> {
   readonly approvalState: T;
   readonly dateOfApproval: DateToUse | null;
 }
-export interface IDocument_Approvable_ByUser<T> extends IDocument, IDocument_Approvable<T> {
+export const IApprovable_ByUser_UserIdOfApprover_PropertyName = "userIdOfApprover"; // eslint-disable-line camelcase
+export interface IApprovable_ByUser<T> extends IApprovable<T> {
   readonly userIdOfApprover: string | null;
 }
+export interface IDocument_Approvable<T> extends IDocument, IApprovable<T> { }
+export interface IDocument_Approvable_ByUser<T> extends IDocument_Approvable<T>, IApprovable_ByUser<T> { }
