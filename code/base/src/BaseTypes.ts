@@ -92,6 +92,9 @@ export const IDocument_DocumentId_PropertyName = "id"; // eslint-disable-line ca
 export const IDocument_Creatable_DateOfCreation_PropertyName = "dateOfCreation"; // eslint-disable-line camelcase
 export const IDocument_Creatable_ByUser_UserIdOfCreator_PropertyName = "userIdOfCreator"; // eslint-disable-line camelcase
 export const IDocument_Creatable_ByNullableUser_UserIdOfCreator_PropertyName = "userIdOfCreator"; // eslint-disable-line camelcase
+export const IDocument_Upgradeable_HasBeenUpgraded_PropertyName = "hasBeenUpgraded"; // eslint-disable-line camelcase
+export const IDocument_Upgradeable_DateOfLatestUpgraded_PropertyName = "dateOfLatestUpgraded"; // eslint-disable-line camelcase
+export const IDocument_Upgradeable_ByUser_UserIdOfLatestUpgrader_PropertyName = "userIdOfLatestUpgrader"; // eslint-disable-line camelcase
 export const IDocument_Updateable_HasBeenUpdated_PropertyName = "hasBeenUpdated"; // eslint-disable-line camelcase
 export const IDocument_Updateable_DateOfLatestUpdate_PropertyName = "dateOfLatestUpdate"; // eslint-disable-line camelcase
 export const IDocument_Updateable_ByUser_UserIdOfLatestUpdater_PropertyName = "userIdOfLatestUpdater"; // eslint-disable-line camelcase
@@ -116,6 +119,13 @@ export interface IDocument_Creatable_ByUser extends IDocument, IDocument_Creatab
 }
 export interface IDocument_Creatable_ByNullableUser extends IDocument, IDocument_Creatable {
   readonly userIdOfCreator: string | null;
+}
+export interface IDocument_Upgradeable extends IDocument {
+  readonly hasBeenUpgraded: boolean;
+  readonly dateOfLatestUpgraded: DateToUse | null;
+}
+export interface IDocument_Upgradeable_ByUser extends IDocument, IDocument_Upgradeable {
+  readonly userIdOfLatestUpgrader: string | null;
 }
 export interface IDocument_Updateable extends IDocument {
   readonly hasBeenUpdated: boolean;
