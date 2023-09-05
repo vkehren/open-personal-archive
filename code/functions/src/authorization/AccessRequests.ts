@@ -1,8 +1,8 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import * as OPA from "../../base/src";
-import {AccessRequests} from "../../domainlogic/src";
-import * as UTL from "./Utilities";
+import * as OPA from "../../../base/src";
+import {AccessRequests} from "../../../domainlogic/src";
+import * as UTL from "../Utilities";
 
 export const requestUserAccess = functions.https.onCall(async (data, context) => { // eslint-disable-line @typescript-eslint/no-unused-vars
   try {

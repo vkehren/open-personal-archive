@@ -14,5 +14,5 @@ if (useDefaultAdminCredential) {
 }
 
 // NOTE: Export API functions
-export * from "./Application";
-export * from "./AccessRequests";
+export * from "./system/Application";
+export * from "./authorization/AccessRequests";
