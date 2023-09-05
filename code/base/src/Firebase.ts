@@ -4,6 +4,7 @@ import * as TC from "./TypeChecking";
 
 // export const name = "Firebase";
 export const BULK_WRITER_MAX_RETRY_ATTEMPTS = 4;
+export const FIREBASE_DEFAULT_REGION = "us-east1";
 
 /**
  * Converts a Firebase key to a Firebase credential.
