@@ -1,6 +1,6 @@
-import * as OPA from "../../base/src";
-import * as OpaDm from "../../datamodel/src";
-import {OpaDbDescriptor as OpaDb} from "../../datamodel/src";
+import * as OPA from "../../../base/src";
+import * as OpaDm from "../../../datamodel/src";
+import {OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
 
 /**
  * Request access to the current installation of the Open Personal Archive™ (OPA) system.
