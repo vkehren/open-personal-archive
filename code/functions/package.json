@@ -1,6 +1,6 @@
 {
   "name": "open-personal-archive-functions",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This library contains Firebase Functions implemented for the Open Personal Archive™ (OPA) system that expose the server-side functionality to the client-side applications (e.g. WebApp or MobileApp).",
   "main": "lib/functions/src/index.js",
   "types": "lib/functions/src/index.d.ts",
@@ -10,7 +10,8 @@
   "author": "Open Personal Archive™",
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
-    "build": "tsc",
+    "prebuild": "node -p \"'export const NAME = ' + JSON.stringify(require('./package.json').name) + ';\\n' + 'export const VERSION = ' + JSON.stringify(require('./package.json').version) + ';\\n' + 'export const BUILD_DATE = ' + JSON.stringify((new Date()).toISOString()) + ';'\" > src/PackageInfo.ts",
+    "build": "cd ../domainlogic & npm run build & cd ../functions & tsc",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
@@ -18,11 +19,12 @@
     "logs": "firebase functions:log"
   },
   "engines": {
-    "node": "14"
+    "node": ">=18"
   },
   "dependencies": {
-    "firebase-admin": "^10.0.0",
-    "firebase-functions": "^3.14.1",
+    "@google-cloud/firestore": "^6.6.0",
+    "firebase-admin": "^11.8.0",
+    "firebase-functions": "^4.3.1",
     "jest-get-type": "^27.3.1"
   },
   "devDependencies": {

@@ -15,12 +15,12 @@ export const isInstalled = functions.https.onCall(async (data, context) => { // 
     const firebaseAuthUserId = (!OPA.isNullish(authenticationState)) ? OPA.convertNonNullish(authenticationState).firebaseAuthUserId : null;
     const isUserAuthenticated = (!OPA.isNullishOrWhitespace(firebaseAuthUserId));
 
-    const isInstalled = await Application.isInstalled(dataStorageState);
+    const isInstalled = await Application.isSystemInstalled(dataStorageState);
     const message = (isInstalled) ? "The OPA system is installed." : "The OPA system is NOT currently installed.";
 
     let archive: OpaDm.IArchive | null = null;
     let locale: OpaDm.ILocale | null = null;
-    let data: unknown = {isInstalled, isAuthenticated: false, isAuthorized: false};
+    let data: any = {isInstalled, isAuthenticated: false, isAuthorized: false};
 
     if (isInstalled) {
       archive = await OpaDb.Archive.queries.getById(dataStorageState.db, OpaDm.ArchiveId);

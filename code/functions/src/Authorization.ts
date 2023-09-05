@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as OPA from "../../base/src";
-import {Authorization} from "../../domainlogic/src";
+import {AccessRequests} from "../../domainlogic/src";
 import * as UTL from "./Utilities";
 
 export const requestUserAccess = functions.https.onCall(async (data, context) => { // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -12,7 +12,7 @@ export const requestUserAccess = functions.https.onCall(async (data, context) =>
     const message = (data.query.message) ? data.query.message : undefined;
     OPA.assertNonNullishOrWhitespace(message, "The Access Request message must not be blank.");
     const citationId = (data.query.citationId) ? data.query.citationId : null;
-    const displayModel = await Authorization.requestUserAccess(callState, message, citationId);
+    const displayModel = await AccessRequests.requestUserAccess(callState, message, citationId);
 
     return OPA.getSuccessResult("", displayModel);
   } catch (error) {

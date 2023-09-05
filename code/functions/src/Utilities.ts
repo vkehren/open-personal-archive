@@ -2,7 +2,7 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as OPA from "../../base/src";
 import * as OpaDm from "../../datamodel/src";
-import * as CallState from "../../domainlogic/src/CallState";
+import * as CSU from "../../domainlogic/src/CallStateUtilities";
 
 /**
  * Gets the Call State for the Firebase context and app.
@@ -20,7 +20,7 @@ export async function getCallStateForFirebaseContextAndApp(context: functions.ht
   OPA.assertNonNullish(authenticationState, "The authentication state could not be determined for the current user.");
 
   const authenticationStateNonNull = OPA.convertNonNullish(authenticationState);
-  const callState = CallState.getCallStateForCurrentUser(dataStorageState, authenticationStateNonNull);
+  const callState = CSU.getCallStateForCurrentUser(dataStorageState, authenticationStateNonNull);
 
   return callState;
 }
