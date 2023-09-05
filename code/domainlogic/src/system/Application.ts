@@ -1,11 +1,12 @@
 import * as OPA from "../../../base/src";
 import * as OpaDm from "../../../datamodel/src";
-import {createArchive, createApplication, getAuthorizationData, IArchivePartial, IAuthorizationData, ILocale, ITimeZoneGroup, OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
+import {createArchive, createApplication, IArchivePartial, ILocale, ITimeZoneGroup, OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
+import * as DMU from "../DisplayModelUtilities";
 import * as SchemaConfig from "../../../datamodel/package.json";
 import * as ApplicationConfig from "../../package.json";
 
 export interface IInstallationScreenDisplayModel {
-  readonly authorizationData: IAuthorizationData;
+  readonly authorizationData: DMU.IAuthorizationData;
   archiveName: string;
   archiveDescription: string;
   pathToStorageFolder: string;
@@ -95,7 +96,7 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
 
   // LATER: Pass IAuthorizationState to getAuthorizationData(...) and include locale and timezone for User
   const displayModel: IInstallationScreenDisplayModel = {
-    authorizationData: getAuthorizationData(dataStorageStateNonNull, systemStateNonNull, authorizationStateNonNull),
+    authorizationData: DMU.getAuthorizationDataForDisplayModel(dataStorageStateNonNull, systemStateNonNull, authorizationStateNonNull),
     archiveName: OPA.getLocalizedText(archiveNonNull.name, localeToUse),
     archiveDescription: OPA.getLocalizedText(archiveNonNull.description, localeToUse),
     pathToStorageFolder: archiveNonNull.pathToStorageFolder,
