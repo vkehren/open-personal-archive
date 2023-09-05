@@ -32,6 +32,7 @@ export interface IUser extends OPA.IDocument, IUserPartial {
   readonly firebaseAuthUserId: string;
   readonly authProviderId: string;
   readonly authAccountName: string;
+  readonly authAccountNameLowered: string;
   assignedRoleId: string;
   localeId: string;
   timeZoneGroupId: string;
@@ -70,6 +71,7 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     firebaseAuthUserId: firebaseAuthUserId,
     authProviderId: authProvider.id,
     authAccountName: authAccountName,
+    authAccountNameLowered: authAccountName.toLowerCase(),
     assignedRoleId: assignedRole.id,
     localeId: locale.id,
     timeZoneGroupId: timeZoneGroup.id,
@@ -108,6 +110,7 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     firebaseAuthUserId: firebaseAuthUserId,
     authProviderId: authProvider.id,
     authAccountName: authAccountName,
+    authAccountNameLowered: authAccountName.toLowerCase(),
     assignedRoleId: Role_OwnerId,
     localeId: locale.id,
     timeZoneGroupId: timeZoneGroup.id,
@@ -186,3 +189,10 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
 
 export type FactoryFunc = (...[params]: Parameters<typeof createInstance>) => ReturnType<typeof createInstance>;
 export const CollectionDescriptor = new OPA.CollectionDescriptor<IUser, UserQuerySet, FactoryFunc>(SingularName, PluralName, IsSingleton, (cd) => new UserQuerySet(cd), null, [], createInstance);
+
+export const Index_User_FirebaseAuthUserId = OPA.createPropertyIndexDescriptor(BT.DefaultIndexCollection, PluralName, "firebaseAuthUserId");
+CollectionDescriptor.propertyIndices.push(Index_User_FirebaseAuthUserId);
+export const Index_User_AuthAccountName = OPA.createPropertyIndexDescriptor(BT.DefaultIndexCollection, PluralName, "authAccountName");
+CollectionDescriptor.propertyIndices.push(Index_User_AuthAccountName);
+export const Index_User_AuthAccountNameLowered = OPA.createPropertyIndexDescriptor(BT.DefaultIndexCollection, PluralName, "authAccountNameLowered");
+CollectionDescriptor.propertyIndices.push(Index_User_AuthAccountNameLowered);

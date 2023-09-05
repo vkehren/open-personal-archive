@@ -56,5 +56,5 @@ export {ITimeZone} from "./doctypes/TimeZone";
 export {ITimeZoneGroup} from "./doctypes/TimeZoneGroup";
 export {IApplication, createSingleton as createApplication, SingletonId as ApplicationId} from "./doctypes/Application";
 export {IArchive, IArchivePartial, createSingleton as createArchive, SingletonId as ArchiveId} from "./doctypes/Archive";
-export {IUser, IUserPartial, createArchiveOwner, User_OwnerId} from "./doctypes/User"; // eslint-disable-line camelcase
+export {IUser, IUserPartial, createArchiveOwner, User_OwnerId, Index_User_FirebaseAuthUserId, Index_User_AuthAccountName, Index_User_AuthAccountNameLowered} from "./doctypes/User"; // eslint-disable-line camelcase
 export {IAccessRequest, IAccessRequestPartial} from "./doctypes/AccessRequest";

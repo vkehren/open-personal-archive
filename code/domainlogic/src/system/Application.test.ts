@@ -158,6 +158,7 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
       firebaseAuthUserId: ownerFirebaseAuthUserId,
       authProviderId: authProvider.id,
       authAccountName: "",
+      authAccountNameLowered: "",
       assignedRoleId: role.id,
       localeId: locale.id,
       timeZoneGroupId: timeZoneGroup.id,
