@@ -259,7 +259,7 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
   }
   if (hasUpdate) {
     archivePartial.userIdForLatestUpdate = currentUserNonNull.id;
-    archivePartial.dateOfLatestUpdate = OpaDm.now();
+    archivePartial.dateOfLatestUpdate = OPA.nowToUse();
   }
 
   if (OPA.isEmpty(archivePartial)) {

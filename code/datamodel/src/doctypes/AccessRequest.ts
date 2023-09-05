@@ -11,11 +11,11 @@ const IsSingleton = false;
 export interface IAccessRequestPartial {
   message?: OPA.ILocalizable<string>;
   userIdForLatestUpdate?: string;
-  dateOfLatestUpdate?: BT.DateShim;
+  dateOfLatestUpdate?: OPA.DateToUse;
   hasBeenViewed?: boolean;
   approvalState?: BT.ApprovalState;
   userIdOfApprover?: string | null;
-  dateOfApproval?: BT.DateShim | null;
+  dateOfApproval?: OPA.DateToUse | null;
 }
 
 export interface IAccessRequest extends OPA.IDocument, IAccessRequestPartial {
@@ -26,13 +26,13 @@ export interface IAccessRequest extends OPA.IDocument, IAccessRequestPartial {
   readonly isSpecificToCitation: boolean;
   readonly citationId: string | null;
   readonly userIdForCreation: string;
-  readonly dateOfCreation: BT.DateShim;
+  readonly dateOfCreation: OPA.DateToUse;
   userIdForLatestUpdate: string;
-  dateOfLatestUpdate: BT.DateShim;
+  dateOfLatestUpdate: OPA.DateToUse;
   hasBeenViewed: boolean;
   approvalState: BT.ApprovalState;
   userIdOfApprover: string | null;
-  dateOfApproval: BT.DateShim | null;
+  dateOfApproval: OPA.DateToUse | null;
 }
 
 /**
@@ -47,7 +47,7 @@ export interface IAccessRequest extends OPA.IDocument, IAccessRequestPartial {
   * @return {IAccessRequest} The new document instance.
   */
 function createInstance(currentUser: IUser, currentLocale: ILocale, id: string, archiveId: string, userIdOfRequestor: string, message: string, citationId: string | null = null): IAccessRequest { // eslint-disable-line max-len
-  const now = BT.now();
+  const now = OPA.nowToUse();
   const messages: OPA.ILocalizable<string> = {en: message};
   messages[currentLocale.optionName] = message;
   const isSpecificToCitation = (!OPA.isNullishOrWhitespace(citationId));

@@ -168,11 +168,11 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
       requestedCitationIds: ([] as Array<string>),
       viewableCitationIds: ([] as Array<string>),
       recentQueries: ([] as Array<string>),
-      dateOfCreation: OpaDm.now(),
-      dateOfLatestUpdate: OpaDm.now(),
+      dateOfCreation: OPA.nowToUse(),
+      dateOfLatestUpdate: OPA.nowToUse(),
       approvalState: OpaDm.ApprovalStates.approved,
       userIdOfApprover: OpaDm.User_OwnerId,
-      dateOfApproval: OpaDm.now(),
+      dateOfApproval: OPA.nowToUse(),
     };
     const userCollectionRef = OpaDb.Users.getTypedCollection(dataStorageState.db);
     const userDocumentRef = userCollectionRef.doc(owner.id);

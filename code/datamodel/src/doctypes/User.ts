@@ -20,11 +20,11 @@ export interface IUserPartial {
   lastName?: string;
   preferredName?: string | null;
   recentQueries?: Array<string>;
-  dateOfCreation?: BT.DateShim;
-  dateOfLatestUpdate?: BT.DateShim;
+  dateOfCreation?: OPA.DateToUse;
+  dateOfLatestUpdate?: OPA.DateToUse;
   approvalState?: BT.ApprovalState;
   userIdOfApprover?: string | null;
-  dateOfApproval?: BT.DateShim | null;
+  dateOfApproval?: OPA.DateToUse | null;
 }
 
 export interface IUser extends OPA.IDocument, IUserPartial {
@@ -42,11 +42,11 @@ export interface IUser extends OPA.IDocument, IUserPartial {
   readonly requestedCitationIds: Array<string>,
   readonly viewableCitationIds: Array<string>;
   recentQueries: Array<string>;
-  dateOfCreation: BT.DateShim;
-  dateOfLatestUpdate: BT.DateShim;
+  dateOfCreation: OPA.DateToUse;
+  dateOfLatestUpdate: OPA.DateToUse;
   approvalState: BT.ApprovalState;
   userIdOfApprover: string | null;
-  dateOfApproval: BT.DateShim | null;
+  dateOfApproval: OPA.DateToUse | null;
 }
 
 /**
@@ -64,7 +64,7 @@ export interface IUser extends OPA.IDocument, IUserPartial {
   * @return {IUser} The new document instance.
   */
 function createInstance(id: string, firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, assignedRole: IRole, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): IUser { // eslint-disable-line max-len
-  const now = BT.now();
+  const now = OPA.nowToUse();
   const document: IUser = {
     id: id,
     firebaseAuthUserId: firebaseAuthUserId,
@@ -102,7 +102,7 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
   * @return {IUser} The new document instance.
   */
 export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): IUser { // eslint-disable-line max-len
-  const now = BT.now();
+  const now = OPA.nowToUse();
   const document: IUser = {
     id: User_OwnerId,
     firebaseAuthUserId: firebaseAuthUserId,

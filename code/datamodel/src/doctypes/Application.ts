@@ -1,5 +1,4 @@
 import * as OPA from "../../../base/src";
-import * as BT from "../BaseTypes";
 
 const SingularName = "Application";
 const PluralName = "Applications";
@@ -10,8 +9,8 @@ export interface IApplication extends OPA.IDocument {
   readonly id: string;
   applicationVersion: string;
   schemaVersion: string;
-  readonly dateOfInstallation: BT.DateShim;
-  dateOfLatestUpgrade: BT.DateShim;
+  readonly dateOfInstallation: OPA.DateToUse;
+  dateOfLatestUpgrade: OPA.DateToUse;
 }
 
 /**
@@ -21,7 +20,7 @@ export interface IApplication extends OPA.IDocument {
   * @return {IApplication} The new document instance.
   */
 export function createSingleton(applicationVersion: string, schemaVersion: string): IApplication {
-  const now = BT.now();
+  const now = OPA.nowToUse();
   const document: IApplication = {
     id: SingletonId,
     applicationVersion: applicationVersion,
