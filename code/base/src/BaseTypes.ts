@@ -92,9 +92,18 @@ export const IDocument_DocumentId_PropertyName = "id"; // eslint-disable-line ca
 export const IDocument_Creatable_DateOfCreation_PropertyName = "dateOfCreation"; // eslint-disable-line camelcase
 export const IDocument_Creatable_ByUser_UserIdOfCreator_PropertyName = "userIdOfCreator"; // eslint-disable-line camelcase
 export const IDocument_Creatable_ByNullableUser_UserIdOfCreator_PropertyName = "userIdOfCreator"; // eslint-disable-line camelcase
+export const IDocument_Updateable_HasBeenUpdated_PropertyName = "hasBeenUpdated"; // eslint-disable-line camelcase
+export const IDocument_Updateable_DateOfLatestUpdate_PropertyName = "dateOfLatestUpdate"; // eslint-disable-line camelcase
+export const IDocument_Updateable_ByUser_UserIdOfLatestUpdater_PropertyName = "userIdOfLatestUpdater"; // eslint-disable-line camelcase
 export const IDocument_Archivable_IsArchived_PropertyName = "isArchived"; // eslint-disable-line camelcase
 export const IDocument_Archivable_DateOfArchival_PropertyName = "dateOfArchival"; // eslint-disable-line camelcase
 export const IDocument_Archivable_ByUser_UserIdOfArchiver_PropertyName = "userIdOfArchiver"; // eslint-disable-line camelcase
+export const IDocument_Viewable_HasBeenViewed_PropertyName = "hasBeenViewed"; // eslint-disable-line camelcase
+export const IDocument_Viewable_DateOfViewing_PropertyName = "dateOfViewing"; // eslint-disable-line camelcase
+export const IDocument_Viewable_ByUser_UserIdOfViewer_PropertyName = "userIdOfViewer"; // eslint-disable-line camelcase
+export const IDocument_Approvable_ApprovalState_PropertyName = "approvalState"; // eslint-disable-line camelcase
+export const IDocument_Approvable_DateOfApproval_PropertyName = "dateOfApproval"; // eslint-disable-line camelcase
+export const IDocument_Approvable_ByUser_UserIdOfApprover_PropertyName = "userIdOfApprover"; // eslint-disable-line camelcase
 
 export interface IDocument {
   id: string,
@@ -108,10 +117,31 @@ export interface IDocument_Creatable_ByUser extends IDocument, IDocument_Creatab
 export interface IDocument_Creatable_ByNullableUser extends IDocument, IDocument_Creatable {
   readonly userIdOfCreator: string | null;
 }
+export interface IDocument_Updateable extends IDocument {
+  readonly hasBeenUpdated: boolean;
+  readonly dateOfLatestUpdate: DateToUse | null;
+}
+export interface IDocument_Updateable_ByUser extends IDocument, IDocument_Updateable {
+  readonly userIdOfLatestUpdater: string | null;
+}
 export interface IDocument_Archivable extends IDocument {
   readonly isArchived: boolean;
   readonly dateOfArchival: DateToUse | null;
 }
 export interface IDocument_Archivable_ByUser extends IDocument, IDocument_Archivable {
   readonly userIdOfArchiver: string | null;
+}
+export interface IDocument_Viewable extends IDocument {
+  readonly hasBeenViewed: boolean;
+  readonly dateOfViewing: DateToUse | null;
+}
+export interface IDocument_Viewable_ByUser extends IDocument, IDocument_Viewable {
+  readonly userIdOfViewer: string | null;
+}
+export interface IDocument_Approvable<T> extends IDocument {
+  readonly approvalState: T;
+  readonly dateOfApproval: DateToUse | null;
+}
+export interface IDocument_Approvable_ByUser<T> extends IDocument, IDocument_Approvable<T> {
+  readonly userIdOfApprover: string | null;
 }
