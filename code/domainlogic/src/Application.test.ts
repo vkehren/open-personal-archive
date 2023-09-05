@@ -47,7 +47,7 @@ const authenticationState: OpaDm.IAuthenticationState = {
   emailIsVerified: true,
 };
 
-describe("Tests using Firebase " + useEmulatorsText, function() {
+describe("Tests using Firebase " + useEmulatorsText, function () {
   if (!OPA.isNullish(timeout)) {
     this.timeout(OPA.convertNonNullish(timeout)); // eslint-disable-line no-invalid-this
   }
@@ -208,7 +208,7 @@ describe("Tests using Firebase " + useEmulatorsText, function() {
     expect(isInstalled).equals(false);
 
     await Application.performInstall(dataStorageState, authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
-        "OPA_Locale_bn_IN", "OPA_TimeZoneGroup_IST_+05:30", "Fake", "Account");
+      "OPA_Locale_bn_IN", "OPA_TimeZoneGroup_IST_+05:30", "Fake", "Account");
 
     isInstalled = await Application.isInstalled(dataStorageState);
     expect(isInstalled).equals(true);
@@ -233,7 +233,7 @@ describe("Tests using Firebase " + useEmulatorsText, function() {
 
     // NOTE: Since the System is already installed, this call should fail
     expect(Application.performInstall(dataStorageState, authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
-        "OPA_Locale_bn_IN", "OPA_TimeZoneGroup_IST_+05:30", "Fake", "Account")).to.be.rejectedWith(Error);
+      "OPA_Locale_bn_IN", "OPA_TimeZoneGroup_IST_+05:30", "Fake", "Account")).to.be.rejectedWith(Error);
   });
 
   afterEach(async () => {
