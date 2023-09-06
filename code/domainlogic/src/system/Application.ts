@@ -172,13 +172,13 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
 
   // 3) Create the User document for the Owner of the Archive
   const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(db, externalAuthProviderId);
-  const localeDefault = await OpaDb.Locales.queries.getById(db, defaultLocaleId);
-  const timeZoneGroupDefault = await OpaDb.TimeZoneGroups.queries.getById(db, defaultTimeZoneGroupId);
+  OPA.assertDocumentIsValid(authProvider, "The required AuthProvider does not exist.");
   const roleOwner = await OpaDb.Roles.queries.getById(db, OpaDm.Role_OwnerId);
-
-  if (OPA.isNullish(authProvider) || OPA.isNullish(localeDefault) || OPA.isNullish(timeZoneGroupDefault) || OPA.isNullish(roleOwner)) {
-    throw new Error("Required data could not be created.");
-  }
+  OPA.assertDocumentIsValid(roleOwner, "The required Role does not exist.");
+  const localeDefault = await OpaDb.Locales.queries.getById(db, defaultLocaleId);
+  OPA.assertDocumentIsValid(localeDefault, "The required Locale does not exist.");
+  const timeZoneGroupDefault = await OpaDb.TimeZoneGroups.queries.getById(db, defaultTimeZoneGroupId);
+  OPA.assertDocumentIsValid(timeZoneGroupDefault, "The required TimeZoneGroup does not exist.");
 
   const authProviderNonNull = OPA.convertNonNullish(authProvider);
   const localeDefaultNonNull = OPA.convertNonNullish(localeDefault);
@@ -187,6 +187,7 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   const userOwner = OpaDm.createArchiveOwner(ownerFirebaseAuthUserId, authProviderNonNull, ownerAccountName, localeDefaultNonNull, timeZoneGroupDefaultNonNull, ownerFirstName, ownerLastName);
   const userCollectionRef = OpaDb.Users.getTypedCollection(db);
   const userOwnerDocumentRef = userCollectionRef.doc(userOwner.id);
+
   const batchUpdate = db.batch(); // REPLACES: await userOwnerDocumentRef.set(userOwner, {merge: true});
   batchUpdate.set(userOwnerDocumentRef, userOwner, {merge: true});
   const firebaseAuthUserIdIndexCollectionRef = db.collection(OpaDm.Index_User_FirebaseAuthUserId.indexCollectionName);
