@@ -130,12 +130,12 @@ export interface IDocument_Upgradeable_ByUser extends IDocument_Upgradeable, IUp
 export const IUpdateable_HasBeenUpdated_PropertyName = "hasBeenUpdated"; // eslint-disable-line camelcase
 export const IUpdateable_DateOfLatestUpdate_PropertyName = "dateOfLatestUpdate"; // eslint-disable-line camelcase
 export interface IUpdateable {
-  readonly hasBeenUpdated: boolean;
-  readonly dateOfLatestUpdate: DateToUse | null;
+  hasBeenUpdated: boolean;
+  dateOfLatestUpdate: DateToUse | null;
 }
 export const IUpdateable_ByUser_UserIdOfLatestUpdater_PropertyName = "userIdOfLatestUpdater"; // eslint-disable-line camelcase
 export interface IUpdateable_ByUser extends IUpdateable {
-  readonly userIdOfLatestUpdater: string | null;
+  userIdOfLatestUpdater: string | null;
 }
 export interface IDocument_Updateable extends IDocument, IUpdateable { }
 export interface IDocument_Updateable_ByUser extends IDocument_Updateable, IUpdateable_ByUser { }
