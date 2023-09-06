@@ -1,6 +1,7 @@
 import * as OPA from "../../base/src";
 import * as OpaDm from "../../datamodel/src";
 import {OpaDbDescriptor as OpaDb} from "../../datamodel/src";
+import * as Application from "./system/Application";
 
 /**
  * Gets the Call State for the current User in the Open Personal Archive™ (OPA) system.
@@ -10,11 +11,12 @@ import {OpaDbDescriptor as OpaDb} from "../../datamodel/src";
  */
 export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState): Promise<OpaDm.ICallState> {
   OPA.assertNonNullish(dataStorageState, "The Data Storage State must not be null.");
-  OPA.assertNonNullish(authenticationState, "The Authentication State must not be null.");
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
-  OPA.assertNonNullishOrWhitespace(authenticationState.providerId, "The Authentication Provider ID for the User's account must not be null.");
-  OPA.assertNonNullishOrWhitespace(authenticationState.email, "The email account of the User must not be null.");
+  OPA.assertNonNullish(authenticationState, "The Authentication State must not be null.");
   OPA.assertIdentifierIsValid(authenticationState.firebaseAuthUserId);
+
+  const isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+  OPA.assertSystemIsInstalled(isSystemInstalled);
 
   // LATER: Consider checking if AuthenticationState is Anonymous and returning ICallState with NULL AuthorizationState
 
@@ -31,7 +33,7 @@ export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataSt
   let archiveNonNull = ((null as unknown) as OpaDm.IArchive);
 
   if (!OPA.isNullish(application)) {
-    OPA.assertDocumentIsValid(archive, "The Archive object must exist.");
+    OPA.assertDocumentIsValid(archive, "The Archive object must exist when the Application object exists.");
 
     applicationNonNull = OPA.convertNonNullish(application);
     archiveNonNull = OPA.convertNonNullish(archive);
@@ -44,45 +46,28 @@ export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataSt
     const callState: OpaDm.ICallState = {
       dataStorageState: dataStorageState,
       authenticationState: authenticationState,
-      hasAuthorizationState: false,
-      authorizationState: undefined,
       hasSystemState: false,
       systemState: undefined,
+      hasAuthorizationState: false,
+      authorizationState: undefined,
     };
     return callState;
   }
 
-  let user = await OpaDb.Users.queries.getByFirebaseAuthUserId(db, firebaseAuthUserId);
+  const systemStateNonNull = OPA.convertNonNullish(systemState);
+  const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(db, firebaseAuthUserId);
+  const hasUser = (!OPA.isNullish(user));
 
-  if (OPA.isNullish(user)) {
-    const externalAuthProviderId = authenticationState.providerId;
-    const accountName = authenticationState.email;
-    const firstName = authenticationState.firstName ?? "";
-    const lastName = authenticationState.lastName ?? "";
-    const preferredName = authenticationState.displayName;
-
-    OPA.assertNonNullishOrWhitespace(externalAuthProviderId, "The Authentication Provider ID for the User's account must not be null.");
-    OPA.assertNonNullishOrWhitespace(accountName, "The email account of the User must not be null.");
-
-    const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(db, externalAuthProviderId);
-    OPA.assertDocumentIsValid(authProvider, "The Authentication Provider used by the current User is not recognized by the OPA system.");
-    const authProviderNonNull = OPA.convertNonNullish(authProvider);
-
-    const defaultRole = await OpaDb.Roles.queries.getById(db, OpaDm.Role_GuestId);
-    OPA.assertDocumentIsValid(defaultRole, "The default Role of Guest must exist.");
-    const defaultRoleNonNull = OPA.convertNonNullish(defaultRole);
-
-    const defaultLocale = await OpaDb.Locales.queries.getById(db, archiveNonNull.defaultLocaleId);
-    OPA.assertDocumentIsValid(defaultLocale, "The default Locale must exist.");
-    const defaultLocaleNonNull = OPA.convertNonNullish(defaultLocale);
-
-    const defaultTimeZoneGroup = await OpaDb.TimeZoneGroups.queries.getById(db, archiveNonNull.defaultTimeZoneGroupId);
-    OPA.assertDocumentIsValid(defaultTimeZoneGroup, "The default Time Zone Group must exist.");
-    const defaultTimeZoneGroupNonNull = OPA.convertNonNullish(defaultTimeZoneGroup);
-
-    const newUserRef = OpaDb.Users.getTypedCollection(db).doc();
-    const newUser = OpaDb.Users.createInstance(newUserRef.id, firebaseAuthUserId, authProviderNonNull, accountName, defaultRoleNonNull, defaultLocaleNonNull, defaultTimeZoneGroupNonNull, firstName, lastName, preferredName); // eslint-disable-line max-len
-    await newUserRef.set(newUser, {merge: true});
+  if (!hasUser) {
+    const callState: OpaDm.ICallState = {
+      dataStorageState: dataStorageState,
+      authenticationState: authenticationState,
+      hasSystemState: true,
+      systemState: systemStateNonNull,
+      hasAuthorizationState: false,
+      authorizationState: undefined,
+    };
+    return callState;
   }
 
   const authorizationState = await readAuthorizationStateForFirebaseAuthUser(dataStorageState, firebaseAuthUserId);
@@ -90,10 +75,10 @@ export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataSt
   const callState: OpaDm.ICallState = {
     dataStorageState: dataStorageState,
     authenticationState: authenticationState,
+    hasSystemState: true,
+    systemState: systemStateNonNull,
     hasAuthorizationState: true,
     authorizationState: authorizationState,
-    hasSystemState: hasSystemState,
-    systemState: systemState,
   };
   return callState;
 }
@@ -109,6 +94,8 @@ export async function readAuthorizationStateForFirebaseAuthUser(dataStorageState
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
   OPA.assertIdentifierIsValid(firebaseAuthUserId);
 
+  const isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+  OPA.assertSystemIsInstalled(isSystemInstalled);
   const db = dataStorageState.db;
 
   const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(db, firebaseAuthUserId);
