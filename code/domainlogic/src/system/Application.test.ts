@@ -265,8 +265,8 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
     let archiveNonNull = OPA.convertNonNullish(archive);
 
-    expect(archiveNonNull.name).equals(archiveOriginal.name);
-    expect(archiveNonNull.description).equals(archiveOriginal.description);
+    expect(archiveNonNull.name[currentLocale.optionName]).equals(archiveOriginal.name[currentLocale.optionName]);
+    expect(archiveNonNull.description[currentLocale.optionName]).equals(archiveOriginal.description[currentLocale.optionName]);
     expect(archiveNonNull.defaultLocaleId).equals(archiveOriginal.defaultLocaleId);
     expect(archiveNonNull.defaultTimeZoneGroupId).equals(archiveOriginal.defaultTimeZoneGroupId);
     expect(archiveNonNull.defaultTimeZoneId).equals(archiveOriginal.defaultTimeZoneId);
@@ -283,12 +283,12 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     archiveNonNull = OPA.convertNonNullish(archive);
 
     expect(archiveNonNull.name[currentLocale.optionName]).equals(nameUpdated);
-    expect(archiveNonNull.description).equals(archiveOriginal.description);
+    expect(archiveNonNull.description[currentLocale.optionName]).equals(archiveOriginal.description[currentLocale.optionName]);
     expect(archiveNonNull.defaultLocaleId).equals(archiveOriginal.defaultLocaleId);
     expect(archiveNonNull.defaultTimeZoneGroupId).equals(archiveOriginal.defaultTimeZoneGroupId);
     expect(archiveNonNull.defaultTimeZoneId).equals(archiveOriginal.defaultTimeZoneId);
     expect(archiveNonNull.hasBeenUpdated).equals(true);
-    expect(archiveNonNull.dateOfLatestUpdate).equals(null);
+    expect(archiveNonNull.dateOfLatestUpdate).not.equals(null);
     expect(archiveNonNull.userIdOfLatestUpdater).equals(currentUser.id);
 
     callState = await CSU.getCallStateForCurrentUser(dataStorageState, authenticationState);
@@ -306,7 +306,7 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     expect(archiveNonNull.defaultTimeZoneGroupId).equals(archiveOriginal.defaultTimeZoneGroupId);
     expect(archiveNonNull.defaultTimeZoneId).equals(archiveOriginal.defaultTimeZoneId);
     expect(archiveNonNull.hasBeenUpdated).equals(true);
-    expect(archiveNonNull.dateOfLatestUpdate).equals(null);
+    expect(archiveNonNull.dateOfLatestUpdate).not.equals(null);
     expect(archiveNonNull.userIdOfLatestUpdater).equals(currentUser.id);
 
     callState = await CSU.getCallStateForCurrentUser(dataStorageState, authenticationState);
@@ -325,7 +325,7 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     expect(archiveNonNull.defaultTimeZoneGroupId).equals(defaultTimeZoneGroupIdUpdated);
     expect(archiveNonNull.defaultTimeZoneId).equals(defaultTimeZoneIdUpdated);
     expect(archiveNonNull.hasBeenUpdated).equals(true);
-    expect(archiveNonNull.dateOfLatestUpdate).equals(null);
+    expect(archiveNonNull.dateOfLatestUpdate).not.equals(null);
     expect(archiveNonNull.userIdOfLatestUpdater).equals(currentUser.id);
   });
 
