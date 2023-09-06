@@ -146,6 +146,22 @@ export const updateInstallationSettings = onCall({region: OPA.FIREBASE_DEFAULT_R
   }
 });
 
+export const performUpgrade = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+  try {
+    logger.info("performUpgrade()", {structuredData: true});
+    const firebaseAdminApp = admin.app();
+    const data = request.data;
+    const callState = await UTL.getCallStateForFirebaseContextAndApp(request, firebaseAdminApp);
+
+    const doBackupFirst = OPA.convertNonNullish(OPA.getBoolean(data.query.doBackupFirst, true));
+    const upgradeResult = await Application.performUpgrade(callState, doBackupFirst);
+
+    return OPA.getSuccessResult("", upgradeResult);
+  } catch (error) {
+    return OPA.getFailureResult(error as Error);
+  }
+});
+
 export const performUninstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   try {
     logger.info("performUninstall()", {structuredData: true});
