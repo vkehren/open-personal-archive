@@ -1,3 +1,4 @@
+import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../../base/src";
 import * as OpaDm from "../../../datamodel/src";
 import {createArchive, createApplication, IArchivePartial, ILocale, ITimeZoneGroup, OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
@@ -305,7 +306,7 @@ export async function performUpgrade(callState: OpaDm.ICallState): Promise<void>
   authorizationStateNonNull.assertUserApproved();
   authorizationStateNonNull.assertRoleAllowed(authorizedRoleIds);
 
-  // const currentUserNonNull = authorizationStateNonNull.user;
+  const currentUserNonNull = authorizationStateNonNull.user;
 
   const application = await OpaDb.Application.queries.getById(db, OpaDm.ApplicationId);
   OPA.assertDocumentIsValid(application, "The Application does not exist.");
@@ -322,10 +323,22 @@ export async function performUpgrade(callState: OpaDm.ICallState): Promise<void>
 
   // LATER: Do upgrade work here
 
-  const applicationPartial: OpaDm.IApplicationPartial = {
-    applicationVersion: ApplicationInfo.VERSION,
-    schemaVersion: SchemaInfo.VERSION,
+  const applicationUpgradeData: OpaDm.IApplicationUpgradeData = {
+    applicationVersionAfterUpgrade: ApplicationInfo.VERSION,
+    schemaVersionAfterUpgrade: SchemaInfo.VERSION,
+    applicationVersionBeforeUpgrade: applicationNonNull.applicationVersion,
+    schemaVersionBeforeUpgrade: applicationNonNull.schemaVersion,
+    hasBeenUpgraded: true,
     dateOfLatestUpgrade: OPA.nowToUse(),
+    userIdOfLatestUpgrader: currentUserNonNull.id,
+  };
+  const applicationPartial: OpaDm.IApplicationPartial = {
+    applicationVersion: applicationUpgradeData.applicationVersionAfterUpgrade,
+    schemaVersion: applicationUpgradeData.schemaVersionAfterUpgrade,
+    upgradeHistory: firestore.FieldValue.arrayUnion(applicationUpgradeData),
+    hasBeenUpgraded: applicationUpgradeData.hasBeenUpgraded,
+    dateOfLatestUpgrade: applicationUpgradeData.dateOfLatestUpgrade,
+    userIdOfLatestUpgrader: applicationUpgradeData.userIdOfLatestUpgrader,
   };
 
   const applicationRef = OpaDb.Application.getTypedCollection(db).doc(applicationNonNull.id);

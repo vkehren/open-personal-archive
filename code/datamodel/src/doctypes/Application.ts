@@ -1,3 +1,4 @@
+import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../../base/src";
 
 const SingularName = "Application";
@@ -5,18 +6,25 @@ const PluralName = "Applications";
 const IsSingleton = true;
 export const SingletonId = "OPA_Application";
 
-export interface IApplicationPartial {
-  applicationVersion: string;
-  schemaVersion: string;
-  dateOfLatestUpgrade: OPA.DateToUse;
+export interface IApplicationUpgradeData extends OPA.IUpgradeable_ByUser {
+  applicationVersionAfterUpgrade: string;
+  schemaVersionAfterUpgrade: string;
+  applicationVersionBeforeUpgrade: string;
+  schemaVersionBeforeUpgrade: string;
 }
 
-export interface IApplication extends OPA.IDocument {
+export interface IApplicationPartial extends OPA.IUpgradeable_ByUser {
+  applicationVersion: string;
+  schemaVersion: string;
+  upgradeHistory: Array<IApplicationUpgradeData> | firestore.FieldValue;
+}
+
+export interface IApplication extends OPA.IDocument_Upgradeable_ByUser {
   readonly id: string;
   applicationVersion: string;
   schemaVersion: string;
+  readonly upgradeHistory: Array<IApplicationUpgradeData>;
   readonly dateOfInstallation: OPA.DateToUse;
-  dateOfLatestUpgrade: OPA.DateToUse;
 }
 
 /**
@@ -31,8 +39,11 @@ export function createSingleton(applicationVersion: string, schemaVersion: strin
     id: SingletonId,
     applicationVersion: applicationVersion,
     schemaVersion: schemaVersion,
+    upgradeHistory: ([] as Array<IApplicationUpgradeData>),
     dateOfInstallation: now,
-    dateOfLatestUpgrade: now,
+    hasBeenUpgraded: false,
+    dateOfLatestUpgrade: null,
+    userIdOfLatestUpgrader: null,
   };
   return document;
 }

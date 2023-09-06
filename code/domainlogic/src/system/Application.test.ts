@@ -257,13 +257,18 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     let applicationNonNull = OPA.convertNonNullish(application);
 
     const oldVersion = "0.0.0.1";
+    const oldDateOfInstallation = applicationNonNull.dateOfInstallation;
     const newApplicationVersion = applicationNonNull.applicationVersion;
     const newSchemaVersion = applicationNonNull.schemaVersion;
 
     let applicationPartial: OpaDm.IApplicationPartial = {
       applicationVersion: oldVersion,
       schemaVersion: oldVersion,
-      dateOfLatestUpgrade: applicationNonNull.dateOfLatestUpgrade, // NOTE: Do NOT update "dateOfLatestUpgrade", as we are simulating an old installation
+      upgradeHistory: applicationNonNull.upgradeHistory,
+      // NOTE: Do NOT update IUpgradeable_ByUser interface fields, as we are simulating an old installation
+      hasBeenUpgraded: applicationNonNull.hasBeenUpgraded,
+      dateOfLatestUpgrade: applicationNonNull.dateOfLatestUpgrade,
+      userIdOfLatestUpgrader: applicationNonNull.userIdOfLatestUpgrader,
     };
     const applicationRef = OpaDb.Application.getTypedCollection(dataStorageState.db).doc(applicationNonNull.id);
     await applicationRef.set(applicationPartial, {merge: true});
@@ -274,6 +279,11 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
 
     expect(applicationNonNull.applicationVersion).equals(oldVersion);
     expect(applicationNonNull.schemaVersion).equals(oldVersion);
+    expect(applicationNonNull.upgradeHistory.length).equals(0);
+    expect(applicationNonNull.dateOfInstallation).equals(oldDateOfInstallation);
+    expect(applicationNonNull.hasBeenUpgraded).equals(false);
+    expect(applicationNonNull.dateOfLatestUpgrade).equals(null);
+    expect(applicationNonNull.userIdOfLatestUpgrader).equals(null);
 
     callState = await CSU.getCallStateForCurrentUser(dataStorageState, authenticationState);
     await Application.performUpgrade(callState);
@@ -282,8 +292,23 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     OPA.assertDocumentIsValid(application, "The Application does not exist.");
     applicationNonNull = OPA.convertNonNullish(application);
 
+    const authorizationState = OPA.convertNonNullish(callState.authorizationState);
     expect(applicationNonNull.applicationVersion).equals(newApplicationVersion);
     expect(applicationNonNull.schemaVersion).equals(newSchemaVersion);
+    expect(applicationNonNull.upgradeHistory.length).equals(1);
+    expect(applicationNonNull.dateOfInstallation).equals(oldDateOfInstallation);
+    expect(applicationNonNull.hasBeenUpgraded).equals(true);
+    expect(applicationNonNull.dateOfLatestUpgrade).not.equals(null);
+    expect(applicationNonNull.userIdOfLatestUpgrader).equals(authorizationState.user.id);
+
+    const applicationUpgradeData = applicationNonNull.upgradeHistory[0];
+    expect(applicationUpgradeData.applicationVersionAfterUpgrade).equals(newApplicationVersion);
+    expect(applicationUpgradeData.schemaVersionAfterUpgrade).equals(newSchemaVersion);
+    expect(applicationUpgradeData.applicationVersionBeforeUpgrade).equals(oldVersion);
+    expect(applicationUpgradeData.schemaVersionBeforeUpgrade).equals(oldVersion);
+    expect(applicationUpgradeData.hasBeenUpgraded).equals(true);
+    expect(applicationUpgradeData.dateOfLatestUpgrade?.valueOf()).equals(applicationNonNull.dateOfLatestUpgrade?.valueOf());
+    expect(applicationUpgradeData.userIdOfLatestUpgrader).equals(authorizationState.user.id);
   });
 
   afterEach(async () => {
