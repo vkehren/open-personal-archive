@@ -280,7 +280,7 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     expect(applicationNonNull.applicationVersion).equals(oldVersion);
     expect(applicationNonNull.schemaVersion).equals(oldVersion);
     expect(applicationNonNull.upgradeHistory.length).equals(0);
-    expect(applicationNonNull.dateOfInstallation).equals(oldDateOfInstallation);
+    expect(applicationNonNull.dateOfInstallation.valueOf()).equals(oldDateOfInstallation.valueOf());
     expect(applicationNonNull.hasBeenUpgraded).equals(false);
     expect(applicationNonNull.dateOfLatestUpgrade).equals(null);
     expect(applicationNonNull.userIdOfLatestUpgrader).equals(null);
@@ -296,7 +296,7 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     expect(applicationNonNull.applicationVersion).equals(newApplicationVersion);
     expect(applicationNonNull.schemaVersion).equals(newSchemaVersion);
     expect(applicationNonNull.upgradeHistory.length).equals(1);
-    expect(applicationNonNull.dateOfInstallation).equals(oldDateOfInstallation);
+    expect(applicationNonNull.dateOfInstallation.valueOf()).equals(oldDateOfInstallation.valueOf());
     expect(applicationNonNull.hasBeenUpgraded).equals(true);
     expect(applicationNonNull.dateOfLatestUpgrade).not.equals(null);
     expect(applicationNonNull.userIdOfLatestUpgrader).equals(authorizationState.user.id);
