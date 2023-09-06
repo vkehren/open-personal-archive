@@ -312,9 +312,23 @@ export async function performUninstall(dataStorageState: OpaDm.IDataStorageState
     throw new Error("Backup of existing Archive data has not been implemented yet.");
   }
 
-  // LATER: If necessary, iterate over specific Documents and delete contents of nested Collections
+  for (let i = 0; i < OpaDb.NestedCollections.length; i++) {
+    const colDesc = OpaDb.NestedCollections[i];
+
+    for (let j = 0; j < colDesc.propertyIndices.length; j++) {
+      const propertyIndexDesc = colDesc.propertyIndices[j];
+      await OPA.clearFirestoreCollectionInDb(db, propertyIndexDesc.indexCollectionName);
+    }
+    // LATER: If necessary, delete all documents from NestedCollection starting with leaves of Collection tree
+  }
+
   for (let i = 0; i < OpaDb.RootCollections.length; i++) {
     const colDesc = OpaDb.RootCollections[i];
+
+    for (let j = 0; j < colDesc.propertyIndices.length; j++) {
+      const propertyIndexDesc = colDesc.propertyIndices[j];
+      await OPA.clearFirestoreCollectionInDb(db, propertyIndexDesc.indexCollectionName);
+    }
     await OPA.clearFirestoreCollectionInDb(db, colDesc.collectionName);
   }
 }
