@@ -49,11 +49,11 @@ export const OpaDbDescriptor = OPA.convertTo<IOpaDbDescriptor>(DbDescriptor);
 
 export {DefaultIndexCollection, localizableStringConstructor, ApprovalState, ApprovalStates, RoleType, RoleTypes} from "./BaseTypes";
 export {AuthorizationState, ISystemState, IAuthenticationState, IAuthorizationState, ICallState, IDataStorageState} from "./CallStateTypes";
-export {IAuthenticationProvider, AuthenticationProvider_GoogleId, AuthenticationProvider_RequiredIds} from "./doctypes/AuthenticationProvider"; // eslint-disable-line camelcase
+export {IAuthenticationProvider, DefaultAuthenticationProviderId, AuthenticationProvider_GoogleId, AuthenticationProvider_RequiredIds} from "./doctypes/AuthenticationProvider"; // eslint-disable-line camelcase
 export {ILocale, DefaultLocaleId, DefaultLocale} from "./doctypes/Locale";
-export {IRole, Role_OwnerId, Role_AdministratorId, Role_EditorId, Role_ViewerId, Role_GuestId, Role_RequiredIds} from "./doctypes/Role"; // eslint-disable-line camelcase
+export {IRole, DefaultRoleId, Role_OwnerId, Role_AdministratorId, Role_EditorId, Role_ViewerId, Role_GuestId, Role_RequiredIds} from "./doctypes/Role"; // eslint-disable-line camelcase
 export {ITimeZone} from "./doctypes/TimeZone";
-export {ITimeZoneGroup} from "./doctypes/TimeZoneGroup";
+export {ITimeZoneGroup, DefaultTimeZoneGroupId} from "./doctypes/TimeZoneGroup";
 export {IApplication, IApplicationPartial, IApplicationUpgradeData, createSingleton as createApplication, SingletonId as ApplicationId} from "./doctypes/Application";
 export {IArchive, IArchivePartial, createSingleton as createArchive, SingletonId as ArchiveId} from "./doctypes/Archive";
 export {IUser, IUserPartial, createArchiveOwner, User_OwnerId, Index_User_FirebaseAuthUserId, Index_User_AuthAccountName, Index_User_AuthAccountNameLowered} from "./doctypes/User"; // eslint-disable-line camelcase

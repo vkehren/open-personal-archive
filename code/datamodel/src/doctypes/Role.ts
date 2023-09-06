@@ -12,6 +12,8 @@ export const Role_ViewerId = "OPA_Role_Viewer"; // eslint-disable-line camelcase
 export const Role_GuestId = "OPA_Role_Guest"; // eslint-disable-line camelcase
 export const Role_RequiredIds = [Role_OwnerId, Role_AdministratorId, Role_EditorId, Role_ViewerId, Role_GuestId]; // eslint-disable-line camelcase
 const RequiredDocuments: Array<IRole> = CollectionData.requiredDocuments.map((value) => ({id: value.id, name: value.name, type: (value.type as BT.RoleType), displayOrder: value.displayOrder, isDefault: value.isDefault} as IRole)); // eslint-disable-line max-len
+const DefaultDocument = (RequiredDocuments.find((v) => v.isDefault) as IRole | undefined);
+export const DefaultRoleId = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNonNullish(DefaultDocument).id : Role_GuestId;
 
 export interface IRole extends OPA.IDocument {
   readonly id: string;
