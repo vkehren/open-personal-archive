@@ -243,39 +243,49 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
   OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
   const archiveNonNull = OPA.convertNonNullish(archive);
 
+  const now = OPA.nowToUse();
   const localeToUse = currentLocaleNonNull.optionName;
-  let hasUpdate = false;
-  const archivePartial: IArchivePartial = {};
+  const archivePartial: IArchivePartial = {
+    hasBeenUpdated: false,
+    dateOfLatestUpdate: null,
+    userIdOfLatestUpdater: null,
+  };
   if ((archiveName) && (archiveNonNull.name[localeToUse] != archiveName)) {
     archivePartial.name = {...archiveNonNull.name};
     archivePartial.name[localeToUse] = archiveName;
-    hasUpdate = true;
+    archivePartial.hasBeenUpdated = true;
+    archivePartial.dateOfLatestUpdate = now;
+    archivePartial.userIdOfLatestUpdater = currentUserNonNull.id;
   }
   if ((archiveDescription) && (archiveNonNull.description[localeToUse] != archiveDescription)) {
     archivePartial.description = {...archiveNonNull.description};
     archivePartial.description[localeToUse] = archiveDescription;
-    hasUpdate = true;
+    archivePartial.hasBeenUpdated = true;
+    archivePartial.dateOfLatestUpdate = now;
+    archivePartial.userIdOfLatestUpdater = currentUserNonNull.id;
   }
   // LATER: Consider allowing change to root storage folder if no files have been added yet
   if ((defaultLocaleId) && (archiveNonNull.defaultLocaleId != defaultLocaleId)) {
     archivePartial.defaultLocaleId = defaultLocaleId;
-    hasUpdate = true;
+    archivePartial.hasBeenUpdated = true;
+    archivePartial.dateOfLatestUpdate = now;
+    archivePartial.userIdOfLatestUpdater = currentUserNonNull.id;
   }
   if ((defaultTimeZoneGroupId) && (archiveNonNull.defaultTimeZoneGroupId != defaultTimeZoneGroupId)) {
     archivePartial.defaultTimeZoneGroupId = defaultTimeZoneGroupId;
-    hasUpdate = true;
+    archivePartial.hasBeenUpdated = true;
+    archivePartial.dateOfLatestUpdate = now;
+    archivePartial.userIdOfLatestUpdater = currentUserNonNull.id;
   }
   if ((defaultTimeZoneId) && (archiveNonNull.defaultTimeZoneId != defaultTimeZoneId)) {
     archivePartial.defaultTimeZoneId = defaultTimeZoneId;
-    hasUpdate = true;
-  }
-  if (hasUpdate) {
-    archivePartial.userIdForLatestUpdate = currentUserNonNull.id;
-    archivePartial.dateOfLatestUpdate = OPA.nowToUse();
+    archivePartial.hasBeenUpdated = true;
+    archivePartial.dateOfLatestUpdate = now;
+    archivePartial.userIdOfLatestUpdater = currentUserNonNull.id;
   }
 
-  if (OPA.isEmpty(archivePartial)) {
-    throw new Error("No updated information was provided.");
+  if (OPA.isEmpty(archivePartial) || (!archivePartial.hasBeenUpdated)) {
+    throw new Error("No updated setting was provided.");
   }
 
   const archiveRef = OpaDb.Archive.getTypedCollection(db).doc(archiveNonNull.id);

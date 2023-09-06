@@ -11,7 +11,8 @@ const PluralName = "Users";
 const IsSingleton = false;
 export const User_OwnerId = "OPA_User_Owner"; // eslint-disable-line camelcase
 
-export interface IUserPartial {
+// NOTE: IViewable_ByUser and IApprovable_ByUser fields should be updated using the corresponding interface directly as a partial interface
+export interface IUserPartial extends OPA.IUpdateable {
   assignedRoleId?: string;
   localeId?: string;
   timeZoneGroupId?: string;
@@ -20,14 +21,9 @@ export interface IUserPartial {
   lastName?: string;
   preferredName?: string | null;
   recentQueries?: Array<string>;
-  dateOfCreation?: OPA.DateToUse;
-  dateOfLatestUpdate?: OPA.DateToUse;
-  approvalState?: BT.ApprovalState;
-  userIdOfApprover?: string | null;
-  dateOfApproval?: OPA.DateToUse | null;
 }
 
-export interface IUser extends OPA.IDocument, IUserPartial {
+export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState> {
   readonly id: string;
   readonly firebaseAuthUserId: string;
   readonly authProviderId: string;
@@ -43,11 +39,6 @@ export interface IUser extends OPA.IDocument, IUserPartial {
   readonly requestedCitationIds: Array<string>,
   readonly viewableCitationIds: Array<string>;
   recentQueries: Array<string>;
-  dateOfCreation: OPA.DateToUse;
-  dateOfLatestUpdate: OPA.DateToUse;
-  approvalState: BT.ApprovalState;
-  userIdOfApprover: string | null;
-  dateOfApproval: OPA.DateToUse | null;
 }
 
 /**
@@ -83,10 +74,15 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     viewableCitationIds: ([] as Array<string>),
     recentQueries: ([] as Array<string>),
     dateOfCreation: now,
-    dateOfLatestUpdate: now,
+    hasBeenUpdated: false,
+    dateOfLatestUpdate: null,
+    hasBeenViewed: false,
+    dateOfLatestViewing: null,
+    userIdOfLatestViewer: null,
     approvalState: BT.ApprovalStates.pending,
-    userIdOfApprover: null,
-    dateOfApproval: null,
+    hasBeenDecided: false,
+    dateOfDecision: null,
+    userIdOfDecider: null,
   };
   return document;
 }
@@ -122,10 +118,15 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     viewableCitationIds: ([] as Array<string>),
     recentQueries: ([] as Array<string>),
     dateOfCreation: now,
-    dateOfLatestUpdate: now,
+    hasBeenUpdated: false,
+    dateOfLatestUpdate: null,
+    hasBeenViewed: true,
+    dateOfLatestViewing: now,
+    userIdOfLatestViewer: User_OwnerId,
     approvalState: BT.ApprovalStates.approved,
-    userIdOfApprover: User_OwnerId,
-    dateOfApproval: now,
+    hasBeenDecided: true,
+    dateOfDecision: now,
+    userIdOfDecider: User_OwnerId,
   };
   return document;
 }

@@ -153,6 +153,7 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     const timeZoneDocumentRef = timeZoneCollectionRef.doc(timeZone.id);
     await timeZoneDocumentRef.set(timeZone, {merge: true});
 
+    const now = OPA.nowToUse();
     const owner: OpaDm.IUser = {
       id: OpaDm.User_OwnerId,
       firebaseAuthUserId: ownerFirebaseAuthUserId,
@@ -169,11 +170,16 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
       requestedCitationIds: ([] as Array<string>),
       viewableCitationIds: ([] as Array<string>),
       recentQueries: ([] as Array<string>),
-      dateOfCreation: OPA.nowToUse(),
-      dateOfLatestUpdate: OPA.nowToUse(),
+      dateOfCreation: now,
+      hasBeenUpdated: false,
+      dateOfLatestUpdate: null,
+      hasBeenViewed: false,
+      dateOfLatestViewing: null,
+      userIdOfLatestViewer: null,
       approvalState: OpaDm.ApprovalStates.approved,
-      userIdOfApprover: OpaDm.User_OwnerId,
-      dateOfApproval: OPA.nowToUse(),
+      hasBeenDecided: true,
+      dateOfDecision: now,
+      userIdOfDecider: OpaDm.User_OwnerId,
     };
     const userCollectionRef = OpaDb.Users.getTypedCollection(dataStorageState.db);
     const userDocumentRef = userCollectionRef.doc(owner.id);

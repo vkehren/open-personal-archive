@@ -8,29 +8,23 @@ const PluralName = "Archives";
 const IsSingleton = true;
 export const SingletonId = "OPA_Archive";
 
-export interface IArchivePartial {
+export interface IArchivePartial extends OPA.IUpdateable_ByUser {
   name?: OPA.ILocalizable<string>;
   description?: OPA.ILocalizable<string>;
   defaultLocaleId?: string;
   defaultTimeZoneGroupId?: string;
   defaultTimeZoneId?: string;
-  userIdForLatestUpdate?: string;
-  dateOfLatestUpdate?: OPA.DateToUse;
 }
 
-export interface IArchive extends OPA.IDocument, IArchivePartial {
+export interface IArchive extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser {
   readonly id: string;
+  readonly ownerId: string;
+  readonly pathToStorageFolder: string;
   name: OPA.ILocalizable<string>;
   description: OPA.ILocalizable<string>;
-  readonly pathToStorageFolder: string;
-  readonly ownerId: string;
   defaultLocaleId: string;
   defaultTimeZoneGroupId: string;
   defaultTimeZoneId: string;
-  readonly userIdForCreation: string;
-  readonly dateOfCreation: OPA.DateToUse;
-  userIdForLatestUpdate: string;
-  dateOfLatestUpdate: OPA.DateToUse;
 }
 
 /**
@@ -52,17 +46,18 @@ export function createSingleton(name: string, description: string, pathToStorage
 
   const document: IArchive = {
     id: SingletonId,
+    ownerId: owner.id,
+    pathToStorageFolder: pathToStorageFolder,
     name: names,
     description: descriptions,
-    pathToStorageFolder: pathToStorageFolder,
-    ownerId: owner.id,
     defaultLocaleId: defaultLocale.id,
     defaultTimeZoneGroupId: defaultTimeZoneGroup.id,
     defaultTimeZoneId: defaultTimeZoneGroup.primaryTimeZoneId,
-    userIdForCreation: owner.id,
     dateOfCreation: now,
-    userIdForLatestUpdate: owner.id,
-    dateOfLatestUpdate: now,
+    userIdOfCreator: owner.id,
+    hasBeenUpdated: false,
+    dateOfLatestUpdate: null,
+    userIdOfLatestUpdater: null,
   };
   return document;
 }
