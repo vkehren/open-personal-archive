@@ -304,9 +304,10 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
 /**
  * Upgrades the Open Personal Archive™ (OPA) system to the latest version.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {boolean} [doBackupFirst=false] Whether to backup the data before upgrading it (NOT IMPLEMENTED YET).
  * @return {Promise<void>}
  */
-export async function performUpgrade(callState: OpaDm.ICallState): Promise<void> { // eslint-disable-line max-len
+export async function performUpgrade(callState: OpaDm.ICallState, doBackupFirst = false): Promise<void> { // eslint-disable-line max-len
   OPA.assertNonNullish(callState, "The Call State must not be null.");
   OPA.assertNonNullish(callState.dataStorageState, "The Data Storage State must not be null.");
   OPA.assertNonNullish(callState.authenticationState, "The Authentication State must not be null.");
@@ -320,12 +321,16 @@ export async function performUpgrade(callState: OpaDm.ICallState): Promise<void>
   OPA.assertIsTrue(isInstalled, "The system has not yet been installed so upgrading is not possible.");
 
   const authorizationStateNonNull = OPA.convertNonNullish(callState.authorizationState);
+  const currentUserNonNull = authorizationStateNonNull.user;
   const authorizedRoleIds = [OpaDm.Role_OwnerId, OpaDm.Role_AdministratorId];
 
   authorizationStateNonNull.assertUserApproved();
   authorizationStateNonNull.assertRoleAllowed(authorizedRoleIds);
 
-  const currentUserNonNull = authorizationStateNonNull.user;
+  if (doBackupFirst) {
+    // LATER: Backup any existing data
+    throw new Error("Backup of existing Archive data has not been implemented yet.");
+  }
 
   const application = await OpaDb.Application.queries.getById(db, OpaDm.ApplicationId);
   OPA.assertDocumentIsValid(application, "The Application does not exist.");
