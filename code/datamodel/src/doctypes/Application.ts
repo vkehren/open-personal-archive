@@ -5,6 +5,12 @@ const PluralName = "Applications";
 const IsSingleton = true;
 export const SingletonId = "OPA_Application";
 
+export interface IApplicationPartial {
+  applicationVersion: string;
+  schemaVersion: string;
+  dateOfLatestUpgrade: OPA.DateToUse;
+}
+
 export interface IApplication extends OPA.IDocument {
   readonly id: string;
   applicationVersion: string;

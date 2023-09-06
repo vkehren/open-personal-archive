@@ -54,7 +54,7 @@ export {ILocale, DefaultLocaleId, DefaultLocale} from "./doctypes/Locale";
 export {IRole, Role_OwnerId, Role_AdministratorId, Role_EditorId, Role_ViewerId, Role_GuestId, Role_RequiredIds} from "./doctypes/Role"; // eslint-disable-line camelcase
 export {ITimeZone} from "./doctypes/TimeZone";
 export {ITimeZoneGroup} from "./doctypes/TimeZoneGroup";
-export {IApplication, createSingleton as createApplication, SingletonId as ApplicationId} from "./doctypes/Application";
+export {IApplication, IApplicationPartial, createSingleton as createApplication, SingletonId as ApplicationId} from "./doctypes/Application";
 export {IArchive, IArchivePartial, createSingleton as createArchive, SingletonId as ArchiveId} from "./doctypes/Archive";
 export {IUser, IUserPartial, createArchiveOwner, User_OwnerId, Index_User_FirebaseAuthUserId, Index_User_AuthAccountName, Index_User_AuthAccountNameLowered} from "./doctypes/User"; // eslint-disable-line camelcase
 export {IAccessRequest, IAccessRequestPartial} from "./doctypes/AccessRequest";

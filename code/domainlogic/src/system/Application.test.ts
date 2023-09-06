@@ -237,6 +237,55 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
       "OPA_Locale_bn_IN", "OPA_TimeZoneGroup_IST_+05:30", "Fake", "Account")).to.be.rejectedWith(Error);
   });
 
+  // IMPORTANT: You must build the domainlogic package before running this test so that the PackageInfo.ts files contain the correct VERSION values
+  test("checks that performUpgrade(...) works properly", async () => {
+    let isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    expect(isSystemInstalled).equals(false);
+
+    await Application.performInstall(dataStorageState, authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
+      "OPA_Locale_bn_IN", "OPA_TimeZoneGroup_IST_+05:30", "Fake", "Account");
+
+    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    expect(isSystemInstalled).equals(true);
+
+    // NOTE: Since the System version has not changed, this call should fail
+    let callState = await CSU.getCallStateForCurrentUser(dataStorageState, authenticationState);
+    expect(Application.performUpgrade(callState)).to.be.rejectedWith(Error);
+
+    let application = await OpaDb.Application.queries.getById(dataStorageState.db, OpaDm.ApplicationId);
+    OPA.assertDocumentIsValid(application, "The Application does not exist.");
+    let applicationNonNull = OPA.convertNonNullish(application);
+
+    const oldVersion = "0.0.0.1";
+    const newApplicationVersion = applicationNonNull.applicationVersion;
+    const newSchemaVersion = applicationNonNull.schemaVersion;
+
+    let applicationPartial: OpaDm.IApplicationPartial = {
+      applicationVersion: oldVersion,
+      schemaVersion: oldVersion,
+      dateOfLatestUpgrade: applicationNonNull.dateOfLatestUpgrade, // NOTE: Do NOT update "dateOfLatestUpgrade", as we are simulating an old installation
+    };
+    const applicationRef = OpaDb.Application.getTypedCollection(dataStorageState.db).doc(applicationNonNull.id);
+    await applicationRef.set(applicationPartial, {merge: true});
+
+    application = await OpaDb.Application.queries.getById(dataStorageState.db, OpaDm.ApplicationId);
+    OPA.assertDocumentIsValid(application, "The Application does not exist.");
+    applicationNonNull = OPA.convertNonNullish(application);
+
+    expect(applicationNonNull.applicationVersion).equals(oldVersion);
+    expect(applicationNonNull.schemaVersion).equals(oldVersion);
+
+    callState = await CSU.getCallStateForCurrentUser(dataStorageState, authenticationState);
+    await Application.performUpgrade(callState);
+
+    application = await OpaDb.Application.queries.getById(dataStorageState.db, OpaDm.ApplicationId);
+    OPA.assertDocumentIsValid(application, "The Application does not exist.");
+    applicationNonNull = OPA.convertNonNullish(application);
+
+    expect(applicationNonNull.applicationVersion).equals(newApplicationVersion);
+    expect(applicationNonNull.schemaVersion).equals(newSchemaVersion);
+  });
+
   afterEach(async () => {
     await dataStorageState.db.terminate();
     await admin.app().delete();

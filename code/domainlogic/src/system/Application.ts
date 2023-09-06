@@ -282,6 +282,57 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
 }
 
 /**
+ * Upgrades the Open Personal Archive™ (OPA) system to the latest version.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @return {Promise<void>}
+ */
+export async function performUpgrade(callState: OpaDm.ICallState): Promise<void> { // eslint-disable-line max-len
+  OPA.assertNonNullish(callState, "The Call State must not be null.");
+  OPA.assertNonNullish(callState.dataStorageState, "The Data Storage State must not be null.");
+  OPA.assertNonNullish(callState.authenticationState, "The Authentication State must not be null.");
+  OPA.assertNonNullish(callState.authorizationState, "The Authorization State must not be null.");
+  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+  OPA.assertIdentifierIsValid(callState.authenticationState.firebaseAuthUserId);
+
+  const db = callState.dataStorageState.db;
+  const isInstalled = (!OPA.isNullish(callState.systemState));
+
+  OPA.assertIsTrue(isInstalled, "The system has not yet been installed so upgrading is not possible.");
+
+  const authorizationStateNonNull = OPA.convertNonNullish(callState.authorizationState);
+  const authorizedRoleIds = [OpaDm.Role_OwnerId, OpaDm.Role_AdministratorId];
+
+  authorizationStateNonNull.assertUserApproved();
+  authorizationStateNonNull.assertRoleAllowed(authorizedRoleIds);
+
+  // const currentUserNonNull = authorizationStateNonNull.user;
+
+  const application = await OpaDb.Application.queries.getById(db, OpaDm.ApplicationId);
+  OPA.assertDocumentIsValid(application, "The Application does not exist.");
+  const applicationNonNull = OPA.convertNonNullish(application);
+
+  const applicationComparison = OPA.compareVersionNumberStrings(applicationNonNull.applicationVersion, ApplicationInfo.VERSION);
+  const schemaComparison = OPA.compareVersionNumberStrings(applicationNonNull.schemaVersion, SchemaInfo.VERSION);
+
+  OPA.assertNonNullish(applicationComparison, "The application version numbers provided are invalid.");
+  OPA.assertNonNullish(schemaComparison, "The schema version numbers provided are invalid.");
+  OPA.assertIsFalse((applicationComparison == -1), "The application version number currently cannot be downgraded.");
+  OPA.assertIsFalse((schemaComparison == -1), "The schema version number currently cannot be downgraded.");
+  OPA.assertIsFalse((applicationComparison == 0) && (schemaComparison == 0), "The application and schema version numbers match the latest build.");
+
+  // LATER: Do upgrade work here
+
+  const applicationPartial: OpaDm.IApplicationPartial = {
+    applicationVersion: ApplicationInfo.VERSION,
+    schemaVersion: SchemaInfo.VERSION,
+    dateOfLatestUpgrade: OPA.nowToUse(),
+  };
+
+  const applicationRef = OpaDb.Application.getTypedCollection(db).doc(applicationNonNull.id);
+  await applicationRef.set(applicationPartial, {merge: true});
+}
+
+/**
  * Uninstalls the Open Personal Archive™ (OPA) system by clearing the data in the Firestore DB.
  * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
  * @param {OpaDm.IAuthenticationState} authenticationState The Firebase Authentication state for the User.
