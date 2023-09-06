@@ -238,13 +238,13 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
 
   const currentUserNonNull = authorizationStateNonNull.user;
   const currentLocaleNonNull = authorizationStateNonNull.locale;
+  const localeToUse = currentLocaleNonNull.optionName;
 
   const archive = await OpaDb.Archive.queries.getById(db, OpaDm.ArchiveId);
   OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
   const archiveNonNull = OPA.convertNonNullish(archive);
 
   const now = OPA.nowToUse();
-  const localeToUse = currentLocaleNonNull.optionName;
   const archivePartial: IArchivePartial = {
     hasBeenUpdated: false,
     dateOfLatestUpdate: null,
@@ -264,25 +264,34 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
     archivePartial.dateOfLatestUpdate = now;
     archivePartial.userIdOfLatestUpdater = currentUserNonNull.id;
   }
-  // LATER: Consider allowing change to root storage folder if no files have been added yet
   if ((defaultLocaleId) && (archiveNonNull.defaultLocaleId != defaultLocaleId)) {
+    const locale = await OpaDb.Locales.queries.getById(db, defaultLocaleId);
+    OPA.assertDocumentIsValid(locale, "The Locale specified does not exist.");
+
     archivePartial.defaultLocaleId = defaultLocaleId;
     archivePartial.hasBeenUpdated = true;
     archivePartial.dateOfLatestUpdate = now;
     archivePartial.userIdOfLatestUpdater = currentUserNonNull.id;
   }
   if ((defaultTimeZoneGroupId) && (archiveNonNull.defaultTimeZoneGroupId != defaultTimeZoneGroupId)) {
+    const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getById(db, defaultTimeZoneGroupId);
+    OPA.assertDocumentIsValid(timeZoneGroup, "The TimeZoneGroup specified does not exist.");
+
     archivePartial.defaultTimeZoneGroupId = defaultTimeZoneGroupId;
     archivePartial.hasBeenUpdated = true;
     archivePartial.dateOfLatestUpdate = now;
     archivePartial.userIdOfLatestUpdater = currentUserNonNull.id;
   }
   if ((defaultTimeZoneId) && (archiveNonNull.defaultTimeZoneId != defaultTimeZoneId)) {
+    const timeZone = await OpaDb.TimeZones.queries.getById(db, defaultTimeZoneId);
+    OPA.assertDocumentIsValid(timeZone, "The TimeZone specified does not exist.");
+
     archivePartial.defaultTimeZoneId = defaultTimeZoneId;
     archivePartial.hasBeenUpdated = true;
     archivePartial.dateOfLatestUpdate = now;
     archivePartial.userIdOfLatestUpdater = currentUserNonNull.id;
   }
+  // LATER: Consider allowing change to root storage folder if no files have been added yet
 
   if (OPA.isEmpty(archivePartial) || (!archivePartial.hasBeenUpdated)) {
     throw new Error("No updated setting was provided.");

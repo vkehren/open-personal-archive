@@ -243,6 +243,92 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
       "OPA_Locale_bn_IN", "OPA_TimeZoneGroup_IST_+05:30", "Fake", "Account")).to.be.rejectedWith(Error);
   });
 
+  test("checks that updateInstallationSettings(...) works properly", async () => {
+    let isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    expect(isSystemInstalled).equals(false);
+
+    await Application.performInstall(dataStorageState, authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
+      "OPA_Locale_bn_IN", "OPA_TimeZoneGroup_IST_+05:30", "Fake", "Account");
+
+    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    expect(isSystemInstalled).equals(true);
+
+    let callState = await CSU.getCallStateForCurrentUser(dataStorageState, authenticationState);
+    OPA.assertNonNullish(callState.authorizationState, "Authorization State should not be null.");
+    const currentUser = OPA.convertNonNullish(callState.authorizationState).user;
+    const currentLocale = OPA.convertNonNullish(callState.authorizationState).locale;
+    OPA.assertNonNullish(callState.systemState, "System State should not be null.");
+    let archiveOriginal = OPA.convertNonNullish(callState.systemState).archive;
+    expect(Application.updateInstallationSettings(callState, undefined, undefined, undefined, undefined, undefined)).to.be.rejectedWith(Error);
+
+    let archive = await OpaDb.Archive.queries.getById(dataStorageState.db, OpaDm.ArchiveId);
+    OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
+    let archiveNonNull = OPA.convertNonNullish(archive);
+
+    expect(archiveNonNull.name).equals(archiveOriginal.name);
+    expect(archiveNonNull.description).equals(archiveOriginal.description);
+    expect(archiveNonNull.defaultLocaleId).equals(archiveOriginal.defaultLocaleId);
+    expect(archiveNonNull.defaultTimeZoneGroupId).equals(archiveOriginal.defaultTimeZoneGroupId);
+    expect(archiveNonNull.defaultTimeZoneId).equals(archiveOriginal.defaultTimeZoneId);
+    expect(archiveNonNull.hasBeenUpdated).equals(false);
+    expect(archiveNonNull.dateOfLatestUpdate).equals(null);
+    expect(archiveNonNull.userIdOfLatestUpdater).equals(null);
+
+    callState = await CSU.getCallStateForCurrentUser(dataStorageState, authenticationState);
+    const nameUpdated = archiveOriginal.name[currentLocale.optionName] + " UPDATED";
+    await Application.updateInstallationSettings(callState, nameUpdated, undefined, undefined, undefined, undefined);
+
+    archive = await OpaDb.Archive.queries.getById(dataStorageState.db, OpaDm.ArchiveId);
+    OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
+    archiveNonNull = OPA.convertNonNullish(archive);
+
+    expect(archiveNonNull.name[currentLocale.optionName]).equals(nameUpdated);
+    expect(archiveNonNull.description).equals(archiveOriginal.description);
+    expect(archiveNonNull.defaultLocaleId).equals(archiveOriginal.defaultLocaleId);
+    expect(archiveNonNull.defaultTimeZoneGroupId).equals(archiveOriginal.defaultTimeZoneGroupId);
+    expect(archiveNonNull.defaultTimeZoneId).equals(archiveOriginal.defaultTimeZoneId);
+    expect(archiveNonNull.hasBeenUpdated).equals(true);
+    expect(archiveNonNull.dateOfLatestUpdate).equals(null);
+    expect(archiveNonNull.userIdOfLatestUpdater).equals(currentUser.id);
+
+    callState = await CSU.getCallStateForCurrentUser(dataStorageState, authenticationState);
+    const descriptionUpdated = archiveOriginal.description[currentLocale.optionName] + " UPDATED";
+    const defaultLocaleIdUpdated = (OpaDb.Locales.requiredDocuments.find((v) => !v.isDefault) as OpaDm.ILocale).id;
+    await Application.updateInstallationSettings(callState, undefined, descriptionUpdated, defaultLocaleIdUpdated, undefined, undefined);
+
+    archive = await OpaDb.Archive.queries.getById(dataStorageState.db, OpaDm.ArchiveId);
+    OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
+    archiveNonNull = OPA.convertNonNullish(archive);
+
+    expect(archiveNonNull.name[currentLocale.optionName]).equals(nameUpdated);
+    expect(archiveNonNull.description[currentLocale.optionName]).equals(descriptionUpdated);
+    expect(archiveNonNull.defaultLocaleId).equals(defaultLocaleIdUpdated);
+    expect(archiveNonNull.defaultTimeZoneGroupId).equals(archiveOriginal.defaultTimeZoneGroupId);
+    expect(archiveNonNull.defaultTimeZoneId).equals(archiveOriginal.defaultTimeZoneId);
+    expect(archiveNonNull.hasBeenUpdated).equals(true);
+    expect(archiveNonNull.dateOfLatestUpdate).equals(null);
+    expect(archiveNonNull.userIdOfLatestUpdater).equals(currentUser.id);
+
+    callState = await CSU.getCallStateForCurrentUser(dataStorageState, authenticationState);
+    const defaultTimeZoneGroupUpdated = (OpaDb.TimeZoneGroups.requiredDocuments.find((v) => !v.isDefault) as OpaDm.ITimeZoneGroup);
+    const defaultTimeZoneGroupIdUpdated = defaultTimeZoneGroupUpdated.id;
+    const defaultTimeZoneIdUpdated = defaultTimeZoneGroupUpdated.primaryTimeZoneId;
+    await Application.updateInstallationSettings(callState, undefined, undefined, undefined, defaultTimeZoneGroupIdUpdated, defaultTimeZoneIdUpdated);
+
+    archive = await OpaDb.Archive.queries.getById(dataStorageState.db, OpaDm.ArchiveId);
+    OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
+    archiveNonNull = OPA.convertNonNullish(archive);
+
+    expect(archiveNonNull.name[currentLocale.optionName]).equals(nameUpdated);
+    expect(archiveNonNull.description[currentLocale.optionName]).equals(descriptionUpdated);
+    expect(archiveNonNull.defaultLocaleId).equals(defaultLocaleIdUpdated);
+    expect(archiveNonNull.defaultTimeZoneGroupId).equals(defaultTimeZoneGroupIdUpdated);
+    expect(archiveNonNull.defaultTimeZoneId).equals(defaultTimeZoneIdUpdated);
+    expect(archiveNonNull.hasBeenUpdated).equals(true);
+    expect(archiveNonNull.dateOfLatestUpdate).equals(null);
+    expect(archiveNonNull.userIdOfLatestUpdater).equals(currentUser.id);
+  });
+
   // IMPORTANT: You must build the domainlogic package before running this test so that the PackageInfo.ts files contain the correct VERSION values
   test("checks that performUpgrade(...) works properly", async () => {
     let isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
