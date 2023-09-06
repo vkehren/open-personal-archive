@@ -156,14 +156,14 @@ export interface IDocument_Archivable_ByUser extends IDocument_Archivable, IArch
 
 // IViewable
 export const IViewable_HasBeenViewed_PropertyName = "hasBeenViewed"; // eslint-disable-line camelcase
-export const IViewable_DateOfViewing_PropertyName = "dateOfViewing"; // eslint-disable-line camelcase
+export const IViewable_DateOfLatestViewing_PropertyName = "dateOfLatestViewing"; // eslint-disable-line camelcase
 export interface IViewable {
   readonly hasBeenViewed: boolean;
-  readonly dateOfViewing: DateToUse | null;
+  readonly dateOfLatestViewing: DateToUse | null;
 }
-export const IViewable_ByUser_UserIdOfViewer_PropertyName = "userIdOfViewer"; // eslint-disable-line camelcase
+export const IViewable_ByUser_UserIdOfLatestViewer_PropertyName = "userIdOfLatestViewer"; // eslint-disable-line camelcase
 export interface IViewable_ByUser extends IViewable {
-  readonly userIdOfViewer: string | null;
+  readonly userIdOfLatestViewer: string | null;
 }
 export interface IDocument_Viewable extends IDocument, IViewable { }
 export interface IDocument_Viewable_ByUser extends IDocument_Viewable, IViewable_ByUser { }
