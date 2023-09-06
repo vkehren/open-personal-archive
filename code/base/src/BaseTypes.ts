@@ -114,10 +114,10 @@ export interface IDocument_Creatable_ByNullableUser extends IDocument_Creatable,
 
 // IUpgradeable
 export const IUpgradeable_HasBeenUpgraded_PropertyName = "hasBeenUpgraded"; // eslint-disable-line camelcase
-export const IUpgradeable_DateOfLatestUpgraded_PropertyName = "dateOfLatestUpgraded"; // eslint-disable-line camelcase
+export const IUpgradeable_DateOfLatestUpgrade_PropertyName = "dateOfLatestUpgrade"; // eslint-disable-line camelcase
 export interface IUpgradeable {
   readonly hasBeenUpgraded: boolean;
-  readonly dateOfLatestUpgraded: DateToUse | null;
+  readonly dateOfLatestUpgrade: DateToUse | null;
 }
 export const IUpgradeable_ByUser_UserIdOfLatestUpgrader_PropertyName = "userIdOfLatestUpgrader"; // eslint-disable-line camelcase
 export interface IUpgradeable_ByUser extends IUpgradeable {
@@ -170,14 +170,16 @@ export interface IDocument_Viewable_ByUser extends IDocument_Viewable, IViewable
 
 // IApprovable
 export const IApprovable_ApprovalState_PropertyName = "approvalState"; // eslint-disable-line camelcase
-export const IApprovable_DateOfApproval_PropertyName = "dateOfApproval"; // eslint-disable-line camelcase
+export const IApprovable_HasBeenDecided_PropertyName = "hasBeenDecided"; // eslint-disable-line camelcase
+export const IApprovable_DateOfDecision_PropertyName = "dateOfDecision"; // eslint-disable-line camelcase
 export interface IApprovable<T> {
   readonly approvalState: T;
-  readonly dateOfApproval: DateToUse | null;
+  readonly hasBeenDecided: boolean;
+  readonly dateOfDecision: DateToUse | null;
 }
-export const IApprovable_ByUser_UserIdOfApprover_PropertyName = "userIdOfApprover"; // eslint-disable-line camelcase
+export const IApprovable_ByUser_UserIdOfDecider_PropertyName = "userIdOfDecider"; // eslint-disable-line camelcase
 export interface IApprovable_ByUser<T> extends IApprovable<T> {
-  readonly userIdOfApprover: string | null;
+  readonly userIdOfDecider: string | null;
 }
 export interface IDocument_Approvable<T> extends IDocument, IApprovable<T> { }
 export interface IDocument_Approvable_ByUser<T> extends IDocument_Approvable<T>, IApprovable_ByUser<T> { }
