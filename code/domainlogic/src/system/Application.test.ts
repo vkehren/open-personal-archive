@@ -10,65 +10,32 @@ import * as CSU from "../CallStateUtilities";
 import * as Application from "./Application";
 import * as SchemaInfo from "../../../datamodel/src/PackageInfo";
 import * as ApplicationInfo from "../PackageInfo";
-import * as TestConfig from "../../test-config.json";
+import * as TestConfiguration from "../TestConfiguration.test";
 
-const useEmulators = TestConfig.use_emulators;
-const useEmulatorsText = (useEmulators ? "Emulators" : "Cloud");
-let timeout: number | null | undefined = TestConfig.timeout;
-let initializeArgs = {projectId: ""};
+const config = TestConfiguration.getTestConfiguration();
 
-if (useEmulators) {
-  const emulatorsConfig = TestConfig.test_emulators;
-  timeout = emulatorsConfig.timeout ?? timeout;
-  OPA.setFirebaseToUseEmulators(emulatorsConfig.project_id, emulatorsConfig.emulator_authentication_host, emulatorsConfig.emulator_firestore_host, emulatorsConfig.emulator_storage_host);
-  initializeArgs = {projectId: emulatorsConfig.project_id_for_admin};
-} else {
-  const cloudConfig = TestConfig.test_cloud;
-  timeout = cloudConfig.timeout ?? timeout;
-  OPA.setFirebaseToUseCloud(cloudConfig.path_to_credential);
-  initializeArgs = {projectId: cloudConfig.project_id_for_admin};
-}
-
-const nullDb = ((null as unknown) as admin.firestore.Firestore);
-const ownerFirebaseAuthUserId = "FB_" + OpaDm.User_OwnerId;
-let isFirstTest = true;
-
-const dataStorageState: OpaDm.IDataStorageState = {
-  appName: "[DEFAULT]", // NOTE: This is the default name Firebase uses for unnamed apps
-  projectId: initializeArgs.projectId,
-  usesAdminAccess: true,
-  usesEmulators: useEmulators,
-  db: nullDb,
-};
-const authenticationState: OpaDm.IAuthenticationState = {
-  firebaseAuthUserId: ownerFirebaseAuthUserId,
-  providerId: "google.com",
-  email: (ownerFirebaseAuthUserId + "@gmail.com"),
-  emailIsVerified: true,
-};
-
-describe("Tests using Firebase " + useEmulatorsText, function () {
-  if (!OPA.isNullish(timeout)) {
-    this.timeout(OPA.convertNonNullish(timeout)); // eslint-disable-line no-invalid-this
+describe("Tests using Firebase " + config.testEnvironment, function () {
+  if (!OPA.isNullish(config.timeout)) {
+    this.timeout(OPA.convertNonNullish(config.timeout)); // eslint-disable-line no-invalid-this
   }
 
   beforeEach(async () => {
-    const doBackup = false && (isFirstTest && !useEmulators); // LATER: Once backup is implemented, delete "false && "
-    isFirstTest = false;
+    const doBackup = false && (config.hasRunTests && (config.testEnvironment != "Emulators")); // LATER: Once backup is implemented, delete "false && "
+    config.hasRunTests = false;
 
-    admin.initializeApp(initializeArgs);
-    dataStorageState.db = admin.firestore();
+    admin.initializeApp(config.appInitializationArgs);
+    config.dataStorageState.db = admin.firestore();
 
-    const isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    const isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     if (isSystemInstalled) {
-      const owner = await OpaDb.Users.queries.getById(dataStorageState.db, OpaDm.User_OwnerId);
+      const owner = await OpaDb.Users.queries.getById(config.dataStorageState.db, OpaDm.User_OwnerId);
 
       if (OPA.isNullish(owner)) {
         // NOTE: Passing a valid value for "authorizationState" only matters if the Archive Owner actually exists
-        await Application.performUninstall(dataStorageState, authenticationState, null, doBackup);
+        await Application.performUninstall(config.dataStorageState, config.authenticationState, null, doBackup);
       } else {
-        const authorizationState = await CSU.readAuthorizationStateForFirebaseAuthUser(dataStorageState, OPA.convertNonNullish(owner).firebaseAuthUserId);
-        await Application.performUninstall(dataStorageState, authenticationState, authorizationState, doBackup);
+        const authorizationState = await CSU.readAuthorizationStateForFirebaseAuthUser(config.dataStorageState, OPA.convertNonNullish(owner).firebaseAuthUserId);
+        await Application.performUninstall(config.dataStorageState, config.authenticationState, authorizationState, doBackup);
       }
     }
 
@@ -76,87 +43,87 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
   });
 
   test("checks that isSystemInstalled(...) works properly", async () => {
-    let isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
     const application = createApplication(ApplicationInfo.VERSION, SchemaInfo.VERSION);
-    const applicationCollectionRef = OpaDb.Application.getTypedCollection(dataStorageState.db);
+    const applicationCollectionRef = OpaDb.Application.getTypedCollection(config.dataStorageState.db);
     const applicationDocumentRef = applicationCollectionRef.doc(application.id);
     await applicationDocumentRef.set(application, {merge: true});
 
-    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
   });
 
   test("checks that performUninstall(...) works properly", async () => {
-    let isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
     let application = createApplication(ApplicationInfo.VERSION, SchemaInfo.VERSION);
-    let applicationCollectionRef = OpaDb.Application.getTypedCollection(dataStorageState.db);
+    let applicationCollectionRef = OpaDb.Application.getTypedCollection(config.dataStorageState.db);
     let applicationDocumentRef = applicationCollectionRef.doc(application.id);
     await applicationDocumentRef.set(application, {merge: true});
 
-    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
 
     // NOTE: Since no Archive Owner exists in the current data, the following call should complete successfully
-    await Application.performUninstall(dataStorageState, authenticationState, null, false);
+    await Application.performUninstall(config.dataStorageState, config.authenticationState, null, false);
 
-    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    const applications = await OpaDb.Application.queries.getAll(dataStorageState.db);
+    const applications = await OpaDb.Application.queries.getAll(config.dataStorageState.db);
     expect(applications.length).equals(0);
-    const authProviders = await OpaDb.AuthProviders.queries.getAll(dataStorageState.db);
+    const authProviders = await OpaDb.AuthProviders.queries.getAll(config.dataStorageState.db);
     expect(authProviders.length).equals(0);
-    const roles = await OpaDb.Roles.queries.getAll(dataStorageState.db);
+    const roles = await OpaDb.Roles.queries.getAll(config.dataStorageState.db);
     expect(roles.length).equals(0);
-    const locales = await OpaDb.Locales.queries.getAll(dataStorageState.db);
+    const locales = await OpaDb.Locales.queries.getAll(config.dataStorageState.db);
     expect(locales.length).equals(0);
-    const timeZoneGroups = await OpaDb.TimeZoneGroups.queries.getAll(dataStorageState.db);
+    const timeZoneGroups = await OpaDb.TimeZoneGroups.queries.getAll(config.dataStorageState.db);
     expect(timeZoneGroups.length).equals(0);
-    const timeZones = await OpaDb.TimeZones.queries.getAll(dataStorageState.db);
+    const timeZones = await OpaDb.TimeZones.queries.getAll(config.dataStorageState.db);
     expect(timeZones.length).equals(0);
-    const users = await OpaDb.Users.queries.getAll(dataStorageState.db);
+    const users = await OpaDb.Users.queries.getAll(config.dataStorageState.db);
     expect(users.length).equals(0);
-    const archives = await OpaDb.Archive.queries.getAll(dataStorageState.db);
+    const archives = await OpaDb.Archive.queries.getAll(config.dataStorageState.db);
     expect(archives.length).equals(0);
 
     application = createApplication(ApplicationInfo.VERSION, SchemaInfo.VERSION);
-    applicationCollectionRef = OpaDb.Application.getTypedCollection(dataStorageState.db);
+    applicationCollectionRef = OpaDb.Application.getTypedCollection(config.dataStorageState.db);
     applicationDocumentRef = applicationCollectionRef.doc(application.id);
     await applicationDocumentRef.set(application, {merge: true});
 
     const authProvider = OpaDb.AuthProviders.requiredDocuments[0];
-    const authProviderCollectionRef = OpaDb.AuthProviders.getTypedCollection(dataStorageState.db);
+    const authProviderCollectionRef = OpaDb.AuthProviders.getTypedCollection(config.dataStorageState.db);
     const authProviderDocumentRef = authProviderCollectionRef.doc(authProvider.id);
     await authProviderDocumentRef.set(application, {merge: true});
 
     const role = OpaDb.Roles.requiredDocuments.filter((value) => (value.type == OpaDm.RoleTypes.owner))[0];
-    const roleCollectionRef = OpaDb.Roles.getTypedCollection(dataStorageState.db);
+    const roleCollectionRef = OpaDb.Roles.getTypedCollection(config.dataStorageState.db);
     const roleDocumentRef = roleCollectionRef.doc(role.id);
     await roleDocumentRef.set(role, {merge: true});
 
     const locale = OpaDb.Locales.requiredDocuments[0];
-    const localeCollectionRef = OpaDb.Locales.getTypedCollection(dataStorageState.db);
+    const localeCollectionRef = OpaDb.Locales.getTypedCollection(config.dataStorageState.db);
     const localeDocumentRef = localeCollectionRef.doc(locale.id);
     await localeDocumentRef.set(locale, {merge: true});
 
     const timeZoneGroup = OpaDb.TimeZoneGroups.requiredDocuments[0];
-    const timeZoneGroupCollectionRef = OpaDb.TimeZoneGroups.getTypedCollection(dataStorageState.db);
+    const timeZoneGroupCollectionRef = OpaDb.TimeZoneGroups.getTypedCollection(config.dataStorageState.db);
     const timeZoneGroupDocumentRef = timeZoneGroupCollectionRef.doc(timeZoneGroup.id);
     await timeZoneGroupDocumentRef.set(timeZoneGroup, {merge: true});
 
     const timeZone = OpaDb.TimeZones.requiredDocuments[0];
-    const timeZoneCollectionRef = OpaDb.TimeZones.getTypedCollection(dataStorageState.db);
+    const timeZoneCollectionRef = OpaDb.TimeZones.getTypedCollection(config.dataStorageState.db);
     const timeZoneDocumentRef = timeZoneCollectionRef.doc(timeZone.id);
     await timeZoneDocumentRef.set(timeZone, {merge: true});
 
     const now = OPA.nowToUse();
     const owner: OpaDm.IUser = {
       id: OpaDm.User_OwnerId,
-      firebaseAuthUserId: ownerFirebaseAuthUserId,
+      firebaseAuthUserId: config.authenticationState.firebaseAuthUserId,
       authProviderId: authProvider.id,
       authAccountName: "",
       authAccountNameLowered: "",
@@ -181,79 +148,79 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
       dateOfDecision: now,
       userIdOfDecider: OpaDm.User_OwnerId,
     };
-    const userCollectionRef = OpaDb.Users.getTypedCollection(dataStorageState.db);
+    const userCollectionRef = OpaDb.Users.getTypedCollection(config.dataStorageState.db);
     const userDocumentRef = userCollectionRef.doc(owner.id);
     await userDocumentRef.set(owner, {merge: true});
 
-    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
 
-    const authorizationState = await CSU.readAuthorizationStateForFirebaseAuthUser(dataStorageState, ownerFirebaseAuthUserId);
+    const authorizationState = await CSU.readAuthorizationStateForFirebaseAuthUser(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
     // NOTE: Since an Archive Owner exists in the current data, the following call should throw an Error
-    expect(Application.performUninstall(dataStorageState, authenticationState, null, false)).to.be.rejectedWith(Error);
+    expect(Application.performUninstall(config.dataStorageState, config.authenticationState, null, false)).to.be.rejectedWith(Error);
     // NOTE: Since we pass the Archive Owner's Authorization State, the following call should complete successfully
-    await Application.performUninstall(dataStorageState, authenticationState, authorizationState, false);
+    await Application.performUninstall(config.dataStorageState, config.authenticationState, authorizationState, false);
 
-    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
     // NOTE: Since the System is no longer installed, this call should succeed
-    await Application.performUninstall(dataStorageState, authenticationState, null, false);
+    await Application.performUninstall(config.dataStorageState, config.authenticationState, null, false);
 
-    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
     // NOTE: Since the System is no longer installed, this call should also succeed
-    await Application.performUninstall(dataStorageState, authenticationState, authorizationState, false);
+    await Application.performUninstall(config.dataStorageState, config.authenticationState, authorizationState, false);
 
-    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
   });
 
   test("checks that performInstall(...) works properly", async () => {
-    let isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await Application.performInstall(dataStorageState, authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
+    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
       "OPA_Locale_bn_IN", "OPA_TimeZoneGroup_IST_+05:30", "Fake", "Account");
 
-    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
 
     // LATER: Extract these checks into a isCorrupted(...) function that checks install data is valid or not
-    const applications = await OpaDb.Application.queries.getAll(dataStorageState.db);
+    const applications = await OpaDb.Application.queries.getAll(config.dataStorageState.db);
     expect(applications.length).equals(1);
-    const authProviders = await OpaDb.AuthProviders.queries.getAll(dataStorageState.db);
+    const authProviders = await OpaDb.AuthProviders.queries.getAll(config.dataStorageState.db);
     expect(authProviders.length).equals(OpaDb.AuthProviders.requiredDocuments.length).equals(1);
-    const roles = await OpaDb.Roles.queries.getAll(dataStorageState.db);
+    const roles = await OpaDb.Roles.queries.getAll(config.dataStorageState.db);
     expect(roles.length).equals(OpaDb.Roles.requiredDocuments.length).equals(5);
-    const locales = await OpaDb.Locales.queries.getAll(dataStorageState.db);
+    const locales = await OpaDb.Locales.queries.getAll(config.dataStorageState.db);
     expect(locales.length).equals(OpaDb.Locales.requiredDocuments.length).equals(53);
-    const timeZoneGroups = await OpaDb.TimeZoneGroups.queries.getAll(dataStorageState.db);
+    const timeZoneGroups = await OpaDb.TimeZoneGroups.queries.getAll(config.dataStorageState.db);
     expect(timeZoneGroups.length).equals(OpaDb.TimeZoneGroups.requiredDocuments.length).equals(41);
-    const timeZones = await OpaDb.TimeZones.queries.getAll(dataStorageState.db);
+    const timeZones = await OpaDb.TimeZones.queries.getAll(config.dataStorageState.db);
     expect(timeZones.length).equals(OpaDb.TimeZones.requiredDocuments.length).equals(41);
-    const users = await OpaDb.Users.queries.getAll(dataStorageState.db);
+    const users = await OpaDb.Users.queries.getAll(config.dataStorageState.db);
     expect(users.length).equals(1);
-    const archives = await OpaDb.Archive.queries.getAll(dataStorageState.db);
+    const archives = await OpaDb.Archive.queries.getAll(config.dataStorageState.db);
     expect(archives.length).equals(1);
 
     // NOTE: Since the System is already installed, this call should fail
-    expect(Application.performInstall(dataStorageState, authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
+    expect(Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
       "OPA_Locale_bn_IN", "OPA_TimeZoneGroup_IST_+05:30", "Fake", "Account")).to.be.rejectedWith(Error);
   });
 
   test("checks that updateInstallationSettings(...) works properly", async () => {
-    let isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await Application.performInstall(dataStorageState, authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
+    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
       "OPA_Locale_bn_IN", "OPA_TimeZoneGroup_IST_+05:30", "Fake", "Account");
 
-    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
 
-    let callState = await CSU.getCallStateForCurrentUser(dataStorageState, authenticationState);
+    let callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     OPA.assertNonNullish(callState.authorizationState, "Authorization State should not be null.");
     const currentUser = OPA.convertNonNullish(callState.authorizationState).user;
     const currentLocale = OPA.convertNonNullish(callState.authorizationState).locale;
@@ -261,7 +228,7 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     let archiveOriginal = OPA.convertNonNullish(callState.systemState).archive;
     expect(Application.updateInstallationSettings(callState, undefined, undefined, undefined, undefined, undefined)).to.be.rejectedWith(Error);
 
-    let archive = await OpaDb.Archive.queries.getById(dataStorageState.db, OpaDm.ArchiveId);
+    let archive = await OpaDb.Archive.queries.getById(config.dataStorageState.db, OpaDm.ArchiveId);
     OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
     let archiveNonNull = OPA.convertNonNullish(archive);
 
@@ -274,11 +241,11 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     expect(archiveNonNull.dateOfLatestUpdate).equals(null);
     expect(archiveNonNull.userIdOfLatestUpdater).equals(null);
 
-    callState = await CSU.getCallStateForCurrentUser(dataStorageState, authenticationState);
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     const nameUpdated = archiveOriginal.name[currentLocale.optionName] + " UPDATED";
     await Application.updateInstallationSettings(callState, nameUpdated, undefined, undefined, undefined, undefined);
 
-    archive = await OpaDb.Archive.queries.getById(dataStorageState.db, OpaDm.ArchiveId);
+    archive = await OpaDb.Archive.queries.getById(config.dataStorageState.db, OpaDm.ArchiveId);
     OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
     archiveNonNull = OPA.convertNonNullish(archive);
 
@@ -291,12 +258,12 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     expect(archiveNonNull.dateOfLatestUpdate).not.equals(null);
     expect(archiveNonNull.userIdOfLatestUpdater).equals(currentUser.id);
 
-    callState = await CSU.getCallStateForCurrentUser(dataStorageState, authenticationState);
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     const descriptionUpdated = archiveOriginal.description[currentLocale.optionName] + " UPDATED";
     const defaultLocaleIdUpdated = (OpaDb.Locales.requiredDocuments.find((v) => !v.isDefault) as OpaDm.ILocale).id;
     await Application.updateInstallationSettings(callState, undefined, descriptionUpdated, defaultLocaleIdUpdated, undefined, undefined);
 
-    archive = await OpaDb.Archive.queries.getById(dataStorageState.db, OpaDm.ArchiveId);
+    archive = await OpaDb.Archive.queries.getById(config.dataStorageState.db, OpaDm.ArchiveId);
     OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
     archiveNonNull = OPA.convertNonNullish(archive);
 
@@ -309,13 +276,13 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     expect(archiveNonNull.dateOfLatestUpdate).not.equals(null);
     expect(archiveNonNull.userIdOfLatestUpdater).equals(currentUser.id);
 
-    callState = await CSU.getCallStateForCurrentUser(dataStorageState, authenticationState);
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     const defaultTimeZoneGroupUpdated = (OpaDb.TimeZoneGroups.requiredDocuments.find((v) => !v.isDefault) as OpaDm.ITimeZoneGroup);
     const defaultTimeZoneGroupIdUpdated = defaultTimeZoneGroupUpdated.id;
     const defaultTimeZoneIdUpdated = defaultTimeZoneGroupUpdated.primaryTimeZoneId;
     await Application.updateInstallationSettings(callState, undefined, undefined, undefined, defaultTimeZoneGroupIdUpdated, defaultTimeZoneIdUpdated);
 
-    archive = await OpaDb.Archive.queries.getById(dataStorageState.db, OpaDm.ArchiveId);
+    archive = await OpaDb.Archive.queries.getById(config.dataStorageState.db, OpaDm.ArchiveId);
     OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
     archiveNonNull = OPA.convertNonNullish(archive);
 
@@ -331,20 +298,20 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
 
   // IMPORTANT: You must build the domainlogic package before running this test so that the PackageInfo.ts files contain the correct VERSION values
   test("checks that performUpgrade(...) works properly", async () => {
-    let isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await Application.performInstall(dataStorageState, authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
+    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
       "OPA_Locale_bn_IN", "OPA_TimeZoneGroup_IST_+05:30", "Fake", "Account");
 
-    isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
+    isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
 
     // NOTE: Since the System version has not changed, this call should fail
-    let callState = await CSU.getCallStateForCurrentUser(dataStorageState, authenticationState);
+    let callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     expect(Application.performUpgrade(callState)).to.be.rejectedWith(Error);
 
-    let application = await OpaDb.Application.queries.getById(dataStorageState.db, OpaDm.ApplicationId);
+    let application = await OpaDb.Application.queries.getById(config.dataStorageState.db, OpaDm.ApplicationId);
     OPA.assertDocumentIsValid(application, "The Application does not exist.");
     let applicationNonNull = OPA.convertNonNullish(application);
 
@@ -362,10 +329,10 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
       dateOfLatestUpgrade: applicationNonNull.dateOfLatestUpgrade,
       userIdOfLatestUpgrader: applicationNonNull.userIdOfLatestUpgrader,
     };
-    const applicationRef = OpaDb.Application.getTypedCollection(dataStorageState.db).doc(applicationNonNull.id);
+    const applicationRef = OpaDb.Application.getTypedCollection(config.dataStorageState.db).doc(applicationNonNull.id);
     await applicationRef.set(applicationPartial, {merge: true});
 
-    application = await OpaDb.Application.queries.getById(dataStorageState.db, OpaDm.ApplicationId);
+    application = await OpaDb.Application.queries.getById(config.dataStorageState.db, OpaDm.ApplicationId);
     OPA.assertDocumentIsValid(application, "The Application does not exist.");
     applicationNonNull = OPA.convertNonNullish(application);
 
@@ -377,10 +344,10 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
     expect(applicationNonNull.dateOfLatestUpgrade).equals(null);
     expect(applicationNonNull.userIdOfLatestUpgrader).equals(null);
 
-    callState = await CSU.getCallStateForCurrentUser(dataStorageState, authenticationState);
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     await Application.performUpgrade(callState);
 
-    application = await OpaDb.Application.queries.getById(dataStorageState.db, OpaDm.ApplicationId);
+    application = await OpaDb.Application.queries.getById(config.dataStorageState.db, OpaDm.ApplicationId);
     OPA.assertDocumentIsValid(application, "The Application does not exist.");
     applicationNonNull = OPA.convertNonNullish(application);
 
@@ -404,7 +371,7 @@ describe("Tests using Firebase " + useEmulatorsText, function () {
   });
 
   afterEach(async () => {
-    await dataStorageState.db.terminate();
+    await config.dataStorageState.db.terminate();
     await admin.app().delete();
   });
 });
