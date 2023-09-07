@@ -10,6 +10,21 @@ export const localizableStringConstructor = function (desiredValue: string | nul
   return localizableString;
 };
 
+export type ActivityType = "browser_page_load" | "browser_page_view" | "browser_page_action" | "browser_page_error" | "server_function_call" | "server_function_error";
+export const ActivityTypes = {
+  default: ("browser_page_view" as ActivityType),
+  web_page_load: ("browser_page_load" as ActivityType),
+  web_page_view: ("browser_page_view" as ActivityType),
+  web_page_action: ("browser_page_action" as ActivityType),
+  web_page_error: ("browser_page_error" as ActivityType),
+  web_page_types: ([] as Array<ActivityType>),
+  server_function_call: ("server_function_call" as ActivityType),
+  server_function_error: ("server_function_error" as ActivityType),
+  server_function_types: ([] as Array<ActivityType>),
+};
+ActivityTypes.web_page_types = [ActivityTypes.web_page_load, ActivityTypes.web_page_view, ActivityTypes.web_page_action, ActivityTypes.web_page_error];
+ActivityTypes.server_function_types = [ActivityTypes.server_function_call, ActivityTypes.server_function_error];
+
 export type RoleType = "owner" | "administrator" | "editor" | "viewer" | "guest";
 export const RoleTypes = {
   default: ("guest" as RoleType),

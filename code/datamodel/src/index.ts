@@ -1,5 +1,6 @@
 import * as OPA from "../../base/src";
 // System Required
+import * as ActivityLogItem from "./doctypes/ActivityLogItem";
 import * as AuthProvider from "./doctypes/AuthenticationProvider";
 import * as Locale from "./doctypes/Locale";
 import * as Role from "./doctypes/Role";
@@ -20,6 +21,7 @@ export const schemaVersion = "0.0.0.1";
 // NOTE: If the CollectionDescriptor represents data that will dynamically be created during usage of system, expose factory function via ITypedFactoryCollectionDescriptor<T, F> interface
 //         -> And for special case instances (e.g. User who is Archive Owner), export the special case factory function directly later below
 export interface IOpaDbDescriptor extends OPA.ICollection {
+  readonly ActivityLogItems: OPA.ITypedQueryableFactoryCollectionDescriptor<ActivityLogItem.IActivityLogItem, ActivityLogItem.QuerySet, ActivityLogItem.FactoryFunc>;
   readonly AuthProviders: OPA.ITypedQueryableCollectionDescriptor<AuthProvider.IAuthenticationProvider, AuthProvider.AuthenticationProviderQuerySet>;
   readonly Locales: OPA.ITypedQueryableCollectionDescriptor<Locale.ILocale, Locale.QuerySet>;
   readonly Roles: OPA.ITypedQueryableCollectionDescriptor<Role.IRole, Role.QuerySet>;
@@ -34,6 +36,7 @@ export interface IOpaDbDescriptor extends OPA.ICollection {
 }
 
 const DbDescriptor = (OPA.CollectionDescriptors as OPA.ICollection);
+DbDescriptor.ActivityLogItems = ActivityLogItem.CollectionDescriptor;
 DbDescriptor.AuthProviders = AuthProvider.CollectionDescriptor;
 DbDescriptor.Locales = Locale.CollectionDescriptor;
 DbDescriptor.Roles = Role.CollectionDescriptor;
@@ -47,8 +50,9 @@ DbDescriptor.RootCollections = OPA.getCollectionFromObject<OPA.ICollectionDescri
 DbDescriptor.NestedCollections = OPA.getCollectionFromObject<OPA.ICollectionDescriptor>(DbDescriptor, (colDesc) => (!OPA.isNullish(colDesc.collectionName)), (colDesc) => (colDesc.isNestedCollection));
 export const OpaDbDescriptor = OPA.convertTo<IOpaDbDescriptor>(DbDescriptor);
 
-export {DefaultIndexCollection, localizableStringConstructor, ApprovalState, ApprovalStates, RoleType, RoleTypes} from "./BaseTypes";
+export {DefaultIndexCollection, localizableStringConstructor, ActivityType, ActivityTypes, ApprovalState, ApprovalStates, RoleType, RoleTypes} from "./BaseTypes";
 export {AuthorizationState, ISystemState, IAuthenticationState, IAuthorizationState, ICallState, IDataStorageState} from "./CallStateTypes";
+export {IActivityLogItem} from "./doctypes/ActivityLogItem";
 export {IAuthenticationProvider, DefaultAuthenticationProviderId, AuthenticationProvider_GoogleId, AuthenticationProvider_RequiredIds} from "./doctypes/AuthenticationProvider"; // eslint-disable-line camelcase
 export {ILocale, DefaultLocaleId, DefaultLocale} from "./doctypes/Locale";
 export {IRole, DefaultRoleId, Role_OwnerId, Role_AdministratorId, Role_EditorId, Role_ViewerId, Role_GuestId, Role_RequiredIds} from "./doctypes/Role"; // eslint-disable-line camelcase
