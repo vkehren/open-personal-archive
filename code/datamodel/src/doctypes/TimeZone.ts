@@ -4,9 +4,9 @@ import * as CollectionData from "./TimeZones.json";
 const SingularName = "TimeZone";
 const PluralName = "TimeZones";
 const IsSingleton = false;
-const RequiredDocuments: Array<ITimeZone> = CollectionData.requiredDocuments;
+const RequiredDocuments: Array<ITimeZone> = OPA.promoteDocumentsToCreatable(CollectionData.requiredDocuments, null);
 
-export interface ITimeZone extends OPA.IDocument {
+export interface ITimeZone extends OPA.IDocument_Creatable {
   readonly id: string;
   readonly name: string;
   readonly countryCode: string;

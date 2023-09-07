@@ -7,11 +7,11 @@ const PluralName = "AuthenticationProviders";
 const IsSingleton = false;
 export const AuthenticationProvider_GoogleId = "OPA_AuthenticationProvider_Google"; // eslint-disable-line camelcase
 export const AuthenticationProvider_RequiredIds = [AuthenticationProvider_GoogleId]; // eslint-disable-line camelcase
-const RequiredDocuments: Array<IAuthenticationProvider> = CollectionData.requiredDocuments;
+const RequiredDocuments: Array<IAuthenticationProvider> = OPA.promoteDocumentsToCreatable(CollectionData.requiredDocuments, null);
 const DefaultDocument = (RequiredDocuments.find((v) => v.isDefault) as IAuthenticationProvider | undefined);
 export const DefaultAuthenticationProviderId = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNonNullish(DefaultDocument).id : AuthenticationProvider_GoogleId;
 
-export interface IAuthenticationProvider extends OPA.IDocument {
+export interface IAuthenticationProvider extends OPA.IDocument_Creatable {
   readonly id: string;
   readonly name: string;
   readonly externalId: string;

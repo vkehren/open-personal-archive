@@ -1,4 +1,5 @@
 import * as firestore from "@google-cloud/firestore";
+import * as TC from "./TypeChecking";
 
 // export const name = "BaseTypes";
 
@@ -183,3 +184,27 @@ export interface IApprovable_ByUser<T> extends IApprovable<T> {
 }
 export interface IDocument_Approvable<T> extends IDocument, IApprovable<T> { }
 export interface IDocument_Approvable_ByUser<T> extends IDocument_Approvable<T>, IApprovable_ByUser<T> { }
+
+/**
+ * Sets the ICreatable properies on the incoming documents and returns the typed result.
+ * @param {Array<IN>} documents The documents to promote to ICreatable.
+ * @param {DateToUse | null} [dateOfCreation=null] The date to use as the value for the "dateOfCreation" property.
+ * @return {Array<OUT>} The result.
+ */
+export function promoteDocumentsToCreatable<IN extends IDocument, OUT extends IN & ICreatable>(documents: Array<IN>, dateOfCreation: DateToUse | null = null): Array<OUT> {
+  TC.assertNonNullish(documents);
+
+  if (TC.isNullish(dateOfCreation)) {
+    dateOfCreation = nowToUse();
+  }
+  const dateOfCreationNonNull = TC.convertNonNullish(dateOfCreation);
+
+  const promotedDocuments = documents.map(
+    (document): OUT => {
+      // NOTE: If "dateOfCreation" has already been set for the document, this should NOT change the incoming value
+      const promotedDocument = {...document, ...({dateOfCreation: dateOfCreationNonNull} as ICreatable)};
+      return (promotedDocument as OUT);
+    }
+  );
+  return promotedDocuments;
+}
