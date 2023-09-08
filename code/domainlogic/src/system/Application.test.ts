@@ -232,7 +232,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     const currentLocale = OPA.convertNonNullish(callState.authorizationState).locale;
     OPA.assertNonNullish(callState.systemState, "System State should not be null.");
     let archiveOriginal = OPA.convertNonNullish(callState.systemState).archive;
-    expect(Application.updateInstallationSettings(callState, undefined, undefined, undefined, undefined, undefined)).to.be.rejectedWith(Error);
+    expect(Application.updateInstallationSettings(callState, undefined, undefined, undefined, undefined, undefined, config.firebaseConstructorProvider)).to.be.rejectedWith(Error);
 
     let archive = await OpaDb.Archive.queries.getById(config.dataStorageState.db, OpaDm.ArchiveId);
     OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
@@ -243,13 +243,14 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(archiveNonNull.defaultLocaleId).equals(archiveOriginal.defaultLocaleId);
     expect(archiveNonNull.defaultTimeZoneGroupId).equals(archiveOriginal.defaultTimeZoneGroupId);
     expect(archiveNonNull.defaultTimeZoneId).equals(archiveOriginal.defaultTimeZoneId);
+    expect(archiveNonNull.updateHistory.length).equals(1);
     expect(archiveNonNull.hasBeenUpdated).equals(false);
     expect(archiveNonNull.dateOfLatestUpdate).equals(null);
     expect(archiveNonNull.userIdOfLatestUpdater).equals(null);
 
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     const nameUpdated = archiveOriginal.name[currentLocale.optionName] + " UPDATED";
-    await Application.updateInstallationSettings(callState, nameUpdated, undefined, undefined, undefined, undefined);
+    await Application.updateInstallationSettings(callState, nameUpdated, undefined, undefined, undefined, undefined, config.firebaseConstructorProvider);
 
     archive = await OpaDb.Archive.queries.getById(config.dataStorageState.db, OpaDm.ArchiveId);
     OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
@@ -260,6 +261,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(archiveNonNull.defaultLocaleId).equals(archiveOriginal.defaultLocaleId);
     expect(archiveNonNull.defaultTimeZoneGroupId).equals(archiveOriginal.defaultTimeZoneGroupId);
     expect(archiveNonNull.defaultTimeZoneId).equals(archiveOriginal.defaultTimeZoneId);
+    expect(archiveNonNull.updateHistory.length).equals(2);
     expect(archiveNonNull.hasBeenUpdated).equals(true);
     expect(archiveNonNull.dateOfLatestUpdate).not.equals(null);
     expect(archiveNonNull.userIdOfLatestUpdater).equals(currentUser.id);
@@ -267,7 +269,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     const descriptionUpdated = archiveOriginal.description[currentLocale.optionName] + " UPDATED";
     const defaultLocaleIdUpdated = (OpaDb.Locales.requiredDocuments.find((v) => !v.isDefault) as OpaDm.ILocale).id;
-    await Application.updateInstallationSettings(callState, undefined, descriptionUpdated, defaultLocaleIdUpdated, undefined, undefined);
+    await Application.updateInstallationSettings(callState, undefined, descriptionUpdated, defaultLocaleIdUpdated, undefined, undefined, config.firebaseConstructorProvider);
 
     archive = await OpaDb.Archive.queries.getById(config.dataStorageState.db, OpaDm.ArchiveId);
     OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
@@ -278,6 +280,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(archiveNonNull.defaultLocaleId).equals(defaultLocaleIdUpdated);
     expect(archiveNonNull.defaultTimeZoneGroupId).equals(archiveOriginal.defaultTimeZoneGroupId);
     expect(archiveNonNull.defaultTimeZoneId).equals(archiveOriginal.defaultTimeZoneId);
+    expect(archiveNonNull.updateHistory.length).equals(3);
     expect(archiveNonNull.hasBeenUpdated).equals(true);
     expect(archiveNonNull.dateOfLatestUpdate).not.equals(null);
     expect(archiveNonNull.userIdOfLatestUpdater).equals(currentUser.id);
@@ -286,7 +289,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     const defaultTimeZoneGroupUpdated = (OpaDb.TimeZoneGroups.requiredDocuments.find((v) => !v.isDefault) as OpaDm.ITimeZoneGroup);
     const defaultTimeZoneGroupIdUpdated = defaultTimeZoneGroupUpdated.id;
     const defaultTimeZoneIdUpdated = defaultTimeZoneGroupUpdated.primaryTimeZoneId;
-    await Application.updateInstallationSettings(callState, undefined, undefined, undefined, defaultTimeZoneGroupIdUpdated, defaultTimeZoneIdUpdated);
+    await Application.updateInstallationSettings(callState, undefined, undefined, undefined, defaultTimeZoneGroupIdUpdated, defaultTimeZoneIdUpdated, config.firebaseConstructorProvider);
 
     archive = await OpaDb.Archive.queries.getById(config.dataStorageState.db, OpaDm.ArchiveId);
     OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
@@ -297,6 +300,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(archiveNonNull.defaultLocaleId).equals(defaultLocaleIdUpdated);
     expect(archiveNonNull.defaultTimeZoneGroupId).equals(defaultTimeZoneGroupIdUpdated);
     expect(archiveNonNull.defaultTimeZoneId).equals(defaultTimeZoneIdUpdated);
+    expect(archiveNonNull.updateHistory.length).equals(4);
     expect(archiveNonNull.hasBeenUpdated).equals(true);
     expect(archiveNonNull.dateOfLatestUpdate).not.equals(null);
     expect(archiveNonNull.userIdOfLatestUpdater).equals(currentUser.id);
