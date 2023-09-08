@@ -23,12 +23,12 @@ export interface IUserPartial {
   recentQueries?: Array<string>;
 }
 
-type UpdateHistoryItem = IUserPartial | OPA.IUpdateable | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState>;
+type UpdateHistoryItem = IUserPartial | OPA.IUpdateable | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState> | OPA.IDeleteable_ByUser;
 interface IUserPartial_WithHistory extends IUserPartial, OPA.IUpdateable {
   updateHistory: Array<UpdateHistoryItem> | firestore.FieldValue;
 }
 
-export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState> {
+export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Deleteable_ByUser {
   readonly id: string;
   readonly firebaseAuthUserId: string;
   readonly authProviderId: string;
@@ -57,6 +57,9 @@ function areUpdatesValid(user: IUser, userUpdateObject: IUserPartial): boolean {
   OPA.assertNonNullish(user);
   OPA.assertNonNullish(userUpdateObject);
 
+  if (user.isMarkedAsDeleted) {
+    return false;
+  }
   if (user.assignedRoleId != Role_OwnerId) {
     return true;
   }
@@ -79,6 +82,15 @@ function areUpdatesValid(user: IUser, userUpdateObject: IUserPartial): boolean {
     return false;
   }
   if (userUpdateObject.hasOwnProperty(OPA.IApprovable_ByUser_UserIdOfDecider_PropertyName)) {
+    return false;
+  }
+  if (userUpdateObject.hasOwnProperty(OPA.IDeleteable_IsMarkedAsDeleted_PropertyName)) {
+    return false;
+  }
+  if (userUpdateObject.hasOwnProperty(OPA.IDeleteable_DateOfDeletion_PropertyName)) {
+    return false;
+  }
+  if (userUpdateObject.hasOwnProperty(OPA.IDeleteable_ByUser_UserIdOfDeleter_PropertyName)) {
     return false;
   }
   return true;
@@ -127,6 +139,9 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     approvalState: BT.ApprovalStates.pending,
     dateOfDecision: null,
     userIdOfDecider: null,
+    isMarkedAsDeleted: false,
+    dateOfDeletion: null,
+    userIdOfDeleter: null,
   };
   return document;
 }
@@ -172,6 +187,9 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     approvalState: BT.ApprovalStates.approved,
     dateOfDecision: now,
     userIdOfDecider: User_OwnerId,
+    isMarkedAsDeleted: false,
+    dateOfDeletion: null,
+    userIdOfDeleter: null,
   };
   return document;
 }
@@ -297,6 +315,32 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const userUpdateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now} as OPA.IUpdateable);
     const userUpdateObject_Approvable = ({hasBeenDecided: true, approvalState: approvalState, dateOfDecision: now, userIdOfDecider: userIdOfDecider} as OPA.IApprovable_ByUser<BT.ApprovalState>);
     const userUpdateObject = {...userUpdateObject_Updateable, ...userUpdateObject_Approvable, ...({} as IUserPartial)};
+    const updateHistory = constructorProvider.arrayUnion(userUpdateObject);
+    const userUpdateObject_WithHistory = ({...userUpdateObject, updateHistory} as IUserPartial_WithHistory);
+
+    const user = await this.getById(db, userId);
+    OPA.assertNonNullish(user);
+    const areValid = areUpdatesValid(OPA.convertNonNullish(user), userUpdateObject_WithHistory);
+    OPA.assertIsTrue(areValid, "The requested update is invalid.");
+
+    const usersCollectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const userRef = usersCollectionRef.doc(userId);
+    await userRef.set(userUpdateObject_WithHistory, {merge: true});
+  }
+
+  /**
+   * Marks the User as deleted on the server by constructing an IDeleteable_ByUser object.
+   * @param {Firestore} db The Firestore Database.
+   * @param {string} userId The ID for the User within the OPA system.
+   * @param {string} userIdOfDeleter The ID for the Deleter within the OPA system.
+   * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
+   * @return {Promise<void>}
+   */
+  async markAsDeleted(db: firestore.Firestore, userId: string, userIdOfDeleter: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    const now = OPA.nowToUse();
+    const userUpdateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now} as OPA.IUpdateable);
+    const userUpdateObject_Deleteable = ({isMarkedAsDeleted: true, dateOfDeletion: now, userIdOfDeleter: userIdOfDeleter} as OPA.IDeleteable_ByUser);
+    const userUpdateObject = {...userUpdateObject_Updateable, ...userUpdateObject_Deleteable, ...({} as IUserPartial)};
     const updateHistory = constructorProvider.arrayUnion(userUpdateObject);
     const userUpdateObject_WithHistory = ({...userUpdateObject, updateHistory} as IUserPartial_WithHistory);
 

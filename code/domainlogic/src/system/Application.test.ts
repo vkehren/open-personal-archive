@@ -148,6 +148,9 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
       approvalState: OpaDm.ApprovalStates.approved,
       dateOfDecision: now,
       userIdOfDecider: OpaDm.User_OwnerId,
+      isMarkedAsDeleted: false,
+      dateOfDeletion: null,
+      userIdOfDeleter: null,
     };
     const userCollectionRef = OpaDb.Users.getTypedCollection(config.dataStorageState.db);
     const userDocumentRef = userCollectionRef.doc(owner.id);

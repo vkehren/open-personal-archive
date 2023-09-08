@@ -107,6 +107,9 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.approvalState).equals(OpaDm.ApprovalStates.approved);
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(userId);
+    expect(userNonNull.isMarkedAsDeleted).equals(false);
+    expect(userNonNull.dateOfDeletion).equals(null);
+    expect(userNonNull.userIdOfDeleter).equals(null);
 
     const firstName_Updated = (userNonNull.firstName + " UPDATED");
     let userUpdateObject = ({firstName: firstName_Updated, hasBeenUpdated: true, dateOfLatestUpdate: OPA.nowToUse()} as OpaDm.IUserPartial);
@@ -131,6 +134,9 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.approvalState).equals(OpaDm.ApprovalStates.approved);
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(userId);
+    expect(userNonNull.isMarkedAsDeleted).equals(false);
+    expect(userNonNull.dateOfDeletion).equals(null);
+    expect(userNonNull.userIdOfDeleter).equals(null);
 
     const lastName_Updated = (userNonNull.lastName + " UPDATED");
     userUpdateObject = ({lastName: lastName_Updated, hasBeenUpdated: true, dateOfLatestUpdate: OPA.nowToUse()} as OpaDm.IUserPartial);
@@ -155,6 +161,9 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.approvalState).equals(OpaDm.ApprovalStates.approved);
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(userId);
+    expect(userNonNull.isMarkedAsDeleted).equals(false);
+    expect(userNonNull.dateOfDeletion).equals(null);
+    expect(userNonNull.userIdOfDeleter).equals(null);
 
     await expect(OpaDb.Users.queries.setUserToViewed(config.dataStorageState.db, userId, owner.id, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
@@ -177,6 +186,9 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.approvalState).equals(OpaDm.ApprovalStates.approved);
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(userId);
+    expect(userNonNull.isMarkedAsDeleted).equals(false);
+    expect(userNonNull.dateOfDeletion).equals(null);
+    expect(userNonNull.userIdOfDeleter).equals(null);
 
     await expect(OpaDb.Users.queries.setUserToDecided(config.dataStorageState.db, userId, OpaDm.ApprovalStates.denied, owner.id, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
@@ -199,6 +211,9 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.approvalState).equals(OpaDm.ApprovalStates.approved);
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(userId);
+    expect(userNonNull.isMarkedAsDeleted).equals(false);
+    expect(userNonNull.dateOfDeletion).equals(null);
+    expect(userNonNull.userIdOfDeleter).equals(null);
 
     await expect(OpaDb.Users.queries.setUserToDecided(config.dataStorageState.db, userId, OpaDm.ApprovalStates.approved, owner.id, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
@@ -221,6 +236,34 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.approvalState).equals(OpaDm.ApprovalStates.approved);
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(userId);
+    expect(userNonNull.isMarkedAsDeleted).equals(false);
+    expect(userNonNull.dateOfDeletion).equals(null);
+    expect(userNonNull.userIdOfDeleter).equals(null);
+
+    await expect(OpaDb.Users.queries.markAsDeleted(config.dataStorageState.db, userId, owner.id, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
+    user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
+    expect(user).not.equals(null);
+
+    userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.firebaseAuthUserId).equals(owner.firebaseAuthUserId);
+    expect(userNonNull.authProviderId).equals(owner.authProviderId);
+    expect(userNonNull.authAccountName).equals(owner.authAccountName);
+    expect(userNonNull.authAccountNameLowered).equals(owner.authAccountNameLowered);
+    expect(userNonNull.firstName).equals(firstName_Updated);
+    expect(userNonNull.lastName).equals(lastName_Updated);
+    expect(userNonNull.updateHistory.length).equals(2);
+    expect(userNonNull.hasBeenUpdated).equals(true);
+    expect(userNonNull.dateOfLatestUpdate).not.equals(null);
+    expect(userNonNull.hasBeenViewed).equals(true);
+    expect(userNonNull.dateOfLatestViewing).not.equals(null);
+    expect(userNonNull.userIdOfLatestViewer).equals(userId);
+    expect(userNonNull.hasBeenDecided).equals(true);
+    expect(userNonNull.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(userNonNull.dateOfDecision).not.equals(null);
+    expect(userNonNull.userIdOfDecider).equals(userId);
+    expect(userNonNull.isMarkedAsDeleted).equals(false);
+    expect(userNonNull.dateOfDeletion).equals(null);
+    expect(userNonNull.userIdOfDeleter).equals(null);
   });
 
   test("checks that initializeUserAccount(...) succeeds and User updates succeed when System is installed and User is not Archive Owner", async () => {
@@ -281,6 +324,9 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.approvalState).equals(OpaDm.ApprovalStates.pending);
     expect(userNonNull.dateOfDecision).equals(null);
     expect(userNonNull.userIdOfDecider).equals(null);
+    expect(userNonNull.isMarkedAsDeleted).equals(false);
+    expect(userNonNull.dateOfDeletion).equals(null);
+    expect(userNonNull.userIdOfDeleter).equals(null);
 
     const firstName_Updated = (userNonNull.firstName + " UPDATED");
     let userUpdateObject = ({firstName: firstName_Updated, hasBeenUpdated: true, dateOfLatestUpdate: OPA.nowToUse()} as OpaDm.IUserPartial);
@@ -305,6 +351,9 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.approvalState).equals(OpaDm.ApprovalStates.pending);
     expect(userNonNull.dateOfDecision).equals(null);
     expect(userNonNull.userIdOfDecider).equals(null);
+    expect(userNonNull.isMarkedAsDeleted).equals(false);
+    expect(userNonNull.dateOfDeletion).equals(null);
+    expect(userNonNull.userIdOfDeleter).equals(null);
 
     const lastName_Updated = (userNonNull.lastName + " UPDATED");
     userUpdateObject = ({lastName: lastName_Updated, hasBeenUpdated: true, dateOfLatestUpdate: OPA.nowToUse()} as OpaDm.IUserPartial);
@@ -329,6 +378,9 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.approvalState).equals(OpaDm.ApprovalStates.pending);
     expect(userNonNull.dateOfDecision).equals(null);
     expect(userNonNull.userIdOfDecider).equals(null);
+    expect(userNonNull.isMarkedAsDeleted).equals(false);
+    expect(userNonNull.dateOfDeletion).equals(null);
+    expect(userNonNull.userIdOfDeleter).equals(null);
 
     await OpaDb.Users.queries.setUserToViewed(config.dataStorageState.db, userId, owner.id, config.firebaseConstructorProvider);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
@@ -351,6 +403,9 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.approvalState).equals(OpaDm.ApprovalStates.pending);
     expect(userNonNull.dateOfDecision).equals(null);
     expect(userNonNull.userIdOfDecider).equals(null);
+    expect(userNonNull.isMarkedAsDeleted).equals(false);
+    expect(userNonNull.dateOfDeletion).equals(null);
+    expect(userNonNull.userIdOfDeleter).equals(null);
 
     await OpaDb.Users.queries.setUserToDecided(config.dataStorageState.db, userId, OpaDm.ApprovalStates.denied, owner.id, config.firebaseConstructorProvider);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
@@ -373,6 +428,9 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.approvalState).equals(OpaDm.ApprovalStates.denied);
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(owner.id);
+    expect(userNonNull.isMarkedAsDeleted).equals(false);
+    expect(userNonNull.dateOfDeletion).equals(null);
+    expect(userNonNull.userIdOfDeleter).equals(null);
 
     await OpaDb.Users.queries.setUserToDecided(config.dataStorageState.db, userId, OpaDm.ApprovalStates.approved, owner.id, config.firebaseConstructorProvider);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
@@ -395,6 +453,34 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.approvalState).equals(OpaDm.ApprovalStates.approved);
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(owner.id);
+    expect(userNonNull.isMarkedAsDeleted).equals(false);
+    expect(userNonNull.dateOfDeletion).equals(null);
+    expect(userNonNull.userIdOfDeleter).equals(null);
+
+    await OpaDb.Users.queries.markAsDeleted(config.dataStorageState.db, userId, owner.id, config.firebaseConstructorProvider);
+    user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
+    expect(user).not.equals(null);
+
+    userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
+    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
+    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.firstName).equals(firstName_Updated);
+    expect(userNonNull.lastName).equals(lastName_Updated);
+    expect(userNonNull.updateHistory.length).equals(6);
+    expect(userNonNull.hasBeenUpdated).equals(true);
+    expect(userNonNull.dateOfLatestUpdate).not.equals(null);
+    expect(userNonNull.hasBeenViewed).equals(true);
+    expect(userNonNull.dateOfLatestViewing).not.equals(null);
+    expect(userNonNull.userIdOfLatestViewer).equals(owner.id);
+    expect(userNonNull.hasBeenDecided).equals(true);
+    expect(userNonNull.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(userNonNull.dateOfDecision).not.equals(null);
+    expect(userNonNull.userIdOfDecider).equals(owner.id);
+    expect(userNonNull.isMarkedAsDeleted).equals(true);
+    expect(userNonNull.dateOfDeletion).not.equals(null);
+    expect(userNonNull.userIdOfDeleter).equals(owner.id);
   });
 
   afterEach(async () => {

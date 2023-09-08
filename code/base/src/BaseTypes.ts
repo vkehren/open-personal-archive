@@ -185,6 +185,20 @@ export interface IApprovable_ByUser<T> extends IApprovable<T> {
 export interface IDocument_Approvable<T> extends IDocument, IApprovable<T> { }
 export interface IDocument_Approvable_ByUser<T> extends IDocument_Approvable<T>, IApprovable_ByUser<T> { }
 
+// IDeleteable
+export const IDeleteable_IsMarkedAsDeleted_PropertyName = "isMarkedAsDeleted"; // eslint-disable-line camelcase
+export const IDeleteable_DateOfDeletion_PropertyName = "dateOfDeletion"; // eslint-disable-line camelcase
+export interface IDeleteable {
+  readonly isMarkedAsDeleted: boolean;
+  readonly dateOfDeletion: DateToUse | null;
+}
+export const IDeleteable_ByUser_UserIdOfDeleter_PropertyName = "userIdOfDeleter"; // eslint-disable-line camelcase
+export interface IDeleteable_ByUser extends IDeleteable {
+  readonly userIdOfDeleter: string | null;
+}
+export interface IDocument_Deleteable extends IDocument, IDeleteable { }
+export interface IDocument_Deleteable_ByUser extends IDocument_Deleteable, IDeleteable_ByUser { }
+
 /**
  * Sets the ICreatable properies on the incoming documents and returns the typed result.
  * @param {Array<IN>} documents The documents to promote to ICreatable.
