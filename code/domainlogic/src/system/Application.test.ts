@@ -143,8 +143,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
       hasBeenViewed: false,
       dateOfLatestViewing: null,
       userIdOfLatestViewer: null,
-      approvalState: OpaDm.ApprovalStates.approved,
       hasBeenDecided: true,
+      approvalState: OpaDm.ApprovalStates.approved,
       dateOfDecision: now,
       userIdOfDecider: OpaDm.User_OwnerId,
     };

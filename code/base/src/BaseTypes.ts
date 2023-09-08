@@ -170,12 +170,12 @@ export interface IDocument_Viewable extends IDocument, IViewable { }
 export interface IDocument_Viewable_ByUser extends IDocument_Viewable, IViewable_ByUser { }
 
 // IApprovable
-export const IApprovable_ApprovalState_PropertyName = "approvalState"; // eslint-disable-line camelcase
 export const IApprovable_HasBeenDecided_PropertyName = "hasBeenDecided"; // eslint-disable-line camelcase
+export const IApprovable_ApprovalState_PropertyName = "approvalState"; // eslint-disable-line camelcase
 export const IApprovable_DateOfDecision_PropertyName = "dateOfDecision"; // eslint-disable-line camelcase
 export interface IApprovable<T> {
-  readonly approvalState: T;
   readonly hasBeenDecided: boolean;
+  readonly approvalState: T;
   readonly dateOfDecision: DateToUse | null;
 }
 export const IApprovable_ByUser_UserIdOfDecider_PropertyName = "userIdOfDecider"; // eslint-disable-line camelcase

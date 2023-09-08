@@ -79,8 +79,8 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     hasBeenViewed: false,
     dateOfLatestViewing: null,
     userIdOfLatestViewer: null,
-    approvalState: BT.ApprovalStates.pending,
     hasBeenDecided: false,
+    approvalState: BT.ApprovalStates.pending,
     dateOfDecision: null,
     userIdOfDecider: null,
   };
@@ -123,8 +123,8 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     hasBeenViewed: true,
     dateOfLatestViewing: now,
     userIdOfLatestViewer: User_OwnerId,
-    approvalState: BT.ApprovalStates.approved,
     hasBeenDecided: true,
+    approvalState: BT.ApprovalStates.approved,
     dateOfDecision: now,
     userIdOfDecider: User_OwnerId,
   };
