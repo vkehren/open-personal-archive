@@ -1,7 +1,7 @@
 import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../../base/src";
 import * as OpaDm from "../../../datamodel/src";
-import {createArchive, createApplication, IArchivePartial, ILocale, ITimeZoneGroup, OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
+import {createApplication, createArchive, OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
 import * as DMU from "../DisplayModelUtilities";
 import * as SchemaInfo from "../../../datamodel/src/PackageInfo";
 import * as ApplicationInfo from "../PackageInfo";
@@ -11,10 +11,10 @@ export interface IInstallationScreenDisplayModel {
   archiveName: string;
   archiveDescription: string;
   pathToStorageFolder: string;
-  validLocales: Array<ILocale>;
-  selectedLocale: ILocale | null;
-  validTimeZoneGroups: Array<ITimeZoneGroup>;
-  selectedTimeZoneGroup: ITimeZoneGroup | null;
+  validLocales: Array<OpaDm.ILocale>;
+  selectedLocale: OpaDm.ILocale | null;
+  validTimeZoneGroups: Array<OpaDm.ITimeZoneGroup>;
+  selectedTimeZoneGroup: OpaDm.ITimeZoneGroup | null;
 }
 
 /**
@@ -52,9 +52,9 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
     archiveDescription: "(a description for the archive)",
     pathToStorageFolder: "./",
     validLocales: OpaDb.Locales.requiredDocuments,
-    selectedLocale: OpaDb.Locales.requiredDocuments.filter((value: ILocale) => value.isDefault)[0],
+    selectedLocale: OpaDb.Locales.requiredDocuments.filter((value: OpaDm.ILocale) => value.isDefault)[0],
     validTimeZoneGroups: OpaDb.TimeZoneGroups.requiredDocuments,
-    selectedTimeZoneGroup: OpaDb.TimeZoneGroups.requiredDocuments.filter((value: ITimeZoneGroup) => value.isDefault)[0],
+    selectedTimeZoneGroup: OpaDb.TimeZoneGroups.requiredDocuments.filter((value: OpaDm.ITimeZoneGroup) => value.isDefault)[0],
   };
 
   if (!isSystemCurrentlyInstalled) {
@@ -246,7 +246,7 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
   OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
   const archiveNonNull = OPA.convertNonNullish(archive);
 
-  const archivePartial: IArchivePartial = {};
+  const archivePartial: OpaDm.IArchivePartial = {};
   if ((archiveName) && (archiveNonNull.name[localeToUse] != archiveName)) {
     archivePartial.name = {...archiveNonNull.name};
     archivePartial.name[localeToUse] = archiveName;
