@@ -111,43 +111,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     const timeZoneDocumentRef = timeZoneCollectionRef.doc(timeZone.id);
     await timeZoneDocumentRef.set(timeZone, {merge: true});
 
-    const now = OPA.nowToUse();
-    const owner: OpaDm.IUser = {
-      id: OpaDm.User_OwnerId,
-      firebaseAuthUserId: config.authenticationState.firebaseAuthUserId,
-      authProviderId: authProvider.id,
-      authAccountName: "",
-      authAccountNameLowered: "",
-      assignedRoleId: role.id,
-      localeId: locale.id,
-      timeZoneGroupId: timeZoneGroup.id,
-      timeZoneId: timeZone.id,
-      firstName: "",
-      lastName: "",
-      preferredName: "",
-      requestedCitationIds: ([] as Array<string>),
-      viewableCitationIds: ([] as Array<string>),
-      recentQueries: ([] as Array<string>),
-      updateHistory: [],
-      dateOfCreation: now,
-      hasBeenUpdated: false,
-      dateOfLatestUpdate: null,
-      hasBeenViewed: false,
-      dateOfLatestViewing: null,
-      userIdOfLatestViewer: null,
-      hasBeenDecided: true,
-      approvalState: OpaDm.ApprovalStates.approved,
-      dateOfDecision: now,
-      userIdOfDecider: OpaDm.User_OwnerId,
-      isMarkedAsDeleted: false,
-      dateOfDeletion: null,
-      userIdOfDeleter: null,
-    };
-    owner.updateHistory.push(OPA.copyObject(owner));
-
-    const userCollectionRef = OpaDb.Users.getTypedCollection(config.dataStorageState.db);
-    const userDocumentRef = userCollectionRef.doc(owner.id);
-    await userDocumentRef.set(owner, {merge: true});
+    await OpaDb.Users.queries.createArchiveOwner(config.dataStorageState.db, config.authenticationState.firebaseAuthUserId,
+      authProvider, config.authenticationState.firebaseAuthUserId + "@gmail.com", locale, timeZoneGroup, "Archive", "la Owner");
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
