@@ -92,13 +92,13 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
   /**
    * Updates the Archive stored on the server using an IArchivePartial object.
    * @param {Firestore} db The Firestore Database.
-   * @param {string} archiveId The ID for the Archive within the OPA system.
    * @param {IArchivePartial} archiveUpdateObject The object containing the updates.
    * @param {string} userIdOfLatestUpdater The ID for the Updater within the OPA system.
    * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async updateArchive(db: firestore.Firestore, archiveId: string, archiveUpdateObject: IArchivePartial, userIdOfLatestUpdater: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async updateArchive(db: firestore.Firestore, archiveUpdateObject: IArchivePartial, userIdOfLatestUpdater: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    const archiveId = SingletonId;
     const now = OPA.nowToUse();
     const archiveUpdateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
     archiveUpdateObject = {...archiveUpdateObject_Updateable, ...archiveUpdateObject};
@@ -117,6 +117,5 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
   }
 }
 
-type createInstance = (id: string) => (IArchive);
-export type FactoryFunc = (...[params]: Parameters<createInstance>) => ReturnType<createInstance>;
+export type FactoryFunc = (...[params]: Parameters<typeof createSingleton>) => ReturnType<typeof createSingleton>;
 export const CollectionDescriptor = new OPA.CollectionDescriptor<IArchive, ArchiveQuerySet, FactoryFunc>(SingularName, PluralName, IsSingleton, (cd) => new ArchiveQuerySet(cd), null, []);

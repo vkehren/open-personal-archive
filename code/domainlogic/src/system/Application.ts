@@ -278,7 +278,7 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
   if (OPA.isEmpty(archivePartial)) {
     throw new Error("No updated setting was provided.");
   }
-  await OpaDb.Archive.queries.updateArchive(db, archiveNonNull.id, archivePartial, currentUserNonNull.id, constructorProvider);
+  await OpaDb.Archive.queries.updateArchive(db, archivePartial, currentUserNonNull.id, constructorProvider);
 }
 
 /**
