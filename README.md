@@ -24,4 +24,5 @@ Furthermore, if you wish to learn more about what Open Personal Archive™ is an
 Finally, if you wish to adapt Open Personal Archive™ to better suit your own unique needs, you may do so, as well, under the flexible [MIT License](./LICENSE) under which we released our code. If you do so, we encourage you to share such changes with our team so that we may have the option to integrate your changes into the main code base for Open Personal Archive™.
 
 Contributors: [Veronica Ehrenreich](https://github.com/vkehren), [Ryan Stephen Ehrenreich](https://github.com/rehrenreich)
+
 Copyright © 2021 Open Personal Archive™
