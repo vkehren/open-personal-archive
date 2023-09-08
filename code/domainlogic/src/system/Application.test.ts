@@ -152,6 +152,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
       dateOfDeletion: null,
       userIdOfDeleter: null,
     };
+    owner.updateHistory.push(OPA.copyObject(owner));
+
     const userCollectionRef = OpaDb.Users.getTypedCollection(config.dataStorageState.db);
     const userDocumentRef = userCollectionRef.doc(owner.id);
     await userDocumentRef.set(owner, {merge: true});

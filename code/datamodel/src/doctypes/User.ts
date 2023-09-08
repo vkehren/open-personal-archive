@@ -20,6 +20,8 @@ export interface IUserPartial {
   firstName?: string;
   lastName?: string;
   preferredName?: string | null;
+  requestedCitationIds?: Array<string>;
+  viewableCitationIds?: Array<string>;
   recentQueries?: Array<string>;
 }
 
@@ -143,6 +145,7 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     dateOfDeletion: null,
     userIdOfDeleter: null,
   };
+  document.updateHistory.push(OPA.copyObject(document));
   return document;
 }
 
@@ -191,6 +194,7 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     dateOfDeletion: null,
     userIdOfDeleter: null,
   };
+  document.updateHistory.push(OPA.copyObject(document));
   return document;
 }
 
