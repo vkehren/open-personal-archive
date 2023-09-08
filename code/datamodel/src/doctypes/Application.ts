@@ -48,5 +48,25 @@ export function createSingleton(applicationVersion: string, schemaVersion: strin
   return document;
 }
 
-export type QuerySet = OPA.QuerySet<IApplication>;
-export const CollectionDescriptor = new OPA.CollectionDescriptor<IApplication, QuerySet, void>(SingularName, PluralName, IsSingleton, (cd) => new OPA.QuerySet(cd), null, []);
+/** Class providing queries for Application collection. */
+export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
+  /**
+   * Creates a ApplicationQuerySet.
+   * @param {OPA.ITypedCollectionDescriptor<IApplication>} collectionDescriptor The collection descriptor to use for queries.
+   */
+  constructor(collectionDescriptor: OPA.ITypedCollectionDescriptor<IApplication>) {
+    super(collectionDescriptor);
+  }
+
+  /**
+   * The typed collection descriptor to use for queries.
+   * @type {OPA.ITypedQueryableFactoryCollectionDescriptor<IApplication, ApplicationQuerySet, FactoryFunc>}
+   */
+  get typedCollectionDescriptor(): OPA.ITypedQueryableFactoryCollectionDescriptor<IApplication, ApplicationQuerySet, FactoryFunc> {
+    return OPA.convertTo<OPA.ITypedQueryableFactoryCollectionDescriptor<IApplication, ApplicationQuerySet, FactoryFunc>>(this.collectionDescriptor);
+  }
+}
+
+type createInstance = (id: string) => (IApplication);
+export type FactoryFunc = (...[params]: Parameters<createInstance>) => ReturnType<createInstance>;
+export const CollectionDescriptor = new OPA.CollectionDescriptor<IApplication, ApplicationQuerySet, void>(SingularName, PluralName, IsSingleton, (cd) => new ApplicationQuerySet(cd), null, []);
