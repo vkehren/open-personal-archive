@@ -1,9 +1,12 @@
 import * as OPA from "../../../base/src";
-import * as CollectionData from "./TimeZones.json";
+import * as BT from "../BaseTypes";
+import * as CollectionData_Full from "./TimeZones.json";
+import * as CollectionData_Min from "./TimeZones.min.json";
 
 const SingularName = "TimeZone";
 const PluralName = "TimeZones";
 const IsSingleton = false;
+const CollectionData = (BT.DataConfiguration.TimeZone_UseMin) ? CollectionData_Min : CollectionData_Full;
 const RequiredDocuments: Array<ITimeZone> = OPA.promoteDocumentsToCreatable(CollectionData.requiredDocuments, null);
 
 export interface ITimeZone extends OPA.IDocument_Creatable {

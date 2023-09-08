@@ -199,11 +199,11 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     const roles = await OpaDb.Roles.queries.getAll(config.dataStorageState.db);
     expect(roles.length).equals(OpaDb.Roles.requiredDocuments.length).equals(5);
     const locales = await OpaDb.Locales.queries.getAll(config.dataStorageState.db);
-    expect(locales.length).equals(OpaDb.Locales.requiredDocuments.length).equals(53);
+    expect(locales.length).equals(OpaDb.Locales.requiredDocuments.length).equals(OpaDm.DataConfiguration.Locale_UseMin ? 3 : 53);
     const timeZoneGroups = await OpaDb.TimeZoneGroups.queries.getAll(config.dataStorageState.db);
-    expect(timeZoneGroups.length).equals(OpaDb.TimeZoneGroups.requiredDocuments.length).equals(41);
+    expect(timeZoneGroups.length).equals(OpaDb.TimeZoneGroups.requiredDocuments.length).equals(OpaDm.DataConfiguration.TimeZoneGroup_UseMin ? 3 : 41);
     const timeZones = await OpaDb.TimeZones.queries.getAll(config.dataStorageState.db);
-    expect(timeZones.length).equals(OpaDb.TimeZones.requiredDocuments.length).equals(41);
+    expect(timeZones.length).equals(OpaDb.TimeZones.requiredDocuments.length).equals(OpaDm.DataConfiguration.TimeZone_UseMin ? 3 : 41);
     const users = await OpaDb.Users.queries.getAll(config.dataStorageState.db);
     expect(users.length).equals(1);
     const archives = await OpaDb.Archive.queries.getAll(config.dataStorageState.db);

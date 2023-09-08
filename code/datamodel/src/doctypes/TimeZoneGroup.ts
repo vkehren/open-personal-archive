@@ -1,9 +1,12 @@
 import * as OPA from "../../../base/src";
-import * as CollectionData from "./TimeZoneGroups.json";
+import * as BT from "../BaseTypes";
+import * as CollectionData_Full from "./TimeZoneGroups.json";
+import * as CollectionData_Min from "./TimeZoneGroups.min.json";
 
 const SingularName = "TimeZoneGroup";
 const PluralName = "TimeZoneGroups";
 const IsSingleton = false;
+const CollectionData = (BT.DataConfiguration.TimeZoneGroup_UseMin) ? CollectionData_Min : CollectionData_Full;
 const RequiredDocuments: Array<ITimeZoneGroup> = OPA.promoteDocumentsToCreatable(CollectionData.requiredDocuments, null);
 const DefaultDocument = (RequiredDocuments.find((v) => v.isDefault) as ITimeZoneGroup | undefined);
 export const DefaultTimeZoneGroupId = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNonNullish(DefaultDocument).id : "OPA_TimeZoneGroup_PST_-08:00";

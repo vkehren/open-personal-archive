@@ -1,9 +1,12 @@
 import * as OPA from "../../../base/src";
-import * as CollectionData from "./Locales.json";
+import * as BT from "../BaseTypes";
+import * as CollectionData_Full from "./Locales.json";
+import * as CollectionData_Min from "./Locales.min.json";
 
 const SingularName = "Locale";
 const PluralName = "Locales";
 const IsSingleton = false;
+const CollectionData = (BT.DataConfiguration.Locale_UseMin) ? CollectionData_Min : CollectionData_Full;
 const RequiredDocuments: Array<ILocale> = OPA.promoteDocumentsToCreatable(CollectionData.requiredDocuments, null);
 const DefaultDocument = (RequiredDocuments.find((v) => v.isDefault) as ILocale | undefined);
 export const DefaultLocaleId = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNonNullish(DefaultDocument).id : "OPA_Locale_en_US";

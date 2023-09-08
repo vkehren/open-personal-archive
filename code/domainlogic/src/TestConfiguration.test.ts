@@ -21,6 +21,10 @@ export interface ITestConfiguration {
  * @return {ITestConfiguration}
  */
 export function getTestConfiguration(): ITestConfiguration {
+  OpaDm.DataConfiguration.Locale_UseMin = true;
+  OpaDm.DataConfiguration.TimeZoneGroup_UseMin = true;
+  OpaDm.DataConfiguration.TimeZone_UseMin = true;
+
   const testEnvironment: TestEnvironment = (TestConfigurationFile.use_emulators) ? "Emulators" : "Cloud";
   let timeout: number | null | undefined = TestConfigurationFile.timeout;
   let appInitializationArgs: any = {projectId: ""};

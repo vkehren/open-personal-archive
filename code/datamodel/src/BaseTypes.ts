@@ -10,6 +10,12 @@ export const localizableStringConstructor = function (desiredValue: string | nul
   return localizableString;
 };
 
+export const DataConfiguration = {
+  Locale_UseMin: false,
+  TimeZoneGroup_UseMin: false,
+  TimeZone_UseMin: false,
+};
+
 export type ActivityType = "browser_page_load" | "browser_page_view" | "browser_page_action" | "browser_page_error" | "server_function_call" | "server_function_error";
 export const ActivityTypes = {
   default: ("browser_page_view" as ActivityType),
