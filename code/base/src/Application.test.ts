@@ -12,6 +12,42 @@ const zeroString = ((0 as unknown) as string);
 const oneString = ((1 as unknown) as string);
 
 
+// TESTS for copyObject(...)
+test("checks that passing 'undefined' returns 'undefined'", () => {
+  expect(AP.copyObject(undefinedString)).toBe(undefinedString);
+});
+
+test("checks that passing 'null' returns 'null'", () => {
+  expect(AP.copyObject(nullString)).toBe(nullString);
+});
+
+test("checks that passing 'falseString' returns 'falseString'", () => {
+  expect(AP.copyObject(falseString)).toBe(falseString);
+});
+
+test("checks that passing 'falseString' returns 'falseString'", () => {
+  expect(AP.copyObject(trueString)).toBe(trueString);
+});
+
+test("checks that passing 'falseString' returns 'falseString'", () => {
+  expect(AP.copyObject(zeroString)).toBe(zeroString);
+});
+
+test("checks that passing 'falseString' returns 'falseString'", () => {
+  expect(AP.copyObject(oneString)).toBe(oneString);
+});
+
+test("checks that passing 'falseString' returns 'falseString'", () => {
+  const input = {a: 1, b: 2, c: true, d: "four"};
+  expect(AP.copyObject(input)).toEqual(input);
+});
+
+test("checks that passing 'falseString' returns 'falseString'", () => {
+  const input = {a: 1, b: 2, c: true, d: "four", e: [trueString, falseString], f: {x: "x", y: 2, z: "aaaaaaaa"}};
+  expect(AP.copyObject(input)).toEqual(input);
+});
+
+
 // TESTS for convertStringToEnumValue(...)
 test("checks that passing 'undefined' returns 'null'", () => {
   expect(AP.convertStringToEnumValue<EnumUnderscore>(undefinedString, "b_c")).toBe("b_c");

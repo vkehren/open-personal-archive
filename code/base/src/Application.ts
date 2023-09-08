@@ -8,6 +8,21 @@ import * as TC from "./TypeChecking";
 export const Query_OrderBy_CharHighest = "\uf8ff"; // eslint-disable-line camelcase
 
 /**
+ * Deep-copies an object of type T.
+ * @param {T | null | undefined} obj The object to copy.
+ * @return {T | null | undefined}
+ */
+export function copyObject<T>(obj: T | null | undefined): T | null | undefined {
+  if (TC.isUndefined(obj)) {
+    return undefined;
+  }
+
+  const objAsString = JSON.stringify(obj);
+  const objAsObject = JSON.parse(objAsString);
+  return objAsObject;
+}
+
+/**
  * @constant
  * @type {boolean}
  * @default
