@@ -86,7 +86,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     await OpaDb.Application.queries.createApplication(config.dataStorageState.db, ApplicationInfo.VERSION, SchemaInfo.VERSION);
 
-    const authProvider = OpaDb.AuthProviders.requiredDocuments[0];
+    const authProvider = OpaDb.AuthProviders.requiredDocuments.filter((value) => (value.isDefault))[0];
     const authProviderCollectionRef = OpaDb.AuthProviders.getTypedCollection(config.dataStorageState.db);
     const authProviderDocumentRef = authProviderCollectionRef.doc(authProvider.id);
     await authProviderDocumentRef.set(authProvider, {merge: true});
@@ -96,17 +96,17 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     const roleDocumentRef = roleCollectionRef.doc(role.id);
     await roleDocumentRef.set(role, {merge: true});
 
-    const locale = OpaDb.Locales.requiredDocuments[0];
+    const locale = OpaDb.Locales.requiredDocuments.filter((value) => (value.isDefault))[0];
     const localeCollectionRef = OpaDb.Locales.getTypedCollection(config.dataStorageState.db);
     const localeDocumentRef = localeCollectionRef.doc(locale.id);
     await localeDocumentRef.set(locale, {merge: true});
 
-    const timeZoneGroup = OpaDb.TimeZoneGroups.requiredDocuments[0];
+    const timeZoneGroup = OpaDb.TimeZoneGroups.requiredDocuments.filter((value) => (value.isDefault))[0];
     const timeZoneGroupCollectionRef = OpaDb.TimeZoneGroups.getTypedCollection(config.dataStorageState.db);
     const timeZoneGroupDocumentRef = timeZoneGroupCollectionRef.doc(timeZoneGroup.id);
     await timeZoneGroupDocumentRef.set(timeZoneGroup, {merge: true});
 
-    const timeZone = OpaDb.TimeZones.requiredDocuments[0];
+    const timeZone = OpaDb.TimeZones.requiredDocuments.filter((value) => (value.id == timeZoneGroup.primaryTimeZoneId))[0];
     const timeZoneCollectionRef = OpaDb.TimeZones.getTypedCollection(config.dataStorageState.db);
     const timeZoneDocumentRef = timeZoneCollectionRef.doc(timeZone.id);
     await timeZoneDocumentRef.set(timeZone, {merge: true});
