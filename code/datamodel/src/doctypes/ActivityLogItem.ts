@@ -19,19 +19,19 @@ export interface IActivityLogItem extends OPA.IDocument_Creatable {
 }
 
 /**
-  * Creates an instance of the IActivityLogItem document type.
-  * @param {string} id The ID for the ActivityLogItem within the OPA system.
-  * @param {BT.ActivityType} activityType The type of the ActivityLogItem.
-  * @param {string} requestor The URI of the requestor.
-  * @param {string} resource The URI of the resource being requested.
-  * @param {string | null} resourceCanonical The canonical URI of the resource being requested.
-  * @param {string | null} action The action being requested, if any.
-  * @param {any} data The data for the request.
-  * @param {string | null} firebaseAuthUserId The ID for the User within the Firebase Authentication system, if the User is authenticated.
-  * @param {string | null} userId The ID for the User within the OPA system, if the User is authenticated.
-  * @param {any | null} otherState Any other state for the request.
-  * @return {IActivityLogItem} The new document instance.
-  */
+ * Creates an instance of the IActivityLogItem document type.
+ * @param {string} id The ID for the ActivityLogItem within the OPA system.
+ * @param {BT.ActivityType} activityType The type of the ActivityLogItem.
+ * @param {string} requestor The URI of the requestor.
+ * @param {string} resource The URI of the resource being requested.
+ * @param {string | null} resourceCanonical The canonical URI of the resource being requested.
+ * @param {string | null} action The action being requested, if any.
+ * @param {any} data The data for the request.
+ * @param {string | null} firebaseAuthUserId The ID for the User within the Firebase Authentication system, if the User is authenticated.
+ * @param {string | null} userId The ID for the User within the OPA system, if the User is authenticated.
+ * @param {any | null} otherState Any other state for the request.
+ * @return {IActivityLogItem} The new document instance.
+ */
 function createInstance(id: string, activityType: BT.ActivityType, requestor: string, resource: string, resourceCanonical: string | null, action: string | null, data: any, firebaseAuthUserId: string | null = null, userId: string | null = null, otherState: any | null = null): IActivityLogItem { // eslint-disable-line max-len
   if ((activityType == "browser_page_action") && OPA.isNullishOrWhitespace(action)) {
     throw new Error("The action name must be specified when logging web page actions.")

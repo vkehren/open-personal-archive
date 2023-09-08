@@ -28,15 +28,15 @@ export interface IArchive extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_
 }
 
 /**
-  * Creates an instance of the IArchive document type.
-  * @param {string} name The name of the Archive.
-  * @param {string} description A description of the Archive.
-  * @param {string} pathToStorageFolder The path to the root folder for storing files in Firebase Storage.
-  * @param {IUser} owner The User who owns the Archive.
-  * @param {ILocale} defaultLocale The default Locale to use for the Archive.
-  * @param {ITimeZoneGroup} defaultTimeZoneGroup The default TimeZoneGroup to use for the Archive.
-  * @return {IArchive} The new document instance.
-  */
+ * Creates an instance of the IArchive document type.
+ * @param {string} name The name of the Archive.
+ * @param {string} description A description of the Archive.
+ * @param {string} pathToStorageFolder The path to the root folder for storing files in Firebase Storage.
+ * @param {IUser} owner The User who owns the Archive.
+ * @param {ILocale} defaultLocale The default Locale to use for the Archive.
+ * @param {ITimeZoneGroup} defaultTimeZoneGroup The default TimeZoneGroup to use for the Archive.
+ * @return {IArchive} The new document instance.
+ */
 export function createSingleton(name: string, description: string, pathToStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): IArchive {
   const now = OPA.nowToUse();
   const names: OPA.ILocalizable<string> = {en: name};

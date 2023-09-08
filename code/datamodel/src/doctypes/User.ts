@@ -42,19 +42,19 @@ export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable
 }
 
 /**
-  * Creates an instance of the IUser document type.
-  * @param {string} id The ID for the User within the OPA system.
-  * @param {string} firebaseAuthUserId The ID for the User within the Firebase Authentication system.
-  * @param {IAuthenticationProvider} authProvider The AuthenticationProvider for the User's account.
-  * @param {string} authAccountName The name of the User's account with the specified AuthenticationProvider.
-  * @param {IRole} assignedRole The Role to which the User is initially assigned.
-  * @param {ILocale} locale The Locale selected by the User.
-  * @param {ITimeZoneGroup} timeZoneGroup The TimeZoneGroup selected by the User.
-  * @param {string} firstName The User's first name.
-  * @param {string} lastName The User's last name.
-  * @param {string | null} preferredName The name by which the User wishes to be called.
-  * @return {IUser} The new document instance.
-  */
+ * Creates an instance of the IUser document type.
+ * @param {string} id The ID for the User within the OPA system.
+ * @param {string} firebaseAuthUserId The ID for the User within the Firebase Authentication system.
+ * @param {IAuthenticationProvider} authProvider The AuthenticationProvider for the User's account.
+ * @param {string} authAccountName The name of the User's account with the specified AuthenticationProvider.
+ * @param {IRole} assignedRole The Role to which the User is initially assigned.
+ * @param {ILocale} locale The Locale selected by the User.
+ * @param {ITimeZoneGroup} timeZoneGroup The TimeZoneGroup selected by the User.
+ * @param {string} firstName The User's first name.
+ * @param {string} lastName The User's last name.
+ * @param {string | null} preferredName The name by which the User wishes to be called.
+ * @return {IUser} The new document instance.
+ */
 function createInstance(id: string, firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, assignedRole: IRole, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): IUser { // eslint-disable-line max-len
   const now = OPA.nowToUse();
   const document: IUser = {
@@ -88,17 +88,17 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
 }
 
 /**
-  * Creates the instance of the IUser document type that owns the Archive.
-  * @param {string} firebaseAuthUserId The ID for the User within the Firebase Authentication system.
-  * @param {IAuthenticationProvider} authProvider The AuthenticationProvider for the User's account.
-  * @param {string} authAccountName The name of the User's account with the specified AuthenticationProvider.
-  * @param {ILocale} locale The Locale selected by the User.
-  * @param {ITimeZoneGroup} timeZoneGroup The TimeZoneGroup selected by the User.
-  * @param {string} firstName The User's first name.
-  * @param {string} lastName The User's last name.
-  * @param {string | null} preferredName The name by which the User wishes to be called.
-  * @return {IUser} The new document instance.
-  */
+ * Creates the instance of the IUser document type that owns the Archive.
+ * @param {string} firebaseAuthUserId The ID for the User within the Firebase Authentication system.
+ * @param {IAuthenticationProvider} authProvider The AuthenticationProvider for the User's account.
+ * @param {string} authAccountName The name of the User's account with the specified AuthenticationProvider.
+ * @param {ILocale} locale The Locale selected by the User.
+ * @param {ITimeZoneGroup} timeZoneGroup The TimeZoneGroup selected by the User.
+ * @param {string} firstName The User's first name.
+ * @param {string} lastName The User's last name.
+ * @param {string | null} preferredName The name by which the User wishes to be called.
+ * @return {IUser} The new document instance.
+ */
 export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): IUser { // eslint-disable-line max-len
   const now = OPA.nowToUse();
   const document: IUser = {
@@ -134,26 +134,26 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
 /** Class providing queries for User collection. */
 export class UserQuerySet extends OPA.QuerySet<IUser> {
   /**
-    * Creates a UserQuerySet.
-    * @param {OPA.ITypedCollectionDescriptor<IUser>} collectionDescriptor The collection descriptor to use for queries.
-    */
+   * Creates a UserQuerySet.
+   * @param {OPA.ITypedCollectionDescriptor<IUser>} collectionDescriptor The collection descriptor to use for queries.
+   */
   constructor(collectionDescriptor: OPA.ITypedCollectionDescriptor<IUser>) {
     super(collectionDescriptor);
   }
 
   /**
-    * The typed collection descriptor to use for queries.
-    * @type {OPA.ITypedQueryableFactoryCollectionDescriptor<IUser, UserQuerySet, FactoryFunc>}
-    */
+   * The typed collection descriptor to use for queries.
+   * @type {OPA.ITypedQueryableFactoryCollectionDescriptor<IUser, UserQuerySet, FactoryFunc>}
+   */
   get typedCollectionDescriptor(): OPA.ITypedQueryableFactoryCollectionDescriptor<IUser, UserQuerySet, FactoryFunc> {
     return OPA.convertTo<OPA.ITypedQueryableFactoryCollectionDescriptor<IUser, UserQuerySet, FactoryFunc>>(this.collectionDescriptor);
   }
 
   /**
-    * Gets the User that is the Owner of the Archive managed by the OPA installation.
-    * @param {Firestore} db The Firestore Database to read from.
-    * @return {Promise<IUser>} The User corresponding to the UUID, or null if none exists.
-    */
+   * Gets the User that is the Owner of the Archive managed by the OPA installation.
+   * @param {Firestore} db The Firestore Database to read from.
+   * @return {Promise<IUser>} The User corresponding to the UUID, or null if none exists.
+   */
   async getArchiveOwner(db: firestore.Firestore): Promise<IUser> {
     OPA.assertFirestoreIsNotNullish(db);
 
@@ -165,11 +165,11 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   }
 
   /**
-    * Gets the User by that User's Firebase Authentication UUID, since that UUID is also a unique key.
-    * @param {Firestore} db The Firestore Database to read from.
-    * @param {string} firebaseAuthUserId The ID for the User within the Firebase Authentication system.
-    * @return {Promise<IUser | null>} The User corresponding to the UUID, or null if none exists.
-    */
+   * Gets the User by that User's Firebase Authentication UUID, since that UUID is also a unique key.
+   * @param {Firestore} db The Firestore Database to read from.
+   * @param {string} firebaseAuthUserId The ID for the User within the Firebase Authentication system.
+   * @return {Promise<IUser | null>} The User corresponding to the UUID, or null if none exists.
+   */
   async getByFirebaseAuthUserId(db: firestore.Firestore, firebaseAuthUserId: string): Promise<IUser | null> {
     OPA.assertFirestoreIsNotNullish(db);
     OPA.assertIdentifierIsValid(firebaseAuthUserId, "A valid Firebase Auth User ID must be provided.");

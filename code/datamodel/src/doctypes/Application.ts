@@ -28,11 +28,11 @@ export interface IApplication extends OPA.IDocument_Upgradeable_ByUser {
 }
 
 /**
-  * Creates an instance of the IApplication document type.
-  * @param {string} applicationVersion The version of the OPA application code.
-  * @param {string} schemaVersion The version of the OPA database schema.
-  * @return {IApplication} The new document instance.
-  */
+ * Creates an instance of the IApplication document type.
+ * @param {string} applicationVersion The version of the OPA application code.
+ * @param {string} schemaVersion The version of the OPA database schema.
+ * @return {IApplication} The new document instance.
+ */
 export function createSingleton(applicationVersion: string, schemaVersion: string): IApplication {
   const now = OPA.nowToUse();
   const document: IApplication = {

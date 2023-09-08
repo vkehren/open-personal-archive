@@ -22,27 +22,27 @@ export interface IAuthenticationProvider extends OPA.IDocument_Creatable {
 /** Class providing queries for AuthenticationProvider collection. */
 export class AuthenticationProviderQuerySet extends OPA.QuerySet<IAuthenticationProvider> {
   /**
-    * Creates a AuthenticationProviderQuerySet.
-    * @param {OPA.ITypedCollectionDescriptor<IAuthenticationProvider>} collectionDescriptor The collection descriptor to use for queries.
-    */
+   * Creates a AuthenticationProviderQuerySet.
+   * @param {OPA.ITypedCollectionDescriptor<IAuthenticationProvider>} collectionDescriptor The collection descriptor to use for queries.
+   */
   constructor(collectionDescriptor: OPA.ITypedCollectionDescriptor<IAuthenticationProvider>) {
     super(collectionDescriptor);
   }
 
   /**
-    * The typed collection descriptor to use for queries.
-    * @type {OPA.ITypedQueryableCollectionDescriptor<IAuthenticationProvider, AuthenticationProviderQuerySet>}
-    */
+   * The typed collection descriptor to use for queries.
+   * @type {OPA.ITypedQueryableCollectionDescriptor<IAuthenticationProvider, AuthenticationProviderQuerySet>}
+   */
   get typedCollectionDescriptor(): OPA.ITypedQueryableCollectionDescriptor<IAuthenticationProvider, AuthenticationProviderQuerySet> {
     return OPA.convertTo<OPA.ITypedQueryableCollectionDescriptor<IAuthenticationProvider, AuthenticationProviderQuerySet>>(this.collectionDescriptor);
   }
 
   /**
-    * Gets the Authentication Provider by that Provider's externally provided ID, since that ID is also a unique key.
-    * @param {Firestore} db The Firestore Database to read from.
-    * @param {string} externalId The ID for the Authentication Provider that is provided by the corresponding Provider.
-    * @return {Promise<IAuthenticationProvider | null>} The User corresponding to the UUID, or null if none exists.
-    */
+   * Gets the Authentication Provider by that Provider's externally provided ID, since that ID is also a unique key.
+   * @param {Firestore} db The Firestore Database to read from.
+   * @param {string} externalId The ID for the Authentication Provider that is provided by the corresponding Provider.
+   * @return {Promise<IAuthenticationProvider | null>} The User corresponding to the UUID, or null if none exists.
+   */
   async getByExternalAuthProviderId(db: firestore.Firestore, externalId: string): Promise<IAuthenticationProvider | null> {
     OPA.assertFirestoreIsNotNullish(db);
     OPA.assertIdentifierIsValid(externalId, "A valid external Authentication Provider ID must be provided.");

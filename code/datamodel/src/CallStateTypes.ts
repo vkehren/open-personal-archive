@@ -65,13 +65,13 @@ export class AuthorizationState implements IAuthorizationState {
   private _timeZone: ITimeZone;
 
   /**
-    * Creates a AuthorizationState.
-    * @param {IUser} user The current User.
-    * @param {IRole} role The Role of the current User.
-    * @param {ILocale} locale The Locale for the current User.
-    * @param {ITimeZoneGroup} timeZoneGroup The Time Zone Group for the current User.
-    * @param {ITimeZone} timeZone The Time Zone for the current User.
-    */
+   * Creates a AuthorizationState.
+   * @param {IUser} user The current User.
+   * @param {IRole} role The Role of the current User.
+   * @param {ILocale} locale The Locale for the current User.
+   * @param {ITimeZoneGroup} timeZoneGroup The Time Zone Group for the current User.
+   * @param {ITimeZone} timeZone The Time Zone for the current User.
+   */
   constructor(user: IUser, role: IRole, locale: ILocale, timeZoneGroup: ITimeZoneGroup, timeZone: ITimeZone) {
     this._user = user;
     this._role = role;
@@ -81,57 +81,57 @@ export class AuthorizationState implements IAuthorizationState {
   }
 
   /**
-    * The current User.
-    * @type {IUser}
-    */
+   * The current User.
+   * @type {IUser}
+   */
   get user(): IUser {
     return this._user;
   }
 
   /**
-    * The Role of the current User.
-    * @type {IRole}
-    */
+   * The Role of the current User.
+   * @type {IRole}
+   */
   get role(): IRole {
     return this._role;
   }
 
   /**
-    * The Locale for the current User.
-    * @type {ILocale}
-    */
+   * The Locale for the current User.
+   * @type {ILocale}
+   */
   get locale(): ILocale {
     return this._locale;
   }
 
   /**
-    * The Time Zone Group for the current User.
-    * @type {ITimeZoneGroup}
-    */
+   * The Time Zone Group for the current User.
+   * @type {ITimeZoneGroup}
+   */
   get timeZoneGroup(): ITimeZoneGroup {
     return this._timeZoneGroup;
   }
 
   /**
-    * The Time Zone for the current User.
-    * @type {ITimeZone}
-    */
+   * The Time Zone for the current User.
+   * @type {ITimeZone}
+   */
   get timeZone(): ITimeZone {
     return this._timeZone;
   }
 
   /**
-    * Returns true if the current User's account has been approved.
-    * @return {boolean} Whether the current User's account has been approved.
-    */
+   * Returns true if the current User's account has been approved.
+   * @return {boolean} Whether the current User's account has been approved.
+   */
   isUserApproved(): boolean {
     return (this._user.approvalState == BT.ApprovalStates.approved);
   }
 
   /**
-    * Asserts that the current User's account has been approved.
-    * @return {void}
-    */
+   * Asserts that the current User's account has been approved.
+   * @return {void}
+   */
   assertUserApproved(): void {
     if (!this.isUserApproved()) {
       throw new Error("The current User's account has NOT been approved.");
@@ -139,20 +139,20 @@ export class AuthorizationState implements IAuthorizationState {
   }
 
   /**
-    * Returns true if the current User's Role is in the list of allowed Roles.
-    * @param {Array<string>} allowedRoleIds The list of allowed Roles.
-    * @return {boolean} Whether the current User's Role is allowed.
-    */
+   * Returns true if the current User's Role is in the list of allowed Roles.
+   * @param {Array<string>} allowedRoleIds The list of allowed Roles.
+   * @return {boolean} Whether the current User's Role is allowed.
+   */
   isRoleAllowed(allowedRoleIds: Array<string>): boolean {
     OPA.assertNonNullish(allowedRoleIds, "A non-null array of allowed Role IDs must be specified.");
     return (allowedRoleIds.includes(this._role.id));
   }
 
   /**
-    * Asserts that the current User's Role is in the list of allowed Roles.
-    * @param {Array<string>} allowedRoleIds The list of allowed Roles.
-    * @return {void}
-    */
+   * Asserts that the current User's Role is in the list of allowed Roles.
+   * @param {Array<string>} allowedRoleIds The list of allowed Roles.
+   * @return {void}
+   */
   assertRoleAllowed(allowedRoleIds: Array<string>): void {
     if (!this.isRoleAllowed(allowedRoleIds)) {
       throw new Error("The current User's Role is not allowed to perform this action.");
@@ -160,20 +160,20 @@ export class AuthorizationState implements IAuthorizationState {
   }
 
   /**
-    * Returns true if the current User's Role is in the list of disallowed Roles.
-    * @param {Array<string>} disallowedRoleIds The list of disallowed Roles.
-    * @return {boolean} Whether the current User's Role is disallowed.
-    */
+   * Returns true if the current User's Role is in the list of disallowed Roles.
+   * @param {Array<string>} disallowedRoleIds The list of disallowed Roles.
+   * @return {boolean} Whether the current User's Role is disallowed.
+   */
   isRoleDisallowed(disallowedRoleIds: Array<string>): boolean {
     OPA.assertNonNullish(disallowedRoleIds, "A non-null array of disallowed Role IDs must be specified.");
     return (disallowedRoleIds.includes(this._role.id));
   }
 
   /**
-    * Asserts that the current User's Role is in the list of disallowed Roles.
-    * @param {Array<string>} disallowedRoleIds The list of disallowed Roles.
-    * @return {void}
-    */
+   * Asserts that the current User's Role is in the list of disallowed Roles.
+   * @param {Array<string>} disallowedRoleIds The list of disallowed Roles.
+   * @return {void}
+   */
   assertRoleDisallowed(disallowedRoleIds: Array<string>): void {
     if (!this.isRoleDisallowed(disallowedRoleIds)) {
       throw new Error("The current User's Role is allowed to perform this action.");
