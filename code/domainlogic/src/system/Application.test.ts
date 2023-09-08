@@ -137,6 +137,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
       requestedCitationIds: ([] as Array<string>),
       viewableCitationIds: ([] as Array<string>),
       recentQueries: ([] as Array<string>),
+      updateHistory: [],
       dateOfCreation: now,
       hasBeenUpdated: false,
       dateOfLatestUpdate: null,

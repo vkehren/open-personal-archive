@@ -12,7 +12,7 @@ const IsSingleton = false;
 export const User_OwnerId = "OPA_User_Owner"; // eslint-disable-line camelcase
 
 // NOTE: IViewable_ByUser and IApprovable_ByUser fields should be updated using the corresponding interface directly as a partial interface
-export interface IUserPartial extends OPA.IUpdateable {
+export interface IUserPartial {
   assignedRoleId?: string;
   localeId?: string;
   timeZoneGroupId?: string;
@@ -21,6 +21,11 @@ export interface IUserPartial extends OPA.IUpdateable {
   lastName?: string;
   preferredName?: string | null;
   recentQueries?: Array<string>;
+}
+
+type UpdateHistoryItem = IUserPartial | OPA.IUpdateable | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState>;
+interface IUserPartial_WithHistory extends IUserPartial, OPA.IUpdateable {
+  updateHistory: Array<UpdateHistoryItem> | firestore.FieldValue;
 }
 
 export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState> {
@@ -39,6 +44,44 @@ export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable
   readonly requestedCitationIds: Array<string>,
   readonly viewableCitationIds: Array<string>;
   recentQueries: Array<string>;
+  readonly updateHistory: Array<UpdateHistoryItem>;
+}
+
+/**
+ * Checks whether the specified updates to a User document are valid.
+ * @param {IUser} user The User document being updated.
+ * @param {IUserPartial} userUpdateObject The updates specified.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+function areUpdatesValid(user: IUser, userUpdateObject: IUserPartial): boolean {
+  OPA.assertNonNullish(user);
+  OPA.assertNonNullish(userUpdateObject);
+
+  if (user.assignedRoleId != Role_OwnerId) {
+    return true;
+  }
+  if (userUpdateObject.hasOwnProperty(OPA.IViewable_HasBeenViewed_PropertyName)) {
+    return false;
+  }
+  if (userUpdateObject.hasOwnProperty(OPA.IViewable_DateOfLatestViewing_PropertyName)) {
+    return false;
+  }
+  if (userUpdateObject.hasOwnProperty(OPA.IViewable_ByUser_UserIdOfLatestViewer_PropertyName)) {
+    return false;
+  }
+  if (userUpdateObject.hasOwnProperty(OPA.IApprovable_HasBeenDecided_PropertyName)) {
+    return false;
+  }
+  if (userUpdateObject.hasOwnProperty(OPA.IApprovable_ApprovalState_PropertyName)) {
+    return false;
+  }
+  if (userUpdateObject.hasOwnProperty(OPA.IApprovable_DateOfDecision_PropertyName)) {
+    return false;
+  }
+  if (userUpdateObject.hasOwnProperty(OPA.IApprovable_ByUser_UserIdOfDecider_PropertyName)) {
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -73,6 +116,7 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     requestedCitationIds: ([] as Array<string>),
     viewableCitationIds: ([] as Array<string>),
     recentQueries: ([] as Array<string>),
+    updateHistory: ([] as Array<UpdateHistoryItem>),
     dateOfCreation: now,
     hasBeenUpdated: false,
     dateOfLatestUpdate: null,
@@ -117,6 +161,7 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     requestedCitationIds: ([] as Array<string>),
     viewableCitationIds: ([] as Array<string>),
     recentQueries: ([] as Array<string>),
+    updateHistory: ([] as Array<UpdateHistoryItem>),
     dateOfCreation: now,
     hasBeenUpdated: false,
     dateOfLatestUpdate: null,
@@ -185,6 +230,84 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
       return null;
     }
     return matchingUsersSnap.docs[0].data();
+  }
+
+  /**
+   * Updates the User stored on the server using an IUserPartial object.
+   * @param {Firestore} db The Firestore Database.
+   * @param {string} userId The ID for the User within the OPA system.
+   * @param {IUserPartial} userUpdateObject The object containing the updates.
+   * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
+   * @return {Promise<void>}
+   */
+  async updateUser(db: firestore.Firestore, userId: string, userUpdateObject: IUserPartial, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    const now = OPA.nowToUse();
+    const userUpdateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now} as OPA.IUpdateable);
+    userUpdateObject = {...userUpdateObject_Updateable, ...userUpdateObject};
+    const updateHistory = constructorProvider.arrayUnion(userUpdateObject);
+    const userUpdateObject_WithHistory = ({...userUpdateObject, updateHistory} as IUserPartial_WithHistory);
+
+    const user = await this.getById(db, userId);
+    OPA.assertNonNullish(user);
+    const areValid = areUpdatesValid(OPA.convertNonNullish(user), userUpdateObject_WithHistory);
+    OPA.assertIsTrue(areValid, "The requested update is invalid.");
+
+    const usersCollectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const userRef = usersCollectionRef.doc(userId);
+    await userRef.set(userUpdateObject_WithHistory, {merge: true});
+  }
+
+  /**
+   * Updates the User stored on the server by constructing an IViewable_ByUser object.
+   * @param {Firestore} db The Firestore Database.
+   * @param {string} userId The ID for the User within the OPA system.
+   * @param {string} userIdOfViewer The ID for the Viewer within the OPA system.
+   * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
+   * @return {Promise<void>}
+   */
+  async setUserToViewed(db: firestore.Firestore, userId: string, userIdOfViewer: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    const now = OPA.nowToUse();
+    const userUpdateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now} as OPA.IUpdateable);
+    const userUpdateObject_Viewable = ({hasBeenViewed: true, dateOfLatestViewing: now, userIdOfLatestViewer: userIdOfViewer} as OPA.IViewable_ByUser);
+    const userUpdateObject = {...userUpdateObject_Updateable, ...userUpdateObject_Viewable, ...({} as IUserPartial)};
+    const updateHistory = constructorProvider.arrayUnion(userUpdateObject);
+    const userUpdateObject_WithHistory = ({...userUpdateObject, updateHistory} as IUserPartial_WithHistory);
+
+    const user = await this.getById(db, userId);
+    OPA.assertNonNullish(user);
+    const areValid = areUpdatesValid(OPA.convertNonNullish(user), userUpdateObject_WithHistory);
+    OPA.assertIsTrue(areValid, "The requested update is invalid.");
+
+    const usersCollectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const userRef = usersCollectionRef.doc(userId);
+    await userRef.set(userUpdateObject_WithHistory, {merge: true});
+  }
+
+  /**
+   * Updates the User stored on the server by constructing an IApprovable_ByUser<T> object.
+   * @param {Firestore} db The Firestore Database.
+   * @param {string} userId The ID for the User within the OPA system.
+   * @param {BT.ApprovalState} approvalState The ApprovalState for the User.
+   * @param {string} userIdOfDecider The ID for the Decider within the OPA system.
+   * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
+   * @return {Promise<void>}
+   */
+  async setUserToDecided(db: firestore.Firestore, userId: string, approvalState: BT.ApprovalState, userIdOfDecider: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    const now = OPA.nowToUse();
+    const userUpdateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now} as OPA.IUpdateable);
+    const userUpdateObject_Approvable = ({hasBeenDecided: true, approvalState: approvalState, dateOfDecision: now, userIdOfDecider: userIdOfDecider} as OPA.IApprovable_ByUser<BT.ApprovalState>);
+    const userUpdateObject = {...userUpdateObject_Updateable, ...userUpdateObject_Approvable, ...({} as IUserPartial)};
+    const updateHistory = constructorProvider.arrayUnion(userUpdateObject);
+    const userUpdateObject_WithHistory = ({...userUpdateObject, updateHistory} as IUserPartial_WithHistory);
+
+    const user = await this.getById(db, userId);
+    OPA.assertNonNullish(user);
+    const areValid = areUpdatesValid(OPA.convertNonNullish(user), userUpdateObject_WithHistory);
+    OPA.assertIsTrue(areValid, "The requested update is invalid.");
+
+    const usersCollectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const userRef = usersCollectionRef.doc(userId);
+    await userRef.set(userUpdateObject_WithHistory, {merge: true});
   }
 }
 
