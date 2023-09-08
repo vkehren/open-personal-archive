@@ -6,24 +6,21 @@ const PluralName = "Applications";
 const IsSingleton = true;
 export const SingletonId = "OPA_Application";
 
-export interface IApplicationUpgradeData extends OPA.IUpgradeable_ByUser {
-  applicationVersionAfterUpgrade: string;
-  schemaVersionAfterUpgrade: string;
-  applicationVersionBeforeUpgrade: string;
-  schemaVersionBeforeUpgrade: string;
+export interface IApplicationPartial {
+  applicationVersion?: string;
+  schemaVersion?: string;
 }
 
-export interface IApplicationPartial extends OPA.IUpgradeable_ByUser {
-  applicationVersion: string;
-  schemaVersion: string;
-  upgradeHistory: Array<IApplicationUpgradeData> | firestore.FieldValue;
+type UpgradeHistoryItem = IApplicationPartial | OPA.IUpgradeable_ByUser;
+interface IApplicationPartial_WithHistory extends IApplicationPartial, OPA.IUpgradeable_ByUser {
+  upgradeHistory: Array<UpgradeHistoryItem> | firestore.FieldValue;
 }
 
 export interface IApplication extends OPA.IDocument_Upgradeable_ByUser {
   readonly id: string;
   applicationVersion: string;
   schemaVersion: string;
-  readonly upgradeHistory: Array<IApplicationUpgradeData>;
+  readonly upgradeHistory: Array<UpgradeHistoryItem>;
   readonly dateOfInstallation: OPA.DateToUse;
 }
 
@@ -39,12 +36,13 @@ export function createSingleton(applicationVersion: string, schemaVersion: strin
     id: SingletonId,
     applicationVersion: applicationVersion,
     schemaVersion: schemaVersion,
-    upgradeHistory: ([] as Array<IApplicationUpgradeData>),
+    upgradeHistory: ([] as Array<UpgradeHistoryItem>),
     dateOfInstallation: now,
     hasBeenUpgraded: false,
     dateOfLatestUpgrade: null,
     userIdOfLatestUpgrader: null,
   };
+  document.upgradeHistory.push(OPA.copyObject(document));
   return document;
 }
 
@@ -65,8 +63,34 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
   get typedCollectionDescriptor(): OPA.ITypedQueryableFactoryCollectionDescriptor<IApplication, ApplicationQuerySet, FactoryFunc> {
     return OPA.convertTo<OPA.ITypedQueryableFactoryCollectionDescriptor<IApplication, ApplicationQuerySet, FactoryFunc>>(this.collectionDescriptor);
   }
+
+  /**
+   * Updates the Application stored on the server using an IApplicationPartial object.
+   * @param {Firestore} db The Firestore Database.
+   * @param {IApplicationPartial} applicationUpdateObject The object containing the updates.
+   * @param {string} userIdOfLatestUpgrader The ID for the Upgrader within the OPA system.
+   * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
+   * @return {Promise<void>}
+   */
+  async updateApplication(db: firestore.Firestore, applicationUpdateObject: IApplicationPartial, userIdOfLatestUpgrader: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    const applicationId = SingletonId;
+    const now = OPA.nowToUse();
+    const applicationUpdateObject_Upgradeable = ({hasBeenUpgraded: true, dateOfLatestUpgrade: now, userIdOfLatestUpgrader: userIdOfLatestUpgrader} as OPA.IUpgradeable_ByUser);
+    applicationUpdateObject = {...applicationUpdateObject_Upgradeable, ...applicationUpdateObject};
+    const upgradeHistory = constructorProvider.arrayUnion(applicationUpdateObject);
+    const applicationUpdateObject_WithHistory = ({...applicationUpdateObject, upgradeHistory} as IApplicationPartial_WithHistory);
+
+    const application = await this.getById(db, applicationId);
+    OPA.assertNonNullish(application);
+    // NOTE: If needed, implement "areUpdatesValid" function
+    // const areValid = areUpdatesValid(OPA.convertNonNullish(application), applicationUpdateObject_WithHistory);
+    // OPA.assertIsTrue(areValid, "The requested update is invalid.");
+
+    const applicationsCollectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const applicationRef = applicationsCollectionRef.doc(applicationId);
+    await applicationRef.set(applicationUpdateObject_WithHistory, {merge: true});
+  }
 }
 
-type createInstance = (id: string) => (IApplication);
-export type FactoryFunc = (...[params]: Parameters<createInstance>) => ReturnType<createInstance>;
+export type FactoryFunc = (...[params]: Parameters<typeof createSingleton>) => ReturnType<typeof createSingleton>;
 export const CollectionDescriptor = new OPA.CollectionDescriptor<IApplication, ApplicationQuerySet, void>(SingularName, PluralName, IsSingleton, (cd) => new ApplicationQuerySet(cd), null, []);

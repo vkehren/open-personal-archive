@@ -1,4 +1,3 @@
-import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../../base/src";
 import * as OpaDm from "../../../datamodel/src";
 import {createApplication, createArchive, OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
@@ -284,10 +283,11 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
 /**
  * Upgrades the Open Personal Archive™ (OPA) system to the latest version.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
  * @param {boolean} [doBackupFirst=false] Whether to backup the data before upgrading it (NOT IMPLEMENTED YET).
  * @return {Promise<void>}
  */
-export async function performUpgrade(callState: OpaDm.ICallState, doBackupFirst = false): Promise<void> { // eslint-disable-line max-len
+export async function performUpgrade(callState: OpaDm.ICallState, constructorProvider: OPA.IFirebaseConstructorProvider, doBackupFirst = false): Promise<void> { // eslint-disable-line max-len
   OPA.assertNonNullish(callState, "The Call State must not be null.");
   OPA.assertNonNullish(callState.dataStorageState, "The Data Storage State must not be null.");
   OPA.assertNonNullish(callState.authenticationState, "The Authentication State must not be null.");
@@ -327,26 +327,18 @@ export async function performUpgrade(callState: OpaDm.ICallState, doBackupFirst 
 
   // LATER: Do upgrade work here
 
-  const applicationUpgradeData: OpaDm.IApplicationUpgradeData = {
-    applicationVersionAfterUpgrade: ApplicationInfo.VERSION,
-    schemaVersionAfterUpgrade: SchemaInfo.VERSION,
-    applicationVersionBeforeUpgrade: applicationNonNull.applicationVersion,
-    schemaVersionBeforeUpgrade: applicationNonNull.schemaVersion,
-    hasBeenUpgraded: true,
-    dateOfLatestUpgrade: OPA.nowToUse(),
-    userIdOfLatestUpgrader: currentUserNonNull.id,
-  };
-  const applicationPartial: OpaDm.IApplicationPartial = {
-    applicationVersion: applicationUpgradeData.applicationVersionAfterUpgrade,
-    schemaVersion: applicationUpgradeData.schemaVersionAfterUpgrade,
-    upgradeHistory: firestore.FieldValue.arrayUnion(applicationUpgradeData),
-    hasBeenUpgraded: applicationUpgradeData.hasBeenUpgraded,
-    dateOfLatestUpgrade: applicationUpgradeData.dateOfLatestUpgrade,
-    userIdOfLatestUpgrader: applicationUpgradeData.userIdOfLatestUpgrader,
-  };
+  const applicationPartial: OpaDm.IApplicationPartial = {};
+  if (applicationComparison > 0) {
+    applicationPartial.applicationVersion = ApplicationInfo.VERSION;
+  }
+  if (schemaComparison > 0) {
+    applicationPartial.schemaVersion = SchemaInfo.VERSION;
+  }
 
-  const applicationRef = OpaDb.Application.getTypedCollection(db).doc(applicationNonNull.id);
-  await applicationRef.set(applicationPartial, {merge: true});
+  if (OPA.isEmpty(applicationPartial)) {
+    throw new Error("No upgraded version was provided.");
+  }
+  await OpaDb.Application.queries.updateApplication(db, applicationPartial, currentUserNonNull.id, constructorProvider);
 }
 
 /**
