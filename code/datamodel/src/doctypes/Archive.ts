@@ -8,6 +8,7 @@ const PluralName = "Archives";
 const IsSingleton = true;
 export const SingletonId = "OPA_Archive";
 
+// NOTE: Remove " extends OPA.IUpdateable_ByUser" after implementing update function in ArchiveQuerySet
 export interface IArchivePartial extends OPA.IUpdateable_ByUser {
   name?: OPA.ILocalizable<string>;
   description?: OPA.ILocalizable<string>;
@@ -15,6 +16,8 @@ export interface IArchivePartial extends OPA.IUpdateable_ByUser {
   defaultTimeZoneGroupId?: string;
   defaultTimeZoneId?: string;
 }
+
+type UpdateHistoryItem = IArchivePartial | OPA.IUpdateable_ByUser;
 
 export interface IArchive extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser {
   readonly id: string;
@@ -25,6 +28,7 @@ export interface IArchive extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_
   defaultLocaleId: string;
   defaultTimeZoneGroupId: string;
   defaultTimeZoneId: string;
+  readonly updateHistory: Array<UpdateHistoryItem>;
 }
 
 /**
@@ -53,14 +57,34 @@ export function createSingleton(name: string, description: string, pathToStorage
     defaultLocaleId: defaultLocale.id,
     defaultTimeZoneGroupId: defaultTimeZoneGroup.id,
     defaultTimeZoneId: defaultTimeZoneGroup.primaryTimeZoneId,
+    updateHistory: ([] as Array<UpdateHistoryItem>),
     dateOfCreation: now,
     userIdOfCreator: owner.id,
     hasBeenUpdated: false,
     dateOfLatestUpdate: null,
     userIdOfLatestUpdater: null,
   };
+  document.updateHistory.push(OPA.copyObject(document));
   return document;
 }
 
-export type QuerySet = OPA.QuerySet<IArchive>;
-export const CollectionDescriptor = new OPA.CollectionDescriptor<IArchive, QuerySet, void>(SingularName, PluralName, IsSingleton, (cd) => new OPA.QuerySet(cd), null, []);
+/** Class providing queries for Archive collection. */
+export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
+  /**
+   * Creates a ArchiveQuerySet.
+   * @param {OPA.ITypedCollectionDescriptor<IArchive>} collectionDescriptor The collection descriptor to use for queries.
+   */
+  constructor(collectionDescriptor: OPA.ITypedCollectionDescriptor<IArchive>) {
+    super(collectionDescriptor);
+  }
+
+  /**
+   * The typed collection descriptor to use for queries.
+   * @type {OPA.ITypedQueryableFactoryCollectionDescriptor<IArchive, ArchiveQuerySet, null>}
+   */
+  get typedCollectionDescriptor(): OPA.ITypedQueryableFactoryCollectionDescriptor<IArchive, ArchiveQuerySet, null> {
+    return OPA.convertTo<OPA.ITypedQueryableFactoryCollectionDescriptor<IArchive, ArchiveQuerySet, null>>(this.collectionDescriptor);
+  }
+}
+
+export const CollectionDescriptor = new OPA.CollectionDescriptor<IArchive, ArchiveQuerySet, void>(SingularName, PluralName, IsSingleton, (cd) => new ArchiveQuerySet(cd), null, []);
