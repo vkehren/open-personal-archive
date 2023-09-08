@@ -6,6 +6,15 @@ import * as TC from "./TypeChecking";
 export const BULK_WRITER_MAX_RETRY_ATTEMPTS = 4;
 export const FIREBASE_DEFAULT_REGION = "us-east1";
 
+/** Provides a workaround for multiple packages constructing Firebase objects (see https://github.com/googleapis/nodejs-firestore/issues/760) */
+export interface IFirebaseConstructorProvider {
+  arrayRemove: (...elements: any[]) => firestore.FieldValue;
+  arrayUnion: (...elements: any[]) => firestore.FieldValue;
+  delete: () => firestore.FieldValue;
+  increment: (n: number) => firestore.FieldValue;
+  serverTimestamp: () => firestore.FieldValue;
+}
+
 /**
  * Converts a Firebase key to a Firebase credential.
  * @param {any} key The Firebase key.
