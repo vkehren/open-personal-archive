@@ -65,6 +65,29 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
   }
 
   /**
+   * Creates an instance of the IApplication document type stored on the server.
+   * @param {Firestore} db The Firestore Database.
+   * @param {string} applicationVersion The version of the OPA application code.
+   * @param {string} schemaVersion The version of the OPA database schema.
+   * @return {string} The new document ID.
+   */
+  async createApplication(db: firestore.Firestore, applicationVersion: string, schemaVersion: string): Promise<string> {
+    const application = createSingleton(applicationVersion, schemaVersion);
+    const applicationId = application.id;
+
+    OPA.assertNonNullish(application);
+    OPA.assertNonNullish(application.upgradeHistory);
+    OPA.assertIsTrue(application.id == SingletonId);
+    OPA.assertIsTrue(applicationId == SingletonId);
+    OPA.assertIsTrue(application.upgradeHistory.length == 1);
+
+    const applicationsCollectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const applicationRef = applicationsCollectionRef.doc(applicationId);
+    await applicationRef.set(application, {merge: true});
+    return applicationId;
+  }
+
+  /**
    * Updates the Application stored on the server using an IApplicationPartial object.
    * @param {Firestore} db The Firestore Database.
    * @param {IApplicationPartial} applicationUpdateObject The object containing the updates.

@@ -5,7 +5,7 @@ import chaiAsPromised from "chai-as-promised";
 chai.use(chaiAsPromised);
 import * as OPA from "../../../base/src";
 import * as OpaDm from "../../../datamodel/src";
-import {createApplication, OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
+import {OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
 import * as CSU from "../CallStateUtilities";
 import * as Application from "./Application";
 import * as SchemaInfo from "../../../datamodel/src/PackageInfo";
@@ -46,10 +46,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    const application = createApplication(ApplicationInfo.VERSION, SchemaInfo.VERSION);
-    const applicationCollectionRef = OpaDb.Application.getTypedCollection(config.dataStorageState.db);
-    const applicationDocumentRef = applicationCollectionRef.doc(application.id);
-    await applicationDocumentRef.set(application, {merge: true});
+    await OpaDb.Application.queries.createApplication(config.dataStorageState.db, ApplicationInfo.VERSION, SchemaInfo.VERSION);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -59,10 +56,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    let application = createApplication(ApplicationInfo.VERSION, SchemaInfo.VERSION);
-    let applicationCollectionRef = OpaDb.Application.getTypedCollection(config.dataStorageState.db);
-    let applicationDocumentRef = applicationCollectionRef.doc(application.id);
-    await applicationDocumentRef.set(application, {merge: true});
+    await OpaDb.Application.queries.createApplication(config.dataStorageState.db, ApplicationInfo.VERSION, SchemaInfo.VERSION);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -90,15 +84,12 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     const archives = await OpaDb.Archive.queries.getAll(config.dataStorageState.db);
     expect(archives.length).equals(0);
 
-    application = createApplication(ApplicationInfo.VERSION, SchemaInfo.VERSION);
-    applicationCollectionRef = OpaDb.Application.getTypedCollection(config.dataStorageState.db);
-    applicationDocumentRef = applicationCollectionRef.doc(application.id);
-    await applicationDocumentRef.set(application, {merge: true});
+    await OpaDb.Application.queries.createApplication(config.dataStorageState.db, ApplicationInfo.VERSION, SchemaInfo.VERSION);
 
     const authProvider = OpaDb.AuthProviders.requiredDocuments[0];
     const authProviderCollectionRef = OpaDb.AuthProviders.getTypedCollection(config.dataStorageState.db);
     const authProviderDocumentRef = authProviderCollectionRef.doc(authProvider.id);
-    await authProviderDocumentRef.set(application, {merge: true});
+    await authProviderDocumentRef.set(authProvider, {merge: true});
 
     const role = OpaDb.Roles.requiredDocuments.filter((value) => (value.type == OpaDm.RoleTypes.owner))[0];
     const roleCollectionRef = OpaDb.Roles.getTypedCollection(config.dataStorageState.db);

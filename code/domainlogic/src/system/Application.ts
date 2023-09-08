@@ -1,6 +1,6 @@
 import * as OPA from "../../../base/src";
 import * as OpaDm from "../../../datamodel/src";
-import {createApplication, OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
+import {OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
 import * as DMU from "../DisplayModelUtilities";
 import * as SchemaInfo from "../../../datamodel/src/PackageInfo";
 import * as ApplicationInfo from "../PackageInfo";
@@ -138,10 +138,7 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   OPA.assertSystemIsNotInstalled(isSystemCurrentlyInstalled, "The Open Personal Archive™ (OPA) system has already been installed. Please un-install before re-installing.");
 
   // 1) Create the Application document
-  const application = createApplication(ApplicationInfo.VERSION, SchemaInfo.VERSION);
-  const applicationCollectionRef = OpaDb.Application.getTypedCollection(db);
-  const applicationDocumentRef = applicationCollectionRef.doc(application.id);
-  await applicationDocumentRef.set(application, {merge: true});
+  await OpaDb.Application.queries.createApplication(db, ApplicationInfo.VERSION, SchemaInfo.VERSION);
 
   // 2) Load required data
   const requiredAuthProviderIds = OpaDm.AuthenticationProvider_RequiredIds;
