@@ -1,4 +1,4 @@
-# [Open Personal Archive™](https://openpersonalarchive.com)
+# [Open Personal Archive™](http://openpersonalarchive.com)
 
 <img src="code/webapp/images/OpenPersonalArchive_Small_Logo.png" width="500" />
 
