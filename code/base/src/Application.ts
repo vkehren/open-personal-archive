@@ -9,12 +9,12 @@ export const Query_OrderBy_CharHighest = "\uf8ff"; // eslint-disable-line camelc
 
 /**
  * Deep-copies an object of type T.
- * @param {T | null | undefined} obj The object to copy.
- * @return {T | null | undefined}
+ * @param {T} obj The object to copy.
+ * @return {T}
  */
-export function copyObject<T>(obj: T | null | undefined): T | null | undefined {
+export function copyObject<T>(obj: T): T {
   if (TC.isUndefined(obj)) {
-    return undefined;
+    return (undefined as T);
   }
 
   const objAsString = JSON.stringify(obj);
