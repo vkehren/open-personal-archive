@@ -59,9 +59,9 @@ export class TimeRangeCollection extends Object implements BT.ITimeRangeCollecti
   private _timeRanges: Map<string, BT.ITimeRange>;
 
   /**
-    * Create a TimeRangeCollection from the values specified.
-    * @param {BT.ITimeRange | Array<BT.ITimeRange>} initialRange The complete range of the of the TimeRangeCollection.
-    */
+   * Create a TimeRangeCollection from the values specified.
+   * @param {BT.ITimeRange | Array<BT.ITimeRange>} initialRange The complete range of the of the TimeRangeCollection.
+   */
   constructor(initialRange: BT.ITimeRange | Array<BT.ITimeRange>) {
     super();
 
@@ -80,17 +80,17 @@ export class TimeRangeCollection extends Object implements BT.ITimeRangeCollecti
   }
 
   /**
-    * The number of TimeRanges in the collection.
-    * @type {number}
-    */
+   * The number of TimeRanges in the collection.
+   * @type {number}
+   */
   get count(): number {
     return this._timeRanges.size;
   }
 
   /**
-    * The first TimeRange in the collection.
-    * @type {BT.ITimeRange}
-    */
+   * The first TimeRange in the collection.
+   * @type {BT.ITimeRange}
+   */
   get first(): BT.ITimeRange {
     const timeRanges = Array.from(this._timeRanges.entries());
     const first = timeRanges[0];
@@ -98,9 +98,9 @@ export class TimeRangeCollection extends Object implements BT.ITimeRangeCollecti
   }
 
   /**
-    * The last TimeRange in the collection.
-    * @type {BT.ITimeRange}
-    */
+   * The last TimeRange in the collection.
+   * @type {BT.ITimeRange}
+   */
   get last(): BT.ITimeRange {
     const timeRanges = Array.from(this._timeRanges.entries());
     const last = timeRanges[timeRanges.length - 1];
@@ -108,20 +108,20 @@ export class TimeRangeCollection extends Object implements BT.ITimeRangeCollecti
   }
 
   /**
-    * The keys in the collection.
-    * @type {Array<string>}
-    */
+   * The keys in the collection.
+   * @type {Array<string>}
+   */
   get keys(): Array<string> {
     const timeRangeKeys = Array.from(this._timeRanges.keys());
     return timeRangeKeys;
   }
 
   /**
-    * Gets a TimeRange from the collection.
-    * @param {number | string | BT.ITimestamp} index The index of the TimeRange to get.
-    * @param {boolean} [returnEarlierSideOfBoundary=Default_ReturnEarlierSideOfBoundary] Whether to return the earlier of a boundary between two (2) TimeRanges or not.
-    * @return {BT.ITimeRange | null} The TimeRange requested, or null if none exists.
-    */
+   * Gets a TimeRange from the collection.
+   * @param {number | string | BT.ITimestamp} index The index of the TimeRange to get.
+   * @param {boolean} [returnEarlierSideOfBoundary=Default_ReturnEarlierSideOfBoundary] Whether to return the earlier of a boundary between two (2) TimeRanges or not.
+   * @return {BT.ITimeRange | null} The TimeRange requested, or null if none exists.
+   */
   get(index: number | string | BT.ITimestamp, returnEarlierSideOfBoundary: boolean = Default_ReturnEarlierSideOfBoundary): BT.ITimeRange | undefined {
     if (TC.isNumber(index)) {
       const indexAsNumber = (index as number);
@@ -161,10 +161,10 @@ export class TimeRangeCollection extends Object implements BT.ITimeRangeCollecti
   }
 
   /**
-    * Splits a TimeRange in the collection into two (2) separate TimeRanges at the Timestamp specified.
-    * @param {BT.ITimestamp} timestamp The Timestamp to split at.
-    * @return {BT.ITimeRangeSplitResult} The result of splitting.
-    */
+   * Splits a TimeRange in the collection into two (2) separate TimeRanges at the Timestamp specified.
+   * @param {BT.ITimestamp} timestamp The Timestamp to split at.
+   * @return {BT.ITimeRangeSplitResult} The result of splitting.
+   */
   split(timestamp: BT.ITimestamp): BT.ITimeRangeSplitResult {
     const original = this.get(timestamp);
     if (TC.isNullish(original)) {
@@ -192,10 +192,10 @@ export class TimeRangeCollection extends Object implements BT.ITimeRangeCollecti
   }
 
   /**
-    * Merges two (2) TimeRanges in the collection into a single TimeRange at the Timestamp specified.
-    * @param {BT.ITimestamp} timestamp The Timestamp to merge at.
-    * @return {BT.ITimeRangeMergeResult} The result of merging.
-    */
+   * Merges two (2) TimeRanges in the collection into a single TimeRange at the Timestamp specified.
+   * @param {BT.ITimestamp} timestamp The Timestamp to merge at.
+   * @return {BT.ITimeRangeMergeResult} The result of merging.
+   */
   merge(timestamp: BT.ITimestamp): BT.ITimeRangeMergeResult {
     const keys = this.keys;
     let earlier: BT.ITimeRange | null = null;

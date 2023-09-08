@@ -19,17 +19,17 @@ export class QuerySet<T extends BT.IDocument> implements IQuerySet<T> {
   private _collectionDescriptor: ST.ITypedCollectionDescriptor<T>;
 
   /**
-    * Creates a QuerySet<T>.
-    * @param {ST.ITypedCollectionDescriptor<T>} collectionDescriptor The collection descriptor to use for queries.
-    */
+   * Creates a QuerySet<T>.
+   * @param {ST.ITypedCollectionDescriptor<T>} collectionDescriptor The collection descriptor to use for queries.
+   */
   constructor(collectionDescriptor: ST.ITypedCollectionDescriptor<T>) {
     this._collectionDescriptor = collectionDescriptor;
   }
 
   /**
-    * The collection descriptor to use for queries.
-    * @type {ST.ITypedCollectionDescriptor<T>}
-    */
+   * The collection descriptor to use for queries.
+   * @type {ST.ITypedCollectionDescriptor<T>}
+   */
   get collectionDescriptor(): ST.ITypedCollectionDescriptor<T> {
     return this._collectionDescriptor;
   }

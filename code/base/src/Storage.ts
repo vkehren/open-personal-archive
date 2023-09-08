@@ -82,24 +82,24 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
   private _factoryFunction: F | null;
 
   /**
-    * Creates a Firestore data converter to use with collection references and collection groups.
-    * @return {firestore.FirestoreDataConverter<T>} The Firestore data converter.
-    */
+   * Creates a Firestore data converter to use with collection references and collection groups.
+   * @return {firestore.FirestoreDataConverter<T>} The Firestore data converter.
+   */
   static getDataConverter<T>(): firestore.FirestoreDataConverter<T> {
     const dataConverter = {toFirestore: FB.convertToFirestoreDocument, fromFirestore: FB.convertFromFirestoreDocument};
     return dataConverter;
   }
 
   /**
-    * Creates a CollectionDescriptor<T>.
-    * @param {string} singularName The name for a single document of the type T.
-    * @param {string} pluralName The name for multiple documents of the type T.
-    * @param {boolean} isSingleton Whether the collection is ONLY allowed to contain a single document of type T or not.
-    * @param {QR.QuerySetConstructor<Q, T>} [querySetConstructor] The function that constructs the object containing the set of queries useful for reading and editing document instances of type T.
-    * @param {ICollectionDescriptor | null} [parentCollectionDescriptor=null] The descriptor of the parent collection, if one exists.
-    * @param {Array<T>} [requiredDocuments=[]] The list of documents that must exist in a valid installation of the system.
-    * @param {F} [factoryFunction=null] The factory function that creates a document instance of type T.
-    */
+   * Creates a CollectionDescriptor<T>.
+   * @param {string} singularName The name for a single document of the type T.
+   * @param {string} pluralName The name for multiple documents of the type T.
+   * @param {boolean} isSingleton Whether the collection is ONLY allowed to contain a single document of type T or not.
+   * @param {QR.QuerySetConstructor<Q, T>} [querySetConstructor] The function that constructs the object containing the set of queries useful for reading and editing document instances of type T.
+   * @param {ICollectionDescriptor | null} [parentCollectionDescriptor=null] The descriptor of the parent collection, if one exists.
+   * @param {Array<T>} [requiredDocuments=[]] The list of documents that must exist in a valid installation of the system.
+   * @param {F} [factoryFunction=null] The factory function that creates a document instance of type T.
+   */
   constructor(singularName: string, pluralName: string, isSingleton: boolean, querySetConstructor: QR.QuerySetConstructor<Q, T>, parentCollectionDescriptor: ICollectionDescriptor | null = null, requiredDocuments: Array<T> = [], factoryFunction: F | null = null) { // eslint-disable-line max-len
     let rootDescriptor = parentCollectionDescriptor;
     while (!TC.isNullish(rootDescriptor)) {
@@ -120,74 +120,74 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
   }
 
   /**
-    * The name for a single document of the type T.
-    * @type {string}
-    */
+   * The name for a single document of the type T.
+   * @type {string}
+   */
   get singularName(): string {
     return this._singularName;
   }
 
   /**
-    * The name for multiple documents of the type T.
-    * @type {string}
-    */
+   * The name for multiple documents of the type T.
+   * @type {string}
+   */
   get pluralName(): string {
     return this._pluralName;
   }
 
   /**
-    * Whether the collection is ONLY allowed to contain a single document of type T or not.
-    * @type {boolean}
-    */
+   * Whether the collection is ONLY allowed to contain a single document of type T or not.
+   * @type {boolean}
+   */
   get isSingleton(): boolean {
     return this._isSingleton;
   }
 
   /**
-    * Whether the collection is nested inside a parent collection or not.
-    * @type {boolean}
-    */
+   * Whether the collection is nested inside a parent collection or not.
+   * @type {boolean}
+   */
   get isNestedCollection(): boolean {
     return (!TC.isNullish(this._parentCollectionDescriptor));
   }
 
   /**
-    * The name to use for querying the collection.
-    * @type {string}
-    */
+   * The name to use for querying the collection.
+   * @type {string}
+   */
   get collectionName(): string {
     return (this.isSingleton) ? this.singularName : this.pluralName;
   }
 
   /**
-    * The descriptor of the parent collection, if one exists.
-    * @type {ICollectionDescriptor | null}
-    */
+   * The descriptor of the parent collection, if one exists.
+   * @type {ICollectionDescriptor | null}
+   */
   get parentCollectionDescriptor(): ICollectionDescriptor | null {
     return this._parentCollectionDescriptor;
   }
 
   /**
-    * The property indices defined for the collection.
-    * @type {Array<IPropertyIndexDescriptor>}
-    */
+   * The property indices defined for the collection.
+   * @type {Array<IPropertyIndexDescriptor>}
+   */
   get propertyIndices(): Array<IPropertyIndexDescriptor> {
     return this._propertyIndices;
   }
 
   /**
-    * The list of documents that must exist in a valid installation of the system.
-    * @type {Array<T>}
-    */
+   * The list of documents that must exist in a valid installation of the system.
+   * @type {Array<T>}
+   */
   get requiredDocuments(): Array<T> {
     return this._requiredDocuments.slice();
   }
 
   /**
-    * Casts and returns typed document.
-    * @param {unknown} document The untyped document to cast.
-    * @return {T} The typed document.
-    */
+   * Casts and returns typed document.
+   * @param {unknown} document The untyped document to cast.
+   * @return {T} The typed document.
+   */
   castTo(document: unknown): T {
     const typedDocument = (document as (T | null | undefined));
     FB.assertDocumentIsValid(typedDocument);
@@ -197,11 +197,11 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
   }
 
   /**
-    * Returns the corresponding Firebase Firestore collection reference for the document type.
-    * @param {Firestore} db The Firebase Firestore database.
-    * @param {Array<INestedCollectionStep>} [pathFromRoot=[]] The path to the nested collection from the root of the database.
-    * @return {firestore.CollectionReference<firestore.DocumentData>} The corresponding collection reference.
-    */
+   * Returns the corresponding Firebase Firestore collection reference for the document type.
+   * @param {Firestore} db The Firebase Firestore database.
+   * @param {Array<INestedCollectionStep>} [pathFromRoot=[]] The path to the nested collection from the root of the database.
+   * @return {firestore.CollectionReference<firestore.DocumentData>} The corresponding collection reference.
+   */
   getCollection(db: firestore.Firestore, pathFromRoot: Array<INestedCollectionStep> = []): firestore.CollectionReference<firestore.DocumentData> {
     FB.assertFirestoreIsNotNullish(db);
 
@@ -231,10 +231,10 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
   }
 
   /**
-    * Returns the corresponding Firebase Firestore collection group for the document type.
-    * @param {Firestore} db The Firebase Firestore database.
-    * @return {firestore.CollectionGroup<firestore.DocumentData>} The corresponding collection group.
-    */
+   * Returns the corresponding Firebase Firestore collection group for the document type.
+   * @param {Firestore} db The Firebase Firestore database.
+   * @return {firestore.CollectionGroup<firestore.DocumentData>} The corresponding collection group.
+   */
   getCollectionGroup(db: firestore.Firestore): firestore.CollectionGroup<firestore.DocumentData> {
     FB.assertFirestoreIsNotNullish(db);
 
@@ -247,11 +247,11 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
   }
 
   /**
-    * Returns the corresponding Firebase Firestore typed collection reference for the document type.
-    * @param {Firestore} db The Firebase Firestore database.
-    * @param {Array<INestedCollectionStep>} [pathFromRoot=[]] The path to the nested collection from the root of the database.
-    * @return {firestore.CollectionReference<T>} The corresponding typed collection reference.
-    */
+   * Returns the corresponding Firebase Firestore typed collection reference for the document type.
+   * @param {Firestore} db The Firebase Firestore database.
+   * @param {Array<INestedCollectionStep>} [pathFromRoot=[]] The path to the nested collection from the root of the database.
+   * @return {firestore.CollectionReference<T>} The corresponding typed collection reference.
+   */
   getTypedCollection(db: firestore.Firestore, pathFromRoot: Array<INestedCollectionStep> = []): firestore.CollectionReference<T> {
     const collection = this.getCollection(db, pathFromRoot);
     const dataConverter = CollectionDescriptor.getDataConverter<T>();
@@ -259,10 +259,10 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
   }
 
   /**
-    * Returns the corresponding Firebase Firestore typed collection group for the document type.
-    * @param {Firestore} db The Firebase Firestore database.
-    * @return {firestore.CollectionGroup<T>} The corresponding typed collection group.
-    */
+   * Returns the corresponding Firebase Firestore typed collection group for the document type.
+   * @param {Firestore} db The Firebase Firestore database.
+   * @return {firestore.CollectionGroup<T>} The corresponding typed collection group.
+   */
   getTypedCollectionGroup(db: firestore.Firestore): firestore.CollectionGroup<T> {
     const collectionGroup = this.getCollectionGroup(db);
     const dataConverter = CollectionDescriptor.getDataConverter<T>();
@@ -270,12 +270,12 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
   }
 
   /**
-    * Loads the required document instances into the Firebase Firestore collection corresponding to the document type.
-    * @param {Firestore} db The Firebase Firestore database.
-    * @param {boolean} eraseExistingDocs Whether to erase the existing documents in the collection before loading the currently required documents.
-    * @param {Array<INestedCollectionStep>} [pathFromRoot=[]] The path to the nested collection from the root of the database.
-    * @return {Promise<void>} A Promise containing an empty result.
-    */
+   * Loads the required document instances into the Firebase Firestore collection corresponding to the document type.
+   * @param {Firestore} db The Firebase Firestore database.
+   * @param {boolean} eraseExistingDocs Whether to erase the existing documents in the collection before loading the currently required documents.
+   * @param {Array<INestedCollectionStep>} [pathFromRoot=[]] The path to the nested collection from the root of the database.
+   * @return {Promise<void>} A Promise containing an empty result.
+   */
   async loadRequiredDocuments(db: firestore.Firestore, eraseExistingDocs: boolean, pathFromRoot: Array<INestedCollectionStep> = []): Promise<void> { // eslint-disable-line max-len
     const collectionRef = this.getTypedCollection(db, pathFromRoot);
 
@@ -292,17 +292,17 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
   }
 
   /**
-    * The set of queries useful for reading and editing document instances of type T.
-    * @type {Q}
-    */
+   * The set of queries useful for reading and editing document instances of type T.
+   * @type {Q}
+   */
   get queries(): Q {
     return this._queries;
   }
 
   /**
-    * Whether a non-null factory function exists.
-    * @type {boolean}
-    */
+   * Whether a non-null factory function exists.
+   * @type {boolean}
+   */
   get canCreateInstance(): boolean {
     if (TC.isNullish(this._factoryFunction)) {
       return false;
@@ -311,9 +311,9 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
   }
 
   /**
-    * The factory function that creates an instance. Check canCreateInstance first, as this property throws Error if no factory function exists.
-    * @type {F}
-    */
+   * The factory function that creates an instance. Check canCreateInstance first, as this property throws Error if no factory function exists.
+   * @type {F}
+   */
   get createInstance(): F {
     if (TC.isNullish(this._factoryFunction)) {
       throw new Error("No factor function exists for the collection.");

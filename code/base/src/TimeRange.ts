@@ -10,9 +10,9 @@ import * as TC from "./TypeChecking";
 export const Timestamp_Seconds_MIN = -62135596800; // eslint-disable-line camelcase
 
 /**
-  * @constant
-  * @type {number}
-  */
+ * @constant
+ * @type {number}
+ */
 export const Timestamp_Nanoseconds_MIN = 0; // eslint-disable-line camelcase
 
 /**
@@ -126,10 +126,10 @@ export class TimeRange extends Object implements BT.ITimeRange {
   private _end: BT.ITimestamp | null;
 
   /**
-    * Create a TimeRange, where the start Timestamp must be strictly less than the end Timestamp (when Timestamps are the same, the second argument must be omitted).
-    * @param {BT.ITimestamp} start The start of the TimeRange.
-    * @param {BT.ITimestamp | null} [end=null] The end of the TimeRange.
-    */
+   * Create a TimeRange, where the start Timestamp must be strictly less than the end Timestamp (when Timestamps are the same, the second argument must be omitted).
+   * @param {BT.ITimestamp} start The start of the TimeRange.
+   * @param {BT.ITimestamp | null} [end=null] The end of the TimeRange.
+   */
   constructor(start: BT.ITimestamp, end: BT.ITimestamp | null = null) {
     super();
 
@@ -176,25 +176,25 @@ export class TimeRange extends Object implements BT.ITimeRange {
   }
 
   /**
-    * The start of the TimeRange.
-    * @type {BT.ITimestamp}
-    */
+   * The start of the TimeRange.
+   * @type {BT.ITimestamp}
+   */
   get start(): BT.ITimestamp {
     return this._start;
   }
 
   /**
-    * The end of the TimeRange.
-    * @type {BT.ITimestamp}
-    */
+   * The end of the TimeRange.
+   * @type {BT.ITimestamp}
+   */
   get end(): BT.ITimestamp {
     return (!TC.isNullish(this._end)) ? (this._end as BT.ITimestamp) : this._start;
   }
 
   /**
-    * The duration of the TimeRange.
-    * @type {BT.IDuration}
-    */
+   * The duration of the TimeRange.
+   * @type {BT.IDuration}
+   */
   get duration(): BT.IDuration {
     const secondsDiff = (this.end.seconds - this.start.seconds);
     const nanosecondsDiff = (this.end.nanoseconds - this.start.nanoseconds);
@@ -204,28 +204,28 @@ export class TimeRange extends Object implements BT.ITimeRange {
   }
 
   /**
-    * Whether the duration of the TimeRange is empty (aka zero).
-    * @type {boolean}
-    */
+   * Whether the duration of the TimeRange is empty (aka zero).
+   * @type {boolean}
+   */
   get isPointInTime(): boolean {
     return this.duration.isEmpty;
   }
 
   /**
-    * An orderable key for the TimeRange.
-    * @type {string}
-    */
+   * An orderable key for the TimeRange.
+   * @type {string}
+   */
   get orderableKey(): string {
     return createOrderableKey(this._start, this._end);
   }
 
   /**
-    * Determines whether the TimeRange contains the Timestamp.
-    * @param {BT.ITimestamp} timestamp The timestamp to check.
-    * @param {boolean} [includeStartOfRange=Default_IncludeStartOfRange] The timestamp to check.
-    * @param {boolean} [includeEndOfRange=Default_IncludeEndOfRange] The timestamp to check.
-    * @return {string} The string representation of the nanoseconds value.
-    */
+   * Determines whether the TimeRange contains the Timestamp.
+   * @param {BT.ITimestamp} timestamp The timestamp to check.
+   * @param {boolean} [includeStartOfRange=Default_IncludeStartOfRange] The timestamp to check.
+   * @param {boolean} [includeEndOfRange=Default_IncludeEndOfRange] The timestamp to check.
+   * @return {string} The string representation of the nanoseconds value.
+   */
   contains(timestamp: BT.ITimestamp, includeStartOfRange: boolean = Default_IncludeStartOfRange, includeEndOfRange: boolean = Default_IncludeEndOfRange): boolean {
     const startValue = this.start.valueOf();
     const endValue = this.end.valueOf();
