@@ -180,22 +180,9 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   const localeDefaultNonNull = OPA.convertNonNullish(localeDefault);
   const timeZoneGroupDefaultNonNull = OPA.convertNonNullish(timeZoneGroupDefault);
 
-  const userOwner = OpaDm.createArchiveOwner(ownerFirebaseAuthUserId, authProviderNonNull, ownerAccountName, localeDefaultNonNull, timeZoneGroupDefaultNonNull, ownerFirstName, ownerLastName);
-  const userCollectionRef = OpaDb.Users.getTypedCollection(db);
-  const userOwnerDocumentRef = userCollectionRef.doc(userOwner.id);
-
-  const batchUpdate = db.batch(); // REPLACES: await userOwnerDocumentRef.set(userOwner, {merge: true});
-  batchUpdate.set(userOwnerDocumentRef, userOwner, {merge: true});
-  const firebaseAuthUserIdIndexCollectionRef = db.collection(OpaDm.Index_User_FirebaseAuthUserId.indexCollectionName);
-  const firebaseAuthUserIdIndexDocRef = firebaseAuthUserIdIndexCollectionRef.doc(OpaDm.Index_User_FirebaseAuthUserId.getDocumentId(userOwner.firebaseAuthUserId));
-  batchUpdate.set(firebaseAuthUserIdIndexDocRef, {value: userOwner.id});
-  const authAccountNameIndexCollectionRef = db.collection(OpaDm.Index_User_AuthAccountName.indexCollectionName);
-  const authAccountNameIndexDocRef = authAccountNameIndexCollectionRef.doc(OpaDm.Index_User_AuthAccountName.getDocumentId(userOwner.authAccountName));
-  batchUpdate.set(authAccountNameIndexDocRef, {value: userOwner.id});
-  const authAccountNameLoweredIndexCollectionRef = dataStorageState.db.collection(OpaDm.Index_User_AuthAccountNameLowered.indexCollectionName);
-  const authAccountNameLoweredIndexDocRef = authAccountNameLoweredIndexCollectionRef.doc(OpaDm.Index_User_AuthAccountNameLowered.getDocumentId(userOwner.authAccountNameLowered));
-  batchUpdate.set(authAccountNameLoweredIndexDocRef, {value: userOwner.id});
-  await batchUpdate.commit();
+  const userOwnerId = await OpaDb.Users.queries.createArchiveOwner(db, ownerFirebaseAuthUserId, authProviderNonNull, ownerAccountName, localeDefaultNonNull, timeZoneGroupDefaultNonNull, ownerFirstName, ownerLastName);
+  const userOwner_Nullable = await OpaDb.Users.queries.getById(db, userOwnerId);
+  const userOwner = OPA.convertNonNullish(userOwner_Nullable);
 
   // 4) Create the Archive document for the Archive
   await OpaDb.Archive.queries.createArchive(db, archiveName, archiveDescription, pathToStorageFolder, userOwner, localeDefaultNonNull, timeZoneGroupDefaultNonNull);

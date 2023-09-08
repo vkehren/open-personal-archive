@@ -109,23 +109,7 @@ export async function initializeUserAccount(callState: OpaDm.ICallState, authPro
   const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getById(db, systemState.archive.defaultTimeZoneGroupId);
   OPA.assertDocumentIsValid(timeZoneGroup, "The required TimeZoneGroup does not exist.");
 
-  const userCollectionRef = OpaDb.Users.getTypedCollection(db);
-  const userDocumentRef = userCollectionRef.doc();
-  const userId = userDocumentRef.id;
-  const user = OpaDb.Users.createInstance(userId, firebaseAuthUserId, OPA.convertNonNullish(authProvider), authAccountName, OPA.convertNonNullish(assignedRole), OPA.convertNonNullish(locale), OPA.convertNonNullish(timeZoneGroup), firstName, lastName);
-
-  const batchUpdate = db.batch(); // REPLACES: await userDocumentRef.set(user, {merge: true});
-  batchUpdate.set(userDocumentRef, user, {merge: true});
-  const firebaseAuthUserIdIndexCollectionRef = db.collection(OpaDm.Index_User_FirebaseAuthUserId.indexCollectionName);
-  const firebaseAuthUserIdIndexDocRef = firebaseAuthUserIdIndexCollectionRef.doc(OpaDm.Index_User_FirebaseAuthUserId.getDocumentId(user.firebaseAuthUserId));
-  batchUpdate.set(firebaseAuthUserIdIndexDocRef, {value: user.id});
-  const authAccountNameIndexCollectionRef = db.collection(OpaDm.Index_User_AuthAccountName.indexCollectionName);
-  const authAccountNameIndexDocRef = authAccountNameIndexCollectionRef.doc(OpaDm.Index_User_AuthAccountName.getDocumentId(user.authAccountName));
-  batchUpdate.set(authAccountNameIndexDocRef, {value: user.id});
-  const authAccountNameLoweredIndexCollectionRef = db.collection(OpaDm.Index_User_AuthAccountNameLowered.indexCollectionName);
-  const authAccountNameLoweredIndexDocRef = authAccountNameLoweredIndexCollectionRef.doc(OpaDm.Index_User_AuthAccountNameLowered.getDocumentId(user.authAccountNameLowered));
-  batchUpdate.set(authAccountNameLoweredIndexDocRef, {value: user.id});
-  await batchUpdate.commit();
+  const userId = await OpaDb.Users.queries.createUser(db, firebaseAuthUserId, OPA.convertNonNullish(authProvider), authAccountName, OPA.convertNonNullish(assignedRole), OPA.convertNonNullish(locale), OPA.convertNonNullish(timeZoneGroup), firstName, lastName);
 
   const userReRead = await OpaDb.Users.queries.getById(db, userId);
   OPA.assertDocumentIsValid(userReRead, "The requested User does not exist.");

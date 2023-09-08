@@ -113,6 +113,8 @@ function areUpdatesValid(user: IUser, userUpdateObject: IUserPartial): boolean {
  * @return {IUser} The new document instance.
  */
 function createInstance(id: string, firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, assignedRole: IRole, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): IUser { // eslint-disable-line max-len
+  OPA.assertIsTrue(assignedRole.id != Role_OwnerId, "The Archive Owner cannot be constructed as a normal User.");
+
   const now = OPA.nowToUse();
   const document: IUser = {
     id: id,
@@ -252,6 +254,90 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
       return null;
     }
     return matchingUsersSnap.docs[0].data();
+  }
+
+  /**
+   * Creates the instance of the IUser document type that owns the Archive stored on the server.
+   * @param {Firestore} db The Firestore Database.
+   * @param {string} firebaseAuthUserId The ID for the User within the Firebase Authentication system.
+   * @param {IAuthenticationProvider} authProvider The AuthenticationProvider for the User's account.
+   * @param {string} authAccountName The name of the User's account with the specified AuthenticationProvider.
+   * @param {ILocale} locale The Locale selected by the User.
+   * @param {ITimeZoneGroup} timeZoneGroup The TimeZoneGroup selected by the User.
+   * @param {string} firstName The User's first name.
+   * @param {string} lastName The User's last name.
+   * @param {string | null} preferredName The name by which the User wishes to be called.
+   * @return {IUser} The new document instance.
+   */
+  async createArchiveOwner(db: firestore.Firestore, firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): Promise<string> { // eslint-disable-line max-len
+    const owner = createArchiveOwner(firebaseAuthUserId, authProvider, authAccountName, locale, timeZoneGroup, firstName, lastName, preferredName);
+    const ownerId = owner.id;
+
+    OPA.assertNonNullish(owner);
+    OPA.assertNonNullish(owner.updateHistory);
+    OPA.assertIsTrue(owner.id == User_OwnerId);
+    OPA.assertIsTrue(ownerId == User_OwnerId);
+    OPA.assertIsTrue(owner.updateHistory.length == 1);
+
+    const usersCollectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const ownerRef = usersCollectionRef.doc(ownerId);
+
+    // REPLACES: await ownerRef.set(owner, {merge: true});
+    const batchUpdate = db.batch();
+    batchUpdate.set(ownerRef, owner, {merge: true});
+    const firebaseAuthUserIdIndexCollectionRef = db.collection(Index_User_FirebaseAuthUserId.indexCollectionName);
+    const firebaseAuthUserIdIndexDocRef = firebaseAuthUserIdIndexCollectionRef.doc(Index_User_FirebaseAuthUserId.getDocumentId(owner.firebaseAuthUserId));
+    batchUpdate.set(firebaseAuthUserIdIndexDocRef, {value: owner.id});
+    const authAccountNameIndexCollectionRef = db.collection(Index_User_AuthAccountName.indexCollectionName);
+    const authAccountNameIndexDocRef = authAccountNameIndexCollectionRef.doc(Index_User_AuthAccountName.getDocumentId(owner.authAccountName));
+    batchUpdate.set(authAccountNameIndexDocRef, {value: owner.id});
+    const authAccountNameLoweredIndexCollectionRef = db.collection(Index_User_AuthAccountNameLowered.indexCollectionName);
+    const authAccountNameLoweredIndexDocRef = authAccountNameLoweredIndexCollectionRef.doc(Index_User_AuthAccountNameLowered.getDocumentId(owner.authAccountNameLowered));
+    batchUpdate.set(authAccountNameLoweredIndexDocRef, {value: owner.id});
+    await batchUpdate.commit();
+    return ownerId;
+  }
+
+  /**
+   * Creates an instance of the IUser document type stored on the server.
+   * @param {Firestore} db The Firestore Database.
+   * @param {string} id The ID for the User within the OPA system.
+   * @param {string} firebaseAuthUserId The ID for the User within the Firebase Authentication system.
+   * @param {IAuthenticationProvider} authProvider The AuthenticationProvider for the User's account.
+   * @param {string} authAccountName The name of the User's account with the specified AuthenticationProvider.
+   * @param {IRole} assignedRole The Role to which the User is initially assigned.
+   * @param {ILocale} locale The Locale selected by the User.
+   * @param {ITimeZoneGroup} timeZoneGroup The TimeZoneGroup selected by the User.
+   * @param {string} firstName The User's first name.
+   * @param {string} lastName The User's last name.
+   * @param {string | null} preferredName The name by which the User wishes to be called.
+   * @return {Promise<string>} The new document instance.
+   */
+  async createUser(db: firestore.Firestore, firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, assignedRole: IRole, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): Promise<string> { // eslint-disable-line max-len
+    const usersCollectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const userRef = usersCollectionRef.doc();
+    const userId = userRef.id;
+    const user = createInstance(userId, firebaseAuthUserId, authProvider, authAccountName, assignedRole, locale, timeZoneGroup, firstName, lastName, preferredName);
+
+    OPA.assertNonNullish(user);
+    OPA.assertNonNullish(user.updateHistory);
+    OPA.assertIsTrue(user.id == userId);
+    OPA.assertIsTrue(user.updateHistory.length == 1);
+
+    // REPLACES: await userRef.set(user, {merge: true});
+    const batchUpdate = db.batch();
+    batchUpdate.set(userRef, user, {merge: true});
+    const firebaseAuthUserIdIndexCollectionRef = db.collection(Index_User_FirebaseAuthUserId.indexCollectionName);
+    const firebaseAuthUserIdIndexDocRef = firebaseAuthUserIdIndexCollectionRef.doc(Index_User_FirebaseAuthUserId.getDocumentId(user.firebaseAuthUserId));
+    batchUpdate.set(firebaseAuthUserIdIndexDocRef, {value: user.id});
+    const authAccountNameIndexCollectionRef = db.collection(Index_User_AuthAccountName.indexCollectionName);
+    const authAccountNameIndexDocRef = authAccountNameIndexCollectionRef.doc(Index_User_AuthAccountName.getDocumentId(user.authAccountName));
+    batchUpdate.set(authAccountNameIndexDocRef, {value: user.id});
+    const authAccountNameLoweredIndexCollectionRef = db.collection(Index_User_AuthAccountNameLowered.indexCollectionName);
+    const authAccountNameLoweredIndexDocRef = authAccountNameLoweredIndexCollectionRef.doc(Index_User_AuthAccountNameLowered.getDocumentId(user.authAccountNameLowered));
+    batchUpdate.set(authAccountNameLoweredIndexDocRef, {value: user.id});
+    await batchUpdate.commit();
+    return userId;
   }
 
   /**
