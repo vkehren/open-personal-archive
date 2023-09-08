@@ -25,12 +25,12 @@ export interface IAuthorizationData {
 }
 
 /**
-    * Gets an AuthorizationData instance for the Archive, User, and Role specified in the input state objects.
-    * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
-    * @param {OpaDm.ISystemState} systemState The System state for the relevant Archive.
-    * @param {OpaDm.IAuthorizationState} authorizationState The Authorization state for the current User.
-    * @return {IAuthorizationData} The corresponding Authorization data.
-    */
+ * Gets an AuthorizationData instance for the Archive, User, and Role specified in the input state objects.
+ * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
+ * @param {OpaDm.ISystemState} systemState The System state for the relevant Archive.
+ * @param {OpaDm.IAuthorizationState} authorizationState The Authorization state for the current User.
+ * @return {IAuthorizationData} The corresponding Authorization data.
+ */
 export function getAuthorizationDataForDisplayModel(dataStorageState: OpaDm.IDataStorageState, systemState: OpaDm.ISystemState, authorizationState: OpaDm.IAuthorizationState): IAuthorizationData {
   if (OPA.isNullish(dataStorageState) || OPA.isNullish(systemState) || OPA.isNullish(authorizationState)) {
     throw new Error("The DataStorageState, SystemState, and AuthorizationState must not be null.");
