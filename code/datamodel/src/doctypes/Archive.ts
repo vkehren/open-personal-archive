@@ -90,6 +90,33 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
   }
 
   /**
+   * Creates an instance of the IArchive document type stored on the server.
+   * @param {Firestore} db The Firestore Database.
+   * @param {string} name The name of the Archive.
+   * @param {string} description A description of the Archive.
+   * @param {string} pathToStorageFolder The path to the root folder for storing files in Firebase Storage.
+   * @param {IUser} owner The User who owns the Archive.
+   * @param {ILocale} defaultLocale The default Locale to use for the Archive.
+   * @param {ITimeZoneGroup} defaultTimeZoneGroup The default TimeZoneGroup to use for the Archive.
+   * @return {string} The new document ID.
+   */
+  async createArchive(db: firestore.Firestore, name: string, description: string, pathToStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): Promise<string> {
+    const archive = createSingleton(name, description, pathToStorageFolder, owner, defaultLocale, defaultTimeZoneGroup);
+    const archiveId = archive.id;
+
+    OPA.assertNonNullish(archive);
+    OPA.assertNonNullish(archive.updateHistory);
+    OPA.assertIsTrue(archive.id == SingletonId);
+    OPA.assertIsTrue(archiveId == SingletonId);
+    OPA.assertIsTrue(archive.updateHistory.length == 1);
+
+    const archivesCollectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const archiveRef = archivesCollectionRef.doc(archiveId);
+    await archiveRef.set(archive, {merge: true});
+    return archiveId;
+  }
+
+  /**
    * Updates the Archive stored on the server using an IArchivePartial object.
    * @param {Firestore} db The Firestore Database.
    * @param {IArchivePartial} archiveUpdateObject The object containing the updates.

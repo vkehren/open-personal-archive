@@ -1,6 +1,6 @@
 import * as OPA from "../../../base/src";
 import * as OpaDm from "../../../datamodel/src";
-import {createApplication, createArchive, OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
+import {createApplication, OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
 import * as DMU from "../DisplayModelUtilities";
 import * as SchemaInfo from "../../../datamodel/src/PackageInfo";
 import * as ApplicationInfo from "../PackageInfo";
@@ -201,10 +201,7 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   await batchUpdate.commit();
 
   // 4) Create the Archive document for the Archive
-  const archive = createArchive(archiveName, archiveDescription, pathToStorageFolder, userOwner, localeDefaultNonNull, timeZoneGroupDefaultNonNull);
-  const archiveCollectionRef = OpaDb.Archive.getTypedCollection(db);
-  const archiveDocumentRef = archiveCollectionRef.doc(archive.id);
-  await archiveDocumentRef.set(archive, {merge: true});
+  await OpaDb.Archive.queries.createArchive(db, archiveName, archiveDescription, pathToStorageFolder, userOwner, localeDefaultNonNull, timeZoneGroupDefaultNonNull);
 }
 
 /**
