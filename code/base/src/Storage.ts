@@ -77,7 +77,7 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
   private _isSingleton: boolean;
   private _parentCollectionDescriptor: ICollectionDescriptor | null;
   private _propertyIndices: Array<IPropertyIndexDescriptor>;
-  private _requiredDocuments: Array<T>;
+  private _requiredDocuments: Array<T> | (() => Array<T>);
   private _queries: Q;
   private _factoryFunction: F | null;
 
@@ -97,10 +97,10 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
    * @param {boolean} isSingleton Whether the collection is ONLY allowed to contain a single document of type T or not.
    * @param {QR.QuerySetConstructor<Q, T>} [querySetConstructor] The function that constructs the object containing the set of queries useful for reading and editing document instances of type T.
    * @param {ICollectionDescriptor | null} [parentCollectionDescriptor=null] The descriptor of the parent collection, if one exists.
-   * @param {Array<T>} [requiredDocuments=[]] The list of documents that must exist in a valid installation of the system.
+   * @param {Array<T> | (() => Array<T>)} [requiredDocuments=[]] The list of documents that must exist in a valid installation of the system.
    * @param {F} [factoryFunction=null] The factory function that creates a document instance of type T.
    */
-  constructor(singularName: string, pluralName: string, isSingleton: boolean, querySetConstructor: QR.QuerySetConstructor<Q, T>, parentCollectionDescriptor: ICollectionDescriptor | null = null, requiredDocuments: Array<T> = [], factoryFunction: F | null = null) { // eslint-disable-line max-len
+  constructor(singularName: string, pluralName: string, isSingleton: boolean, querySetConstructor: QR.QuerySetConstructor<Q, T>, parentCollectionDescriptor: ICollectionDescriptor | null = null, requiredDocuments: Array<T> | (() => Array<T>) = [], factoryFunction: F | null = null) { // eslint-disable-line max-len
     let rootDescriptor = parentCollectionDescriptor;
     while (!TC.isNullish(rootDescriptor)) {
       if (rootDescriptor == this) {
@@ -180,7 +180,8 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
    * @type {Array<T>}
    */
   get requiredDocuments(): Array<T> {
-    return this._requiredDocuments.slice();
+    const requiredDocuments = (TC.isArray(this._requiredDocuments)) ? (this._requiredDocuments as Array<T>) : (this._requiredDocuments as (() => Array<T>))();
+    return requiredDocuments.slice();
   }
 
   /**
@@ -283,8 +284,9 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
       await FB.clearFirestoreCollection(collectionRef);
     }
 
-    for (let i = 0; i < this.requiredDocuments.length; i++) {
-      const requiredDocument = this.requiredDocuments[i];
+    const requiredDocuments = this.requiredDocuments;
+    for (let i = 0; i < requiredDocuments.length; i++) {
+      const requiredDocument = requiredDocuments[i];
       const documentId = requiredDocument.id;
       const documentRef = collectionRef.doc(documentId);
       await documentRef.set(requiredDocument, {merge: true});
