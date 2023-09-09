@@ -117,3 +117,11 @@ export async function initializeUserAccount(callState: OpaDm.ICallState, authPro
 
   return userReReadNonNull;
 }
+
+// LATER: export async function updateUserSettings(...)
+
+// LATER: export async function updateUserApprovalState(...)
+
+// LATER: export async function assignUserToRole(...)
+
+// LATER: export async function disableUser(...)

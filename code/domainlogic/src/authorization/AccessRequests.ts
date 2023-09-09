@@ -26,11 +26,3 @@ export async function requestUserAccess(callState: OpaDm.ICallState, message: st
   const newAccessRequest = OpaDb.AccessRequests.createInstance(currentUser, currentLocale, newAccessRequestRef.id, archive.id, currentUser.id, message, citationId);
   await newAccessRequestRef.set(newAccessRequest, {merge: true});
 }
-
-// LATER: export async function updateUserSettings(...)
-
-// LATER: export async function updateUserApprovalState(...)
-
-// LATER: export async function assignUserToRole(...)
-
-// LATER: export async function disableUser(...)
