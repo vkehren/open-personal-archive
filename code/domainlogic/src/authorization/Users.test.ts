@@ -113,7 +113,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.userIdOfDeleter).equals(null);
 
     const firstName_Updated = (userNonNull.firstName + " UPDATED");
-    let userUpdateObject = ({firstName: firstName_Updated, hasBeenUpdated: true, dateOfLatestUpdate: OPA.nowToUse()} as OpaDm.IUserPartial);
+    let userUpdateObject = ({firstName: firstName_Updated} as OpaDm.IUserPartial);
     await OpaDb.Users.queries.updateUser(config.dataStorageState.db, userId, userUpdateObject, config.firebaseConstructorProvider);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
     expect(user).not.equals(null);
@@ -141,7 +141,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.userIdOfDeleter).equals(null);
 
     const lastName_Updated = (userNonNull.lastName + " UPDATED");
-    userUpdateObject = ({lastName: lastName_Updated, hasBeenUpdated: true, dateOfLatestUpdate: OPA.nowToUse()} as OpaDm.IUserPartial);
+    userUpdateObject = ({lastName: lastName_Updated} as OpaDm.IUserPartial);
     await OpaDb.Users.queries.updateUser(config.dataStorageState.db, userId, userUpdateObject, config.firebaseConstructorProvider);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
     expect(user).not.equals(null);
@@ -169,7 +169,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.userIdOfDeleter).equals(null);
 
     const recentQueries_Updated = ["what?"];
-    userUpdateObject = ({recentQueries: recentQueries_Updated, hasBeenUpdated: true, dateOfLatestUpdate: OPA.nowToUse()} as OpaDm.IUserPartial);
+    userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
     await OpaDb.Users.queries.updateUser(config.dataStorageState.db, userId, userUpdateObject, config.firebaseConstructorProvider);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
     expect(user).not.equals(null);
@@ -274,7 +274,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await expect(OpaDb.Users.queries.markAsDeleted(config.dataStorageState.db, userId, owner.id, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
+    await expect(OpaDb.Users.queries.markUserAsDeleted(config.dataStorageState.db, userId, owner.id, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
     expect(user).not.equals(null);
 
@@ -337,7 +337,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState.db, config.authenticationState.firebaseAuthUserId);
     expect(user).equals(null);
 
-    await Users.initializeUserAccount(callState, config.authenticationState.providerId, config.authenticationState.email);
+    user = await Users.initializeUserAccount(callState, config.authenticationState.providerId, config.authenticationState.email);
+    expect(user).not.equals(null);
     user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState.db, config.authenticationState.firebaseAuthUserId);
     expect(user).not.equals(null);
 
@@ -365,7 +366,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.userIdOfDeleter).equals(null);
 
     const firstName_Updated = (userNonNull.firstName + " UPDATED");
-    let userUpdateObject = ({firstName: firstName_Updated, hasBeenUpdated: true, dateOfLatestUpdate: OPA.nowToUse()} as OpaDm.IUserPartial);
+    let userUpdateObject = ({firstName: firstName_Updated} as OpaDm.IUserPartial);
     await OpaDb.Users.queries.updateUser(config.dataStorageState.db, userId, userUpdateObject, config.firebaseConstructorProvider);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
     expect(user).not.equals(null);
@@ -393,7 +394,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.userIdOfDeleter).equals(null);
 
     const lastName_Updated = (userNonNull.lastName + " UPDATED");
-    userUpdateObject = ({lastName: lastName_Updated, hasBeenUpdated: true, dateOfLatestUpdate: OPA.nowToUse()} as OpaDm.IUserPartial);
+    userUpdateObject = ({lastName: lastName_Updated} as OpaDm.IUserPartial);
     await OpaDb.Users.queries.updateUser(config.dataStorageState.db, userId, userUpdateObject, config.firebaseConstructorProvider);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
     expect(user).not.equals(null);
@@ -421,7 +422,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.userIdOfDeleter).equals(null);
 
     const recentQueries_Updated = ["what?"];
-    userUpdateObject = ({recentQueries: recentQueries_Updated, hasBeenUpdated: true, dateOfLatestUpdate: OPA.nowToUse()} as OpaDm.IUserPartial);
+    userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
     await OpaDb.Users.queries.updateUser(config.dataStorageState.db, userId, userUpdateObject, config.firebaseConstructorProvider);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
     expect(user).not.equals(null);
@@ -526,7 +527,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await OpaDb.Users.queries.markAsDeleted(config.dataStorageState.db, userId, owner.id, config.firebaseConstructorProvider);
+    await OpaDb.Users.queries.markUserAsDeleted(config.dataStorageState.db, userId, owner.id, config.firebaseConstructorProvider);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
     expect(user).not.equals(null);
 
