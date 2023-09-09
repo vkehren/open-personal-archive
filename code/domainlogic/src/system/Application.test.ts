@@ -286,17 +286,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     const newApplicationVersion = applicationNonNull.applicationVersion;
     const newSchemaVersion = applicationNonNull.schemaVersion;
 
-    // NOTE: DO NOT use updateApplication(...) because we are back-setting the version
-    let applicationPartial: OpaDm.IApplicationPartial & OPA.IUpgradeable_ByUser = {
-      applicationVersion: oldVersion,
-      schemaVersion: oldVersion,
-      hasBeenUpgraded: false,
-      dateOfLatestUpgrade: null,
-      userIdOfLatestUpgrader: null,
-    };
-    (applicationPartial as any).upgradeHistory = [OPA.copyObject(applicationPartial)];
+    // NOTE: We must downgrade initial version numbers to test upgrade works properly, but we cannot use updateApplication(...) to do downgrade, so we must update the server fields directly
+    await expect(OpaDb.Application.queries.updateApplication(config.dataStorageState.db, {applicationVersion: oldVersion, schemaVersion: oldVersion}, OpaDm.User_OwnerId, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
     const applicationRef = OpaDb.Application.getTypedCollection(config.dataStorageState.db).doc(applicationNonNull.id);
-    await applicationRef.set(applicationPartial, {merge: true});
+    await applicationRef.update({applicationVersion: oldVersion, schemaVersion: oldVersion});
 
     application = await OpaDb.Application.queries.getById(config.dataStorageState.db, OpaDm.ApplicationId);
     OPA.assertDocumentIsValid(application, "The Application does not exist.");
