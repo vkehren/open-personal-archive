@@ -25,6 +25,33 @@ export interface IApplication extends OPA.IDocument_Upgradeable_ByUser {
 }
 
 /**
+ * Checks whether the specified updates to a Application document are valid.
+ * @param {IApplication} application The Application document being updated.
+ * @param {IApplicationPartial} applicationUpdateObject The updates specified.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+function areUpdatesValid(application: IApplication, applicationUpdateObject: IApplicationPartial): boolean {
+  OPA.assertNonNullish(application);
+  OPA.assertNonNullish(applicationUpdateObject);
+
+  // NOTE: The "applicationVersion" cannot be downgraded or updated to same value as current value
+  if (!OPA.isNullish(applicationUpdateObject.applicationVersion)) {
+    const applicationVersion_Updated = OPA.convertNonNullish(applicationUpdateObject.applicationVersion);
+    if (OPA.compareVersionNumberStrings(application.applicationVersion, applicationVersion_Updated) < 1) {
+      return false;
+    }
+  }
+  // NOTE: The "schemaVersion" cannot be downgraded or updated to same value as current value
+  if (!OPA.isNullish(applicationUpdateObject.schemaVersion)) {
+    const schemaVersion_Updated = OPA.convertNonNullish(applicationUpdateObject.schemaVersion);
+    if (OPA.compareVersionNumberStrings(application.schemaVersion, schemaVersion_Updated) < 1) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
  * Creates an instance of the IApplication document type.
  * @param {string} applicationVersion The version of the OPA application code.
  * @param {string} schemaVersion The version of the OPA database schema.
@@ -105,9 +132,8 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
 
     const application = await this.getById(db, applicationId);
     OPA.assertNonNullish(application);
-    // NOTE: If needed, implement "areUpdatesValid" function
-    // const areValid = areUpdatesValid(OPA.convertNonNullish(application), applicationUpdateObject_WithHistory);
-    // OPA.assertIsTrue(areValid, "The requested update is invalid.");
+    const areValid = areUpdatesValid(OPA.convertNonNullish(application), applicationUpdateObject_WithHistory);
+    OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const applicationsCollectionRef = this.collectionDescriptor.getTypedCollection(db);
     const applicationRef = applicationsCollectionRef.doc(applicationId);
