@@ -98,7 +98,7 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
    * @param {IUser} owner The User who owns the Archive.
    * @param {ILocale} defaultLocale The default Locale to use for the Archive.
    * @param {ITimeZoneGroup} defaultTimeZoneGroup The default TimeZoneGroup to use for the Archive.
-   * @return {string} The new document ID.
+   * @return {Promise<string>} The new document ID.
    */
   async createArchive(db: firestore.Firestore, name: string, description: string, pathToStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): Promise<string> {
     const archive = createSingleton(name, description, pathToStorageFolder, owner, defaultLocale, defaultTimeZoneGroup);

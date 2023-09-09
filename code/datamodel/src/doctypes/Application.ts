@@ -69,7 +69,7 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
    * @param {Firestore} db The Firestore Database.
    * @param {string} applicationVersion The version of the OPA application code.
    * @param {string} schemaVersion The version of the OPA database schema.
-   * @return {string} The new document ID.
+   * @return {Promise<string>} The new document ID.
    */
   async createApplication(db: firestore.Firestore, applicationVersion: string, schemaVersion: string): Promise<string> {
     const application = createSingleton(applicationVersion, schemaVersion);

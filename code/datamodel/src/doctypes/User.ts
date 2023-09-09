@@ -267,7 +267,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
    * @param {string} firstName The User's first name.
    * @param {string} lastName The User's last name.
    * @param {string | null} preferredName The name by which the User wishes to be called.
-   * @return {IUser} The new document instance.
+   * @return {Promise<string>} The new document ID.
    */
   async createArchiveOwner(db: firestore.Firestore, firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): Promise<string> { // eslint-disable-line max-len
     const owner = createArchiveOwner(firebaseAuthUserId, authProvider, authAccountName, locale, timeZoneGroup, firstName, lastName, preferredName);
@@ -301,7 +301,6 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   /**
    * Creates an instance of the IUser document type stored on the server.
    * @param {Firestore} db The Firestore Database.
-   * @param {string} id The ID for the User within the OPA system.
    * @param {string} firebaseAuthUserId The ID for the User within the Firebase Authentication system.
    * @param {IAuthenticationProvider} authProvider The AuthenticationProvider for the User's account.
    * @param {string} authAccountName The name of the User's account with the specified AuthenticationProvider.
@@ -311,7 +310,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
    * @param {string} firstName The User's first name.
    * @param {string} lastName The User's last name.
    * @param {string | null} preferredName The name by which the User wishes to be called.
-   * @return {Promise<string>} The new document instance.
+   * @return {Promise<string>} The new document ID.
    */
   async createUser(db: firestore.Firestore, firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, assignedRole: IRole, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): Promise<string> { // eslint-disable-line max-len
     const usersCollectionRef = this.collectionDescriptor.getTypedCollection(db);
