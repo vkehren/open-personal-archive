@@ -1,3 +1,4 @@
+import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../../base/src";
 import * as BT from "../BaseTypes";
 
@@ -54,6 +55,52 @@ function createInstance(id: string, activityType: BT.ActivityType, requestor: st
   return document;
 }
 
-export type QuerySet = OPA.QuerySet<IActivityLogItem>;
+/** Class providing queries for ActivityLogItem collection. */
+export class ActivityLogItemQuerySet extends OPA.QuerySet<IActivityLogItem> {
+  /**
+   * Creates a ActivityLogItemQuerySet.
+   * @param {OPA.ITypedCollectionDescriptor<IActivityLogItem>} collectionDescriptor The collection descriptor to use for queries.
+   */
+  constructor(collectionDescriptor: OPA.ITypedCollectionDescriptor<IActivityLogItem>) {
+    super(collectionDescriptor);
+  }
+
+  /**
+   * The typed collection descriptor to use for queries.
+   * @type {OPA.ITypedQueryableFactoryCollectionDescriptor<IActivityLogItem, ActivityLogItemQuerySet, FactoryFunc>}
+   */
+  get typedCollectionDescriptor(): OPA.ITypedQueryableFactoryCollectionDescriptor<IActivityLogItem, ActivityLogItemQuerySet, FactoryFunc> {
+    return OPA.convertTo<OPA.ITypedQueryableFactoryCollectionDescriptor<IActivityLogItem, ActivityLogItemQuerySet, FactoryFunc>>(this.collectionDescriptor);
+  }
+
+  /**
+   * Creates an instance of the IActivityLogItem document type.
+   * @param {Firestore} db The Firestore Database.
+   * @param {BT.ActivityType} activityType The type of the ActivityLogItem.
+   * @param {string} requestor The URI of the requestor.
+   * @param {string} resource The URI of the resource being requested.
+   * @param {string | null} resourceCanonical The canonical URI of the resource being requested.
+   * @param {string | null} action The action being requested, if any.
+   * @param {any} data The data for the request.
+   * @param {string | null} firebaseAuthUserId The ID for the User within the Firebase Authentication system, if the User is authenticated.
+   * @param {string | null} userId The ID for the User within the OPA system, if the User is authenticated.
+   * @param {any | null} otherState Any other state for the request.
+   * @return {Promise<string>} The new document ID.
+   */
+  async createActivityLogItem(db: firestore.Firestore, activityType: BT.ActivityType, requestor: string, resource: string, resourceCanonical: string | null, action: string | null, data: any, firebaseAuthUserId: string | null = null, userId: string | null = null, otherState: any | null = null): Promise<string> { // eslint-disable-line max-len
+    const activityLogItemsCollectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const logItemRef = activityLogItemsCollectionRef.doc();
+    const logItemId = logItemRef.id;
+    const logItem = createInstance(logItemId, activityType, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState);
+
+    // NOTE: An ActivityLogItem should NOT be updateable
+    OPA.assertNonNullish(logItem);
+    OPA.assertIsTrue(logItem.id == logItemId);
+
+    await logItemRef.set(logItem, {merge: true});
+    return logItemId;
+  }
+}
+
 export type FactoryFunc = (...[params]: Parameters<typeof createInstance>) => ReturnType<typeof createInstance>;
-export const CollectionDescriptor = new OPA.CollectionDescriptor<IActivityLogItem, QuerySet, FactoryFunc>(SingularName, PluralName, IsSingleton, (cd) => new OPA.QuerySet(cd), null, [], createInstance);
+export const CollectionDescriptor = new OPA.CollectionDescriptor<IActivityLogItem, ActivityLogItemQuerySet, FactoryFunc>(SingularName, PluralName, IsSingleton, (cd) => new ActivityLogItemQuerySet(cd), null, [], createInstance);

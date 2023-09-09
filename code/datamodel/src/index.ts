@@ -21,7 +21,7 @@ export const schemaVersion = "0.0.0.1";
 // NOTE: If the CollectionDescriptor represents data that will dynamically be created during usage of system, expose factory function via ITypedFactoryCollectionDescriptor<T, F> interface
 //         -> And for special case instances (e.g. User who is Archive Owner), export the special case factory function directly later below
 export interface IOpaDbDescriptor extends OPA.ICollection {
-  readonly ActivityLogItems: OPA.ITypedQueryableFactoryCollectionDescriptor<ActivityLogItem.IActivityLogItem, ActivityLogItem.QuerySet, ActivityLogItem.FactoryFunc>;
+  readonly ActivityLogItems: OPA.ITypedQueryableFactoryCollectionDescriptor<ActivityLogItem.IActivityLogItem, ActivityLogItem.ActivityLogItemQuerySet, ActivityLogItem.FactoryFunc>;
   readonly AuthProviders: OPA.ITypedQueryableCollectionDescriptor<AuthProvider.IAuthenticationProvider, AuthProvider.AuthenticationProviderQuerySet>;
   readonly Locales: OPA.ITypedQueryableCollectionDescriptor<Locale.ILocale, Locale.QuerySet>;
   readonly Roles: OPA.ITypedQueryableCollectionDescriptor<Role.IRole, Role.QuerySet>;
