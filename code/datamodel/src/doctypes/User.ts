@@ -59,41 +59,43 @@ function areUpdatesValid(user: IUser, userUpdateObject: IUserPartial): boolean {
   OPA.assertNonNullish(user);
   OPA.assertNonNullish(userUpdateObject);
 
+  // NOTE: A deleted document should not be updateable
   if (user.isMarkedAsDeleted) {
     return false;
   }
-  if (user.assignedRoleId != Role_OwnerId) {
-    return true;
-  }
-  if (userUpdateObject.hasOwnProperty(OPA.IViewable_HasBeenViewed_PropertyName)) {
-    return false;
-  }
-  if (userUpdateObject.hasOwnProperty(OPA.IViewable_DateOfLatestViewing_PropertyName)) {
-    return false;
-  }
-  if (userUpdateObject.hasOwnProperty(OPA.IViewable_ByUser_UserIdOfLatestViewer_PropertyName)) {
-    return false;
-  }
-  if (userUpdateObject.hasOwnProperty(OPA.IApprovable_HasBeenDecided_PropertyName)) {
-    return false;
-  }
-  if (userUpdateObject.hasOwnProperty(OPA.IApprovable_ApprovalState_PropertyName)) {
-    return false;
-  }
-  if (userUpdateObject.hasOwnProperty(OPA.IApprovable_DateOfDecision_PropertyName)) {
-    return false;
-  }
-  if (userUpdateObject.hasOwnProperty(OPA.IApprovable_ByUser_UserIdOfDecider_PropertyName)) {
-    return false;
-  }
-  if (userUpdateObject.hasOwnProperty(OPA.IDeleteable_IsMarkedAsDeleted_PropertyName)) {
-    return false;
-  }
-  if (userUpdateObject.hasOwnProperty(OPA.IDeleteable_DateOfDeletion_PropertyName)) {
-    return false;
-  }
-  if (userUpdateObject.hasOwnProperty(OPA.IDeleteable_ByUser_UserIdOfDeleter_PropertyName)) {
-    return false;
+
+  if (user.assignedRoleId == Role_OwnerId) {
+    // NOTE: The Owner starts as already approved and cannot be deleted, so the following properties are invalid to update
+    if (userUpdateObject.hasOwnProperty(OPA.IViewable_HasBeenViewed_PropertyName)) {
+      return false;
+    }
+    if (userUpdateObject.hasOwnProperty(OPA.IViewable_DateOfLatestViewing_PropertyName)) {
+      return false;
+    }
+    if (userUpdateObject.hasOwnProperty(OPA.IViewable_ByUser_UserIdOfLatestViewer_PropertyName)) {
+      return false;
+    }
+    if (userUpdateObject.hasOwnProperty(OPA.IApprovable_HasBeenDecided_PropertyName)) {
+      return false;
+    }
+    if (userUpdateObject.hasOwnProperty(OPA.IApprovable_ApprovalState_PropertyName)) {
+      return false;
+    }
+    if (userUpdateObject.hasOwnProperty(OPA.IApprovable_DateOfDecision_PropertyName)) {
+      return false;
+    }
+    if (userUpdateObject.hasOwnProperty(OPA.IApprovable_ByUser_UserIdOfDecider_PropertyName)) {
+      return false;
+    }
+    if (userUpdateObject.hasOwnProperty(OPA.IDeleteable_IsMarkedAsDeleted_PropertyName)) {
+      return false;
+    }
+    if (userUpdateObject.hasOwnProperty(OPA.IDeleteable_DateOfDeletion_PropertyName)) {
+      return false;
+    }
+    if (userUpdateObject.hasOwnProperty(OPA.IDeleteable_ByUser_UserIdOfDeleter_PropertyName)) {
+      return false;
+    }
   }
   return true;
 }
