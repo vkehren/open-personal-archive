@@ -199,6 +199,22 @@ export interface IDeleteable_ByUser extends IDeleteable {
 export interface IDocument_Deleteable extends IDocument, IDeleteable { }
 export interface IDocument_Deleteable_ByUser extends IDocument_Deleteable, IDeleteable_ByUser { }
 
+// ISuspendable
+export const ISuspendable_IsSuspended_PropertyName = "isSuspended"; // eslint-disable-line camelcase
+export const ISuspendable_DateOfSuspension_PropertyName = "dateOfSuspension"; // eslint-disable-line camelcase
+export const ISuspendable_ReasonForSuspension_PropertyName = "reasonForSuspension"; // eslint-disable-line camelcase
+export interface ISuspendable {
+  readonly isSuspended: boolean;
+  readonly dateOfSuspension: DateToUse | null;
+  readonly reasonForSuspension: string | null;
+}
+export const ISuspendable_ByUser_UserIdOfSuspender_PropertyName = "userIdOfSuspender"; // eslint-disable-line camelcase
+export interface ISuspendable_ByUser extends ISuspendable {
+  readonly userIdOfSuspender: string | null;
+}
+export interface IDocument_Suspendable extends IDocument, ISuspendable { }
+export interface IDocument_Suspendable_ByUser extends IDocument_Suspendable, ISuspendable_ByUser { }
+
 /**
  * Sets the ICreatable properies on the incoming documents and returns the typed result.
  * @param {Array<IN>} documents The documents to promote to ICreatable.
