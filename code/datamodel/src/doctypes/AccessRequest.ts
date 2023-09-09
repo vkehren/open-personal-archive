@@ -46,6 +46,12 @@ function areUpdatesValid(document: IAccessRequest, updateObject: IAccessRequestP
     return false;
   }
 
+  // NOTE: Only the Creator of the AccessRequest can delete it
+  if (!document.isMarkedAsDeleted && (updateObject as OPA.IDeleteable_ByUser).isMarkedAsDeleted) {
+    const userIdOfDeleter = (updateObject as OPA.IDeleteable_ByUser).userIdOfDeleter;
+    return (userIdOfDeleter == document.userIdOfCreator);
+  }
+
   // NOTE: Only the Creator can update the message
   if (!OPA.isNullish(updateObject.message) && !OPA.areEqual(document.message, updateObject.message)) {
     const userIdOfUpdater = (updateObject as OPA.IUpdateable_ByUser).userIdOfLatestUpdater;

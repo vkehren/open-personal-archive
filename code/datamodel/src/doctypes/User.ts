@@ -64,6 +64,17 @@ function areUpdatesValid(document: IUser, updateObject: IUserPartial): boolean {
     return false;
   }
 
+  // NOTE: Only the Creator of the User (itself) can delete it
+  if (!document.isMarkedAsDeleted && (updateObject as OPA.IDeleteable_ByUser).isMarkedAsDeleted) {
+    // NOTE: The Owner cannot be deleted
+    if (document.id == User_OwnerId) {
+      return false;
+    }
+
+    const userIdOfDeleter = (updateObject as OPA.IDeleteable_ByUser).userIdOfDeleter;
+    return (userIdOfDeleter == document.id);
+  }
+
   if (document.assignedRoleId == Role_OwnerId) {
     // NOTE: The Owner starts as already approved and cannot be deleted, so the following properties are invalid to update
     if (updateObject.hasOwnProperty(OPA.IViewable_HasBeenViewed_PropertyName)) {
