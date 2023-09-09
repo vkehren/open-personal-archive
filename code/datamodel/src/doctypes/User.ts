@@ -160,7 +160,10 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     dateOfDeletion: null,
     userIdOfDeleter: null,
   };
-  document.updateHistory.push(OPA.copyObject(document));
+
+  const documentCopy = (OPA.copyObject(document) as any);
+  delete documentCopy.updateHistory;
+  document.updateHistory.push(documentCopy);
   return document;
 }
 
@@ -209,7 +212,10 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     dateOfDeletion: null,
     userIdOfDeleter: null,
   };
-  document.updateHistory.push(OPA.copyObject(document));
+
+  const documentCopy = (OPA.copyObject(document) as any);
+  delete documentCopy.updateHistory;
+  document.updateHistory.push(documentCopy);
   return document;
 }
 

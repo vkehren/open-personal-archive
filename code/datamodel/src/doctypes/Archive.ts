@@ -67,7 +67,10 @@ export function createSingleton(name: string, description: string, pathToStorage
     dateOfLatestUpdate: null,
     userIdOfLatestUpdater: null,
   };
-  document.updateHistory.push(OPA.copyObject(document));
+
+  const documentCopy = (OPA.copyObject(document) as any);
+  delete documentCopy.updateHistory;
+  document.updateHistory.push(documentCopy);
   return document;
 }
 

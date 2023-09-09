@@ -200,6 +200,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(archiveNonNull.defaultTimeZoneGroupId).equals(archiveOriginal.defaultTimeZoneGroupId);
     expect(archiveNonNull.defaultTimeZoneId).equals(archiveOriginal.defaultTimeZoneId);
     expect(archiveNonNull.updateHistory.length).equals(1);
+    expect((archiveNonNull.updateHistory[0] as any).updateHistory).equals(undefined);
     expect(archiveNonNull.hasBeenUpdated).equals(false);
     expect(archiveNonNull.dateOfLatestUpdate).equals(null);
     expect(archiveNonNull.userIdOfLatestUpdater).equals(null);
@@ -298,6 +299,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(applicationNonNull.applicationVersion).equals(oldVersion);
     expect(applicationNonNull.schemaVersion).equals(oldVersion);
     expect(applicationNonNull.upgradeHistory.length).equals(1);
+    expect((applicationNonNull.upgradeHistory[0] as any).upgradeHistory).equals(undefined);
     expect(applicationNonNull.dateOfInstallation.valueOf()).equals(oldDateOfInstallation.valueOf());
     expect(applicationNonNull.hasBeenUpgraded).equals(false);
     expect(applicationNonNull.dateOfLatestUpgrade).equals(null);

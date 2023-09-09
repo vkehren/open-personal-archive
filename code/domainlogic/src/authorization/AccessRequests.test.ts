@@ -154,6 +154,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.message[OpaDm.DefaultLocale]).equals(testMessage);
     expect(accessRequestNonNull.response[OpaDm.DefaultLocale]).equals("");
     expect(accessRequestNonNull.updateHistory.length).equals(1);
+    expect((accessRequestNonNull.updateHistory[0] as any).updateHistory).equals(undefined);
     expect(accessRequestNonNull.hasBeenUpdated).equals(false);
     expect(accessRequestNonNull.dateOfLatestUpdate).equals(null);
     expect(accessRequestNonNull.userIdOfLatestUpdater).equals(null);

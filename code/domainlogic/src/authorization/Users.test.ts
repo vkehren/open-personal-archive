@@ -99,6 +99,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.lastName).equals(owner.lastName);
     expect(userNonNull.recentQueries.length).equals(0);
     expect(userNonNull.updateHistory.length).equals(1);
+    expect((userNonNull.updateHistory[0] as any).updateHistory).equals(undefined);
     expect(userNonNull.hasBeenUpdated).equals(false);
     expect(userNonNull.dateOfLatestUpdate).equals(null);
     expect(userNonNull.hasBeenViewed).equals(true);
@@ -352,6 +353,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.lastName).equals(config.authenticationState.lastName);
     expect(userNonNull.recentQueries.length).equals(0);
     expect(userNonNull.updateHistory.length).equals(1);
+    expect((userNonNull.updateHistory[0] as any).updateHistory).equals(undefined);
     expect(userNonNull.hasBeenUpdated).equals(false);
     expect(userNonNull.dateOfLatestUpdate).equals(null);
     expect(userNonNull.hasBeenViewed).equals(false);
