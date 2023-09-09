@@ -302,8 +302,8 @@ export async function performUpgrade(callState: OpaDm.ICallState, constructorPro
 
   OPA.assertNonNullish(applicationComparison, "The application version numbers provided are invalid.");
   OPA.assertNonNullish(schemaComparison, "The schema version numbers provided are invalid.");
-  OPA.assertIsFalse((applicationComparison == -1), "The application version number currently cannot be downgraded.");
-  OPA.assertIsFalse((schemaComparison == -1), "The schema version number currently cannot be downgraded.");
+  OPA.assertIsFalse((applicationComparison < 0), "The application version number currently cannot be downgraded.");
+  OPA.assertIsFalse((schemaComparison < 0), "The schema version number currently cannot be downgraded.");
   OPA.assertIsFalse((applicationComparison == 0) && (schemaComparison == 0), "The application and schema version numbers match the latest build.");
 
   // LATER: Do upgrade work here
