@@ -1,8 +1,7 @@
 import * as OPA from "../../base/src";
-import {DefaultLocale} from "./doctypes/Locale";
 
 export const DefaultIndexCollection = "Indices";
-export const localizableStringConstructor = function (desiredValue: string | null, defaultValue: string, locale = DefaultLocale): OPA.ILocalizable<string> {
+export const localizableStringConstructor = function (locale: string, desiredValue: string | null = null, defaultValue: string = ""): OPA.ILocalizable<string> {
   OPA.assertNonNullishOrWhitespace(locale);
   const localizableString = ({} as any);
   localizableString[locale] = (!OPA.isNullishOrWhitespace(desiredValue) ? OPA.convertNonNullish(desiredValue) : defaultValue);
