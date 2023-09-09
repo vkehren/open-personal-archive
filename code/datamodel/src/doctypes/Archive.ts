@@ -101,46 +101,46 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
    * @return {Promise<string>} The new document ID.
    */
   async createArchive(db: firestore.Firestore, name: string, description: string, pathToStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): Promise<string> {
-    const archive = createSingleton(name, description, pathToStorageFolder, owner, defaultLocale, defaultTimeZoneGroup);
-    const archiveId = archive.id;
+    const document = createSingleton(name, description, pathToStorageFolder, owner, defaultLocale, defaultTimeZoneGroup);
+    const documentId = document.id;
 
-    OPA.assertNonNullish(archive);
-    OPA.assertNonNullish(archive.updateHistory);
-    OPA.assertIsTrue(archive.id == SingletonId);
-    OPA.assertIsTrue(archiveId == SingletonId);
-    OPA.assertIsTrue(archive.updateHistory.length == 1);
+    OPA.assertNonNullish(document);
+    OPA.assertNonNullish(document.updateHistory);
+    OPA.assertIsTrue(document.id == SingletonId);
+    OPA.assertIsTrue(documentId == SingletonId);
+    OPA.assertIsTrue(document.updateHistory.length == 1);
 
-    const archivesCollectionRef = this.collectionDescriptor.getTypedCollection(db);
-    const archiveRef = archivesCollectionRef.doc(archiveId);
-    await archiveRef.set(archive, {merge: true});
-    return archiveId;
+    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const documentRef = collectionRef.doc(documentId);
+    await documentRef.set(document, {merge: true});
+    return documentId;
   }
 
   /**
    * Updates the Archive stored on the server using an IArchivePartial object.
    * @param {Firestore} db The Firestore Database.
-   * @param {IArchivePartial} archiveUpdateObject The object containing the updates.
+   * @param {IArchivePartial} updateObject The object containing the updates.
    * @param {string} userIdOfLatestUpdater The ID for the Updater within the OPA system.
    * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async updateArchive(db: firestore.Firestore, archiveUpdateObject: IArchivePartial, userIdOfLatestUpdater: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
-    const archiveId = SingletonId;
+  async updateArchive(db: firestore.Firestore, updateObject: IArchivePartial, userIdOfLatestUpdater: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    const documentId = SingletonId;
     const now = OPA.nowToUse();
-    const archiveUpdateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
-    archiveUpdateObject = {...archiveUpdateObject_Updateable, ...archiveUpdateObject};
-    const updateHistory = constructorProvider.arrayUnion(archiveUpdateObject);
-    const archiveUpdateObject_WithHistory = ({...archiveUpdateObject, updateHistory} as IArchivePartial_WithHistory);
+    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
+    updateObject = {...updateObject_Updateable, ...updateObject};
+    const updateHistory = constructorProvider.arrayUnion(updateObject);
+    const updateObject_WithHistory = ({...updateObject, updateHistory} as IArchivePartial_WithHistory);
 
-    const archive = await this.getById(db, archiveId);
-    OPA.assertNonNullish(archive);
+    const document = await this.getById(db, documentId);
+    OPA.assertNonNullish(document);
     // NOTE: If needed, implement "areUpdatesValid" function
-    // const areValid = areUpdatesValid(OPA.convertNonNullish(archive), archiveUpdateObject_WithHistory);
+    // const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     // OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
-    const archivesCollectionRef = this.collectionDescriptor.getTypedCollection(db);
-    const archiveRef = archivesCollectionRef.doc(archiveId);
-    await archiveRef.set(archiveUpdateObject_WithHistory, {merge: true});
+    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const documentRef = collectionRef.doc(documentId);
+    await documentRef.set(updateObject_WithHistory, {merge: true});
   }
 }
 

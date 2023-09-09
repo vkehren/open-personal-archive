@@ -26,25 +26,25 @@ export interface IApplication extends OPA.IDocument_Upgradeable_ByUser {
 
 /**
  * Checks whether the specified updates to a Application document are valid.
- * @param {IApplication} application The Application document being updated.
- * @param {IApplicationPartial} applicationUpdateObject The updates specified.
+ * @param {IApplication} document The Application document being updated.
+ * @param {IApplicationPartial} updateObject The updates specified.
  * @return {boolean} Whether the updates are valid or not.
  */
-function areUpdatesValid(application: IApplication, applicationUpdateObject: IApplicationPartial): boolean {
-  OPA.assertNonNullish(application);
-  OPA.assertNonNullish(applicationUpdateObject);
+function areUpdatesValid(document: IApplication, updateObject: IApplicationPartial): boolean {
+  OPA.assertNonNullish(document);
+  OPA.assertNonNullish(updateObject);
 
   // NOTE: The "applicationVersion" cannot be downgraded or updated to same value as current value
-  if (!OPA.isNullish(applicationUpdateObject.applicationVersion)) {
-    const applicationVersion_Updated = OPA.convertNonNullish(applicationUpdateObject.applicationVersion);
-    if (OPA.compareVersionNumberStrings(application.applicationVersion, applicationVersion_Updated) < 1) {
+  if (!OPA.isNullish(updateObject.applicationVersion)) {
+    const applicationVersion_Updated = OPA.convertNonNullish(updateObject.applicationVersion);
+    if (OPA.compareVersionNumberStrings(document.applicationVersion, applicationVersion_Updated) < 1) {
       return false;
     }
   }
   // NOTE: The "schemaVersion" cannot be downgraded or updated to same value as current value
-  if (!OPA.isNullish(applicationUpdateObject.schemaVersion)) {
-    const schemaVersion_Updated = OPA.convertNonNullish(applicationUpdateObject.schemaVersion);
-    if (OPA.compareVersionNumberStrings(application.schemaVersion, schemaVersion_Updated) < 1) {
+  if (!OPA.isNullish(updateObject.schemaVersion)) {
+    const schemaVersion_Updated = OPA.convertNonNullish(updateObject.schemaVersion);
+    if (OPA.compareVersionNumberStrings(document.schemaVersion, schemaVersion_Updated) < 1) {
       return false;
     }
   }
@@ -99,45 +99,45 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
    * @return {Promise<string>} The new document ID.
    */
   async createApplication(db: firestore.Firestore, applicationVersion: string, schemaVersion: string): Promise<string> {
-    const application = createSingleton(applicationVersion, schemaVersion);
-    const applicationId = application.id;
+    const document = createSingleton(applicationVersion, schemaVersion);
+    const documentId = document.id;
 
-    OPA.assertNonNullish(application);
-    OPA.assertNonNullish(application.upgradeHistory);
-    OPA.assertIsTrue(application.id == SingletonId);
-    OPA.assertIsTrue(applicationId == SingletonId);
-    OPA.assertIsTrue(application.upgradeHistory.length == 1);
+    OPA.assertNonNullish(document);
+    OPA.assertNonNullish(document.upgradeHistory);
+    OPA.assertIsTrue(document.id == SingletonId);
+    OPA.assertIsTrue(documentId == SingletonId);
+    OPA.assertIsTrue(document.upgradeHistory.length == 1);
 
-    const applicationsCollectionRef = this.collectionDescriptor.getTypedCollection(db);
-    const applicationRef = applicationsCollectionRef.doc(applicationId);
-    await applicationRef.set(application, {merge: true});
-    return applicationId;
+    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const documentRef = collectionRef.doc(documentId);
+    await documentRef.set(document, {merge: true});
+    return documentId;
   }
 
   /**
    * Updates the Application stored on the server using an IApplicationPartial object.
    * @param {Firestore} db The Firestore Database.
-   * @param {IApplicationPartial} applicationUpdateObject The object containing the updates.
+   * @param {IApplicationPartial} updateObject The object containing the updates.
    * @param {string} userIdOfLatestUpgrader The ID for the Upgrader within the OPA system.
    * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async updateApplication(db: firestore.Firestore, applicationUpdateObject: IApplicationPartial, userIdOfLatestUpgrader: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
-    const applicationId = SingletonId;
+  async updateApplication(db: firestore.Firestore, updateObject: IApplicationPartial, userIdOfLatestUpgrader: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    const documentId = SingletonId;
     const now = OPA.nowToUse();
-    const applicationUpdateObject_Upgradeable = ({hasBeenUpgraded: true, dateOfLatestUpgrade: now, userIdOfLatestUpgrader: userIdOfLatestUpgrader} as OPA.IUpgradeable_ByUser);
-    applicationUpdateObject = {...applicationUpdateObject_Upgradeable, ...applicationUpdateObject};
-    const upgradeHistory = constructorProvider.arrayUnion(applicationUpdateObject);
-    const applicationUpdateObject_WithHistory = ({...applicationUpdateObject, upgradeHistory} as IApplicationPartial_WithHistory);
+    const updateObject_Upgradeable = ({hasBeenUpgraded: true, dateOfLatestUpgrade: now, userIdOfLatestUpgrader} as OPA.IUpgradeable_ByUser);
+    updateObject = {...updateObject_Upgradeable, ...updateObject};
+    const upgradeHistory = constructorProvider.arrayUnion(updateObject);
+    const updateObject_WithHistory = ({...updateObject, upgradeHistory} as IApplicationPartial_WithHistory);
 
-    const application = await this.getById(db, applicationId);
-    OPA.assertNonNullish(application);
-    const areValid = areUpdatesValid(OPA.convertNonNullish(application), applicationUpdateObject_WithHistory);
+    const document = await this.getById(db, documentId);
+    OPA.assertNonNullish(document);
+    const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
-    const applicationsCollectionRef = this.collectionDescriptor.getTypedCollection(db);
-    const applicationRef = applicationsCollectionRef.doc(applicationId);
-    await applicationRef.set(applicationUpdateObject_WithHistory, {merge: true});
+    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const documentRef = collectionRef.doc(documentId);
+    await documentRef.set(updateObject_WithHistory, {merge: true});
   }
 }
 

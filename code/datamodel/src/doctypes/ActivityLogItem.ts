@@ -88,17 +88,17 @@ export class ActivityLogItemQuerySet extends OPA.QuerySet<IActivityLogItem> {
    * @return {Promise<string>} The new document ID.
    */
   async createActivityLogItem(db: firestore.Firestore, activityType: BT.ActivityType, requestor: string, resource: string, resourceCanonical: string | null, action: string | null, data: any, firebaseAuthUserId: string | null = null, userId: string | null = null, otherState: any | null = null): Promise<string> { // eslint-disable-line max-len
-    const activityLogItemsCollectionRef = this.collectionDescriptor.getTypedCollection(db);
-    const logItemRef = activityLogItemsCollectionRef.doc();
-    const logItemId = logItemRef.id;
-    const logItem = createInstance(logItemId, activityType, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState);
+    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const documentRef = collectionRef.doc();
+    const documentId = documentRef.id;
+    const document = createInstance(documentId, activityType, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState);
 
     // NOTE: An ActivityLogItem should NOT be updateable
-    OPA.assertNonNullish(logItem);
-    OPA.assertIsTrue(logItem.id == logItemId);
+    OPA.assertNonNullish(document);
+    OPA.assertIsTrue(document.id == documentId);
 
-    await logItemRef.set(logItem, {merge: true});
-    return logItemId;
+    await documentRef.set(document, {merge: true});
+    return documentId;
   }
 }
 
