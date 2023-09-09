@@ -8,6 +8,22 @@ import * as TC from "./TypeChecking";
 export const Query_OrderBy_CharHighest = "\uf8ff"; // eslint-disable-line camelcase
 
 /**
+ * Deep-checks if two objects of type T as value-wise equivalent.
+ * @param {T | null | undefined} obj1 The first object.
+ * @param {T | null | undefined} obj2 The second object.
+ * @return {boolean}
+ */
+export function areEqual<T>(obj1: T | null | undefined, obj2: T | null | undefined): boolean {
+  if (TC.isUndefined(obj1)) {
+    return TC.isUndefined(obj2);
+  }
+
+  const obj1AsString = JSON.stringify(obj1);
+  const obj2AsString = JSON.stringify(obj2);
+  return (obj1AsString == obj2AsString);
+}
+
+/**
  * Deep-copies an object of type T.
  * @param {T} obj The object to copy.
  * @return {T}
