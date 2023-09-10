@@ -14,14 +14,14 @@ export interface IAccessRequestPartial {
   response?: OPA.ILocalizable<string>;
 }
 
-type UpdateHistoryItem = IAccessRequestPartial | OPA.IUpdateable_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState> | OPA.IDeleteable_ByUser;
+type UpdateHistoryItem = IAccessRequestPartial | OPA.IUpdateable_ByUser | OPA.IArchivable_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState> | OPA.IDeleteable_ByUser;
 interface IAccessRequestPartial_WithHistory extends IAccessRequestPartial, OPA.IUpdateable_ByUser {
   updateHistory: Array<UpdateHistoryItem> | firestore.FieldValue;
 }
 
 // NOTE: Use "IDocument_Creatable_ByUser" because we must record the User who created the AccessRequest (i.e. the owner of the AccessRequest)
 // NOTE: Use "IDocument_Updateable_ByUser" because the User creating the AccessRequest updates the "message", but the Decider updates the "response"
-export interface IAccessRequest extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Deleteable_ByUser {
+export interface IAccessRequest extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser, OPA.IDocument_Archivable_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Deleteable_ByUser {
   readonly id: string;
   readonly archiveId: string; // NOTE: This field stores information necessary to extend the OPA system to manage multiple Archives
   readonly isSpecificToCitation: boolean;
@@ -85,6 +85,35 @@ function areUpdatesValid(document: IAccessRequest, updateObject: IAccessRequestP
       const userMatchesDoc = (updateObject_Creatable.userIdOfCreator == document.userIdOfCreator);
 
       if (!dateMatchesDoc || !userMatchesDoc) {
+        return false;
+      }
+    }
+  }
+
+  if (true) {
+    const updateObject_Archivable = (updateObject as OPA.IArchivable_ByUser);
+
+    if (OPA.isNullish(updateObject_Archivable.isArchived)) {
+      const dateIsSet = !OPA.isNullish(updateObject_Archivable.dateOfArchivalChange);
+      const userIsSet = !OPA.isNullish(updateObject_Archivable.userIdOfArchivalChanger);
+
+      if (dateIsSet || userIsSet) {
+        return false;
+      }
+    } else if (updateObject_Archivable.isArchived) {
+      const dateNotSet = OPA.isNullish(updateObject_Archivable.dateOfArchivalChange);
+      const userNotSet = OPA.isNullish(updateObject_Archivable.userIdOfArchivalChanger);
+
+      if (dateNotSet || userNotSet) {
+        return false;
+      }
+    } else {
+      const docIsArchived = document.isArchived;
+      const dateNotSet = OPA.isNullish(updateObject_Archivable.dateOfArchivalChange);
+      const userNotSet = OPA.isNullish(updateObject_Archivable.userIdOfArchivalChanger);
+      const userCanUnArchive = true;
+
+      if ((docIsArchived && !userCanUnArchive) || dateNotSet || userNotSet) {
         return false;
       }
     }
@@ -235,6 +264,9 @@ function createInstance(id: string, user: IUser, locale: ILocale, message: strin
     hasBeenUpdated: false,
     dateOfLatestUpdate: null,
     userIdOfLatestUpdater: null,
+    isArchived: false,
+    dateOfArchivalChange: null,
+    userIdOfArchivalChanger: null,
     hasBeenViewed: false,
     dateOfLatestViewing: null,
     userIdOfLatestViewer: null,
@@ -326,6 +358,33 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const now = OPA.nowToUse();
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
     updateObject = {...updateObject_Updateable, ...updateObject};
+    const updateHistory = constructorProvider.arrayUnion(updateObject);
+    const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
+
+    const document = await this.getById(db, documentId);
+    OPA.assertNonNullish(document);
+    const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
+    OPA.assertIsTrue(areValid, "The requested update is invalid.");
+
+    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const documentRef = collectionRef.doc(documentId);
+    await documentRef.set(updateObject_WithHistory, {merge: true});
+  }
+
+  /**
+   * Updates the AccessRequest stored on the server by constructing an IArchivable_ByUser object.
+   * @param {Firestore} db The Firestore Database.
+   * @param {string} documentId The ID for the AccessRequest within the OPA system.
+   * @param {boolean} isArchived Whether the AccessRequest should be marked as archived.
+   * @param {string} userIdOfArchivalChanger The ID for the archival state Changer within the OPA system.
+   * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
+   * @return {Promise<void>}
+   */
+  async setAccessRequestToArchivedState(db: firestore.Firestore, documentId: string, isArchived: boolean, userIdOfArchivalChanger: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    const now = OPA.nowToUse();
+    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfArchivalChanger} as OPA.IUpdateable_ByUser);
+    const updateObject_Archivable = ({isArchived, dateOfArchivalChange: now, userIdOfArchivalChanger} as OPA.IArchivable_ByUser);
+    const updateObject = {...updateObject_Updateable, ...updateObject_Archivable, ...({} as IAccessRequestPartial)};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
