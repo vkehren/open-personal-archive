@@ -15,6 +15,15 @@ export const DataConfiguration = {
   TimeZone_UseMin: false,
 };
 
+export const PropertyNames_ForUnDelete_ByUser: Array<string | symbol> = [
+  OPA.IUpdateable_HasBeenUpdated_PropertyName,
+  OPA.IUpdateable_DateOfLatestUpdate_PropertyName,
+  OPA.IUpdateable_ByUser_UserIdOfLatestUpdater_PropertyName,
+  OPA.IDeleteable_IsMarkedAsDeleted_PropertyName,
+  OPA.IDeleteable_DateOfDeletion_PropertyName,
+  OPA.IDeleteable_ByUser_UserIdOfDeleter_PropertyName,
+];
+
 export type ActivityType = "browser_page_load" | "browser_page_view" | "browser_page_action" | "browser_page_error" | "server_function_call" | "server_function_error";
 export const ActivityTypes = {
   default: ("browser_page_view" as ActivityType),

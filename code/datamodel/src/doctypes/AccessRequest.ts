@@ -47,6 +47,16 @@ function areUpdatesValid(document: IAccessRequest, updateObject: IAccessRequestP
     return false;
   }
 
+  if (document.isMarkedAsDeleted) {
+    let propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
+    propertyNames_ForUpdate = propertyNames_ForUpdate.filter((propertyName) => !BT.PropertyNames_ForUnDelete_ByUser.includes(propertyName));
+
+    // NOTE: Any property updates beyond those necessary for un-delete are invalid
+    if (propertyNames_ForUpdate.length > 0) {
+      return false;
+    }
+  }
+
   if (true) {
     const updateObject_Creatable = (updateObject as OPA.ICreatable_ByUser);
 
