@@ -46,4 +46,6 @@ export const ApprovalStates = {
   pending: ("pending" as ApprovalState),
   approved: ("approved" as ApprovalState),
   denied: ("denied" as ApprovalState),
+  decided: ([] as Array<ApprovalState>),
 };
+ApprovalStates.decided = [ApprovalStates.approved, ApprovalStates.denied];

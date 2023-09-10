@@ -41,29 +41,142 @@ function areUpdatesValid(document: IAccessRequest, updateObject: IAccessRequestP
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  // NOTE: A deleted document should not be updateable
-  if (document.isMarkedAsDeleted) {
+  // NOTE: updateObject MUST implement IUpdateable_ByUser, so check immediately and do NOT use "if (true) {...}"
+  const updateObject_Updateable = (updateObject as OPA.IUpdateable_ByUser);
+  if (!updateObject_Updateable.hasBeenUpdated || OPA.isNullish(updateObject_Updateable.dateOfLatestUpdate) || OPA.isNullish(updateObject_Updateable.userIdOfLatestUpdater)) {
     return false;
   }
 
-  // NOTE: Only the Creator of the AccessRequest can delete it
-  if (!document.isMarkedAsDeleted && (updateObject as OPA.IDeleteable_ByUser).isMarkedAsDeleted) {
-    const userIdOfDeleter = (updateObject as OPA.IDeleteable_ByUser).userIdOfDeleter;
-    return (userIdOfDeleter == document.userIdOfCreator);
+  if (true) {
+    const updateObject_Creatable = (updateObject as OPA.ICreatable_ByUser);
+
+    if (!OPA.isNullish(updateObject_Creatable.dateOfCreation) || !OPA.isNullish(updateObject_Creatable.userIdOfCreator)) {
+      const dateMatchesDoc = (updateObject_Creatable.dateOfCreation == document.dateOfCreation);
+      const userMatchesDoc = (updateObject_Creatable.userIdOfCreator == document.userIdOfCreator);
+
+      if (!dateMatchesDoc || !userMatchesDoc) {
+        return false;
+      }
+    }
+  }
+
+  if (true) {
+    const updateObject_Viewable = (updateObject as OPA.IViewable_ByUser);
+
+    if (OPA.isNullish(updateObject_Viewable.hasBeenViewed)) {
+      const dateIsSet = !OPA.isNullish(updateObject_Viewable.dateOfLatestViewing);
+      const userIsSet = !OPA.isNullish(updateObject_Viewable.userIdOfLatestViewer);
+
+      if (dateIsSet || userIsSet) {
+        return false;
+      }
+    } else if (updateObject_Viewable.hasBeenViewed) {
+      const dateNotSet = OPA.isNullish(updateObject_Viewable.dateOfLatestViewing);
+      const userNotSet = OPA.isNullish(updateObject_Viewable.userIdOfLatestViewer);
+
+      if (dateNotSet || userNotSet) {
+        return false;
+      }
+    } else {
+      const docIsViewed = document.hasBeenViewed;
+      const dateIsSet = !OPA.isNullish(updateObject_Viewable.dateOfLatestViewing);
+      const userIsSet = !OPA.isNullish(updateObject_Viewable.userIdOfLatestViewer);
+      const userCanUnView = false;
+
+      if ((docIsViewed && !userCanUnView) || dateIsSet || userIsSet) {
+        return false;
+      }
+    }
+  }
+
+  if (true) {
+    const updateObject_Approvable = (updateObject as OPA.IApprovable_ByUser<BT.ApprovalState>);
+
+    if (OPA.isNullish(updateObject_Approvable.hasBeenDecided)) {
+      const stateIsSet = !OPA.isNullish(updateObject_Approvable.approvalState);
+      const dateIsSet = !OPA.isNullish(updateObject_Approvable.dateOfDecision);
+      const userIsSet = !OPA.isNullish(updateObject_Approvable.userIdOfDecider);
+
+      if (stateIsSet || dateIsSet || userIsSet) {
+        return false;
+      }
+    } else if (updateObject_Approvable.hasBeenDecided) {
+      const stateNotSet = OPA.isNullish(updateObject_Approvable.approvalState);
+      const dateNotSet = OPA.isNullish(updateObject_Approvable.dateOfDecision);
+      const userNotSet = OPA.isNullish(updateObject_Approvable.userIdOfDecider);
+      const stateNotDecided = !BT.ApprovalStates.decided.includes(updateObject_Approvable.approvalState);
+      const isSelfApproved = (updateObject_Approvable.userIdOfDecider == document.userIdOfCreator);
+
+      if (stateNotSet || dateNotSet || userNotSet || stateNotDecided || isSelfApproved) {
+        return false;
+      }
+    } else {
+      const docIsDecided = document.hasBeenDecided;
+      const stateNotSet = OPA.isNullish(updateObject_Approvable.approvalState);
+      const dateIsSet = !OPA.isNullish(updateObject_Approvable.dateOfDecision);
+      const userIsSet = !OPA.isNullish(updateObject_Approvable.userIdOfDecider);
+      const stateNotPending = (updateObject_Approvable.approvalState != BT.ApprovalStates.pending);
+      const userCanUnDecide = false;
+
+      if ((docIsDecided && !userCanUnDecide) || stateNotSet || stateNotPending || dateIsSet || userIsSet) {
+        return false;
+      }
+    }
+  }
+
+  if (true) {
+    const updateObject_Deleteable = (updateObject as OPA.IDeleteable_ByUser);
+
+    if (OPA.isNullish(updateObject_Deleteable.isMarkedAsDeleted)) {
+      const dateIsSet = !OPA.isNullish(updateObject_Deleteable.dateOfDeletion);
+      const userIsSet = !OPA.isNullish(updateObject_Deleteable.userIdOfDeleter);
+
+      if (dateIsSet || userIsSet) {
+        return false;
+      }
+    } else if (updateObject_Deleteable.isMarkedAsDeleted) {
+      const docIsDeleted = document.isMarkedAsDeleted;
+      const dateNotSet = OPA.isNullish(updateObject_Deleteable.dateOfDeletion);
+      const userNotSet = OPA.isNullish(updateObject_Deleteable.userIdOfDeleter);
+      const userNotCreator = (updateObject_Deleteable.userIdOfDeleter != document.userIdOfCreator);
+
+      if (docIsDeleted || dateNotSet || userNotSet || userNotCreator) {
+        return false;
+      }
+    } else {
+      const docIsDeleted = document.isMarkedAsDeleted;
+      const dateIsSet = !OPA.isNullish(updateObject_Deleteable.dateOfDeletion);
+      const userIsSet = !OPA.isNullish(updateObject_Deleteable.userIdOfDeleter);
+      const userCanUnDelete = (updateObject_Updateable.userIdOfLatestUpdater == document.userIdOfCreator);
+
+      if ((docIsDeleted && !userCanUnDelete) || dateIsSet || userIsSet) {
+        return false;
+      }
+    }
   }
 
   // NOTE: Only the Creator can update the message
-  if (!OPA.isNullish(updateObject.message) && !OPA.areEqual(document.message, updateObject.message)) {
-    const userIdOfUpdater = (updateObject as OPA.IUpdateable_ByUser).userIdOfLatestUpdater;
-    return (userIdOfUpdater == document.userIdOfCreator);
+  if (!OPA.isUndefined(updateObject.message) && !OPA.areEqual(document.message, updateObject.message)) {
+    const userNotCreator = (updateObject_Updateable.userIdOfLatestUpdater != document.userIdOfCreator);
+
+    if (userNotCreator) {
+      return false;
+    }
   }
 
   // NOTE: Only the Viewers and Deciders can update the response
-  if (!OPA.isNullish(updateObject.response) && !OPA.areEqual(document.response, updateObject.response)) {
-    const userIdOfUpdater = OPA.convertNonNullish((updateObject as OPA.IUpdateable_ByUser).userIdOfLatestUpdater);
-    const userIdsOfViewers = OPA.extractUserIdsFromObjects<OPA.IViewable_ByUser>(document.updateHistory, (doc) => doc.userIdOfLatestViewer);
-    const userIdsOfDeciders = OPA.extractUserIdsFromObjects<OPA.IApprovable_ByUser<BT.ApprovalState>>(document.updateHistory, (doc) => doc.userIdOfDecider);
-    return (userIdsOfViewers.includes(userIdOfUpdater) || userIdsOfDeciders.includes(userIdOfUpdater));
+  if (!OPA.isUndefined(updateObject.response) && !OPA.areEqual(document.response, updateObject.response)) {
+    let userIdsOfViewers = OPA.extractUserIdsFromObjects<OPA.IViewable_ByUser>(document.updateHistory, (doc) => doc.userIdOfLatestViewer);
+    userIdsOfViewers = userIdsOfViewers.filter((userId) => (userId != document.userIdOfCreator));
+    const userNotViewer = (!userIdsOfViewers.includes(OPA.convertNonNullish(updateObject_Updateable.userIdOfLatestUpdater)));
+
+    let userIdsOfDeciders = OPA.extractUserIdsFromObjects<OPA.IApprovable_ByUser<BT.ApprovalState>>(document.updateHistory, (doc) => doc.userIdOfDecider);
+    userIdsOfDeciders = userIdsOfDeciders.filter((userId) => (userId != document.userIdOfCreator));
+    const userNotDecider = (!userIdsOfDeciders.includes(OPA.convertNonNullish(updateObject_Updateable.userIdOfLatestUpdater)));
+
+    if (userNotViewer && userNotDecider) {
+      return false;
+    }
   }
   return true;
 }
