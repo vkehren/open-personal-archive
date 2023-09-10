@@ -1,6 +1,7 @@
 import * as firestore from "@google-cloud/firestore";
 import * as BT from "./BaseTypes";
 import * as TC from "./TypeChecking";
+import * as VC from "./ValueChecking";
 
 // export const name = "Firebase";
 export const BULK_WRITER_MAX_RETRY_ATTEMPTS = 4;
@@ -13,6 +14,137 @@ export interface IFirebaseConstructorProvider {
   delete: () => firestore.FieldValue;
   increment: (n: number) => firestore.FieldValue;
   serverTimestamp: () => firestore.FieldValue;
+}
+const FieldValue_MethodName_ArrayRemove = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("arrayRemove") as string);
+const FieldValue_MethodName_ArrayUnion = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("arrayUnion") as string);
+const FieldValue_MethodName_Delete = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("delete") as string);
+const FieldValue_MethodName_Increment = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("increment") as string);
+const FieldValue_MethodName_ServerTimestamp = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("serverTimestamp") as string);
+
+/**
+ * Checks whether a given argument is of type "firestore.FieldValue".
+ * @param {unknown} fieldValue The value to check.
+ * @return {boolean} The result of checking.
+ */
+export function isOfFieldValue<T extends firestore.FieldValue>(fieldValue: unknown): fieldValue is T {
+  if (TC.isNullish(fieldValue)) {
+    throw new Error("The value to check the type of must not be null or undefined.");
+  }
+
+  const fieldValueAsAny = (fieldValue as any);
+  const guardFunc = (value: T) => (!TC.isNullish(fieldValueAsAny.isEqual));
+  const isFieldValue = TC.isOf(fieldValue, guardFunc);
+  return isFieldValue;
+}
+
+/**
+ * Checks whether a given argument is of type "firestore.FieldValue" and specifies an "arrayRemove".
+ * @param {unknown} fieldValue The value to check.
+ * @return {boolean} The result of checking.
+ */
+export function isOfFieldValue_ArrayRemove<T extends firestore.FieldValue>(fieldValue: unknown): fieldValue is T {
+  if (TC.isNullish(fieldValue)) {
+    throw new Error("The value to check the type of must not be null or undefined.");
+  }
+  if (TC.isNullishOrWhitespace(FieldValue_MethodName_ArrayRemove)) {
+    throw new Error("The method name to check must not be null or undefined.");
+  }
+  if (!isOfFieldValue<T>(fieldValue)) {
+    return false;
+  }
+
+  const fieldValueAsAny = (fieldValue as any);
+  const guardFunc = (value: T) => (!TC.isNullish(fieldValueAsAny.methodName) && (fieldValueAsAny.methodName as string).includes(FieldValue_MethodName_ArrayRemove));
+  const isFieldValue = TC.isOf(fieldValue, guardFunc);
+  return isFieldValue;
+}
+
+/**
+ * Checks whether a given argument is of type "firestore.FieldValue" and specifies an "arrayUnion".
+ * @param {unknown} fieldValue The value to check.
+ * @return {boolean} The result of checking.
+ */
+export function isOfFieldValue_ArrayUnion<T extends firestore.FieldValue>(fieldValue: unknown): fieldValue is T {
+  if (TC.isNullish(fieldValue)) {
+    throw new Error("The value to check the type of must not be null or undefined.");
+  }
+  if (TC.isNullishOrWhitespace(FieldValue_MethodName_ArrayUnion)) {
+    throw new Error("The method name to check must not be null or undefined.");
+  }
+  if (!isOfFieldValue<T>(fieldValue)) {
+    return false;
+  }
+
+  const fieldValueAsAny = (fieldValue as any);
+  const guardFunc = (value: T) => (!TC.isNullish(fieldValueAsAny.methodName) && (fieldValueAsAny.methodName as string).includes(FieldValue_MethodName_ArrayUnion));
+  const isFieldValue = TC.isOf(fieldValue, guardFunc);
+  return isFieldValue;
+}
+
+/**
+ * Checks whether a given argument is of type "firestore.FieldValue" and specifies a "delete".
+ * @param {unknown} fieldValue The value to check.
+ * @return {boolean} The result of checking.
+ */
+export function isOfFieldValue_Delete<T extends firestore.FieldValue>(fieldValue: unknown): fieldValue is T {
+  if (TC.isNullish(fieldValue)) {
+    throw new Error("The value to check the type of must not be null or undefined.");
+  }
+  if (TC.isNullishOrWhitespace(FieldValue_MethodName_Delete)) {
+    throw new Error("The method name to check must not be null or undefined.");
+  }
+  if (!isOfFieldValue<T>(fieldValue)) {
+    return false;
+  }
+
+  const fieldValueAsAny = (fieldValue as any);
+  const guardFunc = (value: T) => (!TC.isNullish(fieldValueAsAny.methodName) && (fieldValueAsAny.methodName as string).includes(FieldValue_MethodName_Delete));
+  const isFieldValue = TC.isOf(fieldValue, guardFunc);
+  return isFieldValue;
+}
+
+/**
+ * Checks whether a given argument is of type "firestore.FieldValue" and specifies an "increment".
+ * @param {unknown} fieldValue The value to check.
+ * @return {boolean} The result of checking.
+ */
+export function isOfFieldValue_Increment<T extends firestore.FieldValue>(fieldValue: unknown): fieldValue is T {
+  if (TC.isNullish(fieldValue)) {
+    throw new Error("The value to check the type of must not be null or undefined.");
+  }
+  if (TC.isNullishOrWhitespace(FieldValue_MethodName_Increment)) {
+    throw new Error("The method name to check must not be null or undefined.");
+  }
+  if (!isOfFieldValue<T>(fieldValue)) {
+    return false;
+  }
+
+  const fieldValueAsAny = (fieldValue as any);
+  const guardFunc = (value: T) => (!TC.isNullish(fieldValueAsAny.methodName) && (fieldValueAsAny.methodName as string).includes(FieldValue_MethodName_Increment));
+  const isFieldValue = TC.isOf(fieldValue, guardFunc);
+  return isFieldValue;
+}
+
+/**
+ * Checks whether a given argument is of type "firestore.FieldValue" and specifies a "serverTimestamp".
+ * @param {unknown} fieldValue The value to check.
+ * @return {boolean} The result of checking.
+ */
+export function isOfFieldValue_ServerTimestamp<T extends firestore.FieldValue>(fieldValue: unknown): fieldValue is T {
+  if (TC.isNullish(fieldValue)) {
+    throw new Error("The value to check the type of must not be null or undefined.");
+  }
+  if (TC.isNullishOrWhitespace(FieldValue_MethodName_ServerTimestamp)) {
+    throw new Error("The method name to check must not be null or undefined.");
+  }
+  if (!isOfFieldValue<T>(fieldValue)) {
+    return false;
+  }
+
+  const fieldValueAsAny = (fieldValue as any);
+  const guardFunc = (value: T) => (!TC.isNullish(fieldValueAsAny.methodName) && (fieldValueAsAny.methodName as string).includes(FieldValue_MethodName_ServerTimestamp));
+  const isFieldValue = TC.isOf(fieldValue, guardFunc);
+  return isFieldValue;
 }
 
 /**
