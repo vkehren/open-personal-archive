@@ -1,3 +1,4 @@
+import * as BT from "./BaseTypes";
 import * as TC from "./TypeChecking";
 
 // export const name = "ValueChecking";
@@ -67,13 +68,39 @@ export function isWhitespace(value: string, includeEmptyAsWhitespace: boolean = 
 /**
  * Gets the property keys specified directly on an object.
  * @param {unknown} obj The incoming object.
- * @return {Array<string | symbol>} The property keys for the object.
+ * @return {Array<BT.KeyText>} The property keys for the object.
  */
-export function getOwnPropertyKeys(obj: unknown): Array<string | symbol> {
+export function getOwnPropertyKeys(obj: unknown): Array<BT.KeyText> {
   const ownNames = Object.getOwnPropertyNames(obj);
   const ownSymbols = Object.getOwnPropertySymbols(obj);
-  const ownCombined = (ownNames as Array<string | symbol>).concat(ownSymbols);
+  const ownCombined = (ownNames as Array<BT.KeyText>).concat(ownSymbols);
   return ownCombined;
+}
+
+/**
+ * Gets the property key specified directly on type T as text.
+ * @param {keyof T} typedKey A property key that exists on type T.
+ * @param {T | undefined} [obj=undefined] An object of type T.
+ * @return {BT.KeyText} The property key as text.
+ */
+export function getTypedPropertyKeyAsText<T>(typedKey: BT.TypedKeyText<T>, obj: T | undefined = undefined): BT.KeyText {
+  const propertyKeyAsText = (typedKey as BT.KeyText);
+  return propertyKeyAsText;
+}
+
+/**
+ * Gets the property keys specified directly on type T as text.
+ * @param {T} obj An object of type T.
+ * @return {BT.ContainerOfTypedKeyText<T>} The object containing the property keys as text.
+ */
+export function getTypedPropertyKeysAsText<T>(obj: T): BT.ContainerOfTypedKeyText<T> {
+  const propertyKeys = getOwnPropertyKeys(obj);
+  const containerOfKeyText = new Object();
+  propertyKeys.forEach((propertyKey) => {
+    Object.defineProperty(containerOfKeyText, propertyKey, {value: (propertyKey as BT.TypedKeyText<T>), writable: false});
+  });
+  const containerOfTypedKeyText = (containerOfKeyText as BT.ContainerOfTypedKeyText<T>);
+  return containerOfTypedKeyText;
 }
 
 /**

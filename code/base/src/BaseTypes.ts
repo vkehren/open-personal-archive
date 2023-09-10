@@ -3,7 +3,13 @@ import * as TC from "./TypeChecking";
 
 // export const name = "BaseTypes";
 
-export type GetterFunc<T, V> = (value: T, propName?: string | symbol) => V;
+export type KeyText = string | symbol;
+export type TypedKeyText<T> = (keyof T) & (KeyText);
+export type ContainerOfTypedKeyText<T> = {
+  [K in keyof T]: TypedKeyText<T>;
+};
+
+export type GetterFunc<T, V> = (value: T, propName?: KeyText) => V;
 export type GuardFunc<T> = (value: T) => boolean;
 export type FilterFunc<T> = (value: T) => boolean;
 export type IdFunc<T> = (value: T) => string | null | undefined;
