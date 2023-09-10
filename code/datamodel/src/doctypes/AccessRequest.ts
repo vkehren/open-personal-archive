@@ -43,16 +43,36 @@ function areUpdatesValid(document: IAccessRequest, updateObject: IAccessRequestP
 
   // NOTE: updateObject MUST implement IUpdateable_ByUser, so check immediately and do NOT use "if (true) {...}"
   const updateObject_Updateable = (updateObject as OPA.IUpdateable_ByUser);
+
   if (!updateObject_Updateable.hasBeenUpdated || OPA.isNullish(updateObject_Updateable.dateOfLatestUpdate) || OPA.isNullish(updateObject_Updateable.userIdOfLatestUpdater)) {
     return false;
   }
 
-  if (document.isMarkedAsDeleted) {
-    let propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
-    propertyNames_ForUpdate = propertyNames_ForUpdate.filter((propertyName) => !BT.PropertyNames_ForUnDelete_ByUser.includes(propertyName));
+  // NOTE: updateObject MUST NOT change read-only data
+  const propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
+  const id_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).id);
+  const archiveId_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).archiveId);
+  const isSpecificToCitation_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).isSpecificToCitation);
+  const citationId_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).citationId);
 
-    // NOTE: Any property updates beyond those necessary for un-delete are invalid
-    if (propertyNames_ForUpdate.length > 0) {
+  if (id_IsUpdated || archiveId_IsUpdated || isSpecificToCitation_IsUpdated || citationId_IsUpdated) {
+    return false;
+  }
+
+  // NOTE: updateObject MUST NOT erase read-only history of changes
+  const updateHistory_KeyText = OPA.getTypedPropertyKeysAsText(document).updateHistory;
+  const updateHistory_IsUpdated = propertyNames_ForUpdate.includes(updateHistory_KeyText);
+  const updateHistory_Value = (updateObject as any)[updateHistory_KeyText];
+
+  if (updateHistory_IsUpdated && !OPA.isOfFieldValue_ArrayUnion<firestore.FieldValue>(updateHistory_Value)) {
+    return false;
+  }
+
+  // NOTE: updateObject MUST NOT change data of already deleted document BEYOND the minimum necessary to un-delete document
+  if (document.isMarkedAsDeleted) {
+    const propertyNames_NotForUnDelete = propertyNames_ForUpdate.filter((propertyName) => !BT.PropertyNames_ForUnDelete_ByUser.includes(propertyName));
+
+    if (propertyNames_NotForUnDelete.length > 0) {
       return false;
     }
   }
