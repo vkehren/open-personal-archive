@@ -58,12 +58,12 @@ function areUpdatesValid(document: IAccessRequest, updateObject: IAccessRequestP
     return (userIdOfUpdater == document.userIdOfCreator);
   }
 
-  // NOTE: Only the Viewer, Decider, or Deleter can update the response
+  // NOTE: Only the Viewers and Deciders can update the response
   if (!OPA.isNullish(updateObject.response) && !OPA.areEqual(document.response, updateObject.response)) {
-    const userIdOfUpdater = (updateObject as OPA.IUpdateable_ByUser).userIdOfLatestUpdater;
-    return ((userIdOfUpdater == document.userIdOfLatestViewer) ||
-      (userIdOfUpdater == document.userIdOfDecider) ||
-      (userIdOfUpdater == document.userIdOfDeleter));
+    const userIdOfUpdater = OPA.convertNonNullish((updateObject as OPA.IUpdateable_ByUser).userIdOfLatestUpdater);
+    const userIdsOfViewers = OPA.extractUserIdsFromObjects<OPA.IViewable_ByUser>(document.updateHistory, (doc) => doc.userIdOfLatestViewer);
+    const userIdsOfDeciders = OPA.extractUserIdsFromObjects<OPA.IApprovable_ByUser<BT.ApprovalState>>(document.updateHistory, (doc) => doc.userIdOfDecider);
+    return (userIdsOfViewers.includes(userIdOfUpdater) || userIdsOfDeciders.includes(userIdOfUpdater));
   }
   return true;
 }
