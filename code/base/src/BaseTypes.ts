@@ -6,6 +6,7 @@ import * as TC from "./TypeChecking";
 export type GetterFunc<T, V> = (value: T, propName?: string | symbol) => V;
 export type GuardFunc<T> = (value: T) => boolean;
 export type FilterFunc<T> = (value: T) => boolean;
+export type IdFunc<T> = (value: T) => string | null | undefined;
 export type ComparisonFunc<T> = (item1: T, item2: T) => number; // NOTE: (item1 < item2) => -1, (item1 == item2) => 0, else 1
 export type MappingFunc<T1, T2> = (item: T1) => T2;
 
@@ -237,4 +238,30 @@ export function promoteDocumentsToCreatable<IN extends IDocument, OUT extends IN
     }
   );
   return promotedDocuments;
+}
+
+/**
+ * Gets the User ID values from the incoming objects using properties from type T.
+ * @param {Array<any>} objs The objects to evaluate.
+ * @param {IdFunc<T>} userIdFunc The function that gets the User ID value from an object of type T.
+ * @return {Array<string>} The result.
+ */
+export function extractUserIdsFromObjects<T>(objs: Array<any>, userIdFunc: IdFunc<T>): Array<string> {
+  TC.assertNonNullish(objs);
+  const userIds = ([] as Array<string>);
+
+  for (let i = 0; i < objs.length; i++) {
+    const obj = objs[i];
+    const guardFunc = (value: T): boolean => {
+      const userId = userIdFunc(value);
+      return !TC.isNullish(userId);
+    };
+
+    if (TC.isOf<T>(obj, guardFunc)) {
+      const userId = userIdFunc(obj);
+      const userIdNonNull = TC.convertNonNullish(userId);
+      userIds.push(userIdNonNull);
+    }
+  }
+  return userIds;
 }
