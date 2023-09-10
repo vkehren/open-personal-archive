@@ -93,13 +93,15 @@ function areUpdatesValid(document: IAccessRequest, updateObject: IAccessRequestP
   if (true) {
     const updateObject_Archivable = (updateObject as OPA.IArchivable_ByUser);
 
-    if (OPA.isNullish(updateObject_Archivable.isArchived)) {
-      const dateIsSet = !OPA.isNullish(updateObject_Archivable.dateOfArchivalChange);
-      const userIsSet = !OPA.isNullish(updateObject_Archivable.userIdOfArchivalChanger);
+    if (OPA.isUndefined(updateObject_Archivable.isArchived)) {
+      const dateIsSet = !OPA.isUndefined(updateObject_Archivable.dateOfArchivalChange);
+      const userIsSet = !OPA.isUndefined(updateObject_Archivable.userIdOfArchivalChanger);
 
       if (dateIsSet || userIsSet) {
         return false;
       }
+    } else if (OPA.isNullish(updateObject_Archivable.isArchived)) {
+      throw new Error("The \"isArchived\" property must not be set to null.");
     } else if (updateObject_Archivable.isArchived) {
       const dateNotSet = OPA.isNullish(updateObject_Archivable.dateOfArchivalChange);
       const userNotSet = OPA.isNullish(updateObject_Archivable.userIdOfArchivalChanger);
@@ -122,13 +124,15 @@ function areUpdatesValid(document: IAccessRequest, updateObject: IAccessRequestP
   if (true) {
     const updateObject_Viewable = (updateObject as OPA.IViewable_ByUser);
 
-    if (OPA.isNullish(updateObject_Viewable.hasBeenViewed)) {
-      const dateIsSet = !OPA.isNullish(updateObject_Viewable.dateOfLatestViewing);
-      const userIsSet = !OPA.isNullish(updateObject_Viewable.userIdOfLatestViewer);
+    if (OPA.isUndefined(updateObject_Viewable.hasBeenViewed)) {
+      const dateIsSet = !OPA.isUndefined(updateObject_Viewable.dateOfLatestViewing);
+      const userIsSet = !OPA.isUndefined(updateObject_Viewable.userIdOfLatestViewer);
 
       if (dateIsSet || userIsSet) {
         return false;
       }
+    } else if (OPA.isNullish(updateObject_Viewable.hasBeenViewed)) {
+      throw new Error("The \"hasBeenViewed\" property must not be set to null.");
     } else if (updateObject_Viewable.hasBeenViewed) {
       const dateNotSet = OPA.isNullish(updateObject_Viewable.dateOfLatestViewing);
       const userNotSet = OPA.isNullish(updateObject_Viewable.userIdOfLatestViewer);
@@ -151,14 +155,16 @@ function areUpdatesValid(document: IAccessRequest, updateObject: IAccessRequestP
   if (true) {
     const updateObject_Approvable = (updateObject as OPA.IApprovable_ByUser<BT.ApprovalState>);
 
-    if (OPA.isNullish(updateObject_Approvable.hasBeenDecided)) {
-      const stateIsSet = !OPA.isNullish(updateObject_Approvable.approvalState);
-      const dateIsSet = !OPA.isNullish(updateObject_Approvable.dateOfDecision);
-      const userIsSet = !OPA.isNullish(updateObject_Approvable.userIdOfDecider);
+    if (OPA.isUndefined(updateObject_Approvable.hasBeenDecided)) {
+      const stateIsSet = !OPA.isUndefined(updateObject_Approvable.approvalState);
+      const dateIsSet = !OPA.isUndefined(updateObject_Approvable.dateOfDecision);
+      const userIsSet = !OPA.isUndefined(updateObject_Approvable.userIdOfDecider);
 
       if (stateIsSet || dateIsSet || userIsSet) {
         return false;
       }
+    } else if (OPA.isNullish(updateObject_Approvable.hasBeenDecided)) {
+      throw new Error("The \"hasBeenDecided\" property must not be set to null.");
     } else if (updateObject_Approvable.hasBeenDecided) {
       const stateNotSet = OPA.isNullish(updateObject_Approvable.approvalState);
       const dateNotSet = OPA.isNullish(updateObject_Approvable.dateOfDecision);
@@ -186,13 +192,15 @@ function areUpdatesValid(document: IAccessRequest, updateObject: IAccessRequestP
   if (true) {
     const updateObject_Deleteable = (updateObject as OPA.IDeleteable_ByUser);
 
-    if (OPA.isNullish(updateObject_Deleteable.isMarkedAsDeleted)) {
-      const dateIsSet = !OPA.isNullish(updateObject_Deleteable.dateOfDeletion);
-      const userIsSet = !OPA.isNullish(updateObject_Deleteable.userIdOfDeleter);
+    if (OPA.isUndefined(updateObject_Deleteable.isMarkedAsDeleted)) {
+      const dateIsSet = !OPA.isUndefined(updateObject_Deleteable.dateOfDeletion);
+      const userIsSet = !OPA.isUndefined(updateObject_Deleteable.userIdOfDeleter);
 
       if (dateIsSet || userIsSet) {
         return false;
       }
+    } else if (OPA.isNullish(updateObject_Deleteable.isMarkedAsDeleted)) {
+      throw new Error("The \"isMarkedAsDeleted\" property must not be set to null.");
     } else if (updateObject_Deleteable.isMarkedAsDeleted) {
       const docIsDeleted = document.isMarkedAsDeleted;
       const dateNotSet = OPA.isNullish(updateObject_Deleteable.dateOfDeletion);
