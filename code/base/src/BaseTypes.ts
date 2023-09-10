@@ -150,14 +150,14 @@ export interface IDocument_Updateable_ByUser extends IDocument_Updateable, IUpda
 
 // IArchivable
 export const IArchivable_IsArchived_PropertyName = "isArchived"; // eslint-disable-line camelcase
-export const IArchivable_DateOfArchival_PropertyName = "dateOfArchival"; // eslint-disable-line camelcase
+export const IArchivable_DateOfArchivalChange_PropertyName = "dateOfArchivalChange"; // eslint-disable-line camelcase
 export interface IArchivable {
   readonly isArchived: boolean;
-  readonly dateOfArchival: DateToUse | null;
+  readonly dateOfArchivalChange: DateToUse | null;
 }
-export const IArchivable_ByUser_UserIdOfArchiver_PropertyName = "userIdOfArchiver"; // eslint-disable-line camelcase
+export const IArchivable_ByUser_UserIdOfArchivalChanger_PropertyName = "userIdOfArchivalChanger"; // eslint-disable-line camelcase
 export interface IArchivable_ByUser extends IArchivable {
-  readonly userIdOfArchiver: string | null;
+  readonly userIdOfArchivalChanger: string | null;
 }
 export interface IDocument_Archivable extends IDocument, IArchivable { }
 export interface IDocument_Archivable_ByUser extends IDocument_Archivable, IArchivable_ByUser { }
