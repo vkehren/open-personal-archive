@@ -109,7 +109,7 @@ export async function initializeUserAccount(callState: OpaDm.ICallState, authPro
   const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getById(db, systemState.archive.defaultTimeZoneGroupId);
   OPA.assertDocumentIsValid(timeZoneGroup, "The required TimeZoneGroup does not exist.");
 
-  const userId = await OpaDb.Users.queries.createUser(db, firebaseAuthUserId, OPA.convertNonNullish(authProvider), authAccountName, OPA.convertNonNullish(assignedRole), OPA.convertNonNullish(locale), OPA.convertNonNullish(timeZoneGroup), firstName, lastName);
+  const userId = await OpaDb.Users.queries.createWithRole(db, firebaseAuthUserId, OPA.convertNonNullish(authProvider), authAccountName, OPA.convertNonNullish(assignedRole), OPA.convertNonNullish(locale), OPA.convertNonNullish(timeZoneGroup), firstName, lastName);
 
   const userReRead = await OpaDb.Users.queries.getById(db, userId);
   OPA.assertDocumentIsValid(userReRead, "The requested User does not exist.");
