@@ -101,7 +101,7 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
    * @param {string} schemaVersion The version of the OPA database schema.
    * @return {Promise<string>} The new document ID.
    */
-  async createApplication(db: firestore.Firestore, applicationVersion: string, schemaVersion: string): Promise<string> {
+  async create(db: firestore.Firestore, applicationVersion: string, schemaVersion: string): Promise<string> {
     const document = createSingleton(applicationVersion, schemaVersion);
     const documentId = document.id;
 
@@ -125,7 +125,7 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
    * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async updateApplication(db: firestore.Firestore, updateObject: IApplicationPartial, userIdOfLatestUpgrader: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async upgrade(db: firestore.Firestore, updateObject: IApplicationPartial, userIdOfLatestUpgrader: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const documentId = SingletonId;
     const now = OPA.nowToUse();
     const updateObject_Upgradeable = ({hasBeenUpgraded: true, dateOfLatestUpgrade: now, userIdOfLatestUpgrader} as OPA.IUpgradeable_ByUser);

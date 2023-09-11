@@ -87,7 +87,7 @@ export class ActivityLogItemQuerySet extends OPA.QuerySet<IActivityLogItem> {
    * @param {any | null} otherState Any other state for the request.
    * @return {Promise<string>} The new document ID.
    */
-  async createActivityLogItem(db: firestore.Firestore, activityType: BT.ActivityType, requestor: string, resource: string, resourceCanonical: string | null, action: string | null, data: any, firebaseAuthUserId: string | null = null, userId: string | null = null, otherState: any | null = null): Promise<string> { // eslint-disable-line max-len
+  async create(db: firestore.Firestore, activityType: BT.ActivityType, requestor: string, resource: string, resourceCanonical: string | null, action: string | null, data: any, firebaseAuthUserId: string | null = null, userId: string | null = null, otherState: any | null = null): Promise<string> { // eslint-disable-line max-len
     const collectionRef = this.collectionDescriptor.getTypedCollection(db);
     const documentRef = collectionRef.doc();
     const documentId = documentRef.id;

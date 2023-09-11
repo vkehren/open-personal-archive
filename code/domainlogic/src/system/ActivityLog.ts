@@ -52,7 +52,7 @@ export async function recordLogItem(dataStorageState: OpaDm.IDataStorageState, a
     }
   }
 
-  const activityLogItemId = await OpaDb.ActivityLogItems.queries.createActivityLogItem(db, activityType, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState);
+  const activityLogItemId = await OpaDb.ActivityLogItems.queries.create(db, activityType, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState);
 
   const activityLogItemReRead = await OpaDb.ActivityLogItems.queries.getById(db, activityLogItemId);
   OPA.assertDocumentIsValid(activityLogItemReRead, "The requested ActivityLogItem does not exist.");

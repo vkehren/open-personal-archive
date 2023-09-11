@@ -138,7 +138,7 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   OPA.assertSystemIsNotInstalled(isSystemCurrentlyInstalled, "The Open Personal Archive™ (OPA) system has already been installed. Please un-install before re-installing.");
 
   // 1) Create the Application document
-  await OpaDb.Application.queries.createApplication(db, ApplicationInfo.VERSION, SchemaInfo.VERSION);
+  await OpaDb.Application.queries.create(db, ApplicationInfo.VERSION, SchemaInfo.VERSION);
 
   // 2) Load required data
   const requiredAuthProviderIds = OpaDm.AuthenticationProvider_RequiredIds;
@@ -185,7 +185,7 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   const userOwner = OPA.convertNonNullish(userOwner_Nullable);
 
   // 4) Create the Archive document for the Archive
-  await OpaDb.Archive.queries.createArchive(db, archiveName, archiveDescription, pathToStorageFolder, userOwner, localeDefaultNonNull, timeZoneGroupDefaultNonNull);
+  await OpaDb.Archive.queries.create(db, archiveName, archiveDescription, pathToStorageFolder, userOwner, localeDefaultNonNull, timeZoneGroupDefaultNonNull);
 }
 
 /**
@@ -258,7 +258,7 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
   if (OPA.isEmpty(archivePartial)) {
     throw new Error("No updated setting was provided.");
   }
-  await OpaDb.Archive.queries.updateArchive(db, archivePartial, currentUserNonNull.id, constructorProvider);
+  await OpaDb.Archive.queries.update(db, archivePartial, currentUserNonNull.id, constructorProvider);
 }
 
 /**
@@ -319,7 +319,7 @@ export async function performUpgrade(callState: OpaDm.ICallState, constructorPro
   if (OPA.isEmpty(applicationPartial)) {
     throw new Error("No upgraded version was provided.");
   }
-  await OpaDb.Application.queries.updateApplication(db, applicationPartial, currentUserNonNull.id, constructorProvider);
+  await OpaDb.Application.queries.upgrade(db, applicationPartial, currentUserNonNull.id, constructorProvider);
 }
 
 /**

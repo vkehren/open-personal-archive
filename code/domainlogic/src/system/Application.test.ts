@@ -46,7 +46,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await OpaDb.Application.queries.createApplication(config.dataStorageState.db, ApplicationInfo.VERSION, SchemaInfo.VERSION);
+    await OpaDb.Application.queries.create(config.dataStorageState.db, ApplicationInfo.VERSION, SchemaInfo.VERSION);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -56,7 +56,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await OpaDb.Application.queries.createApplication(config.dataStorageState.db, ApplicationInfo.VERSION, SchemaInfo.VERSION);
+    await OpaDb.Application.queries.create(config.dataStorageState.db, ApplicationInfo.VERSION, SchemaInfo.VERSION);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -84,7 +84,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     const archives = await OpaDb.Archive.queries.getAll(config.dataStorageState.db);
     expect(archives.length).equals(0);
 
-    await OpaDb.Application.queries.createApplication(config.dataStorageState.db, ApplicationInfo.VERSION, SchemaInfo.VERSION);
+    await OpaDb.Application.queries.create(config.dataStorageState.db, ApplicationInfo.VERSION, SchemaInfo.VERSION);
 
     const authProvider = OpaDb.AuthProviders.requiredDocuments.filter((value) => (value.isDefault))[0];
     const authProviderCollectionRef = OpaDb.AuthProviders.getTypedCollection(config.dataStorageState.db);
@@ -288,7 +288,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     const newSchemaVersion = applicationNonNull.schemaVersion;
 
     // NOTE: We must downgrade initial version numbers to test upgrade works properly, but we cannot use updateApplication(...) to do downgrade, so we must update the server fields directly
-    await expect(OpaDb.Application.queries.updateApplication(config.dataStorageState.db, {applicationVersion: oldVersion, schemaVersion: oldVersion}, OpaDm.User_OwnerId, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
+    await expect(OpaDb.Application.queries.upgrade(config.dataStorageState.db, {applicationVersion: oldVersion, schemaVersion: oldVersion}, OpaDm.User_OwnerId, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
     const applicationRef = OpaDb.Application.getTypedCollection(config.dataStorageState.db).doc(applicationNonNull.id);
     await applicationRef.update({applicationVersion: oldVersion, schemaVersion: oldVersion});
 
