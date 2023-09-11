@@ -115,7 +115,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     const firstName_Updated = (userNonNull.firstName + " UPDATED");
     let userUpdateObject = ({firstName: firstName_Updated} as OpaDm.IUserPartial);
-    await OpaDb.Users.queries.update(config.dataStorageState.db, userId, userUpdateObject, config.firebaseConstructorProvider);
+    await OpaDb.Users.queries.update(config.dataStorageState.db, userId, userUpdateObject, userId, config.firebaseConstructorProvider);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
     expect(user).not.equals(null);
 
@@ -130,6 +130,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.updateHistory.length).equals(2);
     expect(userNonNull.hasBeenUpdated).equals(true);
     expect(userNonNull.dateOfLatestUpdate).not.equals(null);
+    expect(userNonNull.userIdOfLatestUpdater).equals(userId);
     expect(userNonNull.hasBeenViewed).equals(true);
     expect(userNonNull.dateOfLatestViewing).not.equals(null);
     expect(userNonNull.userIdOfLatestViewer).equals(userId);
@@ -143,7 +144,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     const lastName_Updated = (userNonNull.lastName + " UPDATED");
     userUpdateObject = ({lastName: lastName_Updated} as OpaDm.IUserPartial);
-    await OpaDb.Users.queries.update(config.dataStorageState.db, userId, userUpdateObject, config.firebaseConstructorProvider);
+    await OpaDb.Users.queries.update(config.dataStorageState.db, userId, userUpdateObject, userId, config.firebaseConstructorProvider);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
     expect(user).not.equals(null);
 
@@ -158,6 +159,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.updateHistory.length).equals(3);
     expect(userNonNull.hasBeenUpdated).equals(true);
     expect(userNonNull.dateOfLatestUpdate).not.equals(null);
+    expect(userNonNull.userIdOfLatestUpdater).equals(userId);
     expect(userNonNull.hasBeenViewed).equals(true);
     expect(userNonNull.dateOfLatestViewing).not.equals(null);
     expect(userNonNull.userIdOfLatestViewer).equals(userId);
@@ -171,7 +173,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     const recentQueries_Updated = ["what?"];
     userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
-    await OpaDb.Users.queries.update(config.dataStorageState.db, userId, userUpdateObject, config.firebaseConstructorProvider);
+    await OpaDb.Users.queries.update(config.dataStorageState.db, userId, userUpdateObject, userId, config.firebaseConstructorProvider);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
     expect(user).not.equals(null);
 
@@ -186,6 +188,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.updateHistory.length).equals(4);
     expect(userNonNull.hasBeenUpdated).equals(true);
     expect(userNonNull.dateOfLatestUpdate).not.equals(null);
+    expect(userNonNull.userIdOfLatestUpdater).equals(userId);
     expect(userNonNull.hasBeenViewed).equals(true);
     expect(userNonNull.dateOfLatestViewing).not.equals(null);
     expect(userNonNull.userIdOfLatestViewer).equals(userId);
@@ -212,6 +215,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.updateHistory.length).equals(4);
     expect(userNonNull.hasBeenUpdated).equals(true);
     expect(userNonNull.dateOfLatestUpdate).not.equals(null);
+    expect(userNonNull.userIdOfLatestUpdater).equals(userId);
     expect(userNonNull.hasBeenViewed).equals(true);
     expect(userNonNull.dateOfLatestViewing).not.equals(null);
     expect(userNonNull.userIdOfLatestViewer).equals(userId);
@@ -238,6 +242,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.updateHistory.length).equals(4);
     expect(userNonNull.hasBeenUpdated).equals(true);
     expect(userNonNull.dateOfLatestUpdate).not.equals(null);
+    expect(userNonNull.userIdOfLatestUpdater).equals(userId);
     expect(userNonNull.hasBeenViewed).equals(true);
     expect(userNonNull.dateOfLatestViewing).not.equals(null);
     expect(userNonNull.userIdOfLatestViewer).equals(userId);
@@ -264,6 +269,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.updateHistory.length).equals(4);
     expect(userNonNull.hasBeenUpdated).equals(true);
     expect(userNonNull.dateOfLatestUpdate).not.equals(null);
+    expect(userNonNull.userIdOfLatestUpdater).equals(userId);
     expect(userNonNull.hasBeenViewed).equals(true);
     expect(userNonNull.dateOfLatestViewing).not.equals(null);
     expect(userNonNull.userIdOfLatestViewer).equals(userId);
@@ -290,6 +296,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.updateHistory.length).equals(4);
     expect(userNonNull.hasBeenUpdated).equals(true);
     expect(userNonNull.dateOfLatestUpdate).not.equals(null);
+    expect(userNonNull.userIdOfLatestUpdater).equals(userId);
     expect(userNonNull.hasBeenViewed).equals(true);
     expect(userNonNull.dateOfLatestViewing).not.equals(null);
     expect(userNonNull.userIdOfLatestViewer).equals(userId);
@@ -356,6 +363,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect((userNonNull.updateHistory[0] as any).updateHistory).equals(undefined);
     expect(userNonNull.hasBeenUpdated).equals(false);
     expect(userNonNull.dateOfLatestUpdate).equals(null);
+    expect(userNonNull.userIdOfLatestUpdater).equals(null);
     expect(userNonNull.hasBeenViewed).equals(false);
     expect(userNonNull.dateOfLatestViewing).equals(null);
     expect(userNonNull.userIdOfLatestViewer).equals(null);
@@ -369,7 +377,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     const firstName_Updated = (userNonNull.firstName + " UPDATED");
     let userUpdateObject = ({firstName: firstName_Updated} as OpaDm.IUserPartial);
-    await OpaDb.Users.queries.update(config.dataStorageState.db, userId, userUpdateObject, config.firebaseConstructorProvider);
+    await OpaDb.Users.queries.update(config.dataStorageState.db, userId, userUpdateObject, userId, config.firebaseConstructorProvider);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
     expect(user).not.equals(null);
 
@@ -384,6 +392,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.updateHistory.length).equals(2);
     expect(userNonNull.hasBeenUpdated).equals(true);
     expect(userNonNull.dateOfLatestUpdate).not.equals(null);
+    expect(userNonNull.userIdOfLatestUpdater).equals(userId);
     expect(userNonNull.hasBeenViewed).equals(false);
     expect(userNonNull.dateOfLatestViewing).equals(null);
     expect(userNonNull.userIdOfLatestViewer).equals(null);
@@ -397,7 +406,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     const lastName_Updated = (userNonNull.lastName + " UPDATED");
     userUpdateObject = ({lastName: lastName_Updated} as OpaDm.IUserPartial);
-    await OpaDb.Users.queries.update(config.dataStorageState.db, userId, userUpdateObject, config.firebaseConstructorProvider);
+    await OpaDb.Users.queries.update(config.dataStorageState.db, userId, userUpdateObject, userId, config.firebaseConstructorProvider);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
     expect(user).not.equals(null);
 
@@ -412,6 +421,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.updateHistory.length).equals(3);
     expect(userNonNull.hasBeenUpdated).equals(true);
     expect(userNonNull.dateOfLatestUpdate).not.equals(null);
+    expect(userNonNull.userIdOfLatestUpdater).equals(userId);
     expect(userNonNull.hasBeenViewed).equals(false);
     expect(userNonNull.dateOfLatestViewing).equals(null);
     expect(userNonNull.userIdOfLatestViewer).equals(null);
@@ -425,7 +435,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     const recentQueries_Updated = ["what?"];
     userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
-    await OpaDb.Users.queries.update(config.dataStorageState.db, userId, userUpdateObject, config.firebaseConstructorProvider);
+    await OpaDb.Users.queries.update(config.dataStorageState.db, userId, userUpdateObject, userId, config.firebaseConstructorProvider);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
     expect(user).not.equals(null);
 
@@ -440,6 +450,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.updateHistory.length).equals(4);
     expect(userNonNull.hasBeenUpdated).equals(true);
     expect(userNonNull.dateOfLatestUpdate).not.equals(null);
+    expect(userNonNull.userIdOfLatestUpdater).equals(userId);
     expect(userNonNull.hasBeenViewed).equals(false);
     expect(userNonNull.dateOfLatestViewing).equals(null);
     expect(userNonNull.userIdOfLatestViewer).equals(null);
@@ -466,6 +477,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.updateHistory.length).equals(5);
     expect(userNonNull.hasBeenUpdated).equals(true);
     expect(userNonNull.dateOfLatestUpdate).not.equals(null);
+    expect(userNonNull.userIdOfLatestUpdater).equals(owner.id);
     expect(userNonNull.hasBeenViewed).equals(true);
     expect(userNonNull.dateOfLatestViewing).not.equals(null);
     expect(userNonNull.userIdOfLatestViewer).equals(owner.id);
@@ -492,6 +504,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.updateHistory.length).equals(6);
     expect(userNonNull.hasBeenUpdated).equals(true);
     expect(userNonNull.dateOfLatestUpdate).not.equals(null);
+    expect(userNonNull.userIdOfLatestUpdater).equals(owner.id);
     expect(userNonNull.hasBeenViewed).equals(true);
     expect(userNonNull.dateOfLatestViewing).not.equals(null);
     expect(userNonNull.userIdOfLatestViewer).equals(owner.id);
@@ -518,6 +531,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.updateHistory.length).equals(7);
     expect(userNonNull.hasBeenUpdated).equals(true);
     expect(userNonNull.dateOfLatestUpdate).not.equals(null);
+    expect(userNonNull.userIdOfLatestUpdater).equals(owner.id);
     expect(userNonNull.hasBeenViewed).equals(true);
     expect(userNonNull.dateOfLatestViewing).not.equals(null);
     expect(userNonNull.userIdOfLatestViewer).equals(owner.id);
@@ -544,6 +558,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.updateHistory.length).equals(8);
     expect(userNonNull.hasBeenUpdated).equals(true);
     expect(userNonNull.dateOfLatestUpdate).not.equals(null);
+    expect(userNonNull.userIdOfLatestUpdater).equals(userId);
     expect(userNonNull.hasBeenViewed).equals(true);
     expect(userNonNull.dateOfLatestViewing).not.equals(null);
     expect(userNonNull.userIdOfLatestViewer).equals(owner.id);

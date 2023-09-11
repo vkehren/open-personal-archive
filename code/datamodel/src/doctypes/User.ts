@@ -25,12 +25,12 @@ export interface IUserPartial {
   recentQueries?: Array<string>;
 }
 
-type UpdateHistoryItem = IUserPartial | OPA.IUpdateable | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState> | OPA.IDeleteable_ByUser;
+type UpdateHistoryItem = IUserPartial | OPA.IUpdateable_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState> | OPA.IDeleteable_ByUser;
 interface IUserPartial_WithHistory extends IUserPartial, OPA.IUpdateable {
   updateHistory: Array<UpdateHistoryItem> | firestore.FieldValue;
 }
 
-export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Deleteable_ByUser {
+export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Deleteable_ByUser {
   readonly id: string;
   readonly firebaseAuthUserId: string;
   readonly authProviderId: string;
@@ -149,6 +149,7 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     dateOfCreation: now,
     hasBeenUpdated: false,
     dateOfLatestUpdate: null,
+    userIdOfLatestUpdater: null,
     hasBeenViewed: false,
     dateOfLatestViewing: null,
     userIdOfLatestViewer: null,
@@ -201,6 +202,7 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     dateOfCreation: now,
     hasBeenUpdated: false,
     dateOfLatestUpdate: null,
+    userIdOfLatestUpdater: null,
     hasBeenViewed: true,
     dateOfLatestViewing: now,
     userIdOfLatestViewer: User_OwnerId,
@@ -363,12 +365,13 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
    * @param {Firestore} db The Firestore Database.
    * @param {string} documentId The ID for the User within the OPA system.
    * @param {IUserPartial} updateObject The object containing the updates.
+   * @param {string} userIdOfLatestUpdater The ID for the Updater within the OPA system.
    * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async update(db: firestore.Firestore, documentId: string, updateObject: IUserPartial, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async update(db: firestore.Firestore, documentId: string, updateObject: IUserPartial, userIdOfLatestUpdater: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const now = OPA.nowToUse();
-    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now} as OPA.IUpdateable);
+    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
     updateObject = {...updateObject_Updateable, ...updateObject};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
@@ -393,7 +396,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
    */
   async setToViewed(db: firestore.Firestore, documentId: string, userIdOfLatestViewer: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const now = OPA.nowToUse();
-    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now} as OPA.IUpdateable);
+    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfLatestViewer} as OPA.IUpdateable_ByUser);
     const updateObject_Viewable = ({hasBeenViewed: true, dateOfLatestViewing: now, userIdOfLatestViewer} as OPA.IViewable_ByUser);
     const updateObject = {...updateObject_Updateable, ...updateObject_Viewable, ...({} as IUserPartial)};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
@@ -420,7 +423,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
    */
   async setToDecidedOption(db: firestore.Firestore, documentId: string, approvalState: BT.ApprovalState, userIdOfDecider: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const now = OPA.nowToUse();
-    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now} as OPA.IUpdateable);
+    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDecider} as OPA.IUpdateable_ByUser);
     const updateObject_Approvable = ({hasBeenDecided: true, approvalState, dateOfDecision: now, userIdOfDecider} as OPA.IApprovable_ByUser<BT.ApprovalState>);
     const updateObject = {...updateObject_Updateable, ...updateObject_Approvable, ...({} as IUserPartial)};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
@@ -446,7 +449,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
    */
   async markAsDeleted(db: firestore.Firestore, documentId: string, userIdOfDeleter: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const now = OPA.nowToUse();
-    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now} as OPA.IUpdateable);
+    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDeleter} as OPA.IUpdateable_ByUser);
     const updateObject_Deleteable = ({isMarkedAsDeleted: true, dateOfDeletion: now, userIdOfDeleter} as OPA.IDeleteable_ByUser);
     const updateObject = {...updateObject_Updateable, ...updateObject_Deleteable, ...({} as IUserPartial)};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
