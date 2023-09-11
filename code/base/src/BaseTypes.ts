@@ -207,6 +207,41 @@ export interface IApprovable_ByUser<T> extends IApprovable<T> {
 export interface IDocument_Approvable<T> extends IDocument, IApprovable<T> { }
 export interface IDocument_Approvable_ByUser<T> extends IDocument_Approvable<T>, IApprovable_ByUser<T> { }
 
+// ISuspendable
+export const ISuspendable_HasSuspensionStarted_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("hasSuspensionStarted"); // eslint-disable-line camelcase
+export const ISuspendable_HasSuspensionEnded_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("hasSuspensionEnded"); // eslint-disable-line camelcase
+export const ISuspendable_ReasonForSuspensionStart_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("reasonForSuspensionStart"); // eslint-disable-line camelcase
+export const ISuspendable_ReasonForSuspensionEnd_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("reasonForSuspensionEnd"); // eslint-disable-line camelcase
+export const ISuspendable_DateOfSuspensionStart_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("dateOfSuspensionStart"); // eslint-disable-line camelcase
+export const ISuspendable_DateOfSuspensionEnd_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("dateOfSuspensionEnd"); // eslint-disable-line camelcase
+export interface ISuspendable {
+  readonly hasSuspensionStarted: boolean;
+  readonly hasSuspensionEnded: boolean;
+  readonly reasonForSuspensionStart: string | null;
+  readonly reasonForSuspensionEnd: string | null;
+  readonly dateOfSuspensionStart: DateToUse | null;
+  readonly dateOfSuspensionEnd: DateToUse | null;
+}
+export const ISuspendable_ByUser_UserIdOfSuspensionStarter_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable_ByUser>("userIdOfSuspensionStarter"); // eslint-disable-line camelcase
+export const ISuspendable_ByUser_UserIdOfSuspensionEnder_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable_ByUser>("userIdOfSuspensionEnder"); // eslint-disable-line camelcase
+export interface ISuspendable_ByUser extends ISuspendable {
+  readonly userIdOfSuspensionStarter: string | null;
+  readonly userIdOfSuspensionEnder: string | null;
+}
+export interface IDocument_Suspendable extends IDocument, ISuspendable { }
+export interface IDocument_Suspendable_ByUser extends IDocument_Suspendable, ISuspendable_ByUser { }
+
+/**
+ * Gets whether the ISuspendable document is currently suspended.
+ * @param {T} document The document to check.
+ * @return {boolean} The result.
+ */
+export function isSuspended<T extends ISuspendable>(document: T): boolean {
+  TC.assertNonNullish(document);
+  const isSuspended = (document.hasSuspensionStarted && !document.hasSuspensionEnded);
+  return isSuspended;
+}
+
 // IDeleteable
 export const IDeleteable_IsMarkedAsDeleted_PropertyName = VC.getTypedPropertyKeyAsText<IDeleteable>("isMarkedAsDeleted"); // eslint-disable-line camelcase
 export const IDeleteable_DateOfDeletion_PropertyName = VC.getTypedPropertyKeyAsText<IDeleteable>("dateOfDeletion"); // eslint-disable-line camelcase
@@ -220,22 +255,6 @@ export interface IDeleteable_ByUser extends IDeleteable {
 }
 export interface IDocument_Deleteable extends IDocument, IDeleteable { }
 export interface IDocument_Deleteable_ByUser extends IDocument_Deleteable, IDeleteable_ByUser { }
-
-// ISuspendable
-export const ISuspendable_IsSuspended_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("isSuspended"); // eslint-disable-line camelcase
-export const ISuspendable_DateOfSuspension_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("dateOfSuspension"); // eslint-disable-line camelcase
-export const ISuspendable_ReasonForSuspension_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("reasonForSuspension"); // eslint-disable-line camelcase
-export interface ISuspendable {
-  readonly isSuspended: boolean;
-  readonly dateOfSuspension: DateToUse | null;
-  readonly reasonForSuspension: string | null;
-}
-export const ISuspendable_ByUser_UserIdOfSuspender_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable_ByUser>("userIdOfSuspender"); // eslint-disable-line camelcase
-export interface ISuspendable_ByUser extends ISuspendable {
-  readonly userIdOfSuspender: string | null;
-}
-export interface IDocument_Suspendable extends IDocument, ISuspendable { }
-export interface IDocument_Suspendable_ByUser extends IDocument_Suspendable, ISuspendable_ByUser { }
 
 /**
  * Sets the ICreatable properies on the incoming documents and returns the typed result.
