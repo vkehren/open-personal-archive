@@ -366,7 +366,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    * @param {string | null} [citationId=null] The ID of the Citation that the Access Request pertains to, if one exists.
    * @return {Promise<string>} The new document ID.
    */
-  async createAccessRequest(db: firestore.Firestore, user: IUser, locale: ILocale, message: string, citationId: string | null = null): Promise<string> { // eslint-disable-line max-len
+  async create(db: firestore.Firestore, user: IUser, locale: ILocale, message: string, citationId: string | null = null): Promise<string> { // eslint-disable-line max-len
     const collectionRef = this.collectionDescriptor.getTypedCollection(db);
     const documentRef = collectionRef.doc();
     const documentId = documentRef.id;
@@ -390,7 +390,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async updateAccessRequest(db: firestore.Firestore, documentId: string, updateObject: IAccessRequestPartial, userIdOfLatestUpdater: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async update(db: firestore.Firestore, documentId: string, updateObject: IAccessRequestPartial, userIdOfLatestUpdater: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const now = OPA.nowToUse();
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
     updateObject = {...updateObject_Updateable, ...updateObject};
@@ -443,7 +443,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async setAccessRequestToArchivedState(db: firestore.Firestore, documentId: string, isArchived: boolean, userIdOfArchivalChanger: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async setToArchivalOption(db: firestore.Firestore, documentId: string, isArchived: boolean, userIdOfArchivalChanger: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const now = OPA.nowToUse();
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfArchivalChanger} as OPA.IUpdateable_ByUser);
     const updateObject_Archivable = ({isArchived, dateOfArchivalChange: now, userIdOfArchivalChanger} as OPA.IArchivable_ByUser);
@@ -469,7 +469,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async setAccessRequestToViewed(db: firestore.Firestore, documentId: string, userIdOfLatestViewer: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async setToViewed(db: firestore.Firestore, documentId: string, userIdOfLatestViewer: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const now = OPA.nowToUse();
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfLatestViewer} as OPA.IUpdateable_ByUser);
     const updateObject_Viewable = ({hasBeenViewed: true, dateOfLatestViewing: now, userIdOfLatestViewer} as OPA.IViewable_ByUser);
@@ -496,7 +496,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async setAccessRequestToDecided(db: firestore.Firestore, documentId: string, approvalState: BT.ApprovalState, userIdOfDecider: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async setToDecidedOption(db: firestore.Firestore, documentId: string, approvalState: BT.ApprovalState, userIdOfDecider: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const now = OPA.nowToUse();
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDecider} as OPA.IUpdateable_ByUser);
     const updateObject_Approvable = ({hasBeenDecided: true, approvalState, dateOfDecision: now, userIdOfDecider} as OPA.IApprovable_ByUser<BT.ApprovalState>);
@@ -522,7 +522,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async markAccessRequestAsDeleted(db: firestore.Firestore, documentId: string, userIdOfDeleter: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async markAsDeleted(db: firestore.Firestore, documentId: string, userIdOfDeleter: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const now = OPA.nowToUse();
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDeleter} as OPA.IUpdateable_ByUser);
     const updateObject_Deleteable = ({isMarkedAsDeleted: true, dateOfDeletion: now, userIdOfDeleter} as OPA.IDeleteable_ByUser);

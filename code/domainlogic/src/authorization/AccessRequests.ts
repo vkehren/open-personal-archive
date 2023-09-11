@@ -30,7 +30,7 @@ export async function requestUserAccess(callState: OpaDm.ICallState, message: st
   const locale = authorizationState.locale;
 
   OPA.assertIsFalse((user.id == OpaDm.User_OwnerId), "The Owner cannot request access as the Owner already has access to the entire Archive.");
-  const accessRequestId = await OpaDb.AccessRequests.queries.createAccessRequest(db, user, locale, message, citationId);
+  const accessRequestId = await OpaDb.AccessRequests.queries.create(db, user, locale, message, citationId);
 
   const accessRequestReRead = await OpaDb.AccessRequests.queries.getById(db, accessRequestId);
   OPA.assertDocumentIsValid(accessRequestReRead, "The requested AccessRequest does not exist.");
