@@ -149,6 +149,20 @@ export interface IUpdateable_ByUser extends IUpdateable {
 export interface IDocument_Updateable extends IDocument, IUpdateable { }
 export interface IDocument_Updateable_ByUser extends IDocument_Updateable, IUpdateable_ByUser { }
 
+// ITaggable
+export const ITaggable_Tags_PropertyName = VC.getTypedPropertyKeyAsText<ITaggable>("tags"); // eslint-disable-line camelcase
+export const ITaggable_DateOfLatestTagging_PropertyName = VC.getTypedPropertyKeyAsText<ITaggable>("dateOfLatestTagging"); // eslint-disable-line camelcase
+export interface ITaggable {
+  tags: Array<string>;
+  dateOfLatestTagging: DateToUse | null;
+}
+export const ITaggable_ByUser_UserIdOfLatestTagger_PropertyName = VC.getTypedPropertyKeyAsText<ITaggable_ByUser>("userIdOfLatestTagger"); // eslint-disable-line camelcase
+export interface ITaggable_ByUser extends ITaggable {
+  userIdOfLatestTagger: string | null;
+}
+export interface IDocument_Taggable extends IDocument, ITaggable { }
+export interface IDocument_Taggable_ByUser extends IDocument_Taggable, ITaggable_ByUser { }
+
 // IArchivable
 export const IArchivable_IsArchived_PropertyName = VC.getTypedPropertyKeyAsText<IArchivable>("isArchived"); // eslint-disable-line camelcase
 export const IArchivable_DateOfArchivalChange_PropertyName = VC.getTypedPropertyKeyAsText<IArchivable>("dateOfArchivalChange"); // eslint-disable-line camelcase
