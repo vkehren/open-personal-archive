@@ -14,14 +14,14 @@ export interface IAccessRequestPartial {
   response?: OPA.ILocalizable<string>;
 }
 
-type UpdateHistoryItem = IAccessRequestPartial | OPA.IUpdateable_ByUser | OPA.IArchivable_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState> | OPA.IDeleteable_ByUser;
+type UpdateHistoryItem = IAccessRequestPartial | OPA.IUpdateable_ByUser | OPA.ITaggable_ByUser | OPA.IArchivable_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState> | OPA.IDeleteable_ByUser;
 interface IAccessRequestPartial_WithHistory extends IAccessRequestPartial, OPA.IUpdateable_ByUser {
   updateHistory: Array<UpdateHistoryItem> | firestore.FieldValue;
 }
 
 // NOTE: Use "IDocument_Creatable_ByUser" because we must record the User who created the AccessRequest (i.e. the owner of the AccessRequest)
 // NOTE: Use "IDocument_Updateable_ByUser" because the User creating the AccessRequest updates the "message", but the Decider updates the "response"
-export interface IAccessRequest extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser, OPA.IDocument_Archivable_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Deleteable_ByUser {
+export interface IAccessRequest extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser, OPA.IDocument_Taggable_ByUser, OPA.IDocument_Archivable_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Deleteable_ByUser {
   readonly id: string;
   readonly archiveId: string; // NOTE: This field stores information necessary to extend the OPA system to manage multiple Archives
   readonly isSpecificToCitation: boolean;
@@ -85,6 +85,31 @@ function areUpdatesValid(document: IAccessRequest, updateObject: IAccessRequestP
       const userMatchesDoc = (updateObject_Creatable.userIdOfCreator == document.userIdOfCreator);
 
       if (!dateMatchesDoc || !userMatchesDoc) {
+        return false;
+      }
+    }
+  }
+
+  if (true) {
+    const updateObject_Taggable = (updateObject as OPA.ITaggable_ByUser);
+
+    if (OPA.isUndefined(updateObject_Taggable.tags)) {
+      const dateIsSet = !OPA.isUndefined(updateObject_Taggable.dateOfLatestTagging);
+      const userIsSet = !OPA.isUndefined(updateObject_Taggable.userIdOfLatestTagger);
+
+      if (dateIsSet || userIsSet) {
+        return false;
+      }
+    } else if (OPA.isNullish(updateObject_Taggable.tags)) {
+      throw new Error("The \"tags\" property must not be set to null.");
+    } else if (!OPA.isOf<Array<string>>(updateObject_Taggable.tags, (value) => !OPA.isUndefined(value.splice))) {
+      throw new Error("The \"tags\" property can only be set to a value of type \"Array<string>\".");
+    } else {
+      const dateNotSet = OPA.isNullish(updateObject_Taggable.dateOfLatestTagging);
+      const userNotSet = OPA.isNullish(updateObject_Taggable.userIdOfLatestTagger);
+      const isSelfTagged = (updateObject_Taggable.userIdOfLatestTagger == document.userIdOfCreator);
+
+      if (dateNotSet || userNotSet || isSelfTagged) {
         return false;
       }
     }
@@ -272,6 +297,9 @@ function createInstance(id: string, user: IUser, locale: ILocale, message: strin
     hasBeenUpdated: false,
     dateOfLatestUpdate: null,
     userIdOfLatestUpdater: null,
+    tags: ([] as Array<string>),
+    dateOfLatestTagging: null,
+    userIdOfLatestTagger: null,
     isArchived: false,
     dateOfArchivalChange: null,
     userIdOfArchivalChanger: null,
@@ -366,6 +394,33 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const now = OPA.nowToUse();
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
     updateObject = {...updateObject_Updateable, ...updateObject};
+    const updateHistory = constructorProvider.arrayUnion(updateObject);
+    const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
+
+    const document = await this.getById(db, documentId);
+    OPA.assertNonNullish(document);
+    const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
+    OPA.assertIsTrue(areValid, "The requested update is invalid.");
+
+    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const documentRef = collectionRef.doc(documentId);
+    await documentRef.set(updateObject_WithHistory, {merge: true});
+  }
+
+  /**
+   * Updates the AccessRequest stored on the server by constructing an ITaggable_ByUser object.
+   * @param {Firestore} db The Firestore Database.
+   * @param {string} documentId The ID for the AccessRequest within the OPA system.
+   * @param {Array<string>} tags The tags that apply to the AccessRequest.
+   * @param {string} userIdOfLatestTagger The ID for the latest Tagger within the OPA system.
+   * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
+   * @return {Promise<void>}
+   */
+  async setTags(db: firestore.Firestore, documentId: string, tags: Array<string>, userIdOfLatestTagger: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    const now = OPA.nowToUse();
+    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfLatestTagger} as OPA.IUpdateable_ByUser);
+    const updateObject_Taggable = ({tags, dateOfLatestTagging: now, userIdOfLatestTagger} as OPA.ITaggable_ByUser);
+    const updateObject = {...updateObject_Updateable, ...updateObject_Taggable, ...({} as IAccessRequestPartial)};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
