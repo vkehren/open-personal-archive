@@ -1,15 +1,16 @@
 import * as firestore from "@google-cloud/firestore";
 import * as TC from "./TypeChecking";
+import * as VC from "./ValueChecking";
 
 // export const name = "BaseTypes";
 
-export type KeyText = string | symbol;
+export type KeyText = string; // NOTE: " | symbol" causes Firebase Firestore query errors
 export type TypedKeyText<T> = (keyof T) & (KeyText);
 export type ContainerOfTypedKeyText<T> = {
   [K in keyof T]: TypedKeyText<T>;
 };
 
-export type GetterFunc<T, V> = (value: T, propName?: KeyText) => V;
+export type GetterFunc<T, V> = (value: T, propName?: string | symbol) => V;
 export type GuardFunc<T> = (value: T) => boolean;
 export type FilterFunc<T> = (value: T) => boolean;
 export type IdFunc<T> = (value: T) => string | null | undefined;
@@ -97,22 +98,22 @@ export type DateToUse = Date;
 export const nowToUse = (): DateToUse => firestore.Timestamp.now().toDate();
 
 // IDocument
-export const IDocument_DocumentId_PropertyName = "id"; // eslint-disable-line camelcase
+export const IDocument_DocumentId_PropertyName = VC.getTypedPropertyKeyAsText<IDocument>("id"); // eslint-disable-line camelcase
 export interface IDocument {
   id: string,
 }
 
 // ICreatable
-export const ICreatable_DateOfCreation_PropertyName = "dateOfCreation"; // eslint-disable-line camelcase
+export const ICreatable_DateOfCreation_PropertyName = VC.getTypedPropertyKeyAsText<ICreatable>("dateOfCreation"); // eslint-disable-line camelcase
 export interface ICreatable {
   // NOTE: Do not include "hasBeenCreated" because any object that exists has been created
   readonly dateOfCreation: DateToUse;
 }
-export const ICreatable_ByUser_UserIdOfCreator_PropertyName = "userIdOfCreator"; // eslint-disable-line camelcase
+export const ICreatable_ByUser_UserIdOfCreator_PropertyName = VC.getTypedPropertyKeyAsText<ICreatable_ByUser>("userIdOfCreator"); // eslint-disable-line camelcase
 export interface ICreatable_ByUser extends ICreatable {
   readonly userIdOfCreator: string;
 }
-export const ICreatable_ByNullableUser_UserIdOfCreator_PropertyName = "userIdOfCreator"; // eslint-disable-line camelcase
+export const ICreatable_ByNullableUser_UserIdOfCreator_PropertyName = VC.getTypedPropertyKeyAsText<ICreatable_ByNullableUser>("userIdOfCreator"); // eslint-disable-line camelcase
 export interface ICreatable_ByNullableUser extends ICreatable {
   readonly userIdOfCreator: string | null;
 }
@@ -121,13 +122,13 @@ export interface IDocument_Creatable_ByUser extends IDocument_Creatable, ICreata
 export interface IDocument_Creatable_ByNullableUser extends IDocument_Creatable, ICreatable_ByNullableUser { }
 
 // IUpgradeable
-export const IUpgradeable_HasBeenUpgraded_PropertyName = "hasBeenUpgraded"; // eslint-disable-line camelcase
-export const IUpgradeable_DateOfLatestUpgrade_PropertyName = "dateOfLatestUpgrade"; // eslint-disable-line camelcase
+export const IUpgradeable_HasBeenUpgraded_PropertyName = VC.getTypedPropertyKeyAsText<IUpgradeable>("hasBeenUpgraded"); // eslint-disable-line camelcase
+export const IUpgradeable_DateOfLatestUpgrade_PropertyName = VC.getTypedPropertyKeyAsText<IUpgradeable>("dateOfLatestUpgrade"); // eslint-disable-line camelcase
 export interface IUpgradeable {
   readonly hasBeenUpgraded: boolean;
   readonly dateOfLatestUpgrade: DateToUse | null;
 }
-export const IUpgradeable_ByUser_UserIdOfLatestUpgrader_PropertyName = "userIdOfLatestUpgrader"; // eslint-disable-line camelcase
+export const IUpgradeable_ByUser_UserIdOfLatestUpgrader_PropertyName = VC.getTypedPropertyKeyAsText<IUpgradeable_ByUser>("userIdOfLatestUpgrader"); // eslint-disable-line camelcase
 export interface IUpgradeable_ByUser extends IUpgradeable {
   readonly userIdOfLatestUpgrader: string | null;
 }
@@ -135,13 +136,13 @@ export interface IDocument_Upgradeable extends IDocument, IUpgradeable { }
 export interface IDocument_Upgradeable_ByUser extends IDocument_Upgradeable, IUpgradeable_ByUser { }
 
 // IUpdateable
-export const IUpdateable_HasBeenUpdated_PropertyName = "hasBeenUpdated"; // eslint-disable-line camelcase
-export const IUpdateable_DateOfLatestUpdate_PropertyName = "dateOfLatestUpdate"; // eslint-disable-line camelcase
+export const IUpdateable_HasBeenUpdated_PropertyName = VC.getTypedPropertyKeyAsText<IUpdateable>("hasBeenUpdated"); // eslint-disable-line camelcase
+export const IUpdateable_DateOfLatestUpdate_PropertyName = VC.getTypedPropertyKeyAsText<IUpdateable>("dateOfLatestUpdate"); // eslint-disable-line camelcase
 export interface IUpdateable {
   hasBeenUpdated: boolean;
   dateOfLatestUpdate: DateToUse | null;
 }
-export const IUpdateable_ByUser_UserIdOfLatestUpdater_PropertyName = "userIdOfLatestUpdater"; // eslint-disable-line camelcase
+export const IUpdateable_ByUser_UserIdOfLatestUpdater_PropertyName = VC.getTypedPropertyKeyAsText<IUpdateable_ByUser>("userIdOfLatestUpdater"); // eslint-disable-line camelcase
 export interface IUpdateable_ByUser extends IUpdateable {
   userIdOfLatestUpdater: string | null;
 }
@@ -149,13 +150,13 @@ export interface IDocument_Updateable extends IDocument, IUpdateable { }
 export interface IDocument_Updateable_ByUser extends IDocument_Updateable, IUpdateable_ByUser { }
 
 // IArchivable
-export const IArchivable_IsArchived_PropertyName = "isArchived"; // eslint-disable-line camelcase
-export const IArchivable_DateOfArchivalChange_PropertyName = "dateOfArchivalChange"; // eslint-disable-line camelcase
+export const IArchivable_IsArchived_PropertyName = VC.getTypedPropertyKeyAsText<IArchivable>("isArchived"); // eslint-disable-line camelcase
+export const IArchivable_DateOfArchivalChange_PropertyName = VC.getTypedPropertyKeyAsText<IArchivable>("dateOfArchivalChange"); // eslint-disable-line camelcase
 export interface IArchivable {
   readonly isArchived: boolean;
   readonly dateOfArchivalChange: DateToUse | null;
 }
-export const IArchivable_ByUser_UserIdOfArchivalChanger_PropertyName = "userIdOfArchivalChanger"; // eslint-disable-line camelcase
+export const IArchivable_ByUser_UserIdOfArchivalChanger_PropertyName = VC.getTypedPropertyKeyAsText<IArchivable_ByUser>("userIdOfArchivalChanger"); // eslint-disable-line camelcase
 export interface IArchivable_ByUser extends IArchivable {
   readonly userIdOfArchivalChanger: string | null;
 }
@@ -163,13 +164,13 @@ export interface IDocument_Archivable extends IDocument, IArchivable { }
 export interface IDocument_Archivable_ByUser extends IDocument_Archivable, IArchivable_ByUser { }
 
 // IViewable
-export const IViewable_HasBeenViewed_PropertyName = "hasBeenViewed"; // eslint-disable-line camelcase
-export const IViewable_DateOfLatestViewing_PropertyName = "dateOfLatestViewing"; // eslint-disable-line camelcase
+export const IViewable_HasBeenViewed_PropertyName = VC.getTypedPropertyKeyAsText<IViewable>("hasBeenViewed"); // eslint-disable-line camelcase
+export const IViewable_DateOfLatestViewing_PropertyName = VC.getTypedPropertyKeyAsText<IViewable>("dateOfLatestViewing"); // eslint-disable-line camelcase
 export interface IViewable {
   readonly hasBeenViewed: boolean;
   readonly dateOfLatestViewing: DateToUse | null;
 }
-export const IViewable_ByUser_UserIdOfLatestViewer_PropertyName = "userIdOfLatestViewer"; // eslint-disable-line camelcase
+export const IViewable_ByUser_UserIdOfLatestViewer_PropertyName = VC.getTypedPropertyKeyAsText<IViewable_ByUser>("userIdOfLatestViewer"); // eslint-disable-line camelcase
 export interface IViewable_ByUser extends IViewable {
   readonly userIdOfLatestViewer: string | null;
 }
@@ -177,15 +178,15 @@ export interface IDocument_Viewable extends IDocument, IViewable { }
 export interface IDocument_Viewable_ByUser extends IDocument_Viewable, IViewable_ByUser { }
 
 // IApprovable
-export const IApprovable_HasBeenDecided_PropertyName = "hasBeenDecided"; // eslint-disable-line camelcase
-export const IApprovable_ApprovalState_PropertyName = "approvalState"; // eslint-disable-line camelcase
-export const IApprovable_DateOfDecision_PropertyName = "dateOfDecision"; // eslint-disable-line camelcase
+export const IApprovable_HasBeenDecided_PropertyName = VC.getTypedPropertyKeyAsText<IApprovable<string>>("hasBeenDecided"); // eslint-disable-line camelcase
+export const IApprovable_ApprovalState_PropertyName = VC.getTypedPropertyKeyAsText<IApprovable<string>>("approvalState"); // eslint-disable-line camelcase
+export const IApprovable_DateOfDecision_PropertyName = VC.getTypedPropertyKeyAsText<IApprovable<string>>("dateOfDecision"); // eslint-disable-line camelcase
 export interface IApprovable<T> {
   readonly hasBeenDecided: boolean;
   readonly approvalState: T;
   readonly dateOfDecision: DateToUse | null;
 }
-export const IApprovable_ByUser_UserIdOfDecider_PropertyName = "userIdOfDecider"; // eslint-disable-line camelcase
+export const IApprovable_ByUser_UserIdOfDecider_PropertyName = VC.getTypedPropertyKeyAsText<IApprovable_ByUser<string>>("userIdOfDecider"); // eslint-disable-line camelcase
 export interface IApprovable_ByUser<T> extends IApprovable<T> {
   readonly userIdOfDecider: string | null;
 }
@@ -193,13 +194,13 @@ export interface IDocument_Approvable<T> extends IDocument, IApprovable<T> { }
 export interface IDocument_Approvable_ByUser<T> extends IDocument_Approvable<T>, IApprovable_ByUser<T> { }
 
 // IDeleteable
-export const IDeleteable_IsMarkedAsDeleted_PropertyName = "isMarkedAsDeleted"; // eslint-disable-line camelcase
-export const IDeleteable_DateOfDeletion_PropertyName = "dateOfDeletion"; // eslint-disable-line camelcase
+export const IDeleteable_IsMarkedAsDeleted_PropertyName = VC.getTypedPropertyKeyAsText<IDeleteable>("isMarkedAsDeleted"); // eslint-disable-line camelcase
+export const IDeleteable_DateOfDeletion_PropertyName = VC.getTypedPropertyKeyAsText<IDeleteable>("dateOfDeletion"); // eslint-disable-line camelcase
 export interface IDeleteable {
   readonly isMarkedAsDeleted: boolean;
   readonly dateOfDeletion: DateToUse | null;
 }
-export const IDeleteable_ByUser_UserIdOfDeleter_PropertyName = "userIdOfDeleter"; // eslint-disable-line camelcase
+export const IDeleteable_ByUser_UserIdOfDeleter_PropertyName = VC.getTypedPropertyKeyAsText<IDeleteable_ByUser>("userIdOfDeleter"); // eslint-disable-line camelcase
 export interface IDeleteable_ByUser extends IDeleteable {
   readonly userIdOfDeleter: string | null;
 }
@@ -207,15 +208,15 @@ export interface IDocument_Deleteable extends IDocument, IDeleteable { }
 export interface IDocument_Deleteable_ByUser extends IDocument_Deleteable, IDeleteable_ByUser { }
 
 // ISuspendable
-export const ISuspendable_IsSuspended_PropertyName = "isSuspended"; // eslint-disable-line camelcase
-export const ISuspendable_DateOfSuspension_PropertyName = "dateOfSuspension"; // eslint-disable-line camelcase
-export const ISuspendable_ReasonForSuspension_PropertyName = "reasonForSuspension"; // eslint-disable-line camelcase
+export const ISuspendable_IsSuspended_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("isSuspended"); // eslint-disable-line camelcase
+export const ISuspendable_DateOfSuspension_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("dateOfSuspension"); // eslint-disable-line camelcase
+export const ISuspendable_ReasonForSuspension_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("reasonForSuspension"); // eslint-disable-line camelcase
 export interface ISuspendable {
   readonly isSuspended: boolean;
   readonly dateOfSuspension: DateToUse | null;
   readonly reasonForSuspension: string | null;
 }
-export const ISuspendable_ByUser_UserIdOfSuspender_PropertyName = "userIdOfSuspender"; // eslint-disable-line camelcase
+export const ISuspendable_ByUser_UserIdOfSuspender_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable_ByUser>("userIdOfSuspender"); // eslint-disable-line camelcase
 export interface ISuspendable_ByUser extends ISuspendable {
   readonly userIdOfSuspender: string | null;
 }

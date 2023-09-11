@@ -72,8 +72,8 @@ export function isWhitespace(value: string, includeEmptyAsWhitespace: boolean = 
  */
 export function getOwnPropertyKeys(obj: unknown): Array<BT.KeyText> {
   const ownNames = Object.getOwnPropertyNames(obj);
-  const ownSymbols = Object.getOwnPropertySymbols(obj);
-  const ownCombined = (ownNames as Array<BT.KeyText>).concat(ownSymbols);
+  const ownSymbolsAsNames = Object.getOwnPropertySymbols(obj).map((value) => value.toString());
+  const ownCombined = (ownNames as Array<BT.KeyText>).concat(ownSymbolsAsNames);
   return ownCombined;
 }
 
