@@ -491,6 +491,37 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.dateOfDeletion).equals(null);
     expect(accessRequestNonNull.userIdOfDeleter).equals(null);
 
+    await expect(OpaDb.AccessRequests.queries.markAsDeleted(config.dataStorageState.db, accessRequestId, owner.id, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
+    accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState.db, accessRequestId);
+    expect(accessRequest).not.equals(null);
+
+    accessRequestNonNull = OPA.convertNonNullish(accessRequest);
+    expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequestNonNull.isSpecificToCitation).equals(false);
+    expect(accessRequestNonNull.citationId).equals(null);
+    expect(accessRequestNonNull.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
+    expect(accessRequestNonNull.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
+    expect(accessRequestNonNull.updateHistory.length).equals(11);
+    expect(accessRequestNonNull.hasBeenUpdated).equals(true);
+    expect(accessRequestNonNull.dateOfLatestUpdate).not.equals(null);
+    expect(accessRequestNonNull.userIdOfLatestUpdater).equals(owner.id);
+    expect(accessRequestNonNull.tags.length).equals(3);
+    expect(accessRequestNonNull.dateOfLatestTagging).not.equals(null);
+    expect(accessRequestNonNull.userIdOfLatestTagger).equals(owner.id);
+    expect(accessRequestNonNull.isArchived).equals(false);
+    expect(accessRequestNonNull.dateOfArchivalChange).not.equals(null);
+    expect(accessRequestNonNull.userIdOfArchivalChanger).equals(owner.id);
+    expect(accessRequestNonNull.hasBeenViewed).equals(true);
+    expect(accessRequestNonNull.dateOfLatestViewing).not.equals(null);
+    expect(accessRequestNonNull.userIdOfLatestViewer).equals(userId);
+    expect(accessRequestNonNull.hasBeenDecided).equals(true);
+    expect(accessRequestNonNull.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(accessRequestNonNull.dateOfDecision).not.equals(null);
+    expect(accessRequestNonNull.userIdOfDecider).equals(owner.id);
+    expect(accessRequestNonNull.isMarkedAsDeleted).equals(false);
+    expect(accessRequestNonNull.dateOfDeletion).equals(null);
+    expect(accessRequestNonNull.userIdOfDeleter).equals(null);
+
     await OpaDb.AccessRequests.queries.markAsDeleted(config.dataStorageState.db, accessRequestId, userId, config.firebaseConstructorProvider);
     accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState.db, accessRequestId);
     expect(accessRequest).not.equals(null);

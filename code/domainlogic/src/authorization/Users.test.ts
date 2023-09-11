@@ -419,6 +419,42 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
+    await expect(OpaDb.Users.queries.markAsDeleted(config.dataStorageState.db, userId, testOtherUserId, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
+    user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
+    expect(user).not.equals(null);
+
+    userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.firebaseAuthUserId).equals(owner.firebaseAuthUserId);
+    expect(userNonNull.authProviderId).equals(owner.authProviderId);
+    expect(userNonNull.authAccountName).equals(owner.authAccountName);
+    expect(userNonNull.authAccountNameLowered).equals(owner.authAccountNameLowered);
+    expect(userNonNull.firstName).equals(firstName_Updated);
+    expect(userNonNull.lastName).equals(lastName_Updated);
+    expect(userNonNull.recentQueries.length).equals(1);
+    expect(userNonNull.updateHistory.length).equals(4);
+    expect(userNonNull.hasBeenUpdated).equals(true);
+    expect(userNonNull.dateOfLatestUpdate).not.equals(null);
+    expect(userNonNull.userIdOfLatestUpdater).equals(userId);
+    expect(userNonNull.hasBeenViewed).equals(true);
+    expect(userNonNull.dateOfLatestViewing).not.equals(null);
+    expect(userNonNull.userIdOfLatestViewer).equals(userId);
+    expect(userNonNull.hasBeenDecided).equals(true);
+    expect(userNonNull.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(userNonNull.dateOfDecision).not.equals(null);
+    expect(userNonNull.userIdOfDecider).equals(userId);
+    expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.hasSuspensionStarted).equals(false);
+    expect(userNonNull.hasSuspensionEnded).equals(false);
+    expect(userNonNull.reasonForSuspensionStart).equals(null);
+    expect(userNonNull.reasonForSuspensionEnd).equals(null);
+    expect(userNonNull.dateOfSuspensionStart).equals(null);
+    expect(userNonNull.dateOfSuspensionEnd).equals(null);
+    expect(userNonNull.userIdOfSuspensionStarter).equals(null);
+    expect(userNonNull.userIdOfSuspensionEnder).equals(null);
+    expect(userNonNull.isMarkedAsDeleted).equals(false);
+    expect(userNonNull.dateOfDeletion).equals(null);
+    expect(userNonNull.userIdOfDeleter).equals(null);
+
     await expect(OpaDb.Users.queries.markAsDeleted(config.dataStorageState.db, userId, userId, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
     expect(user).not.equals(null);
@@ -934,6 +970,42 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.userIdOfDeleter).equals(null);
 
     await expect(OpaDb.Users.queries.setToUnSuspended(config.dataStorageState.db, userId, testEndReason, owner.id, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
+    user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
+    expect(user).not.equals(null);
+
+    userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
+    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
+    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.firstName).equals(firstName_Updated);
+    expect(userNonNull.lastName).equals(lastName_Updated);
+    expect(userNonNull.recentQueries.length).equals(1);
+    expect(userNonNull.updateHistory.length).equals(9);
+    expect(userNonNull.hasBeenUpdated).equals(true);
+    expect(userNonNull.dateOfLatestUpdate).not.equals(null);
+    expect(userNonNull.userIdOfLatestUpdater).equals(owner.id);
+    expect(userNonNull.hasBeenViewed).equals(true);
+    expect(userNonNull.dateOfLatestViewing).not.equals(null);
+    expect(userNonNull.userIdOfLatestViewer).equals(owner.id);
+    expect(userNonNull.hasBeenDecided).equals(true);
+    expect(userNonNull.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(userNonNull.dateOfDecision).not.equals(null);
+    expect(userNonNull.userIdOfDecider).equals(owner.id);
+    expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.hasSuspensionStarted).equals(true);
+    expect(userNonNull.hasSuspensionEnded).equals(true);
+    expect(userNonNull.reasonForSuspensionStart).equals(testStartReason);
+    expect(userNonNull.reasonForSuspensionEnd).equals(testEndReason);
+    expect(userNonNull.dateOfSuspensionStart).not.equals(null);
+    expect(userNonNull.dateOfSuspensionEnd).not.equals(null);
+    expect(userNonNull.userIdOfSuspensionStarter).equals(owner.id);
+    expect(userNonNull.userIdOfSuspensionEnder).equals(owner.id);
+    expect(userNonNull.isMarkedAsDeleted).equals(false);
+    expect(userNonNull.dateOfDeletion).equals(null);
+    expect(userNonNull.userIdOfDeleter).equals(null);
+
+    await expect(OpaDb.Users.queries.markAsDeleted(config.dataStorageState.db, userId, owner.id, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState.db, userId);
     expect(user).not.equals(null);
 
