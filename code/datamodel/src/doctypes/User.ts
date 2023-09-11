@@ -25,12 +25,12 @@ export interface IUserPartial {
   recentQueries?: Array<string>;
 }
 
-type UpdateHistoryItem = IUserPartial | OPA.IUpdateable_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState> | OPA.IDeleteable_ByUser;
+type UpdateHistoryItem = IUserPartial | OPA.IUpdateable_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState> | OPA.ISuspendable_ByUser | OPA.IDeleteable_ByUser;
 interface IUserPartial_WithHistory extends IUserPartial, OPA.IUpdateable {
   updateHistory: Array<UpdateHistoryItem> | firestore.FieldValue;
 }
 
-export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Deleteable_ByUser {
+export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Suspendable_ByUser, OPA.IDocument_Deleteable_ByUser {
   readonly id: string;
   readonly firebaseAuthUserId: string;
   readonly authProviderId: string;
@@ -185,6 +185,65 @@ function areUpdatesValid(document: IUser, updateObject: IUserPartial): boolean {
   }
 
   if (true) {
+    const updateObject_Suspendable = (updateObject as OPA.ISuspendable_ByUser);
+
+    if (OPA.isUndefined(updateObject_Suspendable.hasSuspensionStarted) || OPA.isUndefined(updateObject_Suspendable.hasSuspensionEnded)) {
+      const startedIsSet = !OPA.isUndefined(updateObject_Suspendable.hasSuspensionStarted);
+      const endedIsSet = !OPA.isUndefined(updateObject_Suspendable.hasSuspensionEnded);
+      const startReasonIsSet = !OPA.isUndefined(updateObject_Suspendable.reasonForSuspensionStart);
+      const endReasonIsSet = !OPA.isUndefined(updateObject_Suspendable.reasonForSuspensionEnd);
+      const startDateIsSet = !OPA.isUndefined(updateObject_Suspendable.dateOfSuspensionStart);
+      const endDateIsSet = !OPA.isUndefined(updateObject_Suspendable.dateOfSuspensionEnd);
+      const startUserIsSet = !OPA.isUndefined(updateObject_Suspendable.userIdOfSuspensionStarter);
+      const endUserIsSet = !OPA.isUndefined(updateObject_Suspendable.userIdOfSuspensionEnder);
+
+      if (startedIsSet || endedIsSet || startReasonIsSet || endReasonIsSet || startDateIsSet || endDateIsSet || startUserIsSet || endUserIsSet) {
+        return false;
+      }
+    } else if (OPA.isNullish(updateObject_Suspendable.hasSuspensionStarted)) {
+      throw new Error("The \"hasSuspensionStarted\" property must not be set to null.");
+    } else if (OPA.isNullish(updateObject_Suspendable.hasSuspensionEnded)) {
+      throw new Error("The \"hasSuspensionEnded\" property must not be set to null.");
+    } else if (updateObject_Suspendable.hasSuspensionEnded) {
+      const startedNotSet = OPA.isNullish(updateObject_Suspendable.hasSuspensionStarted);
+      // NOTE: Allow both reasons to be value, null, or undefined
+      const startDateNotSet = OPA.isNullish(updateObject_Suspendable.dateOfSuspensionStart);
+      const endDateNotSet = OPA.isNullish(updateObject_Suspendable.dateOfSuspensionEnd);
+      const startUserNotSet = OPA.isNullish(updateObject_Suspendable.userIdOfSuspensionStarter);
+      const endUserNotSet = OPA.isNullish(updateObject_Suspendable.userIdOfSuspensionEnder);
+      const isSelfEnded = (updateObject_Suspendable.userIdOfSuspensionEnder == document.id);
+
+      if (startedNotSet || startDateNotSet || endDateNotSet || startUserNotSet || endUserNotSet || isSelfEnded || docIsArchiveOwner) {
+        return false;
+      }
+    } else if (updateObject_Suspendable.hasSuspensionStarted) {
+      const endedNotSet = OPA.isNullish(updateObject_Suspendable.hasSuspensionEnded);
+      // NOTE: Allow start reason to be value, null, or undefined
+      const endReasonIsSet = !OPA.isNullish(updateObject_Suspendable.reasonForSuspensionEnd);
+      const startDateNotSet = OPA.isNullish(updateObject_Suspendable.dateOfSuspensionStart);
+      const endDateIsSet = !OPA.isNullish(updateObject_Suspendable.dateOfSuspensionEnd);
+      const startUserNotSet = OPA.isNullish(updateObject_Suspendable.userIdOfSuspensionStarter);
+      const endUserIsSet = !OPA.isNullish(updateObject_Suspendable.userIdOfSuspensionEnder);
+      const isSelfStarted = (updateObject_Suspendable.userIdOfSuspensionStarter == document.id);
+
+      if (endedNotSet || endReasonIsSet || startDateNotSet || endDateIsSet || startUserNotSet || endUserIsSet || isSelfStarted || docIsArchiveOwner) {
+        return false;
+      }
+    } else {
+      const startReasonIsSet = !OPA.isNullish(updateObject_Suspendable.reasonForSuspensionStart);
+      const endReasonIsSet = !OPA.isNullish(updateObject_Suspendable.reasonForSuspensionEnd);
+      const startDateIsSet = !OPA.isNullish(updateObject_Suspendable.dateOfSuspensionStart);
+      const endDateIsSet = !OPA.isNullish(updateObject_Suspendable.dateOfSuspensionEnd);
+      const startUserIsSet = !OPA.isNullish(updateObject_Suspendable.userIdOfSuspensionStarter);
+      const endUserIsSet = !OPA.isNullish(updateObject_Suspendable.userIdOfSuspensionEnder);
+
+      if (startReasonIsSet || endReasonIsSet || startDateIsSet || endDateIsSet || startUserIsSet || endUserIsSet || docIsArchiveOwner) {
+        return false;
+      }
+    }
+  }
+
+  if (true) {
     const updateObject_Deleteable = (updateObject as OPA.IDeleteable_ByUser);
 
     if (OPA.isUndefined(updateObject_Deleteable.isMarkedAsDeleted)) {
@@ -265,6 +324,14 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     approvalState: BT.ApprovalStates.pending,
     dateOfDecision: null,
     userIdOfDecider: null,
+    hasSuspensionStarted: false,
+    hasSuspensionEnded: false,
+    reasonForSuspensionStart: null,
+    reasonForSuspensionEnd: null,
+    dateOfSuspensionStart: null,
+    dateOfSuspensionEnd: null,
+    userIdOfSuspensionStarter: null,
+    userIdOfSuspensionEnder: null,
     isMarkedAsDeleted: false,
     dateOfDeletion: null,
     userIdOfDeleter: null,
@@ -318,6 +385,14 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     approvalState: BT.ApprovalStates.approved,
     dateOfDecision: now,
     userIdOfDecider: User_OwnerId,
+    hasSuspensionStarted: false,
+    hasSuspensionEnded: false,
+    reasonForSuspensionStart: null,
+    reasonForSuspensionEnd: null,
+    dateOfSuspensionStart: null,
+    dateOfSuspensionEnd: null,
+    userIdOfSuspensionStarter: null,
+    userIdOfSuspensionEnder: null,
     isMarkedAsDeleted: false,
     dateOfDeletion: null,
     userIdOfDeleter: null,
@@ -540,6 +615,74 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const document = await this.getById(db, documentId);
     OPA.assertNonNullish(document);
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
+    OPA.assertIsTrue(areValid, "The requested update is invalid.");
+
+    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const documentRef = collectionRef.doc(documentId);
+    await documentRef.set(updateObject_WithHistory, {merge: true});
+  }
+
+  /**
+   * Updates the User stored on the server by constructing an ISuspendable_ByUser object.
+   * @param {Firestore} db The Firestore Database.
+   * @param {string} documentId The ID for the User within the OPA system.
+   * @param {string} reason The reason for the suspension.
+   * @param {string} userIdOfSuspensionStarter The ID for the Starter within the OPA system.
+   * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
+   * @return {Promise<void>}
+   */
+  async setToSuspended(db: firestore.Firestore, documentId: string, reason: string, userIdOfSuspensionStarter: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    // NOTE: We need the document earlier in this function to get the existing values for ISuspendable_ByUser
+    const document = await this.getById(db, documentId);
+    OPA.assertNonNullish(document);
+    const documentNonNull = OPA.convertNonNullish(document);
+
+    OPA.assertIsFalse(OPA.isSuspended(documentNonNull), "The User must not be suspended before the User is suspended.");
+
+    const now = OPA.nowToUse();
+    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfSuspensionStarter} as OPA.IUpdateable_ByUser);
+    const updateObject_Suspendable = ({hasSuspensionStarted: true, hasSuspensionEnded: false, reasonForSuspensionStart: reason, reasonForSuspensionEnd: null, dateOfSuspensionStart: now, dateOfSuspensionEnd: null, userIdOfSuspensionStarter, userIdOfSuspensionEnder: null} as OPA.ISuspendable_ByUser);
+    const updateObject = {...updateObject_Updateable, ...updateObject_Suspendable, ...({} as IUserPartial)};
+    const updateHistory = constructorProvider.arrayUnion(updateObject);
+    const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
+
+    const areValid = areUpdatesValid(documentNonNull, updateObject_WithHistory);
+    OPA.assertIsTrue(areValid, "The requested update is invalid.");
+
+    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const documentRef = collectionRef.doc(documentId);
+    await documentRef.set(updateObject_WithHistory, {merge: true});
+  }
+
+  /**
+   * Updates the User stored on the server by constructing an ISuspendable_ByUser object.
+   * @param {Firestore} db The Firestore Database.
+   * @param {string} documentId The ID for the User within the OPA system.
+   * @param {string} reason The reason to end the suspension.
+   * @param {string} userIdOfSuspensionEnder The ID for the Ender within the OPA system.
+   * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
+   * @return {Promise<void>}
+   */
+  async setToUnSuspended(db: firestore.Firestore, documentId: string, reason: string, userIdOfSuspensionEnder: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    // NOTE: We need the document earlier in this function to get the existing values for ISuspendable_ByUser
+    const document = await this.getById(db, documentId);
+    OPA.assertNonNullish(document);
+    const documentNonNull = OPA.convertNonNullish(document);
+
+    OPA.assertIsTrue(OPA.isSuspended(documentNonNull), "The User must be suspended before the User is un-suspended.");
+    const hasSuspensionStarted = documentNonNull.hasSuspensionStarted;
+    const reasonForSuspensionStart = documentNonNull.reasonForSuspensionStart;
+    const dateOfSuspensionStart = documentNonNull.dateOfSuspensionStart;
+    const userIdOfSuspensionStarter = documentNonNull.userIdOfSuspensionStarter;
+
+    const now = OPA.nowToUse();
+    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfSuspensionEnder} as OPA.IUpdateable_ByUser);
+    const updateObject_Suspendable = ({hasSuspensionStarted, hasSuspensionEnded: true, reasonForSuspensionStart, reasonForSuspensionEnd: reason, dateOfSuspensionStart, dateOfSuspensionEnd: now, userIdOfSuspensionStarter, userIdOfSuspensionEnder} as OPA.ISuspendable_ByUser);
+    const updateObject = {...updateObject_Updateable, ...updateObject_Suspendable, ...({} as IUserPartial)};
+    const updateHistory = constructorProvider.arrayUnion(updateObject);
+    const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
+
+    const areValid = areUpdatesValid(documentNonNull, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const collectionRef = this.collectionDescriptor.getTypedCollection(db);
