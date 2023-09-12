@@ -25,12 +25,12 @@ export interface IApplication extends OPA.IDocument_Upgradeable_ByUser {
 }
 
 /**
- * Checks whether the specified updates to a Application document are valid.
+ * Checks whether the specified updates to the specified Application document are valid.
  * @param {IApplication} document The Application document being updated.
  * @param {IApplicationPartial} updateObject The updates specified.
  * @return {boolean} Whether the updates are valid or not.
  */
-function areUpdatesValid(document: IApplication, updateObject: IApplicationPartial): boolean {
+export function areUpdatesValid(document: IApplication, updateObject: IApplicationPartial): boolean {
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 

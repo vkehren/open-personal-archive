@@ -32,12 +32,12 @@ export interface IAccessRequest extends OPA.IDocument_Creatable_ByUser, OPA.IDoc
 }
 
 /**
- * Checks whether the specified updates to a AccessRequest document are valid.
+ * Checks whether the specified updates to the specified AccessRequest document are valid.
  * @param {IAccessRequest} document The AccessRequest document being updated.
  * @param {IAccessRequestPartial} updateObject The updates specified.
  * @return {boolean} Whether the updates are valid or not.
  */
-function areUpdatesValid(document: IAccessRequest, updateObject: IAccessRequestPartial): boolean {
+export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessRequestPartial): boolean {
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 

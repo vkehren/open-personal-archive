@@ -50,12 +50,12 @@ export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable
 }
 
 /**
- * Checks whether the specified updates to a User document are valid.
+ * Checks whether the specified updates to the specified User document are valid.
  * @param {IUser} document The User document being updated.
  * @param {IUserPartial} updateObject The updates specified.
  * @return {boolean} Whether the updates are valid or not.
  */
-function areUpdatesValid(document: IUser, updateObject: IUserPartial): boolean {
+export function areUpdatesValid(document: IUser, updateObject: IUserPartial): boolean {
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
