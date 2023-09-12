@@ -34,6 +34,30 @@ export function areUpdatesValid(document: IApplication, updateObject: IApplicati
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
+  // NOTE: updateObject MUST implement IUpgradeable_ByUser, so check immediately and do NOT use "if (true) {...}"
+  const updateObject_Updateable = (updateObject as OPA.IUpgradeable_ByUser);
+
+  if (!updateObject_Updateable.hasBeenUpgraded || OPA.isNullish(updateObject_Updateable.dateOfLatestUpgrade) || OPA.isNullish(updateObject_Updateable.userIdOfLatestUpgrader)) {
+    return false;
+  }
+
+  const propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
+  const id_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).id);
+  const dateOfInstallation_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).dateOfInstallation);
+
+  if (id_IsUpdated || dateOfInstallation_IsUpdated) {
+    return false;
+  }
+
+  // NOTE: updateObject MUST NOT erase read-only history of upgrades
+  const upgradeHistory_KeyText = OPA.getTypedPropertyKeysAsText(document).upgradeHistory;
+  const upgradeHistory_IsUpdated = propertyNames_ForUpdate.includes(upgradeHistory_KeyText);
+  const upgradeHistory_Value = (updateObject as any)[upgradeHistory_KeyText];
+
+  if (upgradeHistory_IsUpdated && !OPA.isOfFieldValue_ArrayUnion<firestore.FieldValue>(upgradeHistory_Value)) {
+    return false;
+  }
+
   // NOTE: The "applicationVersion" cannot be downgraded or updated to same value as current value
   if (!OPA.isNullish(updateObject.applicationVersion)) {
     const applicationVersion_Updated = OPA.convertNonNullish(updateObject.applicationVersion);
