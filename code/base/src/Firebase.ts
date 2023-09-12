@@ -15,11 +15,53 @@ export interface IFirebaseConstructorProvider {
   increment: (n: number) => firestore.FieldValue;
   serverTimestamp: () => firestore.FieldValue;
 }
+const FieldValue_MethodName_Unrecognized = "[UNRECOGNIZED]";
 const FieldValue_MethodName_ArrayRemove = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("arrayRemove") as string);
 const FieldValue_MethodName_ArrayUnion = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("arrayUnion") as string);
 const FieldValue_MethodName_Delete = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("delete") as string);
 const FieldValue_MethodName_Increment = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("increment") as string);
 const FieldValue_MethodName_ServerTimestamp = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("serverTimestamp") as string);
+
+export interface FieldValueSummary {
+  isFieldValue: boolean;
+  fieldValueTypeName: string;
+  fieldValueMethodName: string;
+  fieldValueData: any;
+}
+
+/**
+ * Changes any property values that are FieldValues to FieldValueSummaries.
+ * @param {T} documentFragment The document or partial document to change.
+ * @return {T} Returns the same document fragment that was passed in.
+ */
+export function replaceFieldValuesWithSummaries<T>(documentFragment: T): T {
+  if (TC.isUndefined(documentFragment)) {
+    return documentFragment;
+  }
+  if (TC.isNull(documentFragment)) {
+    return documentFragment;
+  }
+
+  const propertyNames = VC.getOwnPropertyKeys(documentFragment);
+  for (let i = 0; i < propertyNames.length; i++) {
+    const propertyName = propertyNames[i];
+    const propertyValue = (documentFragment as any)[propertyName];
+
+    if (TC.isUndefined(propertyValue)) {
+      continue;
+    }
+    if (TC.isNull(propertyValue)) {
+      continue;
+    }
+    if (!isOfFieldValue<firestore.FieldValue>(propertyValue)) {
+      continue;
+    }
+
+    const summary = getFieldValueSummary<firestore.FieldValue>(propertyValue);
+    (documentFragment as any)[propertyName] = summary;
+  }
+  return documentFragment;
+}
 
 /**
  * Checks whether a given argument is of type "firestore.FieldValue".
@@ -35,6 +77,37 @@ export function isOfFieldValue<T extends firestore.FieldValue>(fieldValue: unkno
   const guardFunc = (value: T) => (!TC.isNullish(fieldValueAsAny.isEqual));
   const isFieldValue = TC.isOf(fieldValue, guardFunc);
   return isFieldValue;
+}
+
+/**
+ * Asserts that the value specified is a FieldValue, then gets a summary of the transform.
+ * @param {unknown} fieldValue The possible field value.
+ * @return {any} The actual value.
+ */
+export function getFieldValueSummary<T extends firestore.FieldValue>(fieldValue: unknown): FieldValueSummary {
+  if (!isOfFieldValue(fieldValue)) {
+    throw new Error("The value specified is not a FieldValue.");
+  }
+
+  if (isOfFieldValue_ArrayRemove(fieldValue)) {
+    return getFieldValueSummary_ArrayRemove(fieldValue);
+  } else if (isOfFieldValue_ArrayUnion(fieldValue)) {
+    return getFieldValueSummary_ArrayUnion(fieldValue);
+  } else if (isOfFieldValue_Delete(fieldValue)) {
+    return getFieldValueSummary_Delete(fieldValue);
+  } else if (isOfFieldValue_Increment(fieldValue)) {
+    return getFieldValueSummary_Increment(fieldValue);
+  } else if (isOfFieldValue_ServerTimestamp(fieldValue)) {
+    return getFieldValueSummary_ServerTimestamp(fieldValue);
+  } else {
+    const unrecognizedSummary: FieldValueSummary = {
+      isFieldValue: true,
+      fieldValueTypeName: FieldValue_MethodName_Unrecognized,
+      fieldValueMethodName: (fieldValue as any).methodName,
+      fieldValueData: {},
+    };
+    return unrecognizedSummary;
+  }
 }
 
 /**
@@ -60,6 +133,26 @@ export function isOfFieldValue_ArrayRemove<T extends firestore.FieldValue>(field
 }
 
 /**
+ * Asserts that the value specified is an "arrayRemove" FieldValue, then gets a summary of the transform.
+ * @param {unknown} fieldValue The possible field value.
+ * @return {any} The actual value.
+ */
+export function getFieldValueSummary_ArrayRemove<T extends firestore.FieldValue>(fieldValue: unknown): FieldValueSummary {
+  if (!isOfFieldValue_ArrayRemove(fieldValue)) {
+    throw new Error("The value specified is not an \"" + FieldValue_MethodName_ArrayRemove + "\" FieldValue.");
+  }
+
+  const data = {elements: [...((fieldValue as any).elements).elements]};
+  const summary: FieldValueSummary = {
+    isFieldValue: true,
+    fieldValueTypeName: FieldValue_MethodName_ArrayRemove,
+    fieldValueMethodName: (fieldValue as any).methodName,
+    fieldValueData: data,
+  };
+  return summary;
+}
+
+/**
  * Checks whether a given argument is of type "firestore.FieldValue" and specifies an "arrayUnion".
  * @param {unknown} fieldValue The value to check.
  * @return {boolean} The result of checking.
@@ -79,6 +172,26 @@ export function isOfFieldValue_ArrayUnion<T extends firestore.FieldValue>(fieldV
   const guardFunc = (value: T) => (!TC.isNullish(fieldValueAsAny.methodName) && (fieldValueAsAny.methodName as string).includes(FieldValue_MethodName_ArrayUnion));
   const isFieldValue = TC.isOf(fieldValue, guardFunc);
   return isFieldValue;
+}
+
+/**
+ * Asserts that the value specified is an "arrayUnion" FieldValue, then gets a summary of the transform.
+ * @param {unknown} fieldValue The possible field value.
+ * @return {any} The actual value.
+ */
+export function getFieldValueSummary_ArrayUnion<T extends firestore.FieldValue>(fieldValue: unknown): FieldValueSummary {
+  if (!isOfFieldValue_ArrayUnion(fieldValue)) {
+    throw new Error("The value specified is not an \"" + FieldValue_MethodName_ArrayUnion + "\" FieldValue.");
+  }
+
+  const data = {elements: [...((fieldValue as any).elements)]};
+  const summary: FieldValueSummary = {
+    isFieldValue: true,
+    fieldValueTypeName: FieldValue_MethodName_ArrayUnion,
+    fieldValueMethodName: (fieldValue as any).methodName,
+    fieldValueData: data,
+  };
+  return summary;
 }
 
 /**
@@ -104,6 +217,26 @@ export function isOfFieldValue_Delete<T extends firestore.FieldValue>(fieldValue
 }
 
 /**
+ * Asserts that the value specified is a "delete" FieldValue, then gets a summary of the transform.
+ * @param {unknown} fieldValue The possible field value.
+ * @return {any} The actual value.
+ */
+export function getFieldValueSummary_Delete<T extends firestore.FieldValue>(fieldValue: unknown): FieldValueSummary {
+  if (!isOfFieldValue_Delete(fieldValue)) {
+    throw new Error("The value specified is not an \"" + FieldValue_MethodName_Delete + "\" FieldValue.");
+  }
+
+  const data = {};
+  const summary: FieldValueSummary = {
+    isFieldValue: true,
+    fieldValueTypeName: FieldValue_MethodName_Delete,
+    fieldValueMethodName: (fieldValue as any).methodName,
+    fieldValueData: data,
+  };
+  return summary;
+}
+
+/**
  * Checks whether a given argument is of type "firestore.FieldValue" and specifies an "increment".
  * @param {unknown} fieldValue The value to check.
  * @return {boolean} The result of checking.
@@ -126,6 +259,26 @@ export function isOfFieldValue_Increment<T extends firestore.FieldValue>(fieldVa
 }
 
 /**
+ * Asserts that the value specified is an "increment" FieldValue, then gets a summary of the transform.
+ * @param {unknown} fieldValue The possible field value.
+ * @return {any} The actual value.
+ */
+export function getFieldValueSummary_Increment<T extends firestore.FieldValue>(fieldValue: unknown): FieldValueSummary {
+  if (!isOfFieldValue_Increment(fieldValue)) {
+    throw new Error("The value specified is not an \"" + FieldValue_MethodName_Increment + "\" FieldValue.");
+  }
+
+  const data = {operand: (fieldValue as any).operand};
+  const summary: FieldValueSummary = {
+    isFieldValue: true,
+    fieldValueTypeName: FieldValue_MethodName_Increment,
+    fieldValueMethodName: (fieldValue as any).methodName,
+    fieldValueData: data,
+  };
+  return summary;
+}
+
+/**
  * Checks whether a given argument is of type "firestore.FieldValue" and specifies a "serverTimestamp".
  * @param {unknown} fieldValue The value to check.
  * @return {boolean} The result of checking.
@@ -145,6 +298,26 @@ export function isOfFieldValue_ServerTimestamp<T extends firestore.FieldValue>(f
   const guardFunc = (value: T) => (!TC.isNullish(fieldValueAsAny.methodName) && (fieldValueAsAny.methodName as string).includes(FieldValue_MethodName_ServerTimestamp));
   const isFieldValue = TC.isOf(fieldValue, guardFunc);
   return isFieldValue;
+}
+
+/**
+ * Asserts that the value specified is a "serverTimestamp" FieldValue, then gets a summary of the transform.
+ * @param {unknown} fieldValue The possible field value.
+ * @return {any} The actual value.
+ */
+export function getFieldValueSummary_ServerTimestamp<T extends firestore.FieldValue>(fieldValue: unknown): FieldValueSummary {
+  if (!isOfFieldValue_ServerTimestamp(fieldValue)) {
+    throw new Error("The value specified is not an \"" + FieldValue_MethodName_ServerTimestamp + "\" FieldValue.");
+  }
+
+  const data = {};
+  const summary: FieldValueSummary = {
+    isFieldValue: true,
+    fieldValueTypeName: FieldValue_MethodName_ServerTimestamp,
+    fieldValueMethodName: (fieldValue as any).methodName,
+    fieldValueData: data,
+  };
+  return summary;
 }
 
 /**
