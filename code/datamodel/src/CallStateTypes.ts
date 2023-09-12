@@ -9,6 +9,15 @@ import {ITimeZone} from "./doctypes/TimeZone";
 import {ITimeZoneGroup} from "./doctypes/TimeZoneGroup";
 import {IUser} from "./doctypes/User";
 
+export interface ICallState {
+  readonly dataStorageState: IDataStorageState;
+  readonly authenticationState: IAuthenticationState;
+  readonly hasSystemState: boolean;
+  readonly systemState?: ISystemState;
+  readonly hasAuthorizationState: boolean;
+  readonly authorizationState?: IAuthorizationState;
+}
+
 export interface IDataStorageState {
   appName: string;
   projectId: string;
@@ -28,6 +37,11 @@ export interface IAuthenticationState {
   readonly displayName?: string;
 }
 
+export interface ISystemState {
+  readonly application: IApplication;
+  readonly archive: IArchive;
+}
+
 export interface IAuthorizationState {
   readonly user: IUser;
   readonly role: IRole;
@@ -40,20 +54,6 @@ export interface IAuthorizationState {
   assertRoleAllowed(allowedRoleIds: Array<string>): void;
   isRoleDisallowed(disallowedRoleIds: Array<string>): boolean;
   assertRoleDisallowed(disallowedRoleIds: Array<string>): void;
-}
-
-export interface ISystemState {
-  readonly application: IApplication;
-  readonly archive: IArchive;
-}
-
-export interface ICallState {
-  readonly dataStorageState: IDataStorageState;
-  readonly authenticationState: IAuthenticationState;
-  readonly hasAuthorizationState: boolean;
-  readonly authorizationState?: IAuthorizationState;
-  readonly hasSystemState: boolean;
-  readonly systemState?: ISystemState;
 }
 
 /** Class providing Authorization-related state and assertions. */

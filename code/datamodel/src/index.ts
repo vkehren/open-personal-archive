@@ -51,7 +51,7 @@ DbDescriptor.NestedCollections = OPA.getCollectionFromObject<OPA.ICollectionDesc
 export const OpaDbDescriptor = OPA.convertTo<IOpaDbDescriptor>(DbDescriptor);
 
 export {DefaultIndexCollection, localizableStringConstructor, DataConfiguration, ActivityType, ActivityTypes, ApprovalState, ApprovalStates, RoleType, RoleTypes} from "./BaseTypes";
-export {AuthorizationState, ISystemState, IAuthenticationState, IAuthorizationState, ICallState, IDataStorageState} from "./CallStateTypes";
+export {ICallState, IDataStorageState, IAuthenticationState, ISystemState, IAuthorizationState, AuthorizationState} from "./CallStateTypes";
 export {IActivityLogItem} from "./doctypes/ActivityLogItem";
 export {IAuthenticationProvider, DefaultAuthenticationProviderId, AuthenticationProvider_GoogleId, AuthenticationProvider_RequiredIds} from "./doctypes/AuthenticationProvider"; // eslint-disable-line camelcase
 export {ILocale, DefaultLocaleId, DefaultLocale} from "./doctypes/Locale";
