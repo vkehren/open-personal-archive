@@ -43,10 +43,10 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
   // NOTE: First handle case where OPA is NOT installed
   const firebaseProjectId = callState.dataStorageState.projectId;
   const usesFirebaseEmulators = callState.dataStorageState.usesEmulators;
-  const isSystemCurrentlyInstalled = await isSystemInstalled(callState.dataStorageState);
+  const isInstalled = await isSystemInstalled(callState.dataStorageState);
 
   const defaultDisplayModel: IInstallationScreenDisplayModel = {
-    authorizationData: {firebaseProjectId, usesFirebaseEmulators, isSystemInstalled: isSystemCurrentlyInstalled, userData: null, roleData: null},
+    authorizationData: {firebaseProjectId, usesFirebaseEmulators, isSystemInstalled: isInstalled, userData: null, roleData: null},
     archiveName: "(a name for the archive)",
     archiveDescription: "(a description for the archive)",
     pathToStorageFolder: "./",
@@ -56,7 +56,7 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
     selectedTimeZoneGroup: OpaDb.TimeZoneGroups.requiredDocuments.filter((value: OpaDm.ITimeZoneGroup) => value.isDefault)[0],
   };
 
-  if (!isSystemCurrentlyInstalled) {
+  if (!isInstalled) {
     return defaultDisplayModel;
   }
 
@@ -65,17 +65,17 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
   OPA.assertNonNullish(callState.authenticationState, "The Authentication State must not be null.");
   OPA.assertNonNullish(callState.authorizationState, "The Authorization State must not be null.");
 
-  const dataStorageStateNonNull = OPA.convertNonNullish(callState.dataStorageState);
-  const systemStateNonNull = OPA.convertNonNullish(callState.systemState);
-  const authorizationStateNonNull = OPA.convertNonNullish(callState.authorizationState);
+  const dataStorageState = OPA.convertNonNullish(callState.dataStorageState);
+  const systemState = OPA.convertNonNullish(callState.systemState);
+  const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const authorizedRoleIds = [OpaDm.Role_OwnerId, OpaDm.Role_AdministratorId];
 
-  authorizationStateNonNull.assertUserApproved();
-  authorizationStateNonNull.assertRoleAllowed(authorizedRoleIds);
+  authorizationState.assertUserApproved();
+  authorizationState.assertRoleAllowed(authorizedRoleIds);
 
   const db = callState.dataStorageState.db;
-  const archiveNonNull = systemStateNonNull.archive;
-  const localeNonNull = authorizationStateNonNull.locale;
+  const archiveNonNull = systemState.archive;
+  const localeNonNull = authorizationState.locale;
   const localeToUse = localeNonNull.optionName;
 
   const localeSnaps = await OpaDb.Locales.getTypedCollection(db).get();
@@ -96,7 +96,7 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
 
   // LATER: Pass IAuthorizationState to getAuthorizationData(...) and include locale and timezone for User
   const displayModel: IInstallationScreenDisplayModel = {
-    authorizationData: DMU.getAuthorizationDataForDisplayModel(dataStorageStateNonNull, systemStateNonNull, authorizationStateNonNull),
+    authorizationData: DMU.getAuthorizationDataForDisplayModel(dataStorageState, systemState, authorizationState),
     archiveName: OPA.getLocalizedText(archiveNonNull.name, localeToUse),
     archiveDescription: OPA.getLocalizedText(archiveNonNull.description, localeToUse),
     pathToStorageFolder: archiveNonNull.pathToStorageFolder,
@@ -123,8 +123,11 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
  */
 export async function performInstall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState, archiveName: string, archiveDescription: string, pathToStorageFolder: string, defaultLocaleId: string, defaultTimeZoneGroupId: string, ownerFirstName: string, ownerLastName: string): Promise<void> { // eslint-disable-line max-len
   OPA.assertNonNullish(dataStorageState, "The Data Storage State must not be null.");
-  OPA.assertNonNullish(authenticationState, "The Authentication State must not be null.");
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
+
+  const isInstalled = await isSystemInstalled(dataStorageState);
+  OPA.assertSystemIsNotInstalled(isInstalled, "The Open Personal Archive™ (OPA) system has already been installed. Please un-install before re-installing.");
+  OPA.assertNonNullish(authenticationState, "The Authentication State must not be null.");
   OPA.assertIdentifierIsValid(authenticationState.firebaseAuthUserId);
   OPA.assertNonNullishOrWhitespace(authenticationState.providerId, "The Authentication Provider ID for the User's account must not be null.");
   OPA.assertNonNullishOrWhitespace(authenticationState.email, "The email account of the User must not be null.");
@@ -133,9 +136,6 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   const ownerFirebaseAuthUserId = authenticationState.firebaseAuthUserId;
   const externalAuthProviderId = authenticationState.providerId;
   const ownerAccountName = authenticationState.email;
-  const isSystemCurrentlyInstalled = await isSystemInstalled(dataStorageState);
-
-  OPA.assertSystemIsNotInstalled(isSystemCurrentlyInstalled, "The Open Personal Archive™ (OPA) system has already been installed. Please un-install before re-installing.");
 
   // 1) Create the Application document
   await OpaDb.Application.queries.create(db, ApplicationInfo.VERSION, SchemaInfo.VERSION);
@@ -202,24 +202,23 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
 export async function updateInstallationSettings(callState: OpaDm.ICallState, archiveName: string | undefined, archiveDescription: string | undefined, defaultLocaleId: string | undefined, defaultTimeZoneGroupId: string | undefined, defaultTimeZoneId: string | undefined, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> { // eslint-disable-line max-len
   OPA.assertNonNullish(callState, "The Call State must not be null.");
   OPA.assertNonNullish(callState.dataStorageState, "The Data Storage State must not be null.");
+  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+
+  const isInstalled = await isSystemInstalled(callState.dataStorageState);
+  OPA.assertSystemIsInstalled(isInstalled);
   OPA.assertNonNullish(callState.authenticationState, "The Authentication State must not be null.");
   OPA.assertNonNullish(callState.authorizationState, "The Authorization State must not be null.");
-  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
   OPA.assertIdentifierIsValid(callState.authenticationState.firebaseAuthUserId);
 
   const db = callState.dataStorageState.db;
-  const isSystemCurrentlyInstalled = (!OPA.isNullish(callState.systemState));
-
-  OPA.assertSystemIsInstalled(isSystemCurrentlyInstalled);
-
-  const authorizationStateNonNull = OPA.convertNonNullish(callState.authorizationState);
+  const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const authorizedRoleIds = [OpaDm.Role_OwnerId, OpaDm.Role_AdministratorId];
 
-  authorizationStateNonNull.assertUserApproved();
-  authorizationStateNonNull.assertRoleAllowed(authorizedRoleIds);
+  authorizationState.assertUserApproved();
+  authorizationState.assertRoleAllowed(authorizedRoleIds);
 
-  const currentUserNonNull = authorizationStateNonNull.user;
-  const currentLocaleNonNull = authorizationStateNonNull.locale;
+  const currentUserNonNull = authorizationState.user;
+  const currentLocaleNonNull = authorizationState.locale;
   const localeToUse = currentLocaleNonNull.optionName;
 
   const archive = await OpaDb.Archive.queries.getById(db, OpaDm.ArchiveId);
@@ -271,22 +270,21 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
 export async function performUpgrade(callState: OpaDm.ICallState, constructorProvider: OPA.IFirebaseConstructorProvider, doBackupFirst = false): Promise<void> { // eslint-disable-line max-len
   OPA.assertNonNullish(callState, "The Call State must not be null.");
   OPA.assertNonNullish(callState.dataStorageState, "The Data Storage State must not be null.");
+  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+
+  const isInstalled = await isSystemInstalled(callState.dataStorageState);
+  OPA.assertSystemIsInstalled(isInstalled);
   OPA.assertNonNullish(callState.authenticationState, "The Authentication State must not be null.");
   OPA.assertNonNullish(callState.authorizationState, "The Authorization State must not be null.");
-  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
   OPA.assertIdentifierIsValid(callState.authenticationState.firebaseAuthUserId);
 
   const db = callState.dataStorageState.db;
-  const isInstalled = (!OPA.isNullish(callState.systemState));
-
-  OPA.assertIsTrue(isInstalled, "The system has not yet been installed so upgrading is not possible.");
-
-  const authorizationStateNonNull = OPA.convertNonNullish(callState.authorizationState);
-  const currentUserNonNull = authorizationStateNonNull.user;
+  const authorizationState = OPA.convertNonNullish(callState.authorizationState);
+  const currentUserNonNull = authorizationState.user;
   const authorizedRoleIds = [OpaDm.Role_OwnerId, OpaDm.Role_AdministratorId];
 
-  authorizationStateNonNull.assertUserApproved();
-  authorizationStateNonNull.assertRoleAllowed(authorizedRoleIds);
+  authorizationState.assertUserApproved();
+  authorizationState.assertRoleAllowed(authorizedRoleIds);
 
   if (doBackupFirst) {
     // LATER: Backup any existing data
@@ -339,6 +337,8 @@ export async function performUninstall(dataStorageState: OpaDm.IDataStorageState
   const owner = await OpaDb.Users.queries.getById(db, OpaDm.User_OwnerId);
 
   if (!OPA.isNullish(owner)) {
+    const isInstalled = await isSystemInstalled(dataStorageState);
+    OPA.assertSystemIsInstalled(isInstalled);
     OPA.assertNonNullish(authorizationState, "The Authorization State must not be null.");
 
     const authorizationStateNonNull = OPA.convertNonNullish(authorizationState);

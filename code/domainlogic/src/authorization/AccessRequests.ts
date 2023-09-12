@@ -21,11 +21,8 @@ export async function requestUserAccess(callState: OpaDm.ICallState, message: st
   OPA.assertNonNullish(callState.systemState, "The System State must not be null.");
   OPA.assertNonNullish(callState.authorizationState, "The Authorization State must not be null.");
 
-  // const systemState = OPA.convertNonNullish(callState.systemState);
-  const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const db = callState.dataStorageState.db;
-
-  // const archive = systemStateNonNull.archive;
+  const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const user = authorizationState.user;
   const locale = authorizationState.locale;
 

@@ -88,9 +88,9 @@ export async function initializeUserAccount(callState: OpaDm.ICallState, authPro
   OPA.assertNonNullish(callState.systemState, "The System State must not be null.");
   OPA.assertIsFalse(callState.hasAuthorizationState, "The User account has already been initialized.");
 
+  const db = callState.dataStorageState.db;
   const authenticationState = OPA.convertNonNullish(callState.authenticationState);
   const systemState = OPA.convertNonNullish(callState.systemState);
-  const db = callState.dataStorageState.db;
 
   const preExistingUser = await OpaDb.Users.queries.getByFirebaseAuthUserId(db, authenticationState.firebaseAuthUserId);
   const hasPreExistingUser = (!OPA.isNullish(preExistingUser));
