@@ -10,6 +10,7 @@ export type QuerySetConstructor<Q extends IQuerySet<T>, T extends BT.IDocument> 
 
 export interface IQuerySet<T extends BT.IDocument> {
   readonly collectionDescriptor: ST.ITypedCollectionDescriptor<T>;
+  documentProxyConstructor: BT.ProxyFunc<T>;
   getById(db: firestore.Firestore, id: string): Promise<T | null>;
   getAll(db: firestore.Firestore, pathFromRoot?: Array<ST.INestedCollectionStep> | undefined): Promise<Array<T>>;
 }
@@ -17,6 +18,7 @@ export interface IQuerySet<T extends BT.IDocument> {
 /** Base class for providing queries for a collection. */
 export class QuerySet<T extends BT.IDocument> implements IQuerySet<T> {
   private _collectionDescriptor: ST.ITypedCollectionDescriptor<T>;
+  private _documentProxyConstructor: BT.ProxyFunc<T>;
 
   /**
    * Creates a QuerySet<T>.
@@ -24,14 +26,31 @@ export class QuerySet<T extends BT.IDocument> implements IQuerySet<T> {
    */
   constructor(collectionDescriptor: ST.ITypedCollectionDescriptor<T>) {
     this._collectionDescriptor = collectionDescriptor;
+    this._documentProxyConstructor = (document: T) => document;
   }
 
   /**
-   * The collection descriptor to use for queries.
+   * Gets the collection descriptor corresponding to the document type for the QuerySet.
    * @type {ST.ITypedCollectionDescriptor<T>}
    */
   get collectionDescriptor(): ST.ITypedCollectionDescriptor<T> {
     return this._collectionDescriptor;
+  }
+
+  /**
+   * Gets the document proxy constructor for proxying documents returned from QuerySet functions.
+   * @type {BT.ProxyFunc<T>}
+   */
+  get documentProxyConstructor(): BT.ProxyFunc<T> {
+    return this._documentProxyConstructor;
+  }
+  /**
+   * Sets the document proxy constructor for proxying documents returned from QuerySet functions.
+   * @type {BT.ProxyFunc<T>}
+   * @param {BT.ProxyFunc<T>} proxyConstructorFunc The constructor function to use for proxying documents.
+   */
+  set documentProxyConstructor(proxyConstructorFunc: BT.ProxyFunc<T>) {
+    this._documentProxyConstructor = proxyConstructorFunc;
   }
 
   /**
@@ -64,7 +83,10 @@ export class QuerySet<T extends BT.IDocument> implements IQuerySet<T> {
     if (TC.isNullish(document)) {
       return null;
     }
-    return TC.convertNonNullish(document);
+
+    const documentNonNull = TC.convertNonNullish(document);
+    const proxiedDocument = this.documentProxyConstructor(documentNonNull);
+    return proxiedDocument;
   }
 
   /**
@@ -76,16 +98,18 @@ export class QuerySet<T extends BT.IDocument> implements IQuerySet<T> {
   async getAll(db: firestore.Firestore, pathFromRoot?: Array<ST.INestedCollectionStep> | undefined): Promise<Array<T>> {
     FB.assertFirestoreIsNotNullish(db);
 
+    let documents = ([] as Array<T>);
     if (TC.isNullish(pathFromRoot) && this.collectionDescriptor.isNestedCollection) {
       const collectionGroup = this.collectionDescriptor.getTypedCollectionGroup(db);
       const querySnap = await collectionGroup.get();
-      const documents = querySnap.docs.map((value) => value.data());
-      return documents;
+      documents = querySnap.docs.map((value) => value.data());
     } else {
       const collectionRef = this.collectionDescriptor.getTypedCollection(db, pathFromRoot);
       const querySnap = await collectionRef.get();
-      const documents = querySnap.docs.map((value) => value.data());
-      return documents;
+      documents = querySnap.docs.map((value) => value.data());
     }
+
+    const proxiedDocuments = documents.map((document) => this.documentProxyConstructor(document));
+    return proxiedDocuments;
   }
 }

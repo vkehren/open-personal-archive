@@ -143,17 +143,18 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
    */
   async create(db: firestore.Firestore, name: string, description: string, pathToStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): Promise<string> {
     const document = createSingleton(name, description, pathToStorageFolder, owner, defaultLocale, defaultTimeZoneGroup);
-    const documentId = document.id;
+    const proxiedDocument = this.documentProxyConstructor(document);
+    const documentId = proxiedDocument.id;
 
-    OPA.assertNonNullish(document);
-    OPA.assertNonNullish(document.updateHistory);
-    OPA.assertIsTrue(document.id == SingletonId);
+    OPA.assertNonNullish(proxiedDocument);
+    OPA.assertNonNullish(proxiedDocument.updateHistory);
+    OPA.assertIsTrue(proxiedDocument.id == SingletonId);
     OPA.assertIsTrue(documentId == SingletonId);
-    OPA.assertIsTrue(document.updateHistory.length == 1);
+    OPA.assertIsTrue(proxiedDocument.updateHistory.length == 1);
 
     const collectionRef = this.collectionDescriptor.getTypedCollection(db);
     const documentRef = collectionRef.doc(documentId);
-    await documentRef.set(document, {merge: true});
+    await documentRef.set(proxiedDocument, {merge: true});
     return documentId;
   }
 

@@ -354,7 +354,8 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const matchingAccessRequestsSnap = await getAccessRequestsForUserIdQuery.get();
 
     const matchingAccessRequests = matchingAccessRequestsSnap.docs.map((doc) => doc.data());
-    return matchingAccessRequests;
+    const proxiedAccessRequests = matchingAccessRequests.map((document) => this.documentProxyConstructor(document));
+    return proxiedAccessRequests
   }
 
   /**
@@ -371,13 +372,14 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const documentRef = collectionRef.doc();
     const documentId = documentRef.id;
     const document = createInstance(documentId, user, locale, message, citationId);
+    const proxiedDocument = this.documentProxyConstructor(document);
 
-    OPA.assertNonNullish(document);
-    OPA.assertNonNullish(document.updateHistory);
-    OPA.assertIsTrue(document.id == documentId);
-    OPA.assertIsTrue(document.updateHistory.length == 1);
+    OPA.assertNonNullish(proxiedDocument);
+    OPA.assertNonNullish(proxiedDocument.updateHistory);
+    OPA.assertIsTrue(proxiedDocument.id == documentId);
+    OPA.assertIsTrue(proxiedDocument.updateHistory.length == 1);
 
-    await documentRef.set(document, {merge: true});
+    await documentRef.set(proxiedDocument, {merge: true});
     return documentId;
   }
 

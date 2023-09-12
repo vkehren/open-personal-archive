@@ -72,7 +72,10 @@ export class AuthenticationProviderQuerySet extends OPA.QuerySet<IAuthentication
     if (matchingAuthProvidersSnap.docs.length < 1) {
       return null;
     }
-    return matchingAuthProvidersSnap.docs[0].data();
+
+    const authProvider = matchingAuthProvidersSnap.docs[0].data();
+    const proxiedAuthProvider = this.documentProxyConstructor(authProvider);
+    return proxiedAuthProvider;
   }
 }
 

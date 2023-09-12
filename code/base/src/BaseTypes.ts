@@ -10,6 +10,7 @@ export type ContainerOfTypedKeyText<T> = {
   [K in keyof T]: TypedKeyText<T>;
 };
 
+export type ProxyFunc<T> = (obj: T) => T;
 export type GetterFunc<T, V> = (value: T, propName?: string | symbol) => V;
 export type GuardFunc<T> = (value: T) => boolean;
 export type FilterFunc<T> = (value: T) => boolean;

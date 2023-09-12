@@ -107,12 +107,13 @@ export class ActivityLogItemQuerySet extends OPA.QuerySet<IActivityLogItem> {
     const documentRef = collectionRef.doc();
     const documentId = documentRef.id;
     const document = createInstance(documentId, activityType, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState);
+    const proxiedDocument = this.documentProxyConstructor(document);
 
     // NOTE: An ActivityLogItem should NOT be updateable
-    OPA.assertNonNullish(document);
-    OPA.assertIsTrue(document.id == documentId);
+    OPA.assertNonNullish(proxiedDocument);
+    OPA.assertIsTrue(proxiedDocument.id == documentId);
 
-    await documentRef.set(document, {merge: true});
+    await documentRef.set(proxiedDocument, {merge: true});
     return documentId;
   }
 }

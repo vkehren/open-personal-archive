@@ -463,7 +463,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     OPA.assertDocumentIsValid(owner, "The Owner of the Archive must NOT be null.");
 
     const ownerNonNull = OPA.convertNonNullish(owner);
-    return ownerNonNull;
+    const proxiedOwner = this.documentProxyConstructor(ownerNonNull);
+    return proxiedOwner;
   }
 
   /**
@@ -486,7 +487,10 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     if (matchingUsersSnap.docs.length < 1) {
       return null;
     }
-    return matchingUsersSnap.docs[0].data();
+
+    const user = matchingUsersSnap.docs[0].data();
+    const proxiedUser = this.documentProxyConstructor(user);
+    return proxiedUser;
   }
 
   /**
@@ -504,28 +508,29 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
    */
   async createArchiveOwner(db: firestore.Firestore, firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): Promise<string> { // eslint-disable-line max-len
     const owner = createArchiveOwner(firebaseAuthUserId, authProvider, authAccountName, locale, timeZoneGroup, firstName, lastName, preferredName);
-    const ownerId = owner.id;
+    const proxiedOwner = this.documentProxyConstructor(owner);
+    const ownerId = proxiedOwner.id;
 
-    OPA.assertNonNullish(owner);
-    OPA.assertNonNullish(owner.updateHistory);
-    OPA.assertIsTrue(owner.id == User_OwnerId);
+    OPA.assertNonNullish(proxiedOwner);
+    OPA.assertNonNullish(proxiedOwner.updateHistory);
+    OPA.assertIsTrue(proxiedOwner.id == User_OwnerId);
     OPA.assertIsTrue(ownerId == User_OwnerId);
-    OPA.assertIsTrue(owner.updateHistory.length == 1);
+    OPA.assertIsTrue(proxiedOwner.updateHistory.length == 1);
 
     const collectionRef = this.collectionDescriptor.getTypedCollection(db);
     const ownerRef = collectionRef.doc(ownerId);
 
     // REPLACES: await ownerRef.set(owner, {merge: true});
     const batchUpdate = db.batch();
-    batchUpdate.set(ownerRef, owner, {merge: true});
+    batchUpdate.set(ownerRef, proxiedOwner, {merge: true});
     const firebaseAuthUserIdIndexCollectionRef = db.collection(Index_User_FirebaseAuthUserId.indexCollectionName);
-    const firebaseAuthUserIdIndexDocRef = firebaseAuthUserIdIndexCollectionRef.doc(Index_User_FirebaseAuthUserId.getDocumentId(owner.firebaseAuthUserId));
+    const firebaseAuthUserIdIndexDocRef = firebaseAuthUserIdIndexCollectionRef.doc(Index_User_FirebaseAuthUserId.getDocumentId(proxiedOwner.firebaseAuthUserId));
     batchUpdate.set(firebaseAuthUserIdIndexDocRef, {value: ownerId});
     const authAccountNameIndexCollectionRef = db.collection(Index_User_AuthAccountName.indexCollectionName);
-    const authAccountNameIndexDocRef = authAccountNameIndexCollectionRef.doc(Index_User_AuthAccountName.getDocumentId(owner.authAccountName));
+    const authAccountNameIndexDocRef = authAccountNameIndexCollectionRef.doc(Index_User_AuthAccountName.getDocumentId(proxiedOwner.authAccountName));
     batchUpdate.set(authAccountNameIndexDocRef, {value: ownerId});
     const authAccountNameLoweredIndexCollectionRef = db.collection(Index_User_AuthAccountNameLowered.indexCollectionName);
-    const authAccountNameLoweredIndexDocRef = authAccountNameLoweredIndexCollectionRef.doc(Index_User_AuthAccountNameLowered.getDocumentId(owner.authAccountNameLowered));
+    const authAccountNameLoweredIndexDocRef = authAccountNameLoweredIndexCollectionRef.doc(Index_User_AuthAccountNameLowered.getDocumentId(proxiedOwner.authAccountNameLowered));
     batchUpdate.set(authAccountNameLoweredIndexDocRef, {value: ownerId});
     await batchUpdate.commit();
     return ownerId;
@@ -550,23 +555,24 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const documentRef = collectionRef.doc();
     const documentId = documentRef.id;
     const document = createInstance(documentId, firebaseAuthUserId, authProvider, authAccountName, assignedRole, locale, timeZoneGroup, firstName, lastName, preferredName);
+    const proxiedDocument = this.documentProxyConstructor(document);
 
-    OPA.assertNonNullish(document);
-    OPA.assertNonNullish(document.updateHistory);
-    OPA.assertIsTrue(document.id == documentId);
-    OPA.assertIsTrue(document.updateHistory.length == 1);
+    OPA.assertNonNullish(proxiedDocument);
+    OPA.assertNonNullish(proxiedDocument.updateHistory);
+    OPA.assertIsTrue(proxiedDocument.id == documentId);
+    OPA.assertIsTrue(proxiedDocument.updateHistory.length == 1);
 
     // REPLACES: await userRef.set(user, {merge: true});
     const batchUpdate = db.batch();
-    batchUpdate.set(documentRef, document, {merge: true});
+    batchUpdate.set(documentRef, proxiedDocument, {merge: true});
     const firebaseAuthUserIdIndexCollectionRef = db.collection(Index_User_FirebaseAuthUserId.indexCollectionName);
-    const firebaseAuthUserIdIndexDocRef = firebaseAuthUserIdIndexCollectionRef.doc(Index_User_FirebaseAuthUserId.getDocumentId(document.firebaseAuthUserId));
+    const firebaseAuthUserIdIndexDocRef = firebaseAuthUserIdIndexCollectionRef.doc(Index_User_FirebaseAuthUserId.getDocumentId(proxiedDocument.firebaseAuthUserId));
     batchUpdate.set(firebaseAuthUserIdIndexDocRef, {value: documentId});
     const authAccountNameIndexCollectionRef = db.collection(Index_User_AuthAccountName.indexCollectionName);
-    const authAccountNameIndexDocRef = authAccountNameIndexCollectionRef.doc(Index_User_AuthAccountName.getDocumentId(document.authAccountName));
+    const authAccountNameIndexDocRef = authAccountNameIndexCollectionRef.doc(Index_User_AuthAccountName.getDocumentId(proxiedDocument.authAccountName));
     batchUpdate.set(authAccountNameIndexDocRef, {value: documentId});
     const authAccountNameLoweredIndexCollectionRef = db.collection(Index_User_AuthAccountNameLowered.indexCollectionName);
-    const authAccountNameLoweredIndexDocRef = authAccountNameLoweredIndexCollectionRef.doc(Index_User_AuthAccountNameLowered.getDocumentId(document.authAccountNameLowered));
+    const authAccountNameLoweredIndexDocRef = authAccountNameLoweredIndexCollectionRef.doc(Index_User_AuthAccountNameLowered.getDocumentId(proxiedDocument.authAccountNameLowered));
     batchUpdate.set(authAccountNameLoweredIndexDocRef, {value: documentId});
     await batchUpdate.commit();
     return documentId;

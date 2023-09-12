@@ -127,17 +127,18 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
    */
   async create(db: firestore.Firestore, applicationVersion: string, schemaVersion: string): Promise<string> {
     const document = createSingleton(applicationVersion, schemaVersion);
-    const documentId = document.id;
+    const proxiedDocument = this.documentProxyConstructor(document);
+    const documentId = proxiedDocument.id;
 
-    OPA.assertNonNullish(document);
-    OPA.assertNonNullish(document.upgradeHistory);
-    OPA.assertIsTrue(document.id == SingletonId);
+    OPA.assertNonNullish(proxiedDocument);
+    OPA.assertNonNullish(proxiedDocument.upgradeHistory);
+    OPA.assertIsTrue(proxiedDocument.id == SingletonId);
     OPA.assertIsTrue(documentId == SingletonId);
-    OPA.assertIsTrue(document.upgradeHistory.length == 1);
+    OPA.assertIsTrue(proxiedDocument.upgradeHistory.length == 1);
 
     const collectionRef = this.collectionDescriptor.getTypedCollection(db);
     const documentRef = collectionRef.doc(documentId);
-    await documentRef.set(document, {merge: true});
+    await documentRef.set(proxiedDocument, {merge: true});
     return documentId;
   }
 
