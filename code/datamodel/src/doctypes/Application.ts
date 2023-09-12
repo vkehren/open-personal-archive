@@ -155,7 +155,8 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
     const now = OPA.nowToUse();
     const updateObject_Upgradeable = ({hasBeenUpgraded: true, dateOfLatestUpgrade: now, userIdOfLatestUpgrader} as OPA.IUpgradeable_ByUser);
     updateObject = {...updateObject, ...updateObject_Upgradeable};
-    const upgradeHistory = constructorProvider.arrayUnion(updateObject);
+    const updateObject_ForHistory = OPA.replaceFieldValuesWithSummaries({...updateObject});
+    const upgradeHistory = constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, upgradeHistory} as IApplicationPartial_WithHistory);
 
     const document = await this.getById(db, documentId);

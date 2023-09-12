@@ -19,9 +19,9 @@ export interface IUserPartial {
   firstName?: string;
   lastName?: string;
   preferredName?: string | null;
-  requestedCitationIds?: Array<string>;
-  viewableCitationIds?: Array<string>;
-  recentQueries?: Array<string>;
+  requestedCitationIds?: Array<string> | firestore.FieldValue;
+  viewableCitationIds?: Array<string> | firestore.FieldValue;
+  recentQueries?: Array<string> | firestore.FieldValue;
 }
 
 type UpdateHistoryItem = IUserPartial | OPA.IUpdateable_ByUser | OPA.IAssignableToRole_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState> | OPA.ISuspendable_ByUser | OPA.IDeleteable_ByUser;
@@ -618,7 +618,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const now = OPA.nowToUse();
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
     updateObject = {...updateObject, ...updateObject_Updateable};
-    const updateHistory = constructorProvider.arrayUnion(updateObject);
+    const updateObject_ForHistory = OPA.replaceFieldValuesWithSummaries({...updateObject});
+    const updateHistory = constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
     const document = await this.getById(db, documentId);
