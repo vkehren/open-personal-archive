@@ -170,7 +170,7 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
     const documentId = SingletonId;
     const now = OPA.nowToUse();
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
-    updateObject = {...updateObject_Updateable, ...updateObject};
+    updateObject = {...updateObject, ...updateObject_Updateable};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IArchivePartial_WithHistory);
 

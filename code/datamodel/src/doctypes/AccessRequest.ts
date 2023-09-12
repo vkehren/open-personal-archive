@@ -395,7 +395,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
   async update(db: firestore.Firestore, documentId: string, updateObject: IAccessRequestPartial, userIdOfLatestUpdater: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const now = OPA.nowToUse();
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
-    updateObject = {...updateObject_Updateable, ...updateObject};
+    updateObject = {...updateObject, ...updateObject_Updateable};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
@@ -420,9 +420,10 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    */
   async setTags(db: firestore.Firestore, documentId: string, tags: Array<string>, userIdOfLatestTagger: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const now = OPA.nowToUse();
+    const updateObject_Partial = ({} as IAccessRequestPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfLatestTagger} as OPA.IUpdateable_ByUser);
     const updateObject_Taggable = ({tags, dateOfLatestTagging: now, userIdOfLatestTagger} as OPA.ITaggable_ByUser);
-    const updateObject = {...updateObject_Updateable, ...updateObject_Taggable, ...({} as IAccessRequestPartial)};
+    const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Taggable};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
@@ -447,9 +448,10 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    */
   async setToArchivalOption(db: firestore.Firestore, documentId: string, isArchived: boolean, userIdOfArchivalChanger: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const now = OPA.nowToUse();
+    const updateObject_Partial = ({} as IAccessRequestPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfArchivalChanger} as OPA.IUpdateable_ByUser);
     const updateObject_Archivable = ({isArchived, dateOfArchivalChange: now, userIdOfArchivalChanger} as OPA.IArchivable_ByUser);
-    const updateObject = {...updateObject_Updateable, ...updateObject_Archivable, ...({} as IAccessRequestPartial)};
+    const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Archivable};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
@@ -473,9 +475,10 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    */
   async setToViewed(db: firestore.Firestore, documentId: string, userIdOfLatestViewer: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const now = OPA.nowToUse();
+    const updateObject_Partial = ({} as IAccessRequestPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfLatestViewer} as OPA.IUpdateable_ByUser);
     const updateObject_Viewable = ({hasBeenViewed: true, dateOfLatestViewing: now, userIdOfLatestViewer} as OPA.IViewable_ByUser);
-    const updateObject = {...updateObject_Updateable, ...updateObject_Viewable, ...({} as IAccessRequestPartial)};
+    const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Viewable};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
@@ -500,9 +503,10 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    */
   async setToDecidedOption(db: firestore.Firestore, documentId: string, approvalState: BT.ApprovalState, userIdOfDecider: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const now = OPA.nowToUse();
+    const updateObject_Partial = ({} as IAccessRequestPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDecider} as OPA.IUpdateable_ByUser);
     const updateObject_Approvable = ({hasBeenDecided: true, approvalState, dateOfDecision: now, userIdOfDecider} as OPA.IApprovable_ByUser<BT.ApprovalState>);
-    const updateObject = {...updateObject_Updateable, ...updateObject_Approvable, ...({} as IAccessRequestPartial)};
+    const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Approvable};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
@@ -526,9 +530,10 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    */
   async markAsDeleted(db: firestore.Firestore, documentId: string, userIdOfDeleter: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const now = OPA.nowToUse();
+    const updateObject_Partial = ({} as IAccessRequestPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDeleter} as OPA.IUpdateable_ByUser);
     const updateObject_Deleteable = ({isMarkedAsDeleted: true, dateOfDeletion: now, userIdOfDeleter} as OPA.IDeleteable_ByUser);
-    const updateObject = {...updateObject_Updateable, ...updateObject_Deleteable, ...({} as IAccessRequestPartial)};
+    const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Deleteable};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 

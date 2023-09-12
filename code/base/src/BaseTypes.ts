@@ -282,15 +282,13 @@ export interface IDocument_Deleteable_ByUser extends IDocument_Deleteable, IDele
 export function promoteDocumentsToCreatable<IN extends IDocument, OUT extends IN & ICreatable>(documents: Array<IN>, dateOfCreation: DateToUse | null = null): Array<OUT> {
   TC.assertNonNullish(documents);
 
-  if (TC.isNullish(dateOfCreation)) {
-    dateOfCreation = nowToUse();
-  }
-  const dateOfCreationNonNull = TC.convertNonNullish(dateOfCreation);
+  const dateOfCreationNonNull = (!TC.isNullish(dateOfCreation)) ? TC.convertNonNullish(dateOfCreation) : nowToUse();
+  const creatable_Default = ({dateOfCreation: dateOfCreationNonNull} as ICreatable);
 
   const promotedDocuments = documents.map(
     (document): OUT => {
       // NOTE: If "dateOfCreation" has already been set for the document, this should NOT change the incoming value
-      const promotedDocument = {...document, ...({dateOfCreation: dateOfCreationNonNull} as ICreatable)};
+      const promotedDocument = {...creatable_Default, ...document};
       return (promotedDocument as OUT);
     }
   );

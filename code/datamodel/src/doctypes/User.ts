@@ -614,7 +614,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   async update(db: firestore.Firestore, documentId: string, updateObject: IUserPartial, userIdOfLatestUpdater: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const now = OPA.nowToUse();
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
-    updateObject = {...updateObject_Updateable, ...updateObject};
+    updateObject = {...updateObject, ...updateObject_Updateable};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
@@ -641,9 +641,10 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     OPA.assertNonNullish(role);
 
     const now = OPA.nowToUse();
+    const updateObject_Partial = ({} as IUserPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfLatestRoleAssigner} as OPA.IUpdateable_ByUser);
     const updateObject_AssignableToRole = ({assignedRoleId: role.id, dateOfLatestRoleAssignment: now, userIdOfLatestRoleAssigner} as OPA.IAssignableToRole_ByUser);
-    const updateObject = {...updateObject_Updateable, ...updateObject_AssignableToRole, ...({} as IUserPartial)};
+    const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_AssignableToRole};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
@@ -667,9 +668,10 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
    */
   async setToViewed(db: firestore.Firestore, documentId: string, userIdOfLatestViewer: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const now = OPA.nowToUse();
+    const updateObject_Partial = ({} as IUserPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfLatestViewer} as OPA.IUpdateable_ByUser);
     const updateObject_Viewable = ({hasBeenViewed: true, dateOfLatestViewing: now, userIdOfLatestViewer} as OPA.IViewable_ByUser);
-    const updateObject = {...updateObject_Updateable, ...updateObject_Viewable, ...({} as IUserPartial)};
+    const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Viewable};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
@@ -694,9 +696,10 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
    */
   async setToDecidedOption(db: firestore.Firestore, documentId: string, approvalState: BT.ApprovalState, userIdOfDecider: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const now = OPA.nowToUse();
+    const updateObject_Partial = ({} as IUserPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDecider} as OPA.IUpdateable_ByUser);
     const updateObject_Approvable = ({hasBeenDecided: true, approvalState, dateOfDecision: now, userIdOfDecider} as OPA.IApprovable_ByUser<BT.ApprovalState>);
-    const updateObject = {...updateObject_Updateable, ...updateObject_Approvable, ...({} as IUserPartial)};
+    const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Approvable};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
@@ -728,9 +731,10 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     OPA.assertIsFalse(OPA.isSuspended(documentNonNull), "The User must not be suspended before the User is suspended.");
 
     const now = OPA.nowToUse();
+    const updateObject_Partial = ({} as IUserPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfSuspensionStarter} as OPA.IUpdateable_ByUser);
     const updateObject_Suspendable = ({hasSuspensionStarted: true, hasSuspensionEnded: false, reasonForSuspensionStart: reason, reasonForSuspensionEnd: null, dateOfSuspensionStart: now, dateOfSuspensionEnd: null, userIdOfSuspensionStarter, userIdOfSuspensionEnder: null} as OPA.ISuspendable_ByUser);
-    const updateObject = {...updateObject_Updateable, ...updateObject_Suspendable, ...({} as IUserPartial)};
+    const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Suspendable};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
@@ -764,9 +768,10 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const userIdOfSuspensionStarter = documentNonNull.userIdOfSuspensionStarter;
 
     const now = OPA.nowToUse();
+    const updateObject_Partial = ({} as IUserPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfSuspensionEnder} as OPA.IUpdateable_ByUser);
     const updateObject_Suspendable = ({hasSuspensionStarted, hasSuspensionEnded: true, reasonForSuspensionStart, reasonForSuspensionEnd: reason, dateOfSuspensionStart, dateOfSuspensionEnd: now, userIdOfSuspensionStarter, userIdOfSuspensionEnder} as OPA.ISuspendable_ByUser);
-    const updateObject = {...updateObject_Updateable, ...updateObject_Suspendable, ...({} as IUserPartial)};
+    const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Suspendable};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
@@ -788,9 +793,10 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
    */
   async markAsDeleted(db: firestore.Firestore, documentId: string, userIdOfDeleter: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
     const now = OPA.nowToUse();
+    const updateObject_Partial = ({} as IUserPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDeleter} as OPA.IUpdateable_ByUser);
     const updateObject_Deleteable = ({isMarkedAsDeleted: true, dateOfDeletion: now, userIdOfDeleter} as OPA.IDeleteable_ByUser);
-    const updateObject = {...updateObject_Updateable, ...updateObject_Deleteable, ...({} as IUserPartial)};
+    const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Deleteable};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
