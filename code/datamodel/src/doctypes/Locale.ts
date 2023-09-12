@@ -31,5 +31,20 @@ export interface ILocale extends OPA.IDocument_Creatable {
   readonly isDefault: boolean;
 }
 
+type ILocalePartial = any;
+/**
+ * Checks whether the specified updates to the specified Locale document are valid.
+ * @param {ILocale} document The Locale document being updated.
+ * @param {ILocalePartial} updateObject The updates specified.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid(document: ILocale, updateObject: ILocalePartial): boolean {
+  OPA.assertNonNullish(document);
+  OPA.assertNonNullish(updateObject);
+
+  // NOTE: Currently, Locales are not updateable
+  return false;
+}
+
 export type QuerySet = OPA.QuerySet<ILocale>;
 export const CollectionDescriptor = new OPA.CollectionDescriptor<ILocale, QuerySet, void>(SingularName, PluralName, IsSingleton, (cd) => new OPA.QuerySet(cd), null, getRequiredDocuments);

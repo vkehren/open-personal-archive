@@ -23,5 +23,20 @@ export interface IRole extends OPA.IDocument_Creatable {
   readonly isDefault: boolean;
 }
 
+type IRolePartial = any;
+/**
+ * Checks whether the specified updates to the specified Role document are valid.
+ * @param {IRole} document The Role document being updated.
+ * @param {IRolePartial} updateObject The updates specified.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid(document: IRole, updateObject: IRolePartial): boolean {
+  OPA.assertNonNullish(document);
+  OPA.assertNonNullish(updateObject);
+
+  // NOTE: Currently, Roles are not updateable
+  return false;
+}
+
 export type QuerySet = OPA.QuerySet<IRole>;
 export const CollectionDescriptor = new OPA.CollectionDescriptor<IRole, QuerySet, void>(SingularName, PluralName, IsSingleton, (cd) => new OPA.QuerySet(cd), null, RequiredDocuments);

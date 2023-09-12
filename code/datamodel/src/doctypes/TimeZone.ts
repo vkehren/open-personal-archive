@@ -28,5 +28,20 @@ export interface ITimeZone extends OPA.IDocument_Creatable {
   readonly displayOrder: number;
 }
 
+type ITimeZonePartial = any;
+/**
+ * Checks whether the specified updates to the specified TimeZone document are valid.
+ * @param {ITimeZone} document The TimeZone document being updated.
+ * @param {ITimeZonePartial} updateObject The updates specified.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid(document: ITimeZone, updateObject: ITimeZonePartial): boolean {
+  OPA.assertNonNullish(document);
+  OPA.assertNonNullish(updateObject);
+
+  // NOTE: Currently, TimeZones are not updateable
+  return false;
+}
+
 export type QuerySet = OPA.QuerySet<ITimeZone>;
 export const CollectionDescriptor = new OPA.CollectionDescriptor<ITimeZone, QuerySet, void>(SingularName, PluralName, IsSingleton, (cd) => new OPA.QuerySet(cd), null, getRequiredDocuments); // eslint-disable-line max-len

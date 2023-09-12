@@ -19,6 +19,21 @@ export interface IActivityLogItem extends OPA.IDocument_Creatable {
   readonly otherState: any | null;
 }
 
+type IActivityLogItemPartial = any;
+/**
+ * Checks whether the specified updates to the specified ActivityLogItem document are valid.
+ * @param {IActivityLogItem} document The ActivityLogItem document being updated.
+ * @param {IActivityLogItemPartial} updateObject The updates specified.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid(document: IActivityLogItem, updateObject: IActivityLogItemPartial): boolean {
+  OPA.assertNonNullish(document);
+  OPA.assertNonNullish(updateObject);
+
+  // NOTE: Currently, ActivityLogItems are not updateable
+  return false;
+}
+
 /**
  * Creates an instance of the IActivityLogItem document type.
  * @param {string} id The ID for the ActivityLogItem within the OPA system.

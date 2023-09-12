@@ -19,6 +19,21 @@ export interface IAuthenticationProvider extends OPA.IDocument_Creatable {
   readonly isDefault: boolean;
 }
 
+type IAuthenticationProviderPartial = any;
+/**
+ * Checks whether the specified updates to the specified AuthenticationProvider document are valid.
+ * @param {IAuthenticationProvider} document The AuthenticationProvider document being updated.
+ * @param {IAuthenticationProviderPartial} updateObject The updates specified.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid(document: IAuthenticationProvider, updateObject: IAuthenticationProviderPartial): boolean {
+  OPA.assertNonNullish(document);
+  OPA.assertNonNullish(updateObject);
+
+  // NOTE: Currently, AuthenticationProviders are not updateable
+  return false;
+}
+
 /** Class providing queries for AuthenticationProvider collection. */
 export class AuthenticationProviderQuerySet extends OPA.QuerySet<IAuthenticationProvider> {
   /**
