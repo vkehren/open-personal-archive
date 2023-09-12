@@ -35,6 +35,44 @@ export interface IArchive extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_
 }
 
 /**
+ * Checks whether the specified updates to the specified Archive document are valid.
+ * @param {IArchive} document The Archive document being updated.
+ * @param {IArchivePartial} updateObject The updates specified.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid(document: IArchive, updateObject: IArchivePartial): boolean {
+  OPA.assertNonNullish(document);
+  OPA.assertNonNullish(updateObject);
+
+  // NOTE: updateObject MUST implement IUpdateable_ByUser, so check immediately and do NOT use "if (true) {...}"
+  const updateObject_Updateable = (updateObject as OPA.IUpdateable_ByUser);
+
+  if (!updateObject_Updateable.hasBeenUpdated || OPA.isNullish(updateObject_Updateable.dateOfLatestUpdate) || OPA.isNullish(updateObject_Updateable.userIdOfLatestUpdater)) {
+    return false;
+  }
+
+  // NOTE: updateObject MUST NOT change read-only data
+  const propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
+  const id_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).id);
+  const ownerId_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).ownerId);
+  const pathToStorageFolder_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).pathToStorageFolder);
+
+  if (id_IsUpdated || ownerId_IsUpdated || pathToStorageFolder_IsUpdated) {
+    return false;
+  }
+
+  // NOTE: updateObject MUST NOT erase read-only history of changes
+  const updateHistory_KeyText = OPA.getTypedPropertyKeysAsText(document).updateHistory;
+  const updateHistory_IsUpdated = propertyNames_ForUpdate.includes(updateHistory_KeyText);
+  const updateHistory_Value = (updateObject as any)[updateHistory_KeyText];
+
+  if (updateHistory_IsUpdated && !OPA.isOfFieldValue_ArrayUnion<firestore.FieldValue>(updateHistory_Value)) {
+    return false;
+  }
+  return true;
+}
+
+/**
  * Creates an instance of the IArchive document type.
  * @param {string} name The name of the Archive.
  * @param {string} description A description of the Archive.
@@ -137,9 +175,8 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
 
     const document = await this.getById(db, documentId);
     OPA.assertNonNullish(document);
-    // NOTE: If needed, implement "areUpdatesValid" function
-    // const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
-    // OPA.assertIsTrue(areValid, "The requested update is invalid.");
+    const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
+    OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const collectionRef = this.collectionDescriptor.getTypedCollection(db);
     const documentRef = collectionRef.doc(documentId);
