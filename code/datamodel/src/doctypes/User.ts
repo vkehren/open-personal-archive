@@ -13,7 +13,6 @@ export const User_OwnerId = "OPA_User_Owner"; // eslint-disable-line camelcase
 
 // NOTE: IViewable_ByUser and IApprovable_ByUser fields should be updated using the corresponding interface directly as a partial interface
 export interface IUserPartial {
-  assignedRoleId?: string;
   localeId?: string;
   timeZoneGroupId?: string;
   timeZoneId?: string;
@@ -78,11 +77,11 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   const authAccountName_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).authAccountName);
   const authAccountNameLowered_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).authAccountNameLowered);
   const assignedRoleId_UpdateUsesInterface = (!OPA.isNullish(updateObject_AssignableToRole.dateOfLatestRoleAssignment));
-  const assignedRoleId_IsUpdated = (!assignedRoleId_UpdateUsesInterface && propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).assignedRoleId));
+  const assignedRoleId_IsUpdatedDirectly = (!assignedRoleId_UpdateUsesInterface && propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).assignedRoleId));
   const requestedCitationIds_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).requestedCitationIds);
   const viewableCitationIds_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).viewableCitationIds);
 
-  if (id_IsUpdated || firebaseAuthUserId_IsUpdated || authProviderId_IsUpdated || authAccountName_IsUpdated || authAccountNameLowered_IsUpdated || assignedRoleId_IsUpdated || requestedCitationIds_IsUpdated || viewableCitationIds_IsUpdated) {
+  if (id_IsUpdated || firebaseAuthUserId_IsUpdated || authProviderId_IsUpdated || authAccountName_IsUpdated || authAccountNameLowered_IsUpdated || assignedRoleId_IsUpdatedDirectly || requestedCitationIds_IsUpdated || viewableCitationIds_IsUpdated) {
     return false;
   }
 
