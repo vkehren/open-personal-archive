@@ -223,6 +223,7 @@ export interface IDocument_Approvable<T> extends IDocument, IApprovable<T> { }
 export interface IDocument_Approvable_ByUser<T> extends IDocument_Approvable<T>, IApprovable_ByUser<T> { }
 
 // ISuspendable
+export const ISuspendable_IsSuspended_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("isSuspended"); // eslint-disable-line camelcase
 export const ISuspendable_HasSuspensionStarted_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("hasSuspensionStarted"); // eslint-disable-line camelcase
 export const ISuspendable_HasSuspensionEnded_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("hasSuspensionEnded"); // eslint-disable-line camelcase
 export const ISuspendable_ReasonForSuspensionStart_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("reasonForSuspensionStart"); // eslint-disable-line camelcase
@@ -230,6 +231,7 @@ export const ISuspendable_ReasonForSuspensionEnd_PropertyName = VC.getTypedPrope
 export const ISuspendable_DateOfSuspensionStart_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("dateOfSuspensionStart"); // eslint-disable-line camelcase
 export const ISuspendable_DateOfSuspensionEnd_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("dateOfSuspensionEnd"); // eslint-disable-line camelcase
 export interface ISuspendable {
+  readonly isSuspended: boolean; // NOTE: This property should be computed by calling isSuspended<T>(...)
   readonly hasSuspensionStarted: boolean;
   readonly hasSuspensionEnded: boolean;
   readonly reasonForSuspensionStart: string | null;

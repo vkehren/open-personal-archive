@@ -117,6 +117,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(userId);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -158,6 +159,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(userId);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -199,6 +201,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(userId);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -240,6 +243,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(userId);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -281,6 +285,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(userId);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -320,6 +325,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(userId);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -359,6 +365,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(userId);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -398,6 +405,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(userId);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -437,6 +445,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(userId);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -476,6 +485,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(userId);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -515,6 +525,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(userId);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -554,6 +565,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(userId);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -633,6 +645,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).equals(null);
     expect(userNonNull.userIdOfDecider).equals(null);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -674,6 +687,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).equals(null);
     expect(userNonNull.userIdOfDecider).equals(null);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -715,6 +729,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).equals(null);
     expect(userNonNull.userIdOfDecider).equals(null);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -756,6 +771,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).equals(null);
     expect(userNonNull.userIdOfDecider).equals(null);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -798,6 +814,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).equals(null);
     expect(userNonNull.userIdOfDecider).equals(null);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -837,6 +854,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).equals(null);
     expect(userNonNull.userIdOfDecider).equals(null);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -876,6 +894,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).equals(null);
     expect(userNonNull.userIdOfDecider).equals(null);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -915,6 +934,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(owner.id);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -954,6 +974,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(owner.id);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -993,6 +1014,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(owner.id);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(false);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(null);
@@ -1032,6 +1054,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(owner.id);
     expect(OPA.isSuspended(userNonNull)).equals(true);
+    expect(userNonNull.isSuspended).equals(true);
     expect(userNonNull.hasSuspensionStarted).equals(true);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(testStartReason);
@@ -1071,6 +1094,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(owner.id);
     expect(OPA.isSuspended(userNonNull)).equals(true);
+    expect(userNonNull.isSuspended).equals(true);
     expect(userNonNull.hasSuspensionStarted).equals(true);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(testStartReason);
@@ -1110,6 +1134,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(owner.id);
     expect(OPA.isSuspended(userNonNull)).equals(true);
+    expect(userNonNull.isSuspended).equals(true);
     expect(userNonNull.hasSuspensionStarted).equals(true);
     expect(userNonNull.hasSuspensionEnded).equals(false);
     expect(userNonNull.reasonForSuspensionStart).equals(testStartReason);
@@ -1149,6 +1174,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(owner.id);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(true);
     expect(userNonNull.hasSuspensionEnded).equals(true);
     expect(userNonNull.reasonForSuspensionStart).equals(testStartReason);
@@ -1188,6 +1214,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(owner.id);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(true);
     expect(userNonNull.hasSuspensionEnded).equals(true);
     expect(userNonNull.reasonForSuspensionStart).equals(testStartReason);
@@ -1227,6 +1254,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(owner.id);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(true);
     expect(userNonNull.hasSuspensionEnded).equals(true);
     expect(userNonNull.reasonForSuspensionStart).equals(testStartReason);
@@ -1266,6 +1294,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDecision).not.equals(null);
     expect(userNonNull.userIdOfDecider).equals(owner.id);
     expect(OPA.isSuspended(userNonNull)).equals(false);
+    expect(userNonNull.isSuspended).equals(false);
     expect(userNonNull.hasSuspensionStarted).equals(true);
     expect(userNonNull.hasSuspensionEnded).equals(true);
     expect(userNonNull.reasonForSuspensionStart).equals(testStartReason);

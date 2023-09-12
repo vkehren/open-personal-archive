@@ -326,7 +326,7 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     firebaseAuthUserId: firebaseAuthUserId,
     authProviderId: authProvider.id,
     authAccountName: authAccountName,
-    authAccountNameLowered: authAccountName.toLowerCase(),
+    authAccountNameLowered: authAccountName.toLowerCase(), // NOTE: Here this is data property, but all QuerySet functions proxy this into a computed property
     assignedRoleId: assignedRole.id,
     localeId: locale.id,
     timeZoneGroupId: timeZoneGroup.id,
@@ -351,6 +351,7 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     approvalState: BT.ApprovalStates.pending,
     dateOfDecision: null,
     userIdOfDecider: null,
+    isSuspended: false, // NOTE: Here this is data property, but all QuerySet functions proxy this into a computed property
     hasSuspensionStarted: false,
     hasSuspensionEnded: false,
     reasonForSuspensionStart: null,
@@ -389,7 +390,7 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     firebaseAuthUserId: firebaseAuthUserId,
     authProviderId: authProvider.id,
     authAccountName: authAccountName,
-    authAccountNameLowered: authAccountName.toLowerCase(),
+    authAccountNameLowered: authAccountName.toLowerCase(), // NOTE: Here this is data property, but all QuerySet functions proxy this into a computed property
     assignedRoleId: Role_OwnerId,
     localeId: locale.id,
     timeZoneGroupId: timeZoneGroup.id,
@@ -414,6 +415,7 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     approvalState: BT.ApprovalStates.approved,
     dateOfDecision: now,
     userIdOfDecider: User_OwnerId,
+    isSuspended: false, // NOTE: Here this is data property, but all QuerySet functions proxy this into a computed property
     hasSuspensionStarted: false,
     hasSuspensionEnded: false,
     reasonForSuspensionStart: null,
@@ -441,6 +443,29 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
    */
   constructor(collectionDescriptor: OPA.ITypedCollectionDescriptor<IUser>) {
     super(collectionDescriptor);
+    this.documentProxyConstructor = (user: IUser): IUser => {
+      return new Proxy(user, {
+        get(target, propertyName, receiver) {
+          if (propertyName == OPA.getTypedPropertyKeyAsText<IUser>("authAccountNameLowered")) {
+            return target.authAccountName.toLowerCase();
+          }
+          else if (propertyName == OPA.ISuspendable_IsSuspended_PropertyName) {
+            return OPA.isSuspended(target);
+          } else {
+            return Reflect.get(arguments[0], arguments[1], arguments[2]);
+          }
+        },
+        set(target, propertyName, propertyValue, receiver) {
+          if (propertyName == OPA.getTypedPropertyKeyAsText<IUser>("authAccountNameLowered")) {
+            throw new Error("The \"" + OPA.getTypedPropertyKeyAsText<IUser>("authAccountNameLowered") + "\" property is not settable.");
+          } else if (propertyName == OPA.ISuspendable_IsSuspended_PropertyName) {
+            throw new Error("The \"" + OPA.ISuspendable_IsSuspended_PropertyName + "\" property is not settable.");
+          } else {
+            return Reflect.set(arguments[0], arguments[1], arguments[2], arguments[3]);
+          }
+        }
+      });
+    };
   }
 
   /**
