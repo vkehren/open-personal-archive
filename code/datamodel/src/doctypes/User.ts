@@ -25,12 +25,12 @@ export interface IUserPartial {
   recentQueries?: Array<string>;
 }
 
-type UpdateHistoryItem = IUserPartial | OPA.IUpdateable_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState> | OPA.ISuspendable_ByUser | OPA.IDeleteable_ByUser;
+type UpdateHistoryItem = IUserPartial | OPA.IUpdateable_ByUser | OPA.IAssignableToRole_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState> | OPA.ISuspendable_ByUser | OPA.IDeleteable_ByUser;
 interface IUserPartial_WithHistory extends IUserPartial, OPA.IUpdateable {
   updateHistory: Array<UpdateHistoryItem> | firestore.FieldValue;
 }
 
-export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Suspendable_ByUser, OPA.IDocument_Deleteable_ByUser {
+export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable_ByUser, OPA.IDocument_AssignableToRole_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Suspendable_ByUser, OPA.IDocument_Deleteable_ByUser {
   readonly id: string;
   readonly firebaseAuthUserId: string;
   readonly authProviderId: string;
@@ -69,13 +69,16 @@ function areUpdatesValid(document: IUser, updateObject: IUserPartial): boolean {
   }
 
   // NOTE: updateObject MUST NOT change read-only data
+  const updateObject_AssignableToRole = (updateObject as OPA.IAssignableToRole_ByUser);
+
   const propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
   const id_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).id);
   const firebaseAuthUserId_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).firebaseAuthUserId);
   const authProviderId_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).authProviderId);
   const authAccountName_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).authAccountName);
   const authAccountNameLowered_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).authAccountNameLowered);
-  const assignedRoleId_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).assignedRoleId);
+  const assignedRoleId_UpdateUsesInterface = (!OPA.isNullish(updateObject_AssignableToRole.dateOfLatestRoleAssignment));
+  const assignedRoleId_IsUpdated = (!assignedRoleId_UpdateUsesInterface && propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).assignedRoleId));
   const requestedCitationIds_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).requestedCitationIds);
   const viewableCitationIds_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).viewableCitationIds);
 
@@ -111,6 +114,28 @@ function areUpdatesValid(document: IUser, updateObject: IUserPartial): boolean {
       const userMatchesDoc = (updateObject_Creatable.userIdOfCreator == document.id);
 
       if (!dateMatchesDoc || !userMatchesDoc) {
+        return false;
+      }
+    }
+  }
+
+  if (true) {
+    if (OPA.isUndefined(updateObject_AssignableToRole.assignedRoleId)) {
+      const dateIsSet = !OPA.isUndefined(updateObject_AssignableToRole.dateOfLatestRoleAssignment);
+      const userIsSet = !OPA.isUndefined(updateObject_AssignableToRole.userIdOfLatestRoleAssigner);
+
+      if (dateIsSet || userIsSet) {
+        return false;
+      }
+    } else if (OPA.isNullish(updateObject_AssignableToRole.assignedRoleId)) {
+      throw new Error("The \"assignedRoleId\" property must not be set to null.");
+    } else {
+      const dateNotSet = OPA.isNullish(updateObject_AssignableToRole.dateOfLatestRoleAssignment);
+      const userNotSet = OPA.isNullish(updateObject_AssignableToRole.userIdOfLatestRoleAssigner);
+      const dateNotCreation = (document.dateOfCreation != updateObject_AssignableToRole.dateOfLatestRoleAssignment);
+      const isSelfAssigned = (updateObject_AssignableToRole.userIdOfLatestRoleAssigner == document.id);
+
+      if (dateNotSet || (userNotSet && dateNotCreation) || isSelfAssigned || docIsArchiveOwner) {
         return false;
       }
     }
@@ -317,6 +342,8 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     hasBeenUpdated: false,
     dateOfLatestUpdate: null,
     userIdOfLatestUpdater: null,
+    dateOfLatestRoleAssignment: now,
+    userIdOfLatestRoleAssigner: null,
     hasBeenViewed: false,
     dateOfLatestViewing: null,
     userIdOfLatestViewer: null,
@@ -378,6 +405,8 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     hasBeenUpdated: false,
     dateOfLatestUpdate: null,
     userIdOfLatestUpdater: null,
+    dateOfLatestRoleAssignment: now,
+    userIdOfLatestRoleAssigner: null,
     hasBeenViewed: true,
     dateOfLatestViewing: now,
     userIdOfLatestViewer: User_OwnerId,
@@ -556,6 +585,35 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const now = OPA.nowToUse();
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
     updateObject = {...updateObject_Updateable, ...updateObject};
+    const updateHistory = constructorProvider.arrayUnion(updateObject);
+    const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
+
+    const document = await this.getById(db, documentId);
+    OPA.assertNonNullish(document);
+    const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
+    OPA.assertIsTrue(areValid, "The requested update is invalid.");
+
+    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const documentRef = collectionRef.doc(documentId);
+    await documentRef.set(updateObject_WithHistory, {merge: true});
+  }
+
+  /**
+   * Updates the User stored on the server by constructing an IViewable_ByUser object.
+   * @param {Firestore} db The Firestore Database.
+   * @param {string} documentId The ID for the User within the OPA system.
+   * @param {IRole} role The Role to which to assign the User within the OPA system.
+   * @param {string} userIdOfLatestRoleAssigner The ID for the Assigner within the OPA system.
+   * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
+   * @return {Promise<void>}
+   */
+  async assignToRole(db: firestore.Firestore, documentId: string, role: IRole, userIdOfLatestRoleAssigner: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    OPA.assertNonNullish(role);
+
+    const now = OPA.nowToUse();
+    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfLatestRoleAssigner} as OPA.IUpdateable_ByUser);
+    const updateObject_AssignableToRole = ({assignedRoleId: role.id, dateOfLatestRoleAssignment: now, userIdOfLatestRoleAssigner} as OPA.IAssignableToRole_ByUser);
+    const updateObject = {...updateObject_Updateable, ...updateObject_AssignableToRole, ...({} as IUserPartial)};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
