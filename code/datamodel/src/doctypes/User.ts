@@ -211,7 +211,8 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   if (true) {
     const updateObject_Suspendable = (updateObject as OPA.ISuspendable_ByUser);
 
-    if (OPA.isUndefined(updateObject_Suspendable.hasSuspensionStarted) || OPA.isUndefined(updateObject_Suspendable.hasSuspensionEnded)) {
+    if (OPA.isUndefined(updateObject_Suspendable.isSuspended) || OPA.isUndefined(updateObject_Suspendable.hasSuspensionStarted) || OPA.isUndefined(updateObject_Suspendable.hasSuspensionEnded)) {
+      const stateIsSet = !OPA.isUndefined(updateObject_Suspendable.isSuspended);
       const startedIsSet = !OPA.isUndefined(updateObject_Suspendable.hasSuspensionStarted);
       const endedIsSet = !OPA.isUndefined(updateObject_Suspendable.hasSuspensionEnded);
       const startReasonIsSet = !OPA.isUndefined(updateObject_Suspendable.reasonForSuspensionStart);
@@ -221,13 +222,15 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
       const startUserIsSet = !OPA.isUndefined(updateObject_Suspendable.userIdOfSuspensionStarter);
       const endUserIsSet = !OPA.isUndefined(updateObject_Suspendable.userIdOfSuspensionEnder);
 
-      if (startedIsSet || endedIsSet || startReasonIsSet || endReasonIsSet || startDateIsSet || endDateIsSet || startUserIsSet || endUserIsSet) {
+      if (stateIsSet || startedIsSet || endedIsSet || startReasonIsSet || endReasonIsSet || startDateIsSet || endDateIsSet || startUserIsSet || endUserIsSet) {
         return false;
       }
     } else if (OPA.isNullish(updateObject_Suspendable.hasSuspensionStarted)) {
       throw new Error("The \"hasSuspensionStarted\" property must not be set to null.");
     } else if (OPA.isNullish(updateObject_Suspendable.hasSuspensionEnded)) {
       throw new Error("The \"hasSuspensionEnded\" property must not be set to null.");
+    } else if (OPA.isSuspended(updateObject_Suspendable) != updateObject_Suspendable.isSuspended) {
+      throw new Error("The \"isSuspended\" property has been set to an incorrect value.");
     } else if (updateObject_Suspendable.hasSuspensionEnded) {
       const startedNotSet = OPA.isNullish(updateObject_Suspendable.hasSuspensionStarted);
       // NOTE: Allow both reasons to be value, null, or undefined
@@ -733,7 +736,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfSuspensionStarter} as OPA.IUpdateable_ByUser);
-    const updateObject_Suspendable = ({hasSuspensionStarted: true, hasSuspensionEnded: false, reasonForSuspensionStart: reason, reasonForSuspensionEnd: null, dateOfSuspensionStart: now, dateOfSuspensionEnd: null, userIdOfSuspensionStarter, userIdOfSuspensionEnder: null} as OPA.ISuspendable_ByUser);
+    const updateObject_Suspendable = ({isSuspended: true, hasSuspensionStarted: true, hasSuspensionEnded: false, reasonForSuspensionStart: reason, reasonForSuspensionEnd: null, dateOfSuspensionStart: now, dateOfSuspensionEnd: null, userIdOfSuspensionStarter, userIdOfSuspensionEnder: null} as OPA.ISuspendable_ByUser);
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Suspendable};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
@@ -762,7 +765,6 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const documentNonNull = OPA.convertNonNullish(document);
 
     OPA.assertIsTrue(OPA.isSuspended(documentNonNull), "The User must be suspended before the User is un-suspended.");
-    const hasSuspensionStarted = documentNonNull.hasSuspensionStarted;
     const reasonForSuspensionStart = documentNonNull.reasonForSuspensionStart;
     const dateOfSuspensionStart = documentNonNull.dateOfSuspensionStart;
     const userIdOfSuspensionStarter = documentNonNull.userIdOfSuspensionStarter;
@@ -770,7 +772,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfSuspensionEnder} as OPA.IUpdateable_ByUser);
-    const updateObject_Suspendable = ({hasSuspensionStarted, hasSuspensionEnded: true, reasonForSuspensionStart, reasonForSuspensionEnd: reason, dateOfSuspensionStart, dateOfSuspensionEnd: now, userIdOfSuspensionStarter, userIdOfSuspensionEnder} as OPA.ISuspendable_ByUser);
+    const updateObject_Suspendable = ({isSuspended: false, hasSuspensionStarted: true, hasSuspensionEnded: true, reasonForSuspensionStart, reasonForSuspensionEnd: reason, dateOfSuspensionStart, dateOfSuspensionEnd: now, userIdOfSuspensionStarter, userIdOfSuspensionEnder} as OPA.ISuspendable_ByUser);
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Suspendable};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
