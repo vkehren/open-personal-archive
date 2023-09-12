@@ -142,7 +142,7 @@ export function getFieldValueSummary_ArrayRemove<T extends firestore.FieldValue>
     throw new Error("The value specified is not an \"" + FieldValue_MethodName_ArrayRemove + "\" FieldValue.");
   }
 
-  const data = {elements: [...((fieldValue as any).elements).elements]};
+  const data = {elements: [...((fieldValue as any).elements)]};
   const summary: FieldValueSummary = {
     isFieldValue: true,
     fieldValueTypeName: FieldValue_MethodName_ArrayRemove,
