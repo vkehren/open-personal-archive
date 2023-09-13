@@ -77,7 +77,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     let user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState.db, config.authenticationState.firebaseAuthUserId);
     expect(user).equals(null);
 
-    await TestUtils.performInstallForTest(config.dataStorageState, config.authenticationState, config.firebaseConstructorProvider);
+    await TestUtils.performInstallForTest(config.dataStorageState, config.authenticationState);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -718,7 +718,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     let user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState.db, config.authenticationState.firebaseAuthUserId);
     expect(user).equals(null);
 
-    await TestUtils.performInstallForTest(config.dataStorageState, config.authenticationState, config.firebaseConstructorProvider);
+    await TestUtils.performInstallForTest(config.dataStorageState, config.authenticationState);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);

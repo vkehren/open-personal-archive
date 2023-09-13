@@ -160,7 +160,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await TestUtils.performInstallForTest(config.dataStorageState, config.authenticationState, config.firebaseConstructorProvider);
+    await TestUtils.performInstallForTest(config.dataStorageState, config.authenticationState);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -278,7 +278,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await TestUtils.performInstallForTest(config.dataStorageState, config.authenticationState, config.firebaseConstructorProvider);
+    await TestUtils.performInstallForTest(config.dataStorageState, config.authenticationState);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);

@@ -4,7 +4,7 @@ import {OpaDbDescriptor as OpaDb} from "../../datamodel/src";
 import * as Application from "./system/Application";
 import * as TestData from "./TestData.test";
 
-export async function performInstallForTest(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> { // eslint-disable-line max-len
+export async function performInstallForTest(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState): Promise<void> { // eslint-disable-line max-len
   await Application.performInstall(dataStorageState, authenticationState,
     "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
     "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "Owner", "de Archive");
