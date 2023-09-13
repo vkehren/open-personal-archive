@@ -252,7 +252,7 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
   if (OPA.isEmpty(archivePartial)) {
     throw new Error("No updated setting was provided.");
   }
-  await OpaDb.Archive.queries.update(callState.dataStorageState, archivePartial, currentUserNonNull.id, constructorProvider);
+  await OpaDb.Archive.queries.update(callState.dataStorageState, archivePartial, currentUserNonNull.id);
 }
 
 /**
@@ -311,7 +311,7 @@ export async function performUpgrade(callState: OpaDm.ICallState, constructorPro
   if (OPA.isEmpty(applicationPartial)) {
     throw new Error("No upgraded version was provided.");
   }
-  await OpaDb.Application.queries.upgrade(callState.dataStorageState, applicationPartial, currentUserNonNull.id, constructorProvider);
+  await OpaDb.Application.queries.upgrade(callState.dataStorageState, applicationPartial, currentUserNonNull.id);
 }
 
 /**

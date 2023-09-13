@@ -28,7 +28,7 @@ export async function requestUserAccess(callState: OpaDm.ICallState, message: st
   OPA.assertIsFalse((user.id == OpaDm.User_OwnerId), "The Owner cannot request access as the Owner already has access to the entire Archive.");
   const accessRequestId = await OpaDb.AccessRequests.queries.create(callState.dataStorageState, user, locale, message, citationId);
   if (!OPA.isNullish(citationId)) {
-    await OpaDb.Users.queries.addRequestedCitation(callState.dataStorageState, user.id, OPA.convertNonNullish(citationId), user.id, callState.dataStorageState.constructorProvider);
+    await OpaDb.Users.queries.addRequestedCitation(callState.dataStorageState, user.id, OPA.convertNonNullish(citationId), user.id);
   }
 
   const accessRequestReRead = await OpaDb.AccessRequests.queries.getById(callState.dataStorageState, accessRequestId);

@@ -393,10 +393,9 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    * @param {string} documentId The ID for the AccessRequest within the OPA system.
    * @param {IAccessRequestPartial} updateObject The object containing the updates.
    * @param {string} userIdOfLatestUpdater The ID for the Updater within the OPA system.
-   * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async update(ds: OPA.IDataStorageState, documentId: string, updateObject: IAccessRequestPartial, userIdOfLatestUpdater: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async update(ds: OPA.IDataStorageState, documentId: string, updateObject: IAccessRequestPartial, userIdOfLatestUpdater: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
@@ -404,7 +403,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
     updateObject = {...updateObject, ...updateObject_Updateable};
     const updateObject_ForHistory = OPA.replaceFieldValuesWithSummaries({...updateObject});
-    const updateHistory = constructorProvider.arrayUnion(updateObject_ForHistory);
+    const updateHistory = ds.constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
     const document = await this.getById(ds, documentId);
@@ -423,10 +422,9 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    * @param {string} documentId The ID for the AccessRequest within the OPA system.
    * @param {Array<string>} tags The tags that apply to the AccessRequest.
    * @param {string} userIdOfLatestTagger The ID for the latest Tagger within the OPA system.
-   * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async setTags(ds: OPA.IDataStorageState, documentId: string, tags: Array<string>, userIdOfLatestTagger: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async setTags(ds: OPA.IDataStorageState, documentId: string, tags: Array<string>, userIdOfLatestTagger: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
@@ -435,7 +433,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfLatestTagger} as OPA.IUpdateable_ByUser);
     const updateObject_Taggable = ({tags, dateOfLatestTagging: now, userIdOfLatestTagger} as OPA.ITaggable_ByUser);
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Taggable};
-    const updateHistory = constructorProvider.arrayUnion(updateObject);
+    const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
     const document = await this.getById(ds, documentId);
@@ -454,10 +452,9 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    * @param {string} documentId The ID for the AccessRequest within the OPA system.
    * @param {boolean} isArchived Whether the AccessRequest should be marked as archived.
    * @param {string} userIdOfArchivalChanger The ID for the archival state Changer within the OPA system.
-   * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async setToArchivalOption(ds: OPA.IDataStorageState, documentId: string, isArchived: boolean, userIdOfArchivalChanger: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async setToArchivalOption(ds: OPA.IDataStorageState, documentId: string, isArchived: boolean, userIdOfArchivalChanger: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
@@ -466,7 +463,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfArchivalChanger} as OPA.IUpdateable_ByUser);
     const updateObject_Archivable = ({isArchived, dateOfArchivalChange: now, userIdOfArchivalChanger} as OPA.IArchivable_ByUser);
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Archivable};
-    const updateHistory = constructorProvider.arrayUnion(updateObject);
+    const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
     const document = await this.getById(ds, documentId);
@@ -484,10 +481,9 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the AccessRequest within the OPA system.
    * @param {string} userIdOfLatestViewer The ID for the Viewer within the OPA system.
-   * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async setToViewed(ds: OPA.IDataStorageState, documentId: string, userIdOfLatestViewer: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async setToViewed(ds: OPA.IDataStorageState, documentId: string, userIdOfLatestViewer: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
@@ -496,7 +492,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfLatestViewer} as OPA.IUpdateable_ByUser);
     const updateObject_Viewable = ({hasBeenViewed: true, dateOfLatestViewing: now, userIdOfLatestViewer} as OPA.IViewable_ByUser);
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Viewable};
-    const updateHistory = constructorProvider.arrayUnion(updateObject);
+    const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
     const document = await this.getById(ds, documentId);
@@ -515,10 +511,9 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    * @param {string} documentId The ID for the AccessRequest within the OPA system.
    * @param {BT.ApprovalState} approvalState The ApprovalState for the AccessRequest.
    * @param {string} userIdOfDecider The ID for the Decider within the OPA system.
-   * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async setToDecidedOption(ds: OPA.IDataStorageState, documentId: string, approvalState: BT.ApprovalState, userIdOfDecider: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async setToDecidedOption(ds: OPA.IDataStorageState, documentId: string, approvalState: BT.ApprovalState, userIdOfDecider: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
@@ -527,7 +522,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDecider} as OPA.IUpdateable_ByUser);
     const updateObject_Approvable = ({hasBeenDecided: true, approvalState, dateOfDecision: now, userIdOfDecider} as OPA.IApprovable_ByUser<BT.ApprovalState>);
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Approvable};
-    const updateHistory = constructorProvider.arrayUnion(updateObject);
+    const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
     const document = await this.getById(ds, documentId);
@@ -545,10 +540,9 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the AccessRequest within the OPA system.
    * @param {string} userIdOfDeleter The ID for the Deleter within the OPA system.
-   * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async markAsDeleted(ds: OPA.IDataStorageState, documentId: string, userIdOfDeleter: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async markAsDeleted(ds: OPA.IDataStorageState, documentId: string, userIdOfDeleter: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
@@ -557,7 +551,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDeleter} as OPA.IUpdateable_ByUser);
     const updateObject_Deleteable = ({isMarkedAsDeleted: true, dateOfDeletion: now, userIdOfDeleter} as OPA.IDeleteable_ByUser);
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Deleteable};
-    const updateHistory = constructorProvider.arrayUnion(updateObject);
+    const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
     const document = await this.getById(ds, documentId);

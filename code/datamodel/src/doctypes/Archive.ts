@@ -166,10 +166,9 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {IArchivePartial} updateObject The object containing the updates.
    * @param {string} userIdOfLatestUpdater The ID for the Updater within the OPA system.
-   * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async update(ds: OPA.IDataStorageState, updateObject: IArchivePartial, userIdOfLatestUpdater: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async update(ds: OPA.IDataStorageState, updateObject: IArchivePartial, userIdOfLatestUpdater: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
@@ -178,7 +177,7 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
     updateObject = {...updateObject, ...updateObject_Updateable};
     const updateObject_ForHistory = OPA.replaceFieldValuesWithSummaries({...updateObject});
-    const updateHistory = constructorProvider.arrayUnion(updateObject_ForHistory);
+    const updateHistory = ds.constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IArchivePartial_WithHistory);
 
     const document = await this.getById(ds, documentId);
