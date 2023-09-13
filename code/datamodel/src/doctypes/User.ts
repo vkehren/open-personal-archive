@@ -35,7 +35,6 @@ export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable
   readonly authProviderId: string;
   readonly authAccountName: string;
   readonly authAccountNameLowered: string;
-  readonly assignedRoleId: string;
   localeId: string;
   timeZoneGroupId: string;
   timeZoneId: string;

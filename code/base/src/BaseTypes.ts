@@ -101,7 +101,7 @@ export const nowToUse = (): DateToUse => firestore.Timestamp.now().toDate();
 // IDocument
 export const IDocument_DocumentId_PropertyName = VC.getTypedPropertyKeyAsText<IDocument>("id"); // eslint-disable-line camelcase
 export interface IDocument {
-  id: string,
+  readonly id: string,
 }
 
 // ICreatable
@@ -140,12 +140,12 @@ export interface IDocument_Upgradeable_ByUser extends IDocument_Upgradeable, IUp
 export const IUpdateable_HasBeenUpdated_PropertyName = VC.getTypedPropertyKeyAsText<IUpdateable>("hasBeenUpdated"); // eslint-disable-line camelcase
 export const IUpdateable_DateOfLatestUpdate_PropertyName = VC.getTypedPropertyKeyAsText<IUpdateable>("dateOfLatestUpdate"); // eslint-disable-line camelcase
 export interface IUpdateable {
-  hasBeenUpdated: boolean;
-  dateOfLatestUpdate: DateToUse | null;
+  readonly hasBeenUpdated: boolean;
+  readonly dateOfLatestUpdate: DateToUse | null;
 }
 export const IUpdateable_ByUser_UserIdOfLatestUpdater_PropertyName = VC.getTypedPropertyKeyAsText<IUpdateable_ByUser>("userIdOfLatestUpdater"); // eslint-disable-line camelcase
 export interface IUpdateable_ByUser extends IUpdateable {
-  userIdOfLatestUpdater: string | null;
+  readonly userIdOfLatestUpdater: string | null;
 }
 export interface IDocument_Updateable extends IDocument, IUpdateable { }
 export interface IDocument_Updateable_ByUser extends IDocument_Updateable, IUpdateable_ByUser { }
@@ -154,12 +154,12 @@ export interface IDocument_Updateable_ByUser extends IDocument_Updateable, IUpda
 export const IAssignableToRole_AssignedRoleId_PropertyName = VC.getTypedPropertyKeyAsText<IAssignableToRole>("assignedRoleId"); // eslint-disable-line camelcase
 export const IAssignableToRole_DateOfLatestRoleAssignment_PropertyName = VC.getTypedPropertyKeyAsText<IAssignableToRole>("dateOfLatestRoleAssignment"); // eslint-disable-line camelcase
 export interface IAssignableToRole {
-  assignedRoleId: string;
-  dateOfLatestRoleAssignment: DateToUse | null;
+  readonly assignedRoleId: string;
+  readonly dateOfLatestRoleAssignment: DateToUse | null;
 }
 export const IAssignableToRole_ByUser_UserIdOfLatestRoleAssigner_PropertyName = VC.getTypedPropertyKeyAsText<IAssignableToRole_ByUser>("userIdOfLatestRoleAssigner"); // eslint-disable-line camelcase
 export interface IAssignableToRole_ByUser extends IAssignableToRole {
-  userIdOfLatestRoleAssigner: string | null;
+  readonly userIdOfLatestRoleAssigner: string | null;
 }
 export interface IDocument_AssignableToRole extends IDocument, IAssignableToRole { }
 export interface IDocument_AssignableToRole_ByUser extends IDocument_AssignableToRole, IAssignableToRole_ByUser { }
@@ -168,12 +168,12 @@ export interface IDocument_AssignableToRole_ByUser extends IDocument_AssignableT
 export const ITaggable_Tags_PropertyName = VC.getTypedPropertyKeyAsText<ITaggable>("tags"); // eslint-disable-line camelcase
 export const ITaggable_DateOfLatestTagging_PropertyName = VC.getTypedPropertyKeyAsText<ITaggable>("dateOfLatestTagging"); // eslint-disable-line camelcase
 export interface ITaggable {
-  tags: Array<string>;
-  dateOfLatestTagging: DateToUse | null;
+  readonly tags: Array<string>;
+  readonly dateOfLatestTagging: DateToUse | null;
 }
 export const ITaggable_ByUser_UserIdOfLatestTagger_PropertyName = VC.getTypedPropertyKeyAsText<ITaggable_ByUser>("userIdOfLatestTagger"); // eslint-disable-line camelcase
 export interface ITaggable_ByUser extends ITaggable {
-  userIdOfLatestTagger: string | null;
+  readonly userIdOfLatestTagger: string | null;
 }
 export interface IDocument_Taggable extends IDocument, ITaggable { }
 export interface IDocument_Taggable_ByUser extends IDocument_Taggable, ITaggable_ByUser { }
