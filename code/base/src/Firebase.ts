@@ -15,6 +15,17 @@ export interface IFirebaseConstructorProvider {
   increment: (n: number) => firestore.FieldValue;
   serverTimestamp: () => firestore.FieldValue;
 }
+
+export interface IDataStorageState {
+  appName: string;
+  projectId: string;
+  usesAdminAccess: boolean;
+  usesEmulators: boolean;
+  db: firestore.Firestore;
+  // LATER: Add storage;
+  constructorProvider: IFirebaseConstructorProvider;
+}
+
 const FieldValue_MethodName_Unrecognized = "[UNRECOGNIZED]";
 const FieldValue_MethodName_ArrayRemove = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("arrayRemove") as string);
 const FieldValue_MethodName_ArrayUnion = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("arrayUnion") as string);

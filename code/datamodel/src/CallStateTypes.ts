@@ -1,4 +1,3 @@
-import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../base/src";
 import * as BT from "./BaseTypes";
 import {IApplication} from "./doctypes/Application";
@@ -18,15 +17,7 @@ export interface ICallState {
   readonly authorizationState?: IAuthorizationState;
 }
 
-export interface IDataStorageState {
-  appName: string;
-  projectId: string;
-  usesAdminAccess: boolean;
-  usesEmulators: boolean;
-  db: firestore.Firestore;
-  // LATER: Add storage;
-  constructorProvider: OPA.IFirebaseConstructorProvider;
-}
+export type IDataStorageState = OPA.IDataStorageState;
 
 export interface IAuthenticationState {
   readonly firebaseAuthUserId: string;
