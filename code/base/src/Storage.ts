@@ -281,7 +281,7 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
     const collectionRef = this.getTypedCollection(db, pathFromRoot);
 
     if (eraseExistingDocs) {
-      await FB.clearFirestoreCollection(collectionRef);
+      await FB.clearFirestoreCollectionByRef(collectionRef);
     }
 
     const requiredDocuments = this.requiredDocuments;

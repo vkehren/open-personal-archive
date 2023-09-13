@@ -358,7 +358,7 @@ export async function performUninstall(dataStorageState: OpaDm.IDataStorageState
 
     for (let j = 0; j < colDesc.propertyIndices.length; j++) {
       const propertyIndexDesc = colDesc.propertyIndices[j];
-      await OPA.clearFirestoreCollectionInDb(db, propertyIndexDesc.indexCollectionName);
+      await OPA.clearFirestoreCollection(db, propertyIndexDesc.indexCollectionName);
     }
     // LATER: If necessary, delete all documents from NestedCollection starting with leaves of Collection tree
   }
@@ -368,8 +368,8 @@ export async function performUninstall(dataStorageState: OpaDm.IDataStorageState
 
     for (let j = 0; j < colDesc.propertyIndices.length; j++) {
       const propertyIndexDesc = colDesc.propertyIndices[j];
-      await OPA.clearFirestoreCollectionInDb(db, propertyIndexDesc.indexCollectionName);
+      await OPA.clearFirestoreCollection(db, propertyIndexDesc.indexCollectionName);
     }
-    await OPA.clearFirestoreCollectionInDb(db, colDesc.collectionName);
+    await OPA.clearFirestoreCollection(db, colDesc.collectionName);
   }
 }

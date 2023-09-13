@@ -503,11 +503,11 @@ export function assertSystemIsNotInstalled(isInstalled: boolean, message = "The 
  * @param {string} collectionName The collection name to clear.
  * @return {Promise<void>}
  */
-export async function clearFirestoreCollectionInDb(db: firestore.Firestore, collectionName: string): Promise<void> {
+export async function clearFirestoreCollection(db: firestore.Firestore, collectionName: string): Promise<void> {
   assertFirestoreIsNotNullish(db);
 
   const collectionRef = db.collection(collectionName);
-  return await clearFirestoreCollection(collectionRef);
+  return await clearFirestoreCollectionByRef(collectionRef);
 }
 
 /**
@@ -515,7 +515,7 @@ export async function clearFirestoreCollectionInDb(db: firestore.Firestore, coll
  * @param {CollectionReference<DocumentData>} collectionRef The Firebase Firestore collection.
  * @return {Promise<void>}
  */
-export async function clearFirestoreCollection(collectionRef: firestore.CollectionReference<firestore.DocumentData>): Promise<void> {
+export async function clearFirestoreCollectionByRef(collectionRef: firestore.CollectionReference<firestore.DocumentData>): Promise<void> {
   if (TC.isNullish(collectionRef)) {
     throw new Error("A valid Firebase Firestore collection must be provided.");
   }
