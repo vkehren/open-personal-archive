@@ -11,9 +11,9 @@ import * as Application from "./Application";
 import * as SchemaInfo from "../../../datamodel/src/PackageInfo";
 import * as ApplicationInfo from "../PackageInfo";
 import * as TestData from "../TestData.test";
-import * as TestConfiguration from "../TestConfiguration.test";
+import * as TestConfig from "../TestConfiguration.test";
 
-const config = TestConfiguration.getTestConfiguration();
+const config = TestConfig.getTestConfiguration();
 
 describe("Tests using Firebase " + config.testEnvironment, function () {
   if (!OPA.isNullish(config.timeout)) {

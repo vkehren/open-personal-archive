@@ -11,9 +11,10 @@ import * as Application from "../system/Application";
 import * as Users from "./Users";
 import * as AccessRequests from "./AccessRequests";
 import * as TestData from "../TestData.test";
-import * as TestConfiguration from "../TestConfiguration.test";
+import * as TestConfig from "../TestConfiguration.test";
+import * as TestUtils from "../TestUtilities.test";
 
-const config = TestConfiguration.getTestConfiguration();
+const config = TestConfig.getTestConfiguration();
 const testMessage = "Please give me access to your archive.";
 const testCitationId_Null: string | null = null;
 // const testCitationId_NonNull: string = "CITATION_1234";
@@ -71,8 +72,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     let user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState.db, config.authenticationState.firebaseAuthUserId);
     expect(user).equals(null);
 
-    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
-      "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "Owner", "de Archive");
+    await TestUtils.performInstallForTest(config.dataStorageState, config.authenticationState, config.firebaseConstructorProvider);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -103,8 +103,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     let user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState.db, config.authenticationState.firebaseAuthUserId);
     expect(user).equals(null);
 
-    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
-      "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "Owner", "de Archive");
+    await TestUtils.performInstallForTest(config.dataStorageState, config.authenticationState, config.firebaseConstructorProvider);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
