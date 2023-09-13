@@ -24,7 +24,8 @@ export interface IDataStorageState {
   usesAdminAccess: boolean;
   usesEmulators: boolean;
   db: firestore.Firestore;
-  // LATER: Add storage
+  // LATER: Add storage;
+  constructorProvider: OPA.IFirebaseConstructorProvider;
 }
 
 export interface IAuthenticationState {

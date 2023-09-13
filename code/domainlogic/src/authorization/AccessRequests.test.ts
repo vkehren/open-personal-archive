@@ -63,7 +63,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
       hasAuthorizationState: false,
     };
 
-    await expect(AccessRequests.requestUserAccess(callState, testMessage, testCitationId, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
+    await expect(AccessRequests.requestUserAccess(callState, testMessage, testCitationId)).to.eventually.be.rejectedWith(Error);
   });
   test("checks that requestUserAccess(...) fails when System is not installed", testFunc1(testCitationId_Null));
   test("checks that requestUserAccess(...) fails when System is not installed", testFunc1(testCitationId_NonNull));
@@ -96,7 +96,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState.db, config.authenticationState.firebaseAuthUserId);
     expect(user).not.equals(null);
 
-    await expect(AccessRequests.requestUserAccess(callState, testMessage, testCitationId, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
+    await expect(AccessRequests.requestUserAccess(callState, testMessage, testCitationId)).to.eventually.be.rejectedWith(Error);
   });
   test("checks that requestUserAccess(...) fails when System is installed and User is Archive Owner", testFunc2(testCitationId_Null));
   test("checks that requestUserAccess(...) fails when System is installed and User is Archive Owner", testFunc2(testCitationId_NonNull));
@@ -136,7 +136,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
 
     let accessRequest: OpaDm.IAccessRequest | null = null;
-    accessRequest = await AccessRequests.requestUserAccess(callState, testMessage, testCitationId, config.firebaseConstructorProvider);
+    accessRequest = await AccessRequests.requestUserAccess(callState, testMessage, testCitationId);
     expect(accessRequest).not.equals(null);
     accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState.db, accessRequest.id);
     expect(accessRequest).not.equals(null);
@@ -182,7 +182,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.dateOfDeletion).equals(null);
     expect(accessRequestNonNull.userIdOfDeleter).equals(null);
 
-    await OpaDb.AccessRequests.queries.setTags(config.dataStorageState.db, accessRequestId, ["a", "b", "c"], owner.id, config.firebaseConstructorProvider);
+    await OpaDb.AccessRequests.queries.setTags(config.dataStorageState.db, accessRequestId, ["a", "b", "c"], owner.id, config.dataStorageState.constructorProvider);
     accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState.db, accessRequestId);
     expect(accessRequestNonNull).not.equals(null);
 
@@ -213,7 +213,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.dateOfDeletion).equals(null);
     expect(accessRequestNonNull.userIdOfDeleter).equals(null);
 
-    await OpaDb.AccessRequests.queries.setToViewed(config.dataStorageState.db, accessRequestId, owner.id, config.firebaseConstructorProvider);
+    await OpaDb.AccessRequests.queries.setToViewed(config.dataStorageState.db, accessRequestId, owner.id, config.dataStorageState.constructorProvider);
     accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState.db, accessRequestId);
     expect(accessRequestNonNull).not.equals(null);
 
@@ -245,7 +245,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.userIdOfDeleter).equals(null);
 
     // NOTE: Set to Viewed by User who created AccessRequest so that "userIdOfLatestViewer" changes to value other than "owner.id" for next step
-    await OpaDb.AccessRequests.queries.setToViewed(config.dataStorageState.db, accessRequestId, userId, config.firebaseConstructorProvider);
+    await OpaDb.AccessRequests.queries.setToViewed(config.dataStorageState.db, accessRequestId, userId, config.dataStorageState.constructorProvider);
     accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState.db, accessRequestId);
     expect(accessRequestNonNull).not.equals(null);
 
@@ -277,7 +277,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.userIdOfDeleter).equals(null);
 
     let accessRequestUpdateObject = ({response: OpaDm.localizableStringConstructor(OpaDm.DefaultLocale, testResponse)} as OpaDm.IAccessRequestPartial);
-    await OpaDb.AccessRequests.queries.update(config.dataStorageState.db, accessRequestId, accessRequestUpdateObject, owner.id, config.firebaseConstructorProvider);
+    await OpaDb.AccessRequests.queries.update(config.dataStorageState.db, accessRequestId, accessRequestUpdateObject, owner.id, config.dataStorageState.constructorProvider);
     accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState.db, accessRequestId);
     expect(accessRequestNonNull).not.equals(null);
 
@@ -310,7 +310,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     const testResponse_Updated = (testResponse + " UPDATED");
     accessRequestUpdateObject = ({response: OpaDm.localizableStringConstructor(OpaDm.DefaultLocale, testResponse_Updated)} as OpaDm.IAccessRequestPartial);
-    await OpaDb.AccessRequests.queries.update(config.dataStorageState.db, accessRequestId, accessRequestUpdateObject, owner.id, config.firebaseConstructorProvider);
+    await OpaDb.AccessRequests.queries.update(config.dataStorageState.db, accessRequestId, accessRequestUpdateObject, owner.id, config.dataStorageState.constructorProvider);
     accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState.db, accessRequestId);
     expect(accessRequestNonNull).not.equals(null);
 
@@ -343,7 +343,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     const testMessage_Updated = (testMessage + " UPDATED");
     accessRequestUpdateObject = ({message: OpaDm.localizableStringConstructor(OpaDm.DefaultLocale, testMessage_Updated)} as OpaDm.IAccessRequestPartial);
-    await OpaDb.AccessRequests.queries.update(config.dataStorageState.db, accessRequestId, accessRequestUpdateObject, userId, config.firebaseConstructorProvider);
+    await OpaDb.AccessRequests.queries.update(config.dataStorageState.db, accessRequestId, accessRequestUpdateObject, userId, config.dataStorageState.constructorProvider);
     accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState.db, accessRequestId);
     expect(accessRequestNonNull).not.equals(null);
 
@@ -374,7 +374,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.dateOfDeletion).equals(null);
     expect(accessRequestNonNull.userIdOfDeleter).equals(null);
 
-    await OpaDb.AccessRequests.queries.setToArchivalOption(config.dataStorageState.db, accessRequestId, true, userId, config.firebaseConstructorProvider);
+    await OpaDb.AccessRequests.queries.setToArchivalOption(config.dataStorageState.db, accessRequestId, true, userId, config.dataStorageState.constructorProvider);
     accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState.db, accessRequestId);
     expect(accessRequestNonNull).not.equals(null);
 
@@ -405,7 +405,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.dateOfDeletion).equals(null);
     expect(accessRequestNonNull.userIdOfDeleter).equals(null);
 
-    await OpaDb.AccessRequests.queries.setToArchivalOption(config.dataStorageState.db, accessRequestId, false, owner.id, config.firebaseConstructorProvider);
+    await OpaDb.AccessRequests.queries.setToArchivalOption(config.dataStorageState.db, accessRequestId, false, owner.id, config.dataStorageState.constructorProvider);
     accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState.db, accessRequestId);
     expect(accessRequestNonNull).not.equals(null);
 
@@ -436,7 +436,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.dateOfDeletion).equals(null);
     expect(accessRequestNonNull.userIdOfDeleter).equals(null);
 
-    await OpaDb.AccessRequests.queries.setToDecidedOption(config.dataStorageState.db, accessRequestId, OpaDm.ApprovalStates.denied, owner.id, config.firebaseConstructorProvider);
+    await OpaDb.AccessRequests.queries.setToDecidedOption(config.dataStorageState.db, accessRequestId, OpaDm.ApprovalStates.denied, owner.id, config.dataStorageState.constructorProvider);
     accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState.db, accessRequestId);
     expect(accessRequest).not.equals(null);
 
@@ -467,7 +467,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.dateOfDeletion).equals(null);
     expect(accessRequestNonNull.userIdOfDeleter).equals(null);
 
-    await OpaDb.AccessRequests.queries.setToDecidedOption(config.dataStorageState.db, accessRequestId, OpaDm.ApprovalStates.approved, owner.id, config.firebaseConstructorProvider);
+    await OpaDb.AccessRequests.queries.setToDecidedOption(config.dataStorageState.db, accessRequestId, OpaDm.ApprovalStates.approved, owner.id, config.dataStorageState.constructorProvider);
     accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState.db, accessRequestId);
     expect(accessRequest).not.equals(null);
 
@@ -498,7 +498,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.dateOfDeletion).equals(null);
     expect(accessRequestNonNull.userIdOfDeleter).equals(null);
 
-    await expect(OpaDb.AccessRequests.queries.markAsDeleted(config.dataStorageState.db, accessRequestId, owner.id, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
+    await expect(OpaDb.AccessRequests.queries.markAsDeleted(config.dataStorageState.db, accessRequestId, owner.id, config.dataStorageState.constructorProvider)).to.eventually.be.rejectedWith(Error);
     accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState.db, accessRequestId);
     expect(accessRequest).not.equals(null);
 
@@ -529,7 +529,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.dateOfDeletion).equals(null);
     expect(accessRequestNonNull.userIdOfDeleter).equals(null);
 
-    await OpaDb.AccessRequests.queries.markAsDeleted(config.dataStorageState.db, accessRequestId, userId, config.firebaseConstructorProvider);
+    await OpaDb.AccessRequests.queries.markAsDeleted(config.dataStorageState.db, accessRequestId, userId, config.dataStorageState.constructorProvider);
     accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState.db, accessRequestId);
     expect(accessRequest).not.equals(null);
 

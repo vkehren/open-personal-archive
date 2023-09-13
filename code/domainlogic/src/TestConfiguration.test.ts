@@ -14,7 +14,6 @@ export interface ITestConfiguration {
   dataStorageState: OpaDm.IDataStorageState;
   authenticationState: OpaDm.IAuthenticationState;
   hasRunTests: boolean;
-  firebaseConstructorProvider: OPA.IFirebaseConstructorProvider;
 }
 
 /**
@@ -49,6 +48,13 @@ export function getTestConfiguration(): ITestConfiguration {
     usesAdminAccess: true,
     usesEmulators: (testEnvironment == "Emulators"),
     db: nullDb,
+    constructorProvider: {
+      arrayRemove: firestore.FieldValue.arrayRemove,
+      arrayUnion: firestore.FieldValue.arrayUnion,
+      delete: firestore.FieldValue.delete,
+      increment: firestore.FieldValue.increment,
+      serverTimestamp: firestore.FieldValue.serverTimestamp,
+    },
   };
 
   const testConfiguration: ITestConfiguration = {
@@ -58,13 +64,6 @@ export function getTestConfiguration(): ITestConfiguration {
     dataStorageState,
     authenticationState: TestData.authenticationState_Owner,
     hasRunTests: false,
-    firebaseConstructorProvider: {
-      arrayRemove: firestore.FieldValue.arrayRemove,
-      arrayUnion: firestore.FieldValue.arrayUnion,
-      delete: firestore.FieldValue.delete,
-      increment: firestore.FieldValue.increment,
-      serverTimestamp: firestore.FieldValue.serverTimestamp,
-    },
   };
   return testConfiguration;
 }
