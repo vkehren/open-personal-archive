@@ -1,4 +1,3 @@
-import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../../base/src";
 import * as CollectionData from "./AuthenticationProviders.json";
 
@@ -54,15 +53,16 @@ export class AuthenticationProviderQuerySet extends OPA.QuerySet<IAuthentication
 
   /**
    * Gets the Authentication Provider by that Provider's externally provided ID, since that ID is also a unique key.
-   * @param {Firestore} db The Firestore Database to read from.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} externalId The ID for the Authentication Provider that is provided by the corresponding Provider.
    * @return {Promise<IAuthenticationProvider | null>} The User corresponding to the UUID, or null if none exists.
    */
-  async getByExternalAuthProviderId(db: firestore.Firestore, externalId: string): Promise<IAuthenticationProvider | null> {
-    OPA.assertFirestoreIsNotNullish(db);
+  async getByExternalAuthProviderId(ds: OPA.IDataStorageState, externalId: string): Promise<IAuthenticationProvider | null> {
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
     OPA.assertIdentifierIsValid(externalId, "A valid external Authentication Provider ID must be provided.");
 
-    const authProvidersCollectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const authProvidersCollectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const getAuthProvidersForIdQuery = authProvidersCollectionRef.where("externalId", "==", externalId);
     const matchingAuthProvidersSnap = await getAuthProvidersForIdQuery.get();
 

@@ -120,12 +120,15 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
 
   /**
    * Creates an instance of the IApplication document type stored on the server.
-   * @param {Firestore} db The Firestore Database.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} applicationVersion The version of the OPA application code.
    * @param {string} schemaVersion The version of the OPA database schema.
    * @return {Promise<string>} The new document ID.
    */
-  async create(db: firestore.Firestore, applicationVersion: string, schemaVersion: string): Promise<string> {
+  async create(ds: OPA.IDataStorageState, applicationVersion: string, schemaVersion: string): Promise<string> {
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
+
     const document = createSingleton(applicationVersion, schemaVersion);
     const proxiedDocument = this.documentProxyConstructor(document);
     const documentId = proxiedDocument.id;
@@ -136,7 +139,7 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
     OPA.assertIsTrue(documentId == SingletonId);
     OPA.assertIsTrue(proxiedDocument.upgradeHistory.length == 1);
 
-    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     await documentRef.set(proxiedDocument, {merge: true});
     return documentId;
@@ -144,13 +147,16 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
 
   /**
    * Updates the Application stored on the server using an IApplicationPartial object.
-   * @param {Firestore} db The Firestore Database.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {IApplicationPartial} updateObject The object containing the updates.
    * @param {string} userIdOfLatestUpgrader The ID for the Upgrader within the OPA system.
    * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async upgrade(db: firestore.Firestore, updateObject: IApplicationPartial, userIdOfLatestUpgrader: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async upgrade(ds: OPA.IDataStorageState, updateObject: IApplicationPartial, userIdOfLatestUpgrader: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
+
     const documentId = SingletonId;
     const now = OPA.nowToUse();
     const updateObject_Upgradeable = ({hasBeenUpgraded: true, dateOfLatestUpgrade: now, userIdOfLatestUpgrader} as OPA.IUpgradeable_ByUser);
@@ -159,12 +165,12 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
     const upgradeHistory = constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, upgradeHistory} as IApplicationPartial_WithHistory);
 
-    const document = await this.getById(db, documentId);
+    const document = await this.getById(ds, documentId);
     OPA.assertNonNullish(document);
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
-    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     await documentRef.set(updateObject_WithHistory, {merge: true});
   }

@@ -30,7 +30,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     const isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     if (isSystemInstalled) {
-      const owner = await OpaDb.Users.queries.getById(config.dataStorageState.db, OpaDm.User_OwnerId);
+      const owner = await OpaDb.Users.queries.getById(config.dataStorageState, OpaDm.User_OwnerId);
 
       if (OPA.isNullish(owner)) {
         // NOTE: Passing a valid value for "authorizationState" only matters if the Archive Owner actually exists
@@ -48,7 +48,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await OpaDb.Application.queries.create(config.dataStorageState.db, ApplicationInfo.VERSION, SchemaInfo.VERSION);
+    await OpaDb.Application.queries.create(config.dataStorageState, ApplicationInfo.VERSION, SchemaInfo.VERSION);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -58,7 +58,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await OpaDb.Application.queries.create(config.dataStorageState.db, ApplicationInfo.VERSION, SchemaInfo.VERSION);
+    await OpaDb.Application.queries.create(config.dataStorageState, ApplicationInfo.VERSION, SchemaInfo.VERSION);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -69,51 +69,51 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    const applications = await OpaDb.Application.queries.getAll(config.dataStorageState.db);
+    const applications = await OpaDb.Application.queries.getAll(config.dataStorageState);
     expect(applications.length).equals(0);
-    const authProviders = await OpaDb.AuthProviders.queries.getAll(config.dataStorageState.db);
+    const authProviders = await OpaDb.AuthProviders.queries.getAll(config.dataStorageState);
     expect(authProviders.length).equals(0);
-    const roles = await OpaDb.Roles.queries.getAll(config.dataStorageState.db);
+    const roles = await OpaDb.Roles.queries.getAll(config.dataStorageState);
     expect(roles.length).equals(0);
-    const locales = await OpaDb.Locales.queries.getAll(config.dataStorageState.db);
+    const locales = await OpaDb.Locales.queries.getAll(config.dataStorageState);
     expect(locales.length).equals(0);
-    const timeZoneGroups = await OpaDb.TimeZoneGroups.queries.getAll(config.dataStorageState.db);
+    const timeZoneGroups = await OpaDb.TimeZoneGroups.queries.getAll(config.dataStorageState);
     expect(timeZoneGroups.length).equals(0);
-    const timeZones = await OpaDb.TimeZones.queries.getAll(config.dataStorageState.db);
+    const timeZones = await OpaDb.TimeZones.queries.getAll(config.dataStorageState);
     expect(timeZones.length).equals(0);
-    const users = await OpaDb.Users.queries.getAll(config.dataStorageState.db);
+    const users = await OpaDb.Users.queries.getAll(config.dataStorageState);
     expect(users.length).equals(0);
-    const archives = await OpaDb.Archive.queries.getAll(config.dataStorageState.db);
+    const archives = await OpaDb.Archive.queries.getAll(config.dataStorageState);
     expect(archives.length).equals(0);
 
-    await OpaDb.Application.queries.create(config.dataStorageState.db, ApplicationInfo.VERSION, SchemaInfo.VERSION);
+    await OpaDb.Application.queries.create(config.dataStorageState, ApplicationInfo.VERSION, SchemaInfo.VERSION);
 
     const authProvider = OpaDb.AuthProviders.requiredDocuments.filter((value) => (value.isDefault))[0];
-    const authProviderCollectionRef = OpaDb.AuthProviders.getTypedCollection(config.dataStorageState.db);
+    const authProviderCollectionRef = OpaDb.AuthProviders.getTypedCollection(config.dataStorageState);
     const authProviderDocumentRef = authProviderCollectionRef.doc(authProvider.id);
     await authProviderDocumentRef.set(authProvider, {merge: true});
 
     const role = OpaDb.Roles.requiredDocuments.filter((value) => (value.type == OpaDm.RoleTypes.owner))[0];
-    const roleCollectionRef = OpaDb.Roles.getTypedCollection(config.dataStorageState.db);
+    const roleCollectionRef = OpaDb.Roles.getTypedCollection(config.dataStorageState);
     const roleDocumentRef = roleCollectionRef.doc(role.id);
     await roleDocumentRef.set(role, {merge: true});
 
     const locale = OpaDb.Locales.requiredDocuments.filter((value) => (value.isDefault))[0];
-    const localeCollectionRef = OpaDb.Locales.getTypedCollection(config.dataStorageState.db);
+    const localeCollectionRef = OpaDb.Locales.getTypedCollection(config.dataStorageState);
     const localeDocumentRef = localeCollectionRef.doc(locale.id);
     await localeDocumentRef.set(locale, {merge: true});
 
     const timeZoneGroup = OpaDb.TimeZoneGroups.requiredDocuments.filter((value) => (value.isDefault))[0];
-    const timeZoneGroupCollectionRef = OpaDb.TimeZoneGroups.getTypedCollection(config.dataStorageState.db);
+    const timeZoneGroupCollectionRef = OpaDb.TimeZoneGroups.getTypedCollection(config.dataStorageState);
     const timeZoneGroupDocumentRef = timeZoneGroupCollectionRef.doc(timeZoneGroup.id);
     await timeZoneGroupDocumentRef.set(timeZoneGroup, {merge: true});
 
     const timeZone = OpaDb.TimeZones.requiredDocuments.filter((value) => (value.id == timeZoneGroup.primaryTimeZoneId))[0];
-    const timeZoneCollectionRef = OpaDb.TimeZones.getTypedCollection(config.dataStorageState.db);
+    const timeZoneCollectionRef = OpaDb.TimeZones.getTypedCollection(config.dataStorageState);
     const timeZoneDocumentRef = timeZoneCollectionRef.doc(timeZone.id);
     await timeZoneDocumentRef.set(timeZone, {merge: true});
 
-    await OpaDb.Users.queries.createArchiveOwner(config.dataStorageState.db, config.authenticationState.firebaseAuthUserId,
+    await OpaDb.Users.queries.createArchiveOwner(config.dataStorageState, config.authenticationState.firebaseAuthUserId,
       authProvider, config.authenticationState.firebaseAuthUserId + "@gmail.com", locale, timeZoneGroup, "Archive", "la Owner");
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
@@ -152,21 +152,21 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(isSystemInstalled).equals(true);
 
     // LATER: Extract these checks into a isCorrupted(...) function that checks install data is valid or not
-    const applications = await OpaDb.Application.queries.getAll(config.dataStorageState.db);
+    const applications = await OpaDb.Application.queries.getAll(config.dataStorageState);
     expect(applications.length).equals(1);
-    const authProviders = await OpaDb.AuthProviders.queries.getAll(config.dataStorageState.db);
+    const authProviders = await OpaDb.AuthProviders.queries.getAll(config.dataStorageState);
     expect(authProviders.length).equals(OpaDb.AuthProviders.requiredDocuments.length).equals(1);
-    const roles = await OpaDb.Roles.queries.getAll(config.dataStorageState.db);
+    const roles = await OpaDb.Roles.queries.getAll(config.dataStorageState);
     expect(roles.length).equals(OpaDb.Roles.requiredDocuments.length).equals(5);
-    const locales = await OpaDb.Locales.queries.getAll(config.dataStorageState.db);
+    const locales = await OpaDb.Locales.queries.getAll(config.dataStorageState);
     expect(locales.length).equals(OpaDb.Locales.requiredDocuments.length).equals(OpaDm.DataConfiguration.Locale_UseMin ? 3 : 53);
-    const timeZoneGroups = await OpaDb.TimeZoneGroups.queries.getAll(config.dataStorageState.db);
+    const timeZoneGroups = await OpaDb.TimeZoneGroups.queries.getAll(config.dataStorageState);
     expect(timeZoneGroups.length).equals(OpaDb.TimeZoneGroups.requiredDocuments.length).equals(OpaDm.DataConfiguration.TimeZoneGroup_UseMin ? 3 : 41);
-    const timeZones = await OpaDb.TimeZones.queries.getAll(config.dataStorageState.db);
+    const timeZones = await OpaDb.TimeZones.queries.getAll(config.dataStorageState);
     expect(timeZones.length).equals(OpaDb.TimeZones.requiredDocuments.length).equals(OpaDm.DataConfiguration.TimeZone_UseMin ? 3 : 41);
-    const users = await OpaDb.Users.queries.getAll(config.dataStorageState.db);
+    const users = await OpaDb.Users.queries.getAll(config.dataStorageState);
     expect(users.length).equals(1);
-    const archives = await OpaDb.Archive.queries.getAll(config.dataStorageState.db);
+    const archives = await OpaDb.Archive.queries.getAll(config.dataStorageState);
     expect(archives.length).equals(1);
 
     // NOTE: Since the System is already installed, this call should fail
@@ -192,7 +192,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     const currentLocale = OPA.convertNonNullish(callState.authorizationState).locale;
     await expect(Application.updateInstallationSettings(callState, undefined, undefined, undefined, undefined, undefined, config.dataStorageState.constructorProvider)).to.be.rejectedWith(Error);
 
-    let archive = await OpaDb.Archive.queries.getById(config.dataStorageState.db, OpaDm.ArchiveId);
+    let archive = await OpaDb.Archive.queries.getById(config.dataStorageState, OpaDm.ArchiveId);
     OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
     let archiveNonNull = OPA.convertNonNullish(archive);
 
@@ -211,7 +211,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     const nameUpdated = archiveOriginal.name[currentLocale.optionName] + " UPDATED";
     await Application.updateInstallationSettings(callState, nameUpdated, undefined, undefined, undefined, undefined, config.dataStorageState.constructorProvider);
 
-    archive = await OpaDb.Archive.queries.getById(config.dataStorageState.db, OpaDm.ArchiveId);
+    archive = await OpaDb.Archive.queries.getById(config.dataStorageState, OpaDm.ArchiveId);
     OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
     archiveNonNull = OPA.convertNonNullish(archive);
 
@@ -230,7 +230,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     const defaultLocaleIdUpdated = (OpaDb.Locales.requiredDocuments.find((v) => !v.isDefault) as OpaDm.ILocale).id;
     await Application.updateInstallationSettings(callState, undefined, descriptionUpdated, defaultLocaleIdUpdated, undefined, undefined, config.dataStorageState.constructorProvider);
 
-    archive = await OpaDb.Archive.queries.getById(config.dataStorageState.db, OpaDm.ArchiveId);
+    archive = await OpaDb.Archive.queries.getById(config.dataStorageState, OpaDm.ArchiveId);
     OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
     archiveNonNull = OPA.convertNonNullish(archive);
 
@@ -250,7 +250,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     const defaultTimeZoneIdUpdated = defaultTimeZoneGroupUpdated.primaryTimeZoneId;
     await Application.updateInstallationSettings(callState, undefined, undefined, undefined, defaultTimeZoneGroupIdUpdated, defaultTimeZoneIdUpdated, config.dataStorageState.constructorProvider);
 
-    archive = await OpaDb.Archive.queries.getById(config.dataStorageState.db, OpaDm.ArchiveId);
+    archive = await OpaDb.Archive.queries.getById(config.dataStorageState, OpaDm.ArchiveId);
     OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
     archiveNonNull = OPA.convertNonNullish(archive);
 
@@ -280,7 +280,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     let callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     expect(Application.performUpgrade(callState, config.dataStorageState.constructorProvider)).to.be.rejectedWith(Error);
 
-    let application = await OpaDb.Application.queries.getById(config.dataStorageState.db, OpaDm.ApplicationId);
+    let application = await OpaDb.Application.queries.getById(config.dataStorageState, OpaDm.ApplicationId);
     OPA.assertDocumentIsValid(application, "The Application does not exist.");
     let applicationNonNull = OPA.convertNonNullish(application);
 
@@ -290,11 +290,11 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     const newSchemaVersion = applicationNonNull.schemaVersion;
 
     // NOTE: We must downgrade initial version numbers to test upgrade works properly, but we cannot use updateApplication(...) to do downgrade, so we must update the server fields directly
-    await expect(OpaDb.Application.queries.upgrade(config.dataStorageState.db, {applicationVersion: oldVersion, schemaVersion: oldVersion}, OpaDm.User_OwnerId, config.dataStorageState.constructorProvider)).to.eventually.be.rejectedWith(Error);
-    const applicationRef = OpaDb.Application.getTypedCollection(config.dataStorageState.db).doc(applicationNonNull.id);
+    await expect(OpaDb.Application.queries.upgrade(config.dataStorageState, {applicationVersion: oldVersion, schemaVersion: oldVersion}, OpaDm.User_OwnerId, config.dataStorageState.constructorProvider)).to.eventually.be.rejectedWith(Error);
+    const applicationRef = OpaDb.Application.getTypedCollection(config.dataStorageState).doc(applicationNonNull.id);
     await applicationRef.update({applicationVersion: oldVersion, schemaVersion: oldVersion});
 
-    application = await OpaDb.Application.queries.getById(config.dataStorageState.db, OpaDm.ApplicationId);
+    application = await OpaDb.Application.queries.getById(config.dataStorageState, OpaDm.ApplicationId);
     OPA.assertDocumentIsValid(application, "The Application does not exist.");
     applicationNonNull = OPA.convertNonNullish(application);
 
@@ -310,7 +310,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     await Application.performUpgrade(callState, config.dataStorageState.constructorProvider);
 
-    application = await OpaDb.Application.queries.getById(config.dataStorageState.db, OpaDm.ApplicationId);
+    application = await OpaDb.Application.queries.getById(config.dataStorageState, OpaDm.ApplicationId);
     OPA.assertDocumentIsValid(application, "The Application does not exist.");
     applicationNonNull = OPA.convertNonNullish(application);
 

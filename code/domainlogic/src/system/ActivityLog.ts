@@ -24,7 +24,7 @@ export async function recordLogItem(dataStorageState: OpaDm.IDataStorageState, a
   // NOTE: DO NOT assert that system has been installed
 
   if (isSystemInstalled && OPA.isNullishOrWhitespace(userId) && !OPA.isNullishOrWhitespace(firebaseAuthUserId)) {
-    const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(dataStorageState.db, OPA.convertNonNullish(firebaseAuthUserId));
+    const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(dataStorageState, OPA.convertNonNullish(firebaseAuthUserId));
 
     // NOTE: Only implicitly set the "userId" when it was not specied, but the "firebaseAuthUserId" was specified
     if (!OPA.isNullish(user)) {
@@ -51,9 +51,9 @@ export async function recordLogItem(dataStorageState: OpaDm.IDataStorageState, a
     }
   }
 
-  const activityLogItemId = await OpaDb.ActivityLogItems.queries.create(dataStorageState.db, activityType, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState);
+  const activityLogItemId = await OpaDb.ActivityLogItems.queries.create(dataStorageState, activityType, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState);
 
-  const activityLogItemReRead = await OpaDb.ActivityLogItems.queries.getById(dataStorageState.db, activityLogItemId);
+  const activityLogItemReRead = await OpaDb.ActivityLogItems.queries.getById(dataStorageState, activityLogItemId);
   OPA.assertDocumentIsValid(activityLogItemReRead, "The requested ActivityLogItem does not exist.");
   const activityLogItemReReadNonNull = OPA.convertNonNullish(activityLogItemReRead);
 

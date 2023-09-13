@@ -88,7 +88,7 @@ export async function initializeUserAccount(callState: OpaDm.ICallState, authPro
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
   OPA.assertIsFalse(callState.hasAuthorizationState, "The User account has already been initialized.");
 
-  const preExistingUser = await OpaDb.Users.queries.getByFirebaseAuthUserId(callState.dataStorageState.db, callState.authenticationState.firebaseAuthUserId);
+  const preExistingUser = await OpaDb.Users.queries.getByFirebaseAuthUserId(callState.dataStorageState, callState.authenticationState.firebaseAuthUserId);
   const hasPreExistingUser = (!OPA.isNullish(preExistingUser));
   OPA.assertIsFalse(hasPreExistingUser, "The User account has already been initialized, but possibly with errors.");
 
@@ -97,18 +97,18 @@ export async function initializeUserAccount(callState: OpaDm.ICallState, authPro
   const firstName = (!OPA.isNullishOrWhitespace(callState.authenticationState.firstName)) ? OPA.convertNonNullish(callState.authenticationState.firstName) : "";
   const lastName = (!OPA.isNullishOrWhitespace(callState.authenticationState.lastName)) ? OPA.convertNonNullish(callState.authenticationState.lastName) : "";
 
-  const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(callState.dataStorageState.db, authProviderId);
+  const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(callState.dataStorageState, authProviderId);
   OPA.assertDocumentIsValid(authProvider, "The required AuthProvider does not exist.");
-  const assignedRole = await OpaDb.Roles.queries.getById(callState.dataStorageState.db, OpaDm.DefaultRoleId);
+  const assignedRole = await OpaDb.Roles.queries.getById(callState.dataStorageState, OpaDm.DefaultRoleId);
   OPA.assertDocumentIsValid(assignedRole, "The required Role does not exist.");
-  const locale = await OpaDb.Locales.queries.getById(callState.dataStorageState.db, systemState.archive.defaultLocaleId);
+  const locale = await OpaDb.Locales.queries.getById(callState.dataStorageState, systemState.archive.defaultLocaleId);
   OPA.assertDocumentIsValid(locale, "The required Locale does not exist.");
-  const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getById(callState.dataStorageState.db, systemState.archive.defaultTimeZoneGroupId);
+  const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getById(callState.dataStorageState, systemState.archive.defaultTimeZoneGroupId);
   OPA.assertDocumentIsValid(timeZoneGroup, "The required TimeZoneGroup does not exist.");
 
-  const userId = await OpaDb.Users.queries.createWithRole(callState.dataStorageState.db, firebaseAuthUserId, OPA.convertNonNullish(authProvider), authAccountName, OPA.convertNonNullish(assignedRole), OPA.convertNonNullish(locale), OPA.convertNonNullish(timeZoneGroup), firstName, lastName);
+  const userId = await OpaDb.Users.queries.createWithRole(callState.dataStorageState, firebaseAuthUserId, OPA.convertNonNullish(authProvider), authAccountName, OPA.convertNonNullish(assignedRole), OPA.convertNonNullish(locale), OPA.convertNonNullish(timeZoneGroup), firstName, lastName);
 
-  const userReRead = await OpaDb.Users.queries.getById(callState.dataStorageState.db, userId);
+  const userReRead = await OpaDb.Users.queries.getById(callState.dataStorageState, userId);
   OPA.assertDocumentIsValid(userReRead, "The requested User does not exist.");
   const userReReadNonNull = OPA.convertNonNullish(userReRead);
 

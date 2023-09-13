@@ -46,16 +46,16 @@ export interface ICollectionDescriptor {
   readonly collectionName: string;
   readonly parentCollectionDescriptor: ICollectionDescriptor | null;
   readonly propertyIndices: Array<IPropertyIndexDescriptor>;
-  getCollection(db: firestore.Firestore, pathFromRoot?: Array<INestedCollectionStep>): firestore.CollectionReference<firestore.DocumentData>;
-  getCollectionGroup(db: firestore.Firestore): firestore.CollectionGroup<firestore.DocumentData>;
+  getCollection(ds: FB.IDataStorageState, pathFromRoot?: Array<INestedCollectionStep>): firestore.CollectionReference<firestore.DocumentData>;
+  getCollectionGroup(ds: FB.IDataStorageState): firestore.CollectionGroup<firestore.DocumentData>;
 }
 
 export interface ITypedCollectionDescriptor<T extends BT.IDocument> extends ICollectionDescriptor {
   readonly requiredDocuments: Array<T>;
   castTo(document: unknown): T;
-  getTypedCollection(db: firestore.Firestore, pathFromRoot?: Array<INestedCollectionStep>): firestore.CollectionReference<T>;
-  getTypedCollectionGroup(db: firestore.Firestore): firestore.CollectionGroup<T>;
-  loadRequiredDocuments(db: firestore.Firestore, eraseExistingDocs: boolean, pathFromRoot?: Array<INestedCollectionStep>): Promise<void>;
+  getTypedCollection(ds: FB.IDataStorageState, pathFromRoot?: Array<INestedCollectionStep>): firestore.CollectionReference<T>;
+  getTypedCollectionGroup(ds: FB.IDataStorageState): firestore.CollectionGroup<T>;
+  loadRequiredDocuments(ds: FB.IDataStorageState, eraseExistingDocs: boolean, pathFromRoot?: Array<INestedCollectionStep>): Promise<void>;
 }
 
 export interface ITypedQueryableCollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet<T>> extends ITypedCollectionDescriptor<T>, ICollectionDescriptor { // eslint-disable-line max-len
@@ -199,15 +199,16 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
 
   /**
    * Returns the corresponding Firebase Firestore collection reference for the document type.
-   * @param {Firestore} db The Firebase Firestore database.
+   * @param {FB.IDataStorageState} ds The state container for data storage.
    * @param {Array<INestedCollectionStep>} [pathFromRoot=[]] The path to the nested collection from the root of the database.
    * @return {firestore.CollectionReference<firestore.DocumentData>} The corresponding collection reference.
    */
-  getCollection(db: firestore.Firestore, pathFromRoot: Array<INestedCollectionStep> = []): firestore.CollectionReference<firestore.DocumentData> {
-    FB.assertFirestoreIsNotNullish(db);
+  getCollection(ds: FB.IDataStorageState, pathFromRoot: Array<INestedCollectionStep> = []): firestore.CollectionReference<firestore.DocumentData> {
+    FB.assertDataStorageStateIsNotNullish(ds);
+    FB.assertFirestoreIsNotNullish(ds.db);
 
     if (!this.isNestedCollection) {
-      return db.collection(this.collectionName);
+      return ds.db.collection(this.collectionName);
     }
 
     const descriptors: Array<ICollectionDescriptor> = [];
@@ -222,7 +223,7 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
       descriptors.unshift(rootDescriptor);
     }
 
-    let collectionRef = db.collection(rootDescriptor.collectionName);
+    let collectionRef = ds.db.collection(rootDescriptor.collectionName);
     for (let i = 1; i < pathFromRoot.length; i++) {
       const step = pathFromRoot[i - 1];
       const descriptor = descriptors[i];
@@ -233,52 +234,62 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
 
   /**
    * Returns the corresponding Firebase Firestore collection group for the document type.
-   * @param {Firestore} db The Firebase Firestore database.
+   * @param {FB.IDataStorageState} ds The state container for data storage.
    * @return {firestore.CollectionGroup<firestore.DocumentData>} The corresponding collection group.
    */
-  getCollectionGroup(db: firestore.Firestore): firestore.CollectionGroup<firestore.DocumentData> {
-    FB.assertFirestoreIsNotNullish(db);
+  getCollectionGroup(ds: FB.IDataStorageState): firestore.CollectionGroup<firestore.DocumentData> {
+    FB.assertDataStorageStateIsNotNullish(ds);
+    FB.assertFirestoreIsNotNullish(ds.db);
 
     if (!this.isNestedCollection) {
       // LATER: Consider throwing an Error here to force client code to use CollectionReference
-      return db.collectionGroup(this.collectionName);
+      return ds.db.collectionGroup(this.collectionName);
     }
 
-    return db.collectionGroup(this.collectionName);
+    return ds.db.collectionGroup(this.collectionName);
   }
 
   /**
    * Returns the corresponding Firebase Firestore typed collection reference for the document type.
-   * @param {Firestore} db The Firebase Firestore database.
+   * @param {FB.IDataStorageState} ds The state container for data storage.
    * @param {Array<INestedCollectionStep>} [pathFromRoot=[]] The path to the nested collection from the root of the database.
    * @return {firestore.CollectionReference<T>} The corresponding typed collection reference.
    */
-  getTypedCollection(db: firestore.Firestore, pathFromRoot: Array<INestedCollectionStep> = []): firestore.CollectionReference<T> {
-    const collection = this.getCollection(db, pathFromRoot);
+  getTypedCollection(ds: FB.IDataStorageState, pathFromRoot: Array<INestedCollectionStep> = []): firestore.CollectionReference<T> {
+    FB.assertDataStorageStateIsNotNullish(ds);
+    FB.assertFirestoreIsNotNullish(ds.db);
+
+    const collection = this.getCollection(ds, pathFromRoot);
     const dataConverter = CollectionDescriptor.getDataConverter<T>();
     return collection.withConverter(dataConverter);
   }
 
   /**
    * Returns the corresponding Firebase Firestore typed collection group for the document type.
-   * @param {Firestore} db The Firebase Firestore database.
+   * @param {FB.IDataStorageState} ds The state container for data storage.
    * @return {firestore.CollectionGroup<T>} The corresponding typed collection group.
    */
-  getTypedCollectionGroup(db: firestore.Firestore): firestore.CollectionGroup<T> {
-    const collectionGroup = this.getCollectionGroup(db);
+  getTypedCollectionGroup(ds: FB.IDataStorageState): firestore.CollectionGroup<T> {
+    FB.assertDataStorageStateIsNotNullish(ds);
+    FB.assertFirestoreIsNotNullish(ds.db);
+
+    const collectionGroup = this.getCollectionGroup(ds);
     const dataConverter = CollectionDescriptor.getDataConverter<T>();
     return collectionGroup.withConverter(dataConverter);
   }
 
   /**
    * Loads the required document instances into the Firebase Firestore collection corresponding to the document type.
-   * @param {Firestore} db The Firebase Firestore database.
+   * @param {FB.IDataStorageState} ds The state container for data storage.
    * @param {boolean} eraseExistingDocs Whether to erase the existing documents in the collection before loading the currently required documents.
    * @param {Array<INestedCollectionStep>} [pathFromRoot=[]] The path to the nested collection from the root of the database.
    * @return {Promise<void>} A Promise containing an empty result.
    */
-  async loadRequiredDocuments(db: firestore.Firestore, eraseExistingDocs: boolean, pathFromRoot: Array<INestedCollectionStep> = []): Promise<void> { // eslint-disable-line max-len
-    const collectionRef = this.getTypedCollection(db, pathFromRoot);
+  async loadRequiredDocuments(ds: FB.IDataStorageState, eraseExistingDocs: boolean, pathFromRoot: Array<INestedCollectionStep> = []): Promise<void> { // eslint-disable-line max-len
+    FB.assertDataStorageStateIsNotNullish(ds);
+    FB.assertFirestoreIsNotNullish(ds.db);
+
+    const collectionRef = this.getTypedCollection(ds, pathFromRoot);
 
     if (eraseExistingDocs) {
       await FB.clearFirestoreCollectionByRef(collectionRef);

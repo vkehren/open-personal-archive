@@ -341,15 +341,16 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
 
   /**
    * Gets all of the AccessRequests for the relevant User's OPA User ID.
-   * @param {Firestore} db The Firestore Database to read from.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} userId The ID for the relevant User within the OPA system.
    * @return {Promise<Array<IAccessRequest>>} The list of Access Requests that correspond to the relevant User.
    */
-  async getAllForUserId(db: firestore.Firestore, userId: string): Promise<Array<IAccessRequest>> {
-    OPA.assertFirestoreIsNotNullish(db);
+  async getAllForUserId(ds: OPA.IDataStorageState, userId: string): Promise<Array<IAccessRequest>> {
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
     OPA.assertIdentifierIsValid(userId, "A valid OPA User ID must be provided.");
 
-    const accessRequestsCollectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const accessRequestsCollectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const getAccessRequestsForUserIdQuery = accessRequestsCollectionRef.where("userIdOfRequestor", "==", userId);
     const matchingAccessRequestsSnap = await getAccessRequestsForUserIdQuery.get();
 
@@ -360,15 +361,18 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
 
   /**
    * Creates an instance of the IAccessRequest document type stored on the server.
-   * @param {Firestore} db The Firestore Database.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {IUser} user The User creating the AccessRequest.
    * @param {ILocale} locale The Locale for that User.
    * @param {string} message A message containing information about the Access Request.
    * @param {string | null} [citationId=null] The ID of the Citation that the Access Request pertains to, if one exists.
    * @return {Promise<string>} The new document ID.
    */
-  async create(db: firestore.Firestore, user: IUser, locale: ILocale, message: string, citationId: string | null = null): Promise<string> { // eslint-disable-line max-len
-    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+  async create(ds: OPA.IDataStorageState, user: IUser, locale: ILocale, message: string, citationId: string | null = null): Promise<string> { // eslint-disable-line max-len
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
+
+    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc();
     const documentId = documentRef.id;
     const document = createInstance(documentId, user, locale, message, citationId);
@@ -385,14 +389,17 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
 
   /**
    * Updates the AccessRequest stored on the server using an IAccessRequestPartial object.
-   * @param {Firestore} db The Firestore Database.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the AccessRequest within the OPA system.
    * @param {IAccessRequestPartial} updateObject The object containing the updates.
    * @param {string} userIdOfLatestUpdater The ID for the Updater within the OPA system.
    * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async update(db: firestore.Firestore, documentId: string, updateObject: IAccessRequestPartial, userIdOfLatestUpdater: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async update(ds: OPA.IDataStorageState, documentId: string, updateObject: IAccessRequestPartial, userIdOfLatestUpdater: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
+
     const now = OPA.nowToUse();
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
     updateObject = {...updateObject, ...updateObject_Updateable};
@@ -400,26 +407,29 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const updateHistory = constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
-    const document = await this.getById(db, documentId);
+    const document = await this.getById(ds, documentId);
     OPA.assertNonNullish(document);
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
-    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     await documentRef.set(updateObject_WithHistory, {merge: true});
   }
 
   /**
    * Updates the AccessRequest stored on the server by constructing an ITaggable_ByUser object.
-   * @param {Firestore} db The Firestore Database.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the AccessRequest within the OPA system.
    * @param {Array<string>} tags The tags that apply to the AccessRequest.
    * @param {string} userIdOfLatestTagger The ID for the latest Tagger within the OPA system.
    * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async setTags(db: firestore.Firestore, documentId: string, tags: Array<string>, userIdOfLatestTagger: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async setTags(ds: OPA.IDataStorageState, documentId: string, tags: Array<string>, userIdOfLatestTagger: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
+
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IAccessRequestPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfLatestTagger} as OPA.IUpdateable_ByUser);
@@ -428,26 +438,29 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
-    const document = await this.getById(db, documentId);
+    const document = await this.getById(ds, documentId);
     OPA.assertNonNullish(document);
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
-    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     await documentRef.set(updateObject_WithHistory, {merge: true});
   }
 
   /**
    * Updates the AccessRequest stored on the server by constructing an IArchivable_ByUser object.
-   * @param {Firestore} db The Firestore Database.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the AccessRequest within the OPA system.
    * @param {boolean} isArchived Whether the AccessRequest should be marked as archived.
    * @param {string} userIdOfArchivalChanger The ID for the archival state Changer within the OPA system.
    * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async setToArchivalOption(db: firestore.Firestore, documentId: string, isArchived: boolean, userIdOfArchivalChanger: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async setToArchivalOption(ds: OPA.IDataStorageState, documentId: string, isArchived: boolean, userIdOfArchivalChanger: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
+
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IAccessRequestPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfArchivalChanger} as OPA.IUpdateable_ByUser);
@@ -456,25 +469,28 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
-    const document = await this.getById(db, documentId);
+    const document = await this.getById(ds, documentId);
     OPA.assertNonNullish(document);
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
-    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     await documentRef.set(updateObject_WithHistory, {merge: true});
   }
 
   /**
    * Updates the AccessRequest stored on the server by constructing an IViewable_ByUser object.
-   * @param {Firestore} db The Firestore Database.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the AccessRequest within the OPA system.
    * @param {string} userIdOfLatestViewer The ID for the Viewer within the OPA system.
    * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async setToViewed(db: firestore.Firestore, documentId: string, userIdOfLatestViewer: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async setToViewed(ds: OPA.IDataStorageState, documentId: string, userIdOfLatestViewer: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
+
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IAccessRequestPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfLatestViewer} as OPA.IUpdateable_ByUser);
@@ -483,26 +499,29 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
-    const document = await this.getById(db, documentId);
+    const document = await this.getById(ds, documentId);
     OPA.assertNonNullish(document);
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
-    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     await documentRef.set(updateObject_WithHistory, {merge: true});
   }
 
   /**
    * Updates the AccessRequest stored on the server by constructing an IApprovable_ByUser<T> object.
-   * @param {Firestore} db The Firestore Database.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the AccessRequest within the OPA system.
    * @param {BT.ApprovalState} approvalState The ApprovalState for the AccessRequest.
    * @param {string} userIdOfDecider The ID for the Decider within the OPA system.
    * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async setToDecidedOption(db: firestore.Firestore, documentId: string, approvalState: BT.ApprovalState, userIdOfDecider: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async setToDecidedOption(ds: OPA.IDataStorageState, documentId: string, approvalState: BT.ApprovalState, userIdOfDecider: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
+
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IAccessRequestPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDecider} as OPA.IUpdateable_ByUser);
@@ -511,25 +530,28 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
-    const document = await this.getById(db, documentId);
+    const document = await this.getById(ds, documentId);
     OPA.assertNonNullish(document);
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
-    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     await documentRef.set(updateObject_WithHistory, {merge: true});
   }
 
   /**
    * Marks the AccessRequest as deleted on the server by constructing an IDeleteable_ByUser object.
-   * @param {Firestore} db The Firestore Database.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the AccessRequest within the OPA system.
    * @param {string} userIdOfDeleter The ID for the Deleter within the OPA system.
    * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async markAsDeleted(db: firestore.Firestore, documentId: string, userIdOfDeleter: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async markAsDeleted(ds: OPA.IDataStorageState, documentId: string, userIdOfDeleter: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
+
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IAccessRequestPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDeleter} as OPA.IUpdateable_ByUser);
@@ -538,12 +560,12 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const updateHistory = constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
-    const document = await this.getById(db, documentId);
+    const document = await this.getById(ds, documentId);
     OPA.assertNonNullish(document);
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
-    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     await documentRef.set(updateObject_WithHistory, {merge: true});
   }

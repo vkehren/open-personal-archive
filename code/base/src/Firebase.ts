@@ -499,14 +499,15 @@ export function assertSystemIsNotInstalled(isInstalled: boolean, message = "The 
 
 /**
  * Deletes all documents from a Firebase Firestore collection within the given DB.
- * @param {Firestore} db The Firebase Firestore database.
+ * @param {IDataStorageState} ds The state container for data storage.
  * @param {string} collectionName The collection name to clear.
  * @return {Promise<void>}
  */
-export async function clearFirestoreCollection(db: firestore.Firestore, collectionName: string): Promise<void> {
-  assertFirestoreIsNotNullish(db);
+export async function clearFirestoreCollection(ds: IDataStorageState, collectionName: string): Promise<void> {
+  assertDataStorageStateIsNotNullish(ds);
+  assertFirestoreIsNotNullish(ds.db);
 
-  const collectionRef = db.collection(collectionName);
+  const collectionRef = ds.db.collection(collectionName);
   return await clearFirestoreCollectionByRef(collectionRef);
 }
 

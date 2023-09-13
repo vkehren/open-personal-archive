@@ -132,7 +132,7 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
 
   /**
    * Creates an instance of the IArchive document type stored on the server.
-   * @param {Firestore} db The Firestore Database.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} name The name of the Archive.
    * @param {string} description A description of the Archive.
    * @param {string} pathToStorageFolder The path to the root folder for storing files in Firebase Storage.
@@ -141,7 +141,10 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
    * @param {ITimeZoneGroup} defaultTimeZoneGroup The default TimeZoneGroup to use for the Archive.
    * @return {Promise<string>} The new document ID.
    */
-  async create(db: firestore.Firestore, name: string, description: string, pathToStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): Promise<string> {
+  async create(ds: OPA.IDataStorageState, name: string, description: string, pathToStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): Promise<string> {
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
+
     const document = createSingleton(name, description, pathToStorageFolder, owner, defaultLocale, defaultTimeZoneGroup);
     const proxiedDocument = this.documentProxyConstructor(document);
     const documentId = proxiedDocument.id;
@@ -152,7 +155,7 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
     OPA.assertIsTrue(documentId == SingletonId);
     OPA.assertIsTrue(proxiedDocument.updateHistory.length == 1);
 
-    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     await documentRef.set(proxiedDocument, {merge: true});
     return documentId;
@@ -160,13 +163,16 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
 
   /**
    * Updates the Archive stored on the server using an IArchivePartial object.
-   * @param {Firestore} db The Firestore Database.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {IArchivePartial} updateObject The object containing the updates.
    * @param {string} userIdOfLatestUpdater The ID for the Updater within the OPA system.
    * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
    * @return {Promise<void>}
    */
-  async update(db: firestore.Firestore, updateObject: IArchivePartial, userIdOfLatestUpdater: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+  async update(ds: OPA.IDataStorageState, updateObject: IArchivePartial, userIdOfLatestUpdater: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
+
     const documentId = SingletonId;
     const now = OPA.nowToUse();
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
@@ -175,12 +181,12 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
     const updateHistory = constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IArchivePartial_WithHistory);
 
-    const document = await this.getById(db, documentId);
+    const document = await this.getById(ds, documentId);
     OPA.assertNonNullish(document);
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
-    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     await documentRef.set(updateObject_WithHistory, {merge: true});
   }

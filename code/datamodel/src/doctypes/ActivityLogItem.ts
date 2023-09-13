@@ -1,4 +1,3 @@
-import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../../base/src";
 import * as BT from "../BaseTypes";
 
@@ -90,7 +89,7 @@ export class ActivityLogItemQuerySet extends OPA.QuerySet<IActivityLogItem> {
 
   /**
    * Creates an instance of the IActivityLogItem document type.
-   * @param {Firestore} db The Firestore Database.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {BT.ActivityType} activityType The type of the ActivityLogItem.
    * @param {string} requestor The URI of the requestor.
    * @param {string} resource The URI of the resource being requested.
@@ -102,8 +101,11 @@ export class ActivityLogItemQuerySet extends OPA.QuerySet<IActivityLogItem> {
    * @param {any | null} otherState Any other state for the request.
    * @return {Promise<string>} The new document ID.
    */
-  async create(db: firestore.Firestore, activityType: BT.ActivityType, requestor: string, resource: string, resourceCanonical: string | null, action: string | null, data: any, firebaseAuthUserId: string | null = null, userId: string | null = null, otherState: any | null = null): Promise<string> { // eslint-disable-line max-len
-    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+  async create(ds: OPA.IDataStorageState, activityType: BT.ActivityType, requestor: string, resource: string, resourceCanonical: string | null, action: string | null, data: any, firebaseAuthUserId: string | null = null, userId: string | null = null, otherState: any | null = null): Promise<string> { // eslint-disable-line max-len
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
+
+    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc();
     const documentId = documentRef.id;
     const document = createInstance(documentId, activityType, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState);

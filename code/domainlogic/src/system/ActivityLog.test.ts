@@ -33,7 +33,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     const isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     if (isSystemInstalled) {
-      const owner = await OpaDb.Users.queries.getById(config.dataStorageState.db, OpaDm.User_OwnerId);
+      const owner = await OpaDb.Users.queries.getById(config.dataStorageState, OpaDm.User_OwnerId);
 
       if (OPA.isNullish(owner)) {
         // NOTE: Passing a valid value for "authorizationState" only matters if the Archive Owner actually exists
@@ -165,7 +165,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
 
-    const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState.db, config.authenticationState.firebaseAuthUserId);
+    const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
     expect(user).not.equals(null);
     const userNonNull = OPA.convertNonNullish(user);
 
@@ -288,7 +288,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     const callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     await Users.initializeUserAccount(callState, config.authenticationState.providerId, config.authenticationState.email);
-    const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState.db, config.authenticationState.firebaseAuthUserId);
+    const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
     expect(user).not.equals(null);
     const userNonNull = OPA.convertNonNullish(user);
 
