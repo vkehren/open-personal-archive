@@ -17,7 +17,7 @@ import * as TestUtils from "../TestUtilities.test";
 const config = TestConfig.getTestConfiguration();
 const testMessage = "Please give me access to your archive.";
 const testCitationId_Null: string | null = null;
-// const testCitationId_NonNull: string = "CITATION_1234";
+const testCitationId_NonNull: string = "CITATION_1234";
 const testResponse = "OK.";
 
 describe("Tests using Firebase " + config.testEnvironment, function () {
@@ -49,7 +49,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     // LATER: Consider terminating DB, deleting App, and re-creating App
   });
 
-  test("checks that requestUserAccess(...) fails when System is not installed", async () => {
+  const testFunc1 = (testCitationId: string | null) => (async () => {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
     let user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState.db, config.authenticationState.firebaseAuthUserId);
@@ -63,10 +63,12 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
       hasAuthorizationState: false,
     };
 
-    await expect(AccessRequests.requestUserAccess(callState, testMessage, testCitationId_Null, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
+    await expect(AccessRequests.requestUserAccess(callState, testMessage, testCitationId, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
   });
+  test("checks that requestUserAccess(...) fails when System is not installed", testFunc1(testCitationId_Null));
+  test("checks that requestUserAccess(...) fails when System is not installed", testFunc1(testCitationId_NonNull));
 
-  test("checks that requestUserAccess(...) fails when System is installed and User is Archive Owner", async () => {
+  const testFunc2 = (testCitationId: string | null) => (async () => {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
     let user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState.db, config.authenticationState.firebaseAuthUserId);
@@ -94,10 +96,12 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState.db, config.authenticationState.firebaseAuthUserId);
     expect(user).not.equals(null);
 
-    await expect(AccessRequests.requestUserAccess(callState, testMessage, testCitationId_Null, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
+    await expect(AccessRequests.requestUserAccess(callState, testMessage, testCitationId, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
   });
+  test("checks that requestUserAccess(...) fails when System is installed and User is Archive Owner", testFunc2(testCitationId_Null));
+  test("checks that requestUserAccess(...) fails when System is installed and User is Archive Owner", testFunc2(testCitationId_NonNull));
 
-  test("checks that requestUserAccess(...) succeeds and AccessRequest updates succeed when System is installed and User is not Archive Owner", async () => {
+  const testFunc3 = (testCitationId: string | null) => (async () => {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
     let user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState.db, config.authenticationState.firebaseAuthUserId);
@@ -132,18 +136,28 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
 
     let accessRequest: OpaDm.IAccessRequest | null = null;
-    accessRequest = await AccessRequests.requestUserAccess(callState, testMessage, testCitationId_Null, config.firebaseConstructorProvider);
+    accessRequest = await AccessRequests.requestUserAccess(callState, testMessage, testCitationId, config.firebaseConstructorProvider);
     expect(accessRequest).not.equals(null);
     accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState.db, accessRequest.id);
     expect(accessRequest).not.equals(null);
 
+    user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState.db, config.authenticationState.firebaseAuthUserId);
+
     const userNonNull = OPA.convertNonNullish(user);
     const userId = userNonNull.id;
+    const hasCitationId = (!OPA.isNullish(testCitationId));
+    if (!hasCitationId) {
+      expect(userNonNull.requestedCitationIds.length).equals(0);
+    } else {
+      expect(userNonNull.requestedCitationIds.length).equals(1);
+      expect(userNonNull.requestedCitationIds[0]).equals(testCitationId);
+    }
+
     let accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     const accessRequestId = accessRequestNonNull.id;
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
-    expect(accessRequestNonNull.isSpecificToCitation).equals(false);
-    expect(accessRequestNonNull.citationId).equals(null);
+    expect(accessRequestNonNull.isSpecificToCitation).equals(hasCitationId);
+    expect(accessRequestNonNull.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequestNonNull.message[OpaDm.DefaultLocale]).equals(testMessage);
     expect(accessRequestNonNull.response[OpaDm.DefaultLocale]).equals("");
     expect(accessRequestNonNull.updateHistory.length).equals(1);
@@ -174,8 +188,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
-    expect(accessRequestNonNull.isSpecificToCitation).equals(false);
-    expect(accessRequestNonNull.citationId).equals(null);
+    expect(accessRequestNonNull.isSpecificToCitation).equals(hasCitationId);
+    expect(accessRequestNonNull.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequestNonNull.message[OpaDm.DefaultLocale]).equals(testMessage);
     expect(accessRequestNonNull.response[OpaDm.DefaultLocale]).equals("");
     expect(accessRequestNonNull.updateHistory.length).equals(2);
@@ -205,8 +219,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
-    expect(accessRequestNonNull.isSpecificToCitation).equals(false);
-    expect(accessRequestNonNull.citationId).equals(null);
+    expect(accessRequestNonNull.isSpecificToCitation).equals(hasCitationId);
+    expect(accessRequestNonNull.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequestNonNull.message[OpaDm.DefaultLocale]).equals(testMessage);
     expect(accessRequestNonNull.response[OpaDm.DefaultLocale]).equals("");
     expect(accessRequestNonNull.updateHistory.length).equals(3);
@@ -237,8 +251,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
-    expect(accessRequestNonNull.isSpecificToCitation).equals(false);
-    expect(accessRequestNonNull.citationId).equals(null);
+    expect(accessRequestNonNull.isSpecificToCitation).equals(hasCitationId);
+    expect(accessRequestNonNull.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequestNonNull.message[OpaDm.DefaultLocale]).equals(testMessage);
     expect(accessRequestNonNull.response[OpaDm.DefaultLocale]).equals("");
     expect(accessRequestNonNull.updateHistory.length).equals(4);
@@ -269,8 +283,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
-    expect(accessRequestNonNull.isSpecificToCitation).equals(false);
-    expect(accessRequestNonNull.citationId).equals(null);
+    expect(accessRequestNonNull.isSpecificToCitation).equals(hasCitationId);
+    expect(accessRequestNonNull.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequestNonNull.message[OpaDm.DefaultLocale]).equals(testMessage);
     expect(accessRequestNonNull.response[OpaDm.DefaultLocale]).equals(testResponse);
     expect(accessRequestNonNull.updateHistory.length).equals(5);
@@ -302,8 +316,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
-    expect(accessRequestNonNull.isSpecificToCitation).equals(false);
-    expect(accessRequestNonNull.citationId).equals(null);
+    expect(accessRequestNonNull.isSpecificToCitation).equals(hasCitationId);
+    expect(accessRequestNonNull.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequestNonNull.message[OpaDm.DefaultLocale]).equals(testMessage);
     expect(accessRequestNonNull.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
     expect(accessRequestNonNull.updateHistory.length).equals(6);
@@ -335,8 +349,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
-    expect(accessRequestNonNull.isSpecificToCitation).equals(false);
-    expect(accessRequestNonNull.citationId).equals(null);
+    expect(accessRequestNonNull.isSpecificToCitation).equals(hasCitationId);
+    expect(accessRequestNonNull.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequestNonNull.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
     expect(accessRequestNonNull.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
     expect(accessRequestNonNull.updateHistory.length).equals(7);
@@ -366,8 +380,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
-    expect(accessRequestNonNull.isSpecificToCitation).equals(false);
-    expect(accessRequestNonNull.citationId).equals(null);
+    expect(accessRequestNonNull.isSpecificToCitation).equals(hasCitationId);
+    expect(accessRequestNonNull.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequestNonNull.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
     expect(accessRequestNonNull.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
     expect(accessRequestNonNull.updateHistory.length).equals(8);
@@ -397,8 +411,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
-    expect(accessRequestNonNull.isSpecificToCitation).equals(false);
-    expect(accessRequestNonNull.citationId).equals(null);
+    expect(accessRequestNonNull.isSpecificToCitation).equals(hasCitationId);
+    expect(accessRequestNonNull.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequestNonNull.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
     expect(accessRequestNonNull.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
     expect(accessRequestNonNull.updateHistory.length).equals(9);
@@ -428,8 +442,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
-    expect(accessRequestNonNull.isSpecificToCitation).equals(false);
-    expect(accessRequestNonNull.citationId).equals(null);
+    expect(accessRequestNonNull.isSpecificToCitation).equals(hasCitationId);
+    expect(accessRequestNonNull.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequestNonNull.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
     expect(accessRequestNonNull.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
     expect(accessRequestNonNull.updateHistory.length).equals(10);
@@ -459,8 +473,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
-    expect(accessRequestNonNull.isSpecificToCitation).equals(false);
-    expect(accessRequestNonNull.citationId).equals(null);
+    expect(accessRequestNonNull.isSpecificToCitation).equals(hasCitationId);
+    expect(accessRequestNonNull.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequestNonNull.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
     expect(accessRequestNonNull.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
     expect(accessRequestNonNull.updateHistory.length).equals(11);
@@ -490,8 +504,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
-    expect(accessRequestNonNull.isSpecificToCitation).equals(false);
-    expect(accessRequestNonNull.citationId).equals(null);
+    expect(accessRequestNonNull.isSpecificToCitation).equals(hasCitationId);
+    expect(accessRequestNonNull.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequestNonNull.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
     expect(accessRequestNonNull.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
     expect(accessRequestNonNull.updateHistory.length).equals(11);
@@ -521,8 +535,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
-    expect(accessRequestNonNull.isSpecificToCitation).equals(false);
-    expect(accessRequestNonNull.citationId).equals(null);
+    expect(accessRequestNonNull.isSpecificToCitation).equals(hasCitationId);
+    expect(accessRequestNonNull.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequestNonNull.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
     expect(accessRequestNonNull.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
     expect(accessRequestNonNull.updateHistory.length).equals(12);
@@ -546,6 +560,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.dateOfDeletion).not.equals(null);
     expect(accessRequestNonNull.userIdOfDeleter).equals(userId);
   });
+  test("checks that requestUserAccess(...) succeeds and AccessRequest updates succeed when System is installed and User is not Archive Owner", testFunc3(testCitationId_Null));
+  test("checks that requestUserAccess(...) succeeds and AccessRequest updates succeed when System is installed and User is not Archive Owner", testFunc3(testCitationId_NonNull));
 
   afterEach(async () => {
     await config.dataStorageState.db.terminate();
