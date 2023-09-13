@@ -63,7 +63,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
       hasAuthorizationState: false,
     };
 
-    await expect(AccessRequests.requestUserAccess(callState, testMessage, testCitationId_Null)).to.eventually.be.rejectedWith(Error);
+    await expect(AccessRequests.requestUserAccess(callState, testMessage, testCitationId_Null, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
   });
 
   test("checks that requestUserAccess(...) fails when System is installed and User is Archive Owner", async () => {
@@ -94,7 +94,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState.db, config.authenticationState.firebaseAuthUserId);
     expect(user).not.equals(null);
 
-    await expect(AccessRequests.requestUserAccess(callState, testMessage, testCitationId_Null)).to.eventually.be.rejectedWith(Error);
+    await expect(AccessRequests.requestUserAccess(callState, testMessage, testCitationId_Null, config.firebaseConstructorProvider)).to.eventually.be.rejectedWith(Error);
   });
 
   test("checks that requestUserAccess(...) succeeds and AccessRequest updates succeed when System is installed and User is not Archive Owner", async () => {
@@ -132,7 +132,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
 
     let accessRequest: OpaDm.IAccessRequest | null = null;
-    accessRequest = await AccessRequests.requestUserAccess(callState, testMessage, testCitationId_Null);
+    accessRequest = await AccessRequests.requestUserAccess(callState, testMessage, testCitationId_Null, config.firebaseConstructorProvider);
     expect(accessRequest).not.equals(null);
     accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState.db, accessRequest.id);
     expect(accessRequest).not.equals(null);
