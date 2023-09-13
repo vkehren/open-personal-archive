@@ -27,14 +27,14 @@ export async function performInstallForTest(dataStorageState: OpaDm.IDataStorage
   const timeZoneGroup = OPA.convertNonNullish(await OpaDb.TimeZoneGroups.queries.getById(db, archive.defaultTimeZoneGroupId));
 
   let authState = TestData.authenticationState_Admin;
-  await OpaDb.Users.queries.createWithRole(db, authState.firebaseAuthUserId, authProvider, authState.email, role_Admin, locale, timeZoneGroup, authState.firstName ?? "", authState.lastName ?? "", authState.displayName);
+  authState.opaUserId = await OpaDb.Users.queries.createWithRole(db, authState.firebaseAuthUserId, authProvider, authState.email, role_Admin, locale, timeZoneGroup, authState.firstName ?? "", authState.lastName ?? "", authState.displayName);
 
   authState = TestData.authenticationState_Editor;
-  await OpaDb.Users.queries.createWithRole(db, authState.firebaseAuthUserId, authProvider, authState.email, role_Editor, locale, timeZoneGroup, authState.firstName ?? "", authState.lastName ?? "", authState.displayName);
+  authState.opaUserId = await OpaDb.Users.queries.createWithRole(db, authState.firebaseAuthUserId, authProvider, authState.email, role_Editor, locale, timeZoneGroup, authState.firstName ?? "", authState.lastName ?? "", authState.displayName);
 
   authState = TestData.authenticationState_Viewer;
-  await OpaDb.Users.queries.createWithRole(db, authState.firebaseAuthUserId, authProvider, authState.email, role_Viewer, locale, timeZoneGroup, authState.firstName ?? "", authState.lastName ?? "", authState.displayName);
+  authState.opaUserId = await OpaDb.Users.queries.createWithRole(db, authState.firebaseAuthUserId, authProvider, authState.email, role_Viewer, locale, timeZoneGroup, authState.firstName ?? "", authState.lastName ?? "", authState.displayName);
 
   authState = TestData.authenticationState_Guest;
-  await OpaDb.Users.queries.createWithRole(db, authState.firebaseAuthUserId, authProvider, authState.email, role_Guest, locale, timeZoneGroup, authState.firstName ?? "", authState.lastName ?? "", authState.displayName);
+  authState.opaUserId = await OpaDb.Users.queries.createWithRole(db, authState.firebaseAuthUserId, authProvider, authState.email, role_Guest, locale, timeZoneGroup, authState.firstName ?? "", authState.lastName ?? "", authState.displayName);
 }
