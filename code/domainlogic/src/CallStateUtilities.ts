@@ -20,15 +20,12 @@ export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataSt
 
   // LATER: Consider checking if AuthenticationState is Anonymous and returning ICallState with NULL AuthorizationState
 
-  const db = dataStorageState.db;
-  const firebaseAuthUserId = authenticationState.firebaseAuthUserId;
-
   let hasSystemState = false;
   let systemState: OpaDm.ISystemState | undefined = undefined;
 
   // NOTE: Create System State
-  const application = await OpaDb.Application.queries.getById(db, OpaDm.ApplicationId);
-  const archive = await OpaDb.Archive.queries.getById(db, OpaDm.ArchiveId);
+  const application = await OpaDb.Application.queries.getById(dataStorageState.db, OpaDm.ApplicationId);
+  const archive = await OpaDb.Archive.queries.getById(dataStorageState.db, OpaDm.ArchiveId);
   let applicationNonNull = ((null as unknown) as OpaDm.IApplication);
   let archiveNonNull = ((null as unknown) as OpaDm.IArchive);
 
@@ -55,7 +52,7 @@ export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataSt
   }
 
   const systemStateNonNull = OPA.convertNonNullish(systemState);
-  const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(db, firebaseAuthUserId);
+  const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(dataStorageState.db, authenticationState.firebaseAuthUserId);
   const hasUser = (!OPA.isNullish(user));
 
   if (!hasUser) {
@@ -70,7 +67,7 @@ export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataSt
     return callState;
   }
 
-  const authorizationState = await readAuthorizationStateForFirebaseAuthUser(dataStorageState, firebaseAuthUserId);
+  const authorizationState = await readAuthorizationStateForFirebaseAuthUser(dataStorageState, authenticationState.firebaseAuthUserId);
 
   const callState: OpaDm.ICallState = {
     dataStorageState: dataStorageState,
@@ -96,25 +93,24 @@ export async function readAuthorizationStateForFirebaseAuthUser(dataStorageState
 
   const isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
   OPA.assertSystemIsInstalled(isSystemInstalled);
-  const db = dataStorageState.db;
 
-  const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(db, firebaseAuthUserId);
+  const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(dataStorageState.db, firebaseAuthUserId);
   OPA.assertDocumentIsValid(user, "The current User must be properly authenticated.");
   const userNonNull = OPA.convertNonNullish(user);
 
-  const role = await OpaDb.Roles.queries.getById(db, userNonNull.assignedRoleId);
+  const role = await OpaDb.Roles.queries.getById(dataStorageState.db, userNonNull.assignedRoleId);
   OPA.assertDocumentIsValid(role, "The current User's Role must be properly assigned.");
   const roleNonNull = OPA.convertNonNullish(role);
 
-  const locale = await OpaDb.Locales.queries.getById(db, userNonNull.localeId);
+  const locale = await OpaDb.Locales.queries.getById(dataStorageState.db, userNonNull.localeId);
   OPA.assertDocumentIsValid(locale, "The current User must have a valid Locale.");
   const localeNonNull = OPA.convertNonNullish(locale);
 
-  const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getById(db, userNonNull.timeZoneGroupId);
+  const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getById(dataStorageState.db, userNonNull.timeZoneGroupId);
   OPA.assertDocumentIsValid(timeZoneGroup, "The current User must have a valid Time Zone Group.");
   const timeZoneGroupNonNull = OPA.convertNonNullish(timeZoneGroup);
 
-  const timeZone = await OpaDb.TimeZones.queries.getById(db, userNonNull.timeZoneId);
+  const timeZone = await OpaDb.TimeZones.queries.getById(dataStorageState.db, userNonNull.timeZoneId);
   OPA.assertDocumentIsValid(timeZone, "The current User must have a valid Time Zone.");
   const timeZoneNonNull = OPA.convertNonNullish(timeZone);
 

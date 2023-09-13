@@ -25,8 +25,7 @@ export async function isSystemInstalled(dataStorageState: OpaDm.IDataStorageStat
   OPA.assertDataStorageStateIsNotNullish(dataStorageState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
-  const db = dataStorageState.db;
-  const application = await OpaDb.Application.queries.getById(db, OpaDm.ApplicationId);
+  const application = await OpaDb.Application.queries.getById(dataStorageState.db, OpaDm.ApplicationId);
   return (!OPA.isNullish(application));
 }
 
@@ -65,7 +64,6 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
   OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
-  const dataStorageState = OPA.convertNonNullish(callState.dataStorageState);
   const systemState = OPA.convertNonNullish(callState.systemState);
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const authorizedRoleIds = [OpaDm.Role_OwnerId, OpaDm.Role_AdministratorId];
@@ -73,15 +71,14 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
   authorizationState.assertUserApproved();
   authorizationState.assertRoleAllowed(authorizedRoleIds);
 
-  const db = callState.dataStorageState.db;
   const archiveNonNull = systemState.archive;
   const localeNonNull = authorizationState.locale;
   const localeToUse = localeNonNull.optionName;
 
-  const localeSnaps = await OpaDb.Locales.getTypedCollection(db).get();
+  const localeSnaps = await OpaDb.Locales.getTypedCollection(callState.dataStorageState.db).get();
   const locales = localeSnaps.docs.map((localeSnap) => localeSnap.data());
   let selectedLocales = locales.filter((locale) => (locale.id == archiveNonNull.defaultLocaleId));
-  const timeZoneGroupSnaps = await OpaDb.TimeZoneGroups.getTypedCollection(db).get();
+  const timeZoneGroupSnaps = await OpaDb.TimeZoneGroups.getTypedCollection(callState.dataStorageState.db).get();
   const timeZoneGroups = timeZoneGroupSnaps.docs.map((timeZoneGroupSnap) => timeZoneGroupSnap.data());
   let selectedTimeZoneGroups = timeZoneGroups.filter((timeZoneGroup) => (timeZoneGroup.id == archiveNonNull.defaultTimeZoneGroupId));
 
@@ -96,7 +93,7 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
 
   // LATER: Pass IAuthorizationState to getAuthorizationData(...) and include locale and timezone for User
   const displayModel: IInstallationScreenDisplayModel = {
-    authorizationData: DMU.getAuthorizationDataForDisplayModel(dataStorageState, systemState, authorizationState),
+    authorizationData: DMU.getAuthorizationDataForDisplayModel(callState.dataStorageState, systemState, authorizationState),
     archiveName: OPA.getLocalizedText(archiveNonNull.name, localeToUse),
     archiveDescription: OPA.getLocalizedText(archiveNonNull.description, localeToUse),
     pathToStorageFolder: archiveNonNull.pathToStorageFolder,
@@ -132,13 +129,12 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   OPA.assertNonNullishOrWhitespace(authenticationState.providerId, "The Authentication Provider ID for the User's account must not be null.");
   OPA.assertNonNullishOrWhitespace(authenticationState.email, "The email account of the User must not be null.");
 
-  const db = dataStorageState.db;
   const ownerFirebaseAuthUserId = authenticationState.firebaseAuthUserId;
   const externalAuthProviderId = authenticationState.providerId;
   const ownerAccountName = authenticationState.email;
 
   // 1) Create the Application document
-  await OpaDb.Application.queries.create(db, ApplicationInfo.VERSION, SchemaInfo.VERSION);
+  await OpaDb.Application.queries.create(dataStorageState.db, ApplicationInfo.VERSION, SchemaInfo.VERSION);
 
   // 2) Load required data
   const requiredAuthProviderIds = OpaDm.AuthenticationProvider_RequiredIds;
@@ -160,32 +156,32 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   }
 
   const eraseExistingData = true;
-  await OpaDb.AuthProviders.loadRequiredDocuments(db, eraseExistingData);
-  await OpaDb.Roles.loadRequiredDocuments(db, eraseExistingData);
-  await OpaDb.Locales.loadRequiredDocuments(db, eraseExistingData);
-  await OpaDb.TimeZones.loadRequiredDocuments(db, eraseExistingData);
-  await OpaDb.TimeZoneGroups.loadRequiredDocuments(db, eraseExistingData);
+  await OpaDb.AuthProviders.loadRequiredDocuments(dataStorageState.db, eraseExistingData);
+  await OpaDb.Roles.loadRequiredDocuments(dataStorageState.db, eraseExistingData);
+  await OpaDb.Locales.loadRequiredDocuments(dataStorageState.db, eraseExistingData);
+  await OpaDb.TimeZones.loadRequiredDocuments(dataStorageState.db, eraseExistingData);
+  await OpaDb.TimeZoneGroups.loadRequiredDocuments(dataStorageState.db, eraseExistingData);
 
   // 3) Create the User document for the Owner of the Archive
-  const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(db, externalAuthProviderId);
+  const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(dataStorageState.db, externalAuthProviderId);
   OPA.assertDocumentIsValid(authProvider, "The required AuthProvider does not exist.");
-  const roleOwner = await OpaDb.Roles.queries.getById(db, OpaDm.Role_OwnerId);
+  const roleOwner = await OpaDb.Roles.queries.getById(dataStorageState.db, OpaDm.Role_OwnerId);
   OPA.assertDocumentIsValid(roleOwner, "The required Role does not exist.");
-  const localeDefault = await OpaDb.Locales.queries.getById(db, defaultLocaleId);
+  const localeDefault = await OpaDb.Locales.queries.getById(dataStorageState.db, defaultLocaleId);
   OPA.assertDocumentIsValid(localeDefault, "The required Locale does not exist.");
-  const timeZoneGroupDefault = await OpaDb.TimeZoneGroups.queries.getById(db, defaultTimeZoneGroupId);
+  const timeZoneGroupDefault = await OpaDb.TimeZoneGroups.queries.getById(dataStorageState.db, defaultTimeZoneGroupId);
   OPA.assertDocumentIsValid(timeZoneGroupDefault, "The required TimeZoneGroup does not exist.");
 
   const authProviderNonNull = OPA.convertNonNullish(authProvider);
   const localeDefaultNonNull = OPA.convertNonNullish(localeDefault);
   const timeZoneGroupDefaultNonNull = OPA.convertNonNullish(timeZoneGroupDefault);
 
-  const userOwnerId = await OpaDb.Users.queries.createArchiveOwner(db, ownerFirebaseAuthUserId, authProviderNonNull, ownerAccountName, localeDefaultNonNull, timeZoneGroupDefaultNonNull, ownerFirstName, ownerLastName);
-  const userOwner_Nullable = await OpaDb.Users.queries.getById(db, userOwnerId);
+  const userOwnerId = await OpaDb.Users.queries.createArchiveOwner(dataStorageState.db, ownerFirebaseAuthUserId, authProviderNonNull, ownerAccountName, localeDefaultNonNull, timeZoneGroupDefaultNonNull, ownerFirstName, ownerLastName);
+  const userOwner_Nullable = await OpaDb.Users.queries.getById(dataStorageState.db, userOwnerId);
   const userOwner = OPA.convertNonNullish(userOwner_Nullable);
 
   // 4) Create the Archive document for the Archive
-  await OpaDb.Archive.queries.create(db, archiveName, archiveDescription, pathToStorageFolder, userOwner, localeDefaultNonNull, timeZoneGroupDefaultNonNull);
+  await OpaDb.Archive.queries.create(dataStorageState.db, archiveName, archiveDescription, pathToStorageFolder, userOwner, localeDefaultNonNull, timeZoneGroupDefaultNonNull);
 }
 
 /**
@@ -210,7 +206,6 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
   OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
   OPA.assertIdentifierIsValid(callState.authenticationState.firebaseAuthUserId);
 
-  const db = callState.dataStorageState.db;
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const authorizedRoleIds = [OpaDm.Role_OwnerId, OpaDm.Role_AdministratorId];
 
@@ -221,7 +216,7 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
   const currentLocaleNonNull = authorizationState.locale;
   const localeToUse = currentLocaleNonNull.optionName;
 
-  const archive = await OpaDb.Archive.queries.getById(db, OpaDm.ArchiveId);
+  const archive = await OpaDb.Archive.queries.getById(callState.dataStorageState.db, OpaDm.ArchiveId);
   OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
   const archiveNonNull = OPA.convertNonNullish(archive);
 
@@ -235,19 +230,19 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
     archivePartial.description[localeToUse] = archiveDescription;
   }
   if ((defaultLocaleId) && (archiveNonNull.defaultLocaleId != defaultLocaleId)) {
-    const locale = await OpaDb.Locales.queries.getById(db, defaultLocaleId);
+    const locale = await OpaDb.Locales.queries.getById(callState.dataStorageState.db, defaultLocaleId);
     OPA.assertDocumentIsValid(locale, "The Locale specified does not exist.");
 
     archivePartial.defaultLocaleId = defaultLocaleId;
   }
   if ((defaultTimeZoneGroupId) && (archiveNonNull.defaultTimeZoneGroupId != defaultTimeZoneGroupId)) {
-    const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getById(db, defaultTimeZoneGroupId);
+    const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getById(callState.dataStorageState.db, defaultTimeZoneGroupId);
     OPA.assertDocumentIsValid(timeZoneGroup, "The TimeZoneGroup specified does not exist.");
 
     archivePartial.defaultTimeZoneGroupId = defaultTimeZoneGroupId;
   }
   if ((defaultTimeZoneId) && (archiveNonNull.defaultTimeZoneId != defaultTimeZoneId)) {
-    const timeZone = await OpaDb.TimeZones.queries.getById(db, defaultTimeZoneId);
+    const timeZone = await OpaDb.TimeZones.queries.getById(callState.dataStorageState.db, defaultTimeZoneId);
     OPA.assertDocumentIsValid(timeZone, "The TimeZone specified does not exist.");
 
     archivePartial.defaultTimeZoneId = defaultTimeZoneId;
@@ -257,7 +252,7 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
   if (OPA.isEmpty(archivePartial)) {
     throw new Error("No updated setting was provided.");
   }
-  await OpaDb.Archive.queries.update(db, archivePartial, currentUserNonNull.id, constructorProvider);
+  await OpaDb.Archive.queries.update(callState.dataStorageState.db, archivePartial, currentUserNonNull.id, constructorProvider);
 }
 
 /**
@@ -278,7 +273,6 @@ export async function performUpgrade(callState: OpaDm.ICallState, constructorPro
   OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
   OPA.assertIdentifierIsValid(callState.authenticationState.firebaseAuthUserId);
 
-  const db = callState.dataStorageState.db;
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const currentUserNonNull = authorizationState.user;
   const authorizedRoleIds = [OpaDm.Role_OwnerId, OpaDm.Role_AdministratorId];
@@ -291,7 +285,7 @@ export async function performUpgrade(callState: OpaDm.ICallState, constructorPro
     throw new Error("Backup of existing Archive data has not been implemented yet.");
   }
 
-  const application = await OpaDb.Application.queries.getById(db, OpaDm.ApplicationId);
+  const application = await OpaDb.Application.queries.getById(callState.dataStorageState.db, OpaDm.ApplicationId);
   OPA.assertDocumentIsValid(application, "The Application does not exist.");
   const applicationNonNull = OPA.convertNonNullish(application);
 
@@ -317,7 +311,7 @@ export async function performUpgrade(callState: OpaDm.ICallState, constructorPro
   if (OPA.isEmpty(applicationPartial)) {
     throw new Error("No upgraded version was provided.");
   }
-  await OpaDb.Application.queries.upgrade(db, applicationPartial, currentUserNonNull.id, constructorProvider);
+  await OpaDb.Application.queries.upgrade(callState.dataStorageState.db, applicationPartial, currentUserNonNull.id, constructorProvider);
 }
 
 /**
@@ -333,8 +327,7 @@ export async function performUninstall(dataStorageState: OpaDm.IDataStorageState
   OpaDm.assertAuthenticationStateIsNotNullish(authenticationState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
-  const db = dataStorageState.db;
-  const owner = await OpaDb.Users.queries.getById(db, OpaDm.User_OwnerId);
+  const owner = await OpaDb.Users.queries.getById(dataStorageState.db, OpaDm.User_OwnerId);
 
   if (!OPA.isNullish(owner)) {
     const isInstalled = await isSystemInstalled(dataStorageState);
@@ -358,7 +351,7 @@ export async function performUninstall(dataStorageState: OpaDm.IDataStorageState
 
     for (let j = 0; j < colDesc.propertyIndices.length; j++) {
       const propertyIndexDesc = colDesc.propertyIndices[j];
-      await OPA.clearFirestoreCollection(db, propertyIndexDesc.indexCollectionName);
+      await OPA.clearFirestoreCollection(dataStorageState.db, propertyIndexDesc.indexCollectionName);
     }
     // LATER: If necessary, delete all documents from NestedCollection starting with leaves of Collection tree
   }
@@ -368,8 +361,8 @@ export async function performUninstall(dataStorageState: OpaDm.IDataStorageState
 
     for (let j = 0; j < colDesc.propertyIndices.length; j++) {
       const propertyIndexDesc = colDesc.propertyIndices[j];
-      await OPA.clearFirestoreCollection(db, propertyIndexDesc.indexCollectionName);
+      await OPA.clearFirestoreCollection(dataStorageState.db, propertyIndexDesc.indexCollectionName);
     }
-    await OPA.clearFirestoreCollection(db, colDesc.collectionName);
+    await OPA.clearFirestoreCollection(dataStorageState.db, colDesc.collectionName);
   }
 }
