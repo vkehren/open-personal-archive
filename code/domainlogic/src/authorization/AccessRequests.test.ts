@@ -10,6 +10,7 @@ import * as CSU from "../CallStateUtilities";
 import * as Application from "../system/Application";
 import * as Users from "./Users";
 import * as AccessRequests from "./AccessRequests";
+import * as TestData from "../TestData.test";
 import * as TestConfiguration from "../TestConfiguration.test";
 
 const config = TestConfiguration.getTestConfiguration();
@@ -24,6 +25,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
   }
 
   beforeEach(async () => {
+    config.authenticationState = TestData.authenticationState_Owner;
     const doBackup = false && (config.hasRunTests && (config.testEnvironment != "Emulators")); // LATER: Once backup is implemented, delete "false && "
     config.hasRunTests = false;
 
@@ -112,18 +114,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(config.dataStorageState.db, config.authenticationState.providerId);
     expect(authProvider).not.equals(null);
-    const authProviderNonNull = OPA.convertNonNullish(authProvider);
+    // const authProviderNonNull = OPA.convertNonNullish(authProvider);
 
     // NOTE: Set the test AuthenticationState to a User other than the Archive Owner
-    config.authenticationState = {
-      firebaseAuthUserId: "OPA_Test_User",
-      providerId: authProviderNonNull.externalId,
-      email: "OPA_Test_User" + "@gmail.com",
-      emailIsVerified: true,
-      firstName: "Test",
-      lastName: "User",
-      displayName: "T.U.",
-    };
+    config.authenticationState = TestData.authenticationState_TestUser;
     user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState.db, config.authenticationState.firebaseAuthUserId);
     expect(user).equals(null);
 

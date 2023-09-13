@@ -10,6 +10,7 @@ import * as CSU from "../CallStateUtilities";
 import * as Application from "./Application";
 import * as Users from "../authorization/Users";
 import * as ActivityLog from "./ActivityLog";
+import * as TestData from "../TestData.test";
 import * as TestConfiguration from "../TestConfiguration.test";
 
 const config = TestConfiguration.getTestConfiguration();
@@ -22,6 +23,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
   }
 
   beforeEach(async () => {
+    config.authenticationState = TestData.authenticationState_Owner;
     const doBackup = false && (config.hasRunTests && (config.testEnvironment != "Emulators")); // LATER: Once backup is implemented, delete "false && "
     config.hasRunTests = false;
 
@@ -282,16 +284,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
 
-    config.authenticationState = {
-      firebaseAuthUserId: "OPA_Test_User",
-      providerId: config.authenticationState.providerId,
-      email: "OPA_Test_User" + "@gmail.com",
-      emailIsVerified: true,
-      firstName: "Test",
-      lastName: "User",
-      displayName: "T.U.",
-    };
-
+    config.authenticationState = TestData.authenticationState_TestUser;
     // LATER: Consider testing that only "firebaseAuthUserId" is set (i.e. not "userId")
 
     const callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);

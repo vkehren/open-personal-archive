@@ -2,6 +2,7 @@ import * as firestore from "@google-cloud/firestore";
 import * as admin from "firebase-admin";
 import * as OPA from "../../base/src";
 import * as OpaDm from "../../datamodel/src";
+import * as TestData from "./TestData.test";
 import * as TestConfigurationFile from "../test-config.json";
 
 export type TestEnvironment = "Cloud" | "Emulators";
@@ -42,8 +43,6 @@ export function getTestConfiguration(): ITestConfiguration {
   }
 
   const nullDb = ((null as unknown) as firestore.Firestore);
-  const ownerFirebaseAuthUserId = "FB_" + OpaDm.User_OwnerId;
-
   const dataStorageState: OpaDm.IDataStorageState = {
     appName: "[DEFAULT]", // NOTE: This is the default name Firebase uses for unnamed apps
     projectId: appInitializationArgs.projectId,
@@ -51,19 +50,13 @@ export function getTestConfiguration(): ITestConfiguration {
     usesEmulators: (testEnvironment == "Emulators"),
     db: nullDb,
   };
-  const authenticationState: OpaDm.IAuthenticationState = {
-    firebaseAuthUserId: ownerFirebaseAuthUserId,
-    providerId: "google.com",
-    email: (ownerFirebaseAuthUserId + "@gmail.com"),
-    emailIsVerified: true,
-  };
 
   const testConfiguration: ITestConfiguration = {
     testEnvironment,
     timeout,
     appInitializationArgs,
     dataStorageState,
-    authenticationState,
+    authenticationState: TestData.authenticationState_Owner,
     hasRunTests: false,
     firebaseConstructorProvider: {
       arrayRemove: firestore.FieldValue.arrayRemove,

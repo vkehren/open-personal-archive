@@ -10,6 +10,7 @@ import * as CSU from "../CallStateUtilities";
 import * as Application from "./Application";
 import * as SchemaInfo from "../../../datamodel/src/PackageInfo";
 import * as ApplicationInfo from "../PackageInfo";
+import * as TestData from "../TestData.test";
 import * as TestConfiguration from "../TestConfiguration.test";
 
 const config = TestConfiguration.getTestConfiguration();
@@ -20,6 +21,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
   }
 
   beforeEach(async () => {
+    config.authenticationState = TestData.authenticationState_Owner;
     const doBackup = false && (config.hasRunTests && (config.testEnvironment != "Emulators")); // LATER: Once backup is implemented, delete "false && "
     config.hasRunTests = false;
 
