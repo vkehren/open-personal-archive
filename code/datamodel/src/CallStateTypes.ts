@@ -172,3 +172,51 @@ export class AuthorizationState implements IAuthorizationState {
     }
   }
 }
+
+/**
+ * Asserts that the state container for the call is NOT nullish.
+ * @param {ICallState | null | undefined} callState The state container for the call.
+ * @param {string} [message=default] The message to display on failure of assertion.
+ * @return {void}
+ */
+export function assertCallStateIsNotNullish(callState: ICallState | null | undefined, message = "The Call State must not be null."): void {
+  if (OPA.isNullish(callState)) {
+    throw new Error(message);
+  }
+}
+
+/**
+ * Asserts that the state container for authentication is NOT nullish.
+ * @param {IAuthenticationState | null | undefined} authenticationState The state container for authentication.
+ * @param {string} [message=default] The message to display on failure of assertion.
+ * @return {void}
+ */
+export function assertAuthenticationStateIsNotNullish(authenticationState: IAuthenticationState | null | undefined, message = "The Authentication State must not be null."): void {
+  if (OPA.isNullish(authenticationState)) {
+    throw new Error(message);
+  }
+}
+
+/**
+ * Asserts that the state container for the system is NOT nullish.
+ * @param {ISystemState | null | undefined} systemState The state container for the system.
+ * @param {string} [message=default] The message to display on failure of assertion.
+ * @return {void}
+ */
+export function assertSystemStateIsNotNullish(systemState: ISystemState | null | undefined, message = "The System State must not be null."): void {
+  if (OPA.isNullish(systemState)) {
+    throw new Error(message);
+  }
+}
+
+/**
+ * Asserts that the state container for authorization is NOT nullish.
+ * @param {IAuthorizationState | null | undefined} authorizationState The state container for authorization.
+ * @param {string} [message=default] The message to display on failure of assertion.
+ * @return {void}
+ */
+export function assertAuthorizationStateIsNotNullish(authorizationState: IAuthorizationState | null | undefined, message = "The Authorization State must not be null."): void {
+  if (OPA.isNullish(authorizationState)) {
+    throw new Error(message);
+  }
+}

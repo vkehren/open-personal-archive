@@ -17,7 +17,7 @@ import * as Application from "./Application";
  * @return {Promise<OpaDm.IActivityLogItem>}
  */
 export async function recordLogItem(dataStorageState: OpaDm.IDataStorageState, activityType: OpaDm.ActivityType, requestor: string, resource: string, action: string | null, data: any, firebaseAuthUserId: string | null = null, userId: string | null = null, otherState: any | null = null): Promise<OpaDm.IActivityLogItem> { // eslint-disable-line max-len
-  OPA.assertNonNullish(dataStorageState, "The Data Storage State must not be null.");
+  OPA.assertDataStorageStateIsNotNullish(dataStorageState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
   const isSystemInstalled = await Application.isSystemInstalled(dataStorageState);

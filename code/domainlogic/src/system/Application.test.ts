@@ -185,12 +185,12 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(isSystemInstalled).equals(true);
 
     let callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    OPA.assertNonNullish(callState.authorizationState, "Authorization State should not be null.");
+    OpaDm.assertSystemStateIsNotNullish(callState.systemState);
+    let archiveOriginal = OPA.convertNonNullish(callState.systemState).archive;
+    OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
     const currentUser = OPA.convertNonNullish(callState.authorizationState).user;
     const currentLocale = OPA.convertNonNullish(callState.authorizationState).locale;
-    OPA.assertNonNullish(callState.systemState, "System State should not be null.");
-    let archiveOriginal = OPA.convertNonNullish(callState.systemState).archive;
-    expect(Application.updateInstallationSettings(callState, undefined, undefined, undefined, undefined, undefined, config.dataStorageState.constructorProvider)).to.be.rejectedWith(Error);
+    await expect(Application.updateInstallationSettings(callState, undefined, undefined, undefined, undefined, undefined, config.dataStorageState.constructorProvider)).to.be.rejectedWith(Error);
 
     let archive = await OpaDb.Archive.queries.getById(config.dataStorageState.db, OpaDm.ArchiveId);
     OPA.assertDocumentIsValid(archive, "The Archive does not exist.");

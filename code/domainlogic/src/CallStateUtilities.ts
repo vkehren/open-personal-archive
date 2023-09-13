@@ -10,9 +10,9 @@ import * as Application from "./system/Application";
  * @return {Promise<OpaDm.ICallState>}
  */
 export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState): Promise<OpaDm.ICallState> {
-  OPA.assertNonNullish(dataStorageState, "The Data Storage State must not be null.");
+  OPA.assertDataStorageStateIsNotNullish(dataStorageState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
-  OPA.assertNonNullish(authenticationState, "The Authentication State must not be null.");
+  OpaDm.assertAuthenticationStateIsNotNullish(authenticationState);
   OPA.assertIdentifierIsValid(authenticationState.firebaseAuthUserId);
 
   const isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
@@ -90,7 +90,7 @@ export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataSt
  * @return {Promise<OpaDm.IAuthorizationState>}
  */
 export async function readAuthorizationStateForFirebaseAuthUser(dataStorageState: OpaDm.IDataStorageState, firebaseAuthUserId: string): Promise<OpaDm.IAuthorizationState> {
-  OPA.assertNonNullish(dataStorageState, "The Data Storage State must not be null.");
+  OPA.assertDataStorageStateIsNotNullish(dataStorageState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
   OPA.assertIdentifierIsValid(firebaseAuthUserId);
 

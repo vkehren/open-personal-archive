@@ -11,15 +11,15 @@ import * as Application from "../system/Application";
  * @return {Promise<OpaDm.IAccessRequest>}
  */
 export async function requestUserAccess(callState: OpaDm.ICallState, message: string, citationId: string | null = null): Promise<OpaDm.IAccessRequest> { // eslint-disable-line max-len
-  OPA.assertNonNullish(callState, "The Call State must not be null.");
-  OPA.assertNonNullish(callState.dataStorageState, "The Data Storage State must not be null.");
+  OpaDm.assertCallStateIsNotNullish(callState);
+  OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
 
   const isSystemInstalled = await Application.isSystemInstalled(callState.dataStorageState);
   OPA.assertSystemIsInstalled(isSystemInstalled);
-  OPA.assertNonNullish(callState.authenticationState, "The Authentication State must not be null.");
-  OPA.assertNonNullish(callState.systemState, "The System State must not be null.");
-  OPA.assertNonNullish(callState.authorizationState, "The Authorization State must not be null.");
+  OpaDm.assertAuthenticationStateIsNotNullish(callState.authenticationState);
+  OpaDm.assertSystemStateIsNotNullish(callState.systemState);
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const db = callState.dataStorageState.db;
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);

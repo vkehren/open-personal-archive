@@ -40,13 +40,13 @@ export async function getUserAccountDisplayModel(callState: OpaDm.ICallState | n
   }
 
   const callStateNonNull = OPA.convertNonNullish(callState);
-  OPA.assertNonNullish(callStateNonNull.dataStorageState, "The Data Storage State must not be null.");
+  OPA.assertDataStorageStateIsNotNullish(callStateNonNull.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callStateNonNull.dataStorageState.db);
 
   const isSystemInstalled = await Application.isSystemInstalled(callStateNonNull.dataStorageState);
   OPA.assertSystemIsInstalled(isSystemInstalled);
-  OPA.assertNonNullish(callStateNonNull.authenticationState, "The Authentication State must not be null.");
-  OPA.assertNonNullish(callStateNonNull.systemState, "The System State must not be null.");
+  OpaDm.assertAuthenticationStateIsNotNullish(callStateNonNull.authenticationState);
+  OpaDm.assertSystemStateIsNotNullish(callStateNonNull.systemState);
 
   if (!callStateNonNull.hasAuthorizationState) {
     const uninitializedAccountDisplayModel: IUserAccountDisplayModel = {
@@ -58,7 +58,7 @@ export async function getUserAccountDisplayModel(callState: OpaDm.ICallState | n
     return uninitializedAccountDisplayModel;
   }
 
-  OPA.assertNonNullish(callStateNonNull.authorizationState, "The Authorization State must not be null.");
+  OpaDm.assertAuthorizationStateIsNotNullish(callStateNonNull.authorizationState);
   const authorizationState = OPA.convertNonNullish(callStateNonNull.authorizationState);
 
   const userAccountDisplayModel: IUserAccountDisplayModel = {
@@ -78,14 +78,14 @@ export async function getUserAccountDisplayModel(callState: OpaDm.ICallState | n
  * @return {Promise<OpaDm.IUser>}
  */
 export async function initializeUserAccount(callState: OpaDm.ICallState, authProviderId: string, authAccountName: string): Promise<OpaDm.IUser> {
-  OPA.assertNonNullish(callState, "The Call State must not be null.");
-  OPA.assertNonNullish(callState.dataStorageState, "The Data Storage State must not be null.");
+  OpaDm.assertCallStateIsNotNullish(callState);
+  OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
 
   const isSystemInstalled = await Application.isSystemInstalled(callState.dataStorageState);
   OPA.assertSystemIsInstalled(isSystemInstalled);
-  OPA.assertNonNullish(callState.authenticationState, "The Authentication State must not be null.");
-  OPA.assertNonNullish(callState.systemState, "The System State must not be null.");
+  OpaDm.assertAuthenticationStateIsNotNullish(callState.authenticationState);
+  OpaDm.assertSystemStateIsNotNullish(callState.systemState);
   OPA.assertIsFalse(callState.hasAuthorizationState, "The User account has already been initialized.");
 
   const db = callState.dataStorageState.db;

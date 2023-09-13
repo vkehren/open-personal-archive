@@ -420,6 +420,18 @@ export function convertFromFirestoreDocument<T>(snapshot: firestore.QueryDocumen
 }
 
 /**
+ * Asserts that the state container for data storage is NOT nullish.
+ * @param {IDataStorageState | null | undefined} dataStorageState The state container for data storage.
+ * @param {string} [message=default] The message to display on failure of assertion.
+ * @return {void}
+ */
+export function assertDataStorageStateIsNotNullish(dataStorageState: IDataStorageState | null | undefined, message = "The Data Storage State must not be null."): void {
+  if (TC.isNullish(dataStorageState)) {
+    throw new Error(message);
+  }
+}
+
+/**
  * Asserts that the Firebase Firestore database is NOT nullish.
  * @param {Firestore | null | undefined} db The Firebase Firestore database.
  * @param {string} [message=default] The message to display on failure of assertion.
