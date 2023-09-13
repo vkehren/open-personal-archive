@@ -216,15 +216,21 @@ export function convertTo<T>(value: unknown, guardFunc: BT.GuardFunc<T> | undefi
 /**
  * Converts a nullish-able value of type T to a non-nullish value.
  * @param {T | null | undefined} value The value to convert.
- * @param {T | undefined} [defaultValue=undefined] The optional default value. If not specifed, providing a nullish value for the value will cause error.
+ * @param {BT.DefaultFunc<T> | T | undefined} [defaultValue=undefined] The optional default value. If not specifed, providing a nullish value for the value will cause error.
  * @return {T} The result of conversion.
  */
-export function convertNonNullish<T>(value: T | null | undefined, defaultValue: T | undefined = undefined): T {
+export function convertNonNullish<T>(value: T | null | undefined, defaultValue: BT.DefaultFunc<T> | T | undefined = undefined): T {
   if (isNullish(value)) {
     if (isNullish(defaultValue)) {
       throw new Error("The value to convert must NOT be null or undefined, unless a default value is provided.");
+    } else if (!isFunction(defaultValue)) {
+      value = (defaultValue as T);
     } else {
-      value = defaultValue;
+      const defaultValueResult = (defaultValue as BT.DefaultFunc<T>)();
+      if (isNullish(defaultValueResult)) {
+        throw new Error("The value to convert must NOT be null or undefined, unless a default value is provided.");
+      }
+      value = defaultValueResult;
     }
   }
   return (value as T);
