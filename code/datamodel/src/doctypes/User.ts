@@ -19,9 +19,21 @@ export interface IUserPartial {
   firstName?: string;
   lastName?: string;
   preferredName?: string | null;
+  recentQueries?: Array<string> | firestore.FieldValue;
+}
+
+interface ICitationAccessor {
+  readonly requestedCitationIds: Array<string>;
+  readonly viewableCitationIds: Array<string>;
+  readonly dateOfLatestCitationChange: OPA.DateToUse | null;
+  readonly userIdOfLatestCitationChanger: string | null;
+}
+interface IDocument_CitationAccessor extends OPA.IDocument, ICitationAccessor { }
+interface ICitationAccessorPartial {
   requestedCitationIds?: Array<string> | firestore.FieldValue;
   viewableCitationIds?: Array<string> | firestore.FieldValue;
-  recentQueries?: Array<string> | firestore.FieldValue;
+  dateOfLatestCitationChange: OPA.DateToUse | null;
+  userIdOfLatestCitationChanger: string | null;
 }
 
 type UpdateHistoryItem = IUserPartial | OPA.IUpdateable_ByUser | OPA.IAssignableToRole_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState> | OPA.ISuspendable_ByUser | OPA.IDeleteable_ByUser;
@@ -29,7 +41,7 @@ interface IUserPartial_WithHistory extends IUserPartial, OPA.IUpdateable {
   updateHistory: Array<UpdateHistoryItem> | firestore.FieldValue;
 }
 
-export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable_ByUser, OPA.IDocument_AssignableToRole_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Suspendable_ByUser, OPA.IDocument_Deleteable_ByUser {
+export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable_ByUser, OPA.IDocument_AssignableToRole_ByUser, IDocument_CitationAccessor, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Suspendable_ByUser, OPA.IDocument_Deleteable_ByUser {
   readonly id: string;
   readonly firebaseAuthUserId: string;
   readonly authProviderId: string;
@@ -41,8 +53,6 @@ export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable
   firstName: string;
   lastName: string;
   preferredName: string | null;
-  readonly requestedCitationIds: Array<string>,
-  readonly viewableCitationIds: Array<string>;
   recentQueries: Array<string>;
   readonly updateHistory: Array<UpdateHistoryItem>;
 }
@@ -68,6 +78,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
 
   // NOTE: updateObject MUST NOT change read-only data
   const updateObject_AssignableToRole = (updateObject as OPA.IAssignableToRole_ByUser);
+  const updateObject_CitationAccessor = (updateObject as ICitationAccessorPartial);
 
   const propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
   const id_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).id);
@@ -77,10 +88,12 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   const authAccountNameLowered_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).authAccountNameLowered);
   const assignedRoleId_UpdateUsesInterface = (!OPA.isNullish(updateObject_AssignableToRole.dateOfLatestRoleAssignment));
   const assignedRoleId_IsUpdatedDirectly = (!assignedRoleId_UpdateUsesInterface && propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).assignedRoleId));
-  const requestedCitationIds_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).requestedCitationIds);
-  const viewableCitationIds_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).viewableCitationIds);
+  const requestedCitationIds_UpdateUsesInterface = (!OPA.isNullish(updateObject_CitationAccessor.dateOfLatestCitationChange));
+  const requestedCitationIds_IsUpdatedDirectly = (!requestedCitationIds_UpdateUsesInterface && propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).requestedCitationIds));
+  const viewableCitationIds_UpdateUsesInterface = requestedCitationIds_UpdateUsesInterface;
+  const viewableCitationIds_IsUpdatedDirectly = (!viewableCitationIds_UpdateUsesInterface && propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).viewableCitationIds));
 
-  if (id_IsUpdated || firebaseAuthUserId_IsUpdated || authProviderId_IsUpdated || authAccountName_IsUpdated || authAccountNameLowered_IsUpdated || assignedRoleId_IsUpdatedDirectly || requestedCitationIds_IsUpdated || viewableCitationIds_IsUpdated) {
+  if (id_IsUpdated || firebaseAuthUserId_IsUpdated || authProviderId_IsUpdated || authAccountName_IsUpdated || authAccountNameLowered_IsUpdated || assignedRoleId_IsUpdatedDirectly || requestedCitationIds_IsUpdatedDirectly || viewableCitationIds_IsUpdatedDirectly) {
     return false;
   }
 
@@ -134,6 +147,32 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
       const isSelfAssigned = (updateObject_AssignableToRole.userIdOfLatestRoleAssigner == document.id);
 
       if (dateNotSet || (userNotSet && dateNotCreation) || isSelfAssigned || docIsArchiveOwner) {
+        return false;
+      }
+    }
+  }
+
+  if (true) {
+    // NOTE: Unlike most interfaces used in this fuction, ICitationAccessor only requires that one of the two array properties is updated 
+    if (OPA.isUndefined(updateObject_CitationAccessor.requestedCitationIds) && OPA.isUndefined(updateObject_CitationAccessor.viewableCitationIds)) {
+      const dateIsSet = !OPA.isUndefined(updateObject_CitationAccessor.dateOfLatestCitationChange);
+      const userIsSet = !OPA.isUndefined(updateObject_CitationAccessor.userIdOfLatestCitationChanger);
+
+      if (dateIsSet || userIsSet) {
+        return false;
+      }
+    } else if (OPA.isNull(updateObject_CitationAccessor.requestedCitationIds)) {
+      throw new Error("The \"requestedCitationIds\" property must not be set to null.");
+    } else if (OPA.isNull(updateObject_CitationAccessor.viewableCitationIds)) {
+      throw new Error("The \"viewableCitationIds\" property must not be set to null.");
+    } else {
+      const dateNotSet = OPA.isNullish(updateObject_CitationAccessor.dateOfLatestCitationChange);
+      const userNotSet = OPA.isNullish(updateObject_CitationAccessor.userIdOfLatestCitationChanger);
+      const dateNotCreation = (document.dateOfCreation != updateObject_AssignableToRole.dateOfLatestRoleAssignment);
+      const isRequestedNotSelfAssigned = (!OPA.isNullish(updateObject_CitationAccessor.requestedCitationIds) && (updateObject_CitationAccessor.userIdOfLatestCitationChanger != document.id));
+      const isViewableSelfAssigned = (!OPA.isNullish(updateObject_CitationAccessor.viewableCitationIds) && (updateObject_CitationAccessor.userIdOfLatestCitationChanger == document.id));
+
+      if ((dateNotSet && dateNotCreation) || (userNotSet && dateNotCreation) || isRequestedNotSelfAssigned || isViewableSelfAssigned) {
         return false;
       }
     }
@@ -337,6 +376,8 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     preferredName: preferredName,
     requestedCitationIds: ([] as Array<string>),
     viewableCitationIds: ([] as Array<string>),
+    dateOfLatestCitationChange: null,
+    userIdOfLatestCitationChanger: null,
     recentQueries: ([] as Array<string>),
     updateHistory: ([] as Array<UpdateHistoryItem>),
     dateOfCreation: now,
@@ -401,6 +442,8 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     preferredName: preferredName,
     requestedCitationIds: ([] as Array<string>),
     viewableCitationIds: ([] as Array<string>),
+    dateOfLatestCitationChange: null,
+    userIdOfLatestCitationChanger: null,
     recentQueries: ([] as Array<string>),
     updateHistory: ([] as Array<UpdateHistoryItem>),
     dateOfCreation: now,
@@ -649,6 +692,68 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateObject_AssignableToRole = ({assignedRoleId: role.id, dateOfLatestRoleAssignment: now, userIdOfLatestRoleAssigner} as OPA.IAssignableToRole_ByUser);
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_AssignableToRole};
     const updateHistory = constructorProvider.arrayUnion(updateObject);
+    const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
+
+    const document = await this.getById(db, documentId);
+    OPA.assertNonNullish(document);
+    const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
+    OPA.assertIsTrue(areValid, "The requested update is invalid.");
+
+    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const documentRef = collectionRef.doc(documentId);
+    await documentRef.set(updateObject_WithHistory, {merge: true});
+  }
+
+  /**
+   * Adds a requested Citation to the User stored on the server by constructing an ICitationAccessor_Updateable object.
+   * @param {Firestore} db The Firestore Database.
+   * @param {string} documentId The ID for the User within the OPA system.
+   * @param {string} requestedCitationId The Citation to which the User has requested access.
+   * @param {string} userIdOfLatestUpdater The ID for the Updater within the OPA system.
+   * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
+   * @return {Promise<void>}
+   */
+  async addRequestedCitation(db: firestore.Firestore, documentId: string, requestedCitationId: string, userIdOfLatestUpdater: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    OPA.assertNonNullishOrWhitespace(requestedCitationId);
+
+    const now = OPA.nowToUse();
+    const updateObject_Partial = ({} as IUserPartial);
+    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
+    const updateObject_CitationAccessor = ({requestedCitationIds: constructorProvider.arrayUnion(requestedCitationId), dateOfLatestCitationChange: now, userIdOfLatestCitationChanger: userIdOfLatestUpdater} as ICitationAccessorPartial);
+    const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_CitationAccessor};
+    const updateObject_ForHistory = OPA.replaceFieldValuesWithSummaries({...updateObject});
+    const updateHistory = constructorProvider.arrayUnion(updateObject_ForHistory);
+    const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
+
+    const document = await this.getById(db, documentId);
+    OPA.assertNonNullish(document);
+    const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
+    OPA.assertIsTrue(areValid, "The requested update is invalid.");
+
+    const collectionRef = this.collectionDescriptor.getTypedCollection(db);
+    const documentRef = collectionRef.doc(documentId);
+    await documentRef.set(updateObject_WithHistory, {merge: true});
+  }
+
+  /**
+     * Adds a viewable Citation to the User stored on the server by constructing an ICitationAccessor_Updateable object.
+     * @param {Firestore} db The Firestore Database.
+     * @param {string} documentId The ID for the User within the OPA system.
+     * @param {string} viewableCitationId The Citation to which the User has been granted permission to view.
+     * @param {string} userIdOfLatestUpdater The ID for the Updater within the OPA system.
+     * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
+     * @return {Promise<void>}
+     */
+  async addViewableCitation(db: firestore.Firestore, documentId: string, viewableCitationId: string, userIdOfLatestUpdater: string, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> {
+    OPA.assertNonNullishOrWhitespace(viewableCitationId);
+
+    const now = OPA.nowToUse();
+    const updateObject_Partial = ({} as IUserPartial);
+    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
+    const updateObject_CitationAccessor = ({viewableCitationIds: constructorProvider.arrayUnion(viewableCitationId), dateOfLatestCitationChange: now, userIdOfLatestCitationChanger: userIdOfLatestUpdater} as ICitationAccessorPartial);
+    const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_CitationAccessor};
+    const updateObject_ForHistory = OPA.replaceFieldValuesWithSummaries({...updateObject});
+    const updateHistory = constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
     const document = await this.getById(db, documentId);
