@@ -155,9 +155,11 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
     OPA.assertIsTrue(documentId == SingletonId);
     OPA.assertIsTrue(proxiedDocument.updateHistory.length == 1);
 
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
-    await documentRef.set(proxiedDocument, {merge: true});
+    batchUpdate.set(documentRef, proxiedDocument, {merge: true});
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
     return documentId;
   }
 
@@ -185,9 +187,11 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
-    await documentRef.set(updateObject_WithHistory, {merge: true});
+    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
   }
 }
 

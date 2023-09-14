@@ -122,6 +122,8 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   OPA.assertDataStorageStateIsNotNullish(dataStorageState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
+  dataStorageState.currentWriteBatch = OPA.convertNonNullish(dataStorageState.currentWriteBatch, () => dataStorageState.constructorProvider.writeBatch());
+
   const isInstalled = await isSystemInstalled(dataStorageState);
   OPA.assertSystemIsNotInstalled(isInstalled, "The Open Personal Archive™ (OPA) system has already been installed. Please un-install before re-installing.");
   OpaDm.assertAuthenticationStateIsNotNullish(authenticationState);
@@ -175,13 +177,12 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   const authProviderNonNull = OPA.convertNonNullish(authProvider);
   const localeDefaultNonNull = OPA.convertNonNullish(localeDefault);
   const timeZoneGroupDefaultNonNull = OPA.convertNonNullish(timeZoneGroupDefault);
-
-  const userOwnerId = await OpaDb.Users.queries.createArchiveOwner(dataStorageState, ownerFirebaseAuthUserId, authProviderNonNull, ownerAccountName, localeDefaultNonNull, timeZoneGroupDefaultNonNull, ownerFirstName, ownerLastName);
-  const userOwner_Nullable = await OpaDb.Users.queries.getById(dataStorageState, userOwnerId);
-  const userOwner = OPA.convertNonNullish(userOwner_Nullable);
+  const userOwner = await OpaDb.Users.queries.createArchiveOwner(dataStorageState, ownerFirebaseAuthUserId, authProviderNonNull, ownerAccountName, localeDefaultNonNull, timeZoneGroupDefaultNonNull, ownerFirstName, ownerLastName);
 
   // 4) Create the Archive document for the Archive
   await OpaDb.Archive.queries.create(dataStorageState, archiveName, archiveDescription, pathToStorageFolder, userOwner, localeDefaultNonNull, timeZoneGroupDefaultNonNull);
+  await dataStorageState.currentWriteBatch.commit();
+  dataStorageState.currentWriteBatch = null;
 }
 
 /**
@@ -199,6 +200,8 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
   OpaDm.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+
+  callState.dataStorageState.currentWriteBatch = OPA.convertNonNullish(callState.dataStorageState.currentWriteBatch, () => callState.dataStorageState.constructorProvider.writeBatch());
 
   const isInstalled = await isSystemInstalled(callState.dataStorageState);
   OPA.assertSystemIsInstalled(isInstalled);
@@ -252,7 +255,10 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
   if (OPA.isEmpty(archivePartial)) {
     throw new Error("No updated setting was provided.");
   }
+
   await OpaDb.Archive.queries.update(callState.dataStorageState, archivePartial, currentUserNonNull.id);
+  await callState.dataStorageState.currentWriteBatch.commit();
+  callState.dataStorageState.currentWriteBatch = null;
 }
 
 /**
@@ -266,6 +272,8 @@ export async function performUpgrade(callState: OpaDm.ICallState, constructorPro
   OpaDm.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+
+  callState.dataStorageState.currentWriteBatch = OPA.convertNonNullish(callState.dataStorageState.currentWriteBatch, () => callState.dataStorageState.constructorProvider.writeBatch());
 
   const isInstalled = await isSystemInstalled(callState.dataStorageState);
   OPA.assertSystemIsInstalled(isInstalled);
@@ -311,7 +319,10 @@ export async function performUpgrade(callState: OpaDm.ICallState, constructorPro
   if (OPA.isEmpty(applicationPartial)) {
     throw new Error("No upgraded version was provided.");
   }
+
   await OpaDb.Application.queries.upgrade(callState.dataStorageState, applicationPartial, currentUserNonNull.id);
+  await callState.dataStorageState.currentWriteBatch.commit();
+  callState.dataStorageState.currentWriteBatch = null;
 }
 
 /**
@@ -327,8 +338,9 @@ export async function performUninstall(dataStorageState: OpaDm.IDataStorageState
   OpaDm.assertAuthenticationStateIsNotNullish(authenticationState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
-  const owner = await OpaDb.Users.queries.getById(dataStorageState, OpaDm.User_OwnerId);
+  // LATER: Figure-out if it possible to combine BulkWriter and WriteBatch, as "clearFirestoreCollection" already uses BulkWriter internally
 
+  const owner = await OpaDb.Users.queries.getById(dataStorageState, OpaDm.User_OwnerId);
   if (!OPA.isNullish(owner)) {
     const isInstalled = await isSystemInstalled(dataStorageState);
     OPA.assertSystemIsInstalled(isInstalled);

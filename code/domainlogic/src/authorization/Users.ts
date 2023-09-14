@@ -82,6 +82,8 @@ export async function initializeUserAccount(callState: OpaDm.ICallState, authPro
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
 
+  callState.dataStorageState.currentWriteBatch = OPA.convertNonNullish(callState.dataStorageState.currentWriteBatch, () => callState.dataStorageState.constructorProvider.writeBatch());
+
   const isSystemInstalled = await Application.isSystemInstalled(callState.dataStorageState);
   OPA.assertSystemIsInstalled(isSystemInstalled);
   OpaDm.assertAuthenticationStateIsNotNullish(callState.authenticationState);
@@ -107,6 +109,8 @@ export async function initializeUserAccount(callState: OpaDm.ICallState, authPro
   OPA.assertDocumentIsValid(timeZoneGroup, "The required TimeZoneGroup does not exist.");
 
   const userId = await OpaDb.Users.queries.createWithRole(callState.dataStorageState, firebaseAuthUserId, OPA.convertNonNullish(authProvider), authAccountName, OPA.convertNonNullish(assignedRole), OPA.convertNonNullish(locale), OPA.convertNonNullish(timeZoneGroup), firstName, lastName);
+  await callState.dataStorageState.currentWriteBatch.commit();
+  callState.dataStorageState.currentWriteBatch = null;
 
   const userReRead = await OpaDb.Users.queries.getById(callState.dataStorageState, userId);
   OPA.assertDocumentIsValid(userReRead, "The requested User does not exist.");

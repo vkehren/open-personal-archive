@@ -35,6 +35,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     admin.initializeApp(config.appInitializationArgs);
     config.dataStorageState.db = admin.firestore();
+    config.dataStorageState.currentWriteBatch = null;
 
     const isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     if (isSystemInstalled) {
@@ -67,6 +68,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     };
 
     await expect(Users.initializeUserAccount(callState, config.authenticationState.providerId, config.authenticationState.email)).to.eventually.be.rejectedWith(Error);
+    callState.dataStorageState.currentWriteBatch = null; // NOTE: This should be done in the outer try-catch-finally of the calling Firebase function
     user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
     expect(user).equals(null);
   });
@@ -96,6 +98,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(user).not.equals(null);
 
     await expect(Users.initializeUserAccount(callState, config.authenticationState.providerId, config.authenticationState.email)).to.eventually.be.rejectedWith(Error);
+    callState.dataStorageState.currentWriteBatch = null; // NOTE: This should be done in the outer try-catch-finally of the calling Firebase function
     user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
     expect(user).not.equals(null);
 

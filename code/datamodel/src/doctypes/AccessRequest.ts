@@ -383,7 +383,9 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     OPA.assertIsTrue(proxiedDocument.id == documentId);
     OPA.assertIsTrue(proxiedDocument.updateHistory.length == 1);
 
-    await documentRef.set(proxiedDocument, {merge: true});
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
+    batchUpdate.set(documentRef, proxiedDocument, {merge: true});
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
     return documentId;
   }
 
@@ -411,9 +413,11 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
-    await documentRef.set(updateObject_WithHistory, {merge: true});
+    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
   }
 
   /**
@@ -441,9 +445,11 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
-    await documentRef.set(updateObject_WithHistory, {merge: true});
+    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
   }
 
   /**
@@ -471,9 +477,11 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
-    await documentRef.set(updateObject_WithHistory, {merge: true});
+    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
   }
 
   /**
@@ -500,9 +508,11 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
-    await documentRef.set(updateObject_WithHistory, {merge: true});
+    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
   }
 
   /**
@@ -530,9 +540,11 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
-    await documentRef.set(updateObject_WithHistory, {merge: true});
+    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
   }
 
   /**
@@ -559,9 +571,11 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
-    await documentRef.set(updateObject_WithHistory, {merge: true});
+    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
   }
 }
 

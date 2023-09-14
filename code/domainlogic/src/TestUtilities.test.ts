@@ -5,10 +5,16 @@ import * as Application from "./system/Application";
 import * as TestData from "./TestData.test";
 
 export async function performInstallForTest(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState): Promise<void> { // eslint-disable-line max-len
+  OPA.assertDataStorageStateIsNotNullish(dataStorageState);
+  OPA.assertFirestoreIsNotNullish(dataStorageState.db);
+
+  // NOTE: Install the Application completely before performing any more writes
   await Application.performInstall(dataStorageState, authenticationState,
     "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
     "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "Owner", "de Archive");
-  // const owner = OPA.convertNonNullish(await OpaDb.Users.queries.getById(dataStorageState.db, OpaDm.User_OwnerId));
+
+  // NOTE: Create the writeBatch AFTER installation is complete bc data from installation is necessary for later queries in this function
+  dataStorageState.currentWriteBatch = OPA.convertNonNullish(dataStorageState.currentWriteBatch, () => dataStorageState.constructorProvider.writeBatch());
 
   const authProvider = OPA.convertNonNullish(await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(dataStorageState, authenticationState.providerId));
   // const role_Owner = OPA.convertNonNullish(await OpaDb.Roles.queries.getById(dataStorageState.db, OpaDm.Role_OwnerId));
@@ -32,4 +38,7 @@ export async function performInstallForTest(dataStorageState: OpaDm.IDataStorage
 
   authState = TestData.authenticationState_Guest;
   authState.opaUserId = await OpaDb.Users.queries.createWithRole(dataStorageState, authState.firebaseAuthUserId, authProvider, authState.email, role_Guest, locale, timeZoneGroup, authState.firstName ?? "", authState.lastName ?? "", authState.displayName);
+
+  await dataStorageState.currentWriteBatch.commit();
+  dataStorageState.currentWriteBatch = null;
 }

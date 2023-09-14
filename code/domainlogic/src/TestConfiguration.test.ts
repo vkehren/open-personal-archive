@@ -54,7 +54,9 @@ export function getTestConfiguration(): ITestConfiguration {
       delete: firestore.FieldValue.delete,
       increment: firestore.FieldValue.increment,
       serverTimestamp: firestore.FieldValue.serverTimestamp,
+      writeBatch: () => (dataStorageState.db.batch()),
     },
+    currentWriteBatch: (null as firestore.WriteBatch | null),
   };
 
   const testConfiguration: ITestConfiguration = {

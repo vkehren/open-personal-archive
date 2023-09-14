@@ -15,6 +15,8 @@ export async function requestUserAccess(callState: OpaDm.ICallState, message: st
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
 
+  callState.dataStorageState.currentWriteBatch = OPA.convertNonNullish(callState.dataStorageState.currentWriteBatch, () => callState.dataStorageState.constructorProvider.writeBatch());
+
   const isSystemInstalled = await Application.isSystemInstalled(callState.dataStorageState);
   OPA.assertSystemIsInstalled(isSystemInstalled);
   OpaDm.assertAuthenticationStateIsNotNullish(callState.authenticationState);
@@ -30,6 +32,9 @@ export async function requestUserAccess(callState: OpaDm.ICallState, message: st
   if (!OPA.isNullish(citationId)) {
     await OpaDb.Users.queries.addRequestedCitation(callState.dataStorageState, user.id, OPA.convertNonNullish(citationId), user.id);
   }
+
+  await callState.dataStorageState.currentWriteBatch.commit();
+  callState.dataStorageState.currentWriteBatch = null;
 
   const accessRequestReRead = await OpaDb.AccessRequests.queries.getById(callState.dataStorageState, accessRequestId);
   OPA.assertDocumentIsValid(accessRequestReRead, "The requested AccessRequest does not exist.");

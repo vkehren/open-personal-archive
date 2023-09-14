@@ -27,6 +27,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     admin.initializeApp(config.appInitializationArgs);
     config.dataStorageState.db = admin.firestore();
+    config.dataStorageState.currentWriteBatch = null;
 
     const isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     if (isSystemInstalled) {

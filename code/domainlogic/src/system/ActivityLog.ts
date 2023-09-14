@@ -20,6 +20,8 @@ export async function recordLogItem(dataStorageState: OpaDm.IDataStorageState, a
   OPA.assertDataStorageStateIsNotNullish(dataStorageState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
+  dataStorageState.currentWriteBatch = OPA.convertNonNullish(dataStorageState.currentWriteBatch, () => dataStorageState.constructorProvider.writeBatch());
+
   const isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
   // NOTE: DO NOT assert that system has been installed
 
@@ -52,6 +54,8 @@ export async function recordLogItem(dataStorageState: OpaDm.IDataStorageState, a
   }
 
   const activityLogItemId = await OpaDb.ActivityLogItems.queries.create(dataStorageState, activityType, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState);
+  await dataStorageState.currentWriteBatch.commit();
+  dataStorageState.currentWriteBatch = null;
 
   const activityLogItemReRead = await OpaDb.ActivityLogItems.queries.getById(dataStorageState, activityLogItemId);
   OPA.assertDocumentIsValid(activityLogItemReRead, "The requested ActivityLogItem does not exist.");

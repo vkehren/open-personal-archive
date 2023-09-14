@@ -575,9 +575,9 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
    * @param {string} firstName The User's first name.
    * @param {string} lastName The User's last name.
    * @param {string | null} preferredName The name by which the User wishes to be called.
-   * @return {Promise<string>} The new document ID.
+   * @return {Promise<IUser>} The Owner document.
    */
-  async createArchiveOwner(ds: OPA.IDataStorageState, firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): Promise<string> { // eslint-disable-line max-len
+  async createArchiveOwner(ds: OPA.IDataStorageState, firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): Promise<IUser> { // eslint-disable-line max-len
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
@@ -594,8 +594,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const ownerRef = collectionRef.doc(ownerId);
 
-    // REPLACES: await ownerRef.set(owner, {merge: true});
-    const batchUpdate = ds.db.batch();
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     batchUpdate.set(ownerRef, proxiedOwner, {merge: true});
     const firebaseAuthUserIdIndexCollectionRef = ds.db.collection(Index_User_FirebaseAuthUserId.indexCollectionName);
     const firebaseAuthUserIdIndexDocRef = firebaseAuthUserIdIndexCollectionRef.doc(Index_User_FirebaseAuthUserId.getDocumentId(proxiedOwner.firebaseAuthUserId));
@@ -606,8 +605,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const authAccountNameLoweredIndexCollectionRef = ds.db.collection(Index_User_AuthAccountNameLowered.indexCollectionName);
     const authAccountNameLoweredIndexDocRef = authAccountNameLoweredIndexCollectionRef.doc(Index_User_AuthAccountNameLowered.getDocumentId(proxiedOwner.authAccountNameLowered));
     batchUpdate.set(authAccountNameLoweredIndexDocRef, {value: ownerId});
-    await batchUpdate.commit();
-    return ownerId;
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    return proxiedOwner;
   }
 
   /**
@@ -639,8 +638,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     OPA.assertIsTrue(proxiedDocument.id == documentId);
     OPA.assertIsTrue(proxiedDocument.updateHistory.length == 1);
 
-    // REPLACES: await userRef.set(user, {merge: true});
-    const batchUpdate = ds.db.batch();
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     batchUpdate.set(documentRef, proxiedDocument, {merge: true});
     const firebaseAuthUserIdIndexCollectionRef = ds.db.collection(Index_User_FirebaseAuthUserId.indexCollectionName);
     const firebaseAuthUserIdIndexDocRef = firebaseAuthUserIdIndexCollectionRef.doc(Index_User_FirebaseAuthUserId.getDocumentId(proxiedDocument.firebaseAuthUserId));
@@ -651,7 +649,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const authAccountNameLoweredIndexCollectionRef = ds.db.collection(Index_User_AuthAccountNameLowered.indexCollectionName);
     const authAccountNameLoweredIndexDocRef = authAccountNameLoweredIndexCollectionRef.doc(Index_User_AuthAccountNameLowered.getDocumentId(proxiedDocument.authAccountNameLowered));
     batchUpdate.set(authAccountNameLoweredIndexDocRef, {value: documentId});
-    await batchUpdate.commit();
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
     return documentId;
   }
 
@@ -679,9 +677,11 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
-    await documentRef.set(updateObject_WithHistory, {merge: true});
+    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
   }
 
   /**
@@ -710,9 +710,11 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
-    await documentRef.set(updateObject_WithHistory, {merge: true});
+    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
   }
 
   /**
@@ -742,9 +744,11 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
-    await documentRef.set(updateObject_WithHistory, {merge: true});
+    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
   }
 
   /**
@@ -774,9 +778,11 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
-    await documentRef.set(updateObject_WithHistory, {merge: true});
+    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
   }
 
   /**
@@ -803,9 +809,11 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
-    await documentRef.set(updateObject_WithHistory, {merge: true});
+    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
   }
 
   /**
@@ -833,9 +841,11 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
-    await documentRef.set(updateObject_WithHistory, {merge: true});
+    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
   }
 
   /**
@@ -868,9 +878,11 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const areValid = areUpdatesValid(documentNonNull, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
-    await documentRef.set(updateObject_WithHistory, {merge: true});
+    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
   }
 
   /**
@@ -906,9 +918,11 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const areValid = areUpdatesValid(documentNonNull, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
-    await documentRef.set(updateObject_WithHistory, {merge: true});
+    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
   }
 
   /**
@@ -935,9 +949,11 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
+    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
-    await documentRef.set(updateObject_WithHistory, {merge: true});
+    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
   }
 }
 

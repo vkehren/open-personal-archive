@@ -7,13 +7,14 @@ import * as VC from "./ValueChecking";
 export const BULK_WRITER_MAX_RETRY_ATTEMPTS = 4;
 export const FIREBASE_DEFAULT_REGION = "us-east1";
 
-/** Provides a workaround for multiple packages constructing Firebase objects (see https://github.com/googleapis/nodejs-firestore/issues/760) */
+/** Provides workarounds for issues constructing Firebase objects across multiple packages (see https://github.com/googleapis/nodejs-firestore/issues/760) */
 export interface IFirebaseConstructorProvider {
   arrayRemove: (...elements: any[]) => firestore.FieldValue;
   arrayUnion: (...elements: any[]) => firestore.FieldValue;
   delete: () => firestore.FieldValue;
   increment: (n: number) => firestore.FieldValue;
   serverTimestamp: () => firestore.FieldValue;
+  writeBatch: () => firestore.WriteBatch;
 }
 
 export interface IDataStorageState {
@@ -24,6 +25,7 @@ export interface IDataStorageState {
   db: firestore.Firestore;
   // LATER: Add storage;
   constructorProvider: IFirebaseConstructorProvider;
+  currentWriteBatch: firestore.WriteBatch | null;
 }
 
 const FieldValue_MethodName_Unrecognized = "[UNRECOGNIZED]";
