@@ -15,7 +15,7 @@ export async function requestUserAccess(callState: OpaDm.ICallState, message: st
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
 
-  callState.dataStorageState.currentWriteBatch = OPA.convertNonNullish(callState.dataStorageState.currentWriteBatch, () => callState.dataStorageState.constructorProvider.writeBatch());
+  callState.dataStorageState.currentWriteBatch = callState.dataStorageState.constructorProvider.writeBatch();
 
   const isSystemInstalled = await Application.isSystemInstalled(callState.dataStorageState);
   OPA.assertSystemIsInstalled(isSystemInstalled);

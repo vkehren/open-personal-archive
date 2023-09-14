@@ -14,7 +14,7 @@ export async function performInstallForTest(dataStorageState: OpaDm.IDataStorage
     "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "Owner", "de Archive");
 
   // NOTE: Create the writeBatch AFTER installation is complete bc data from installation is necessary for later queries in this function
-  dataStorageState.currentWriteBatch = OPA.convertNonNullish(dataStorageState.currentWriteBatch, () => dataStorageState.constructorProvider.writeBatch());
+  dataStorageState.currentWriteBatch = dataStorageState.constructorProvider.writeBatch();
 
   const authProvider = OPA.convertNonNullish(await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(dataStorageState, authenticationState.providerId));
   // const role_Owner = OPA.convertNonNullish(await OpaDb.Roles.queries.getById(dataStorageState.db, OpaDm.Role_OwnerId));

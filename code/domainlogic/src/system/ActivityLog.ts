@@ -20,7 +20,7 @@ export async function recordLogItem(dataStorageState: OpaDm.IDataStorageState, a
   OPA.assertDataStorageStateIsNotNullish(dataStorageState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
-  dataStorageState.currentWriteBatch = OPA.convertNonNullish(dataStorageState.currentWriteBatch, () => dataStorageState.constructorProvider.writeBatch());
+  dataStorageState.currentWriteBatch = dataStorageState.constructorProvider.writeBatch();
 
   const isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
   // NOTE: DO NOT assert that system has been installed

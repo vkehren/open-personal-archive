@@ -122,7 +122,7 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   OPA.assertDataStorageStateIsNotNullish(dataStorageState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
-  dataStorageState.currentWriteBatch = OPA.convertNonNullish(dataStorageState.currentWriteBatch, () => dataStorageState.constructorProvider.writeBatch());
+  dataStorageState.currentWriteBatch = dataStorageState.constructorProvider.writeBatch();
 
   const isInstalled = await isSystemInstalled(dataStorageState);
   OPA.assertSystemIsNotInstalled(isInstalled, "The Open Personal Archive™ (OPA) system has already been installed. Please un-install before re-installing.");
@@ -201,7 +201,7 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
 
-  callState.dataStorageState.currentWriteBatch = OPA.convertNonNullish(callState.dataStorageState.currentWriteBatch, () => callState.dataStorageState.constructorProvider.writeBatch());
+  callState.dataStorageState.currentWriteBatch = callState.dataStorageState.constructorProvider.writeBatch();
 
   const isInstalled = await isSystemInstalled(callState.dataStorageState);
   OPA.assertSystemIsInstalled(isInstalled);
@@ -273,7 +273,7 @@ export async function performUpgrade(callState: OpaDm.ICallState, constructorPro
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
 
-  callState.dataStorageState.currentWriteBatch = OPA.convertNonNullish(callState.dataStorageState.currentWriteBatch, () => callState.dataStorageState.constructorProvider.writeBatch());
+  callState.dataStorageState.currentWriteBatch = callState.dataStorageState.constructorProvider.writeBatch();
 
   const isInstalled = await isSystemInstalled(callState.dataStorageState);
   OPA.assertSystemIsInstalled(isInstalled);
