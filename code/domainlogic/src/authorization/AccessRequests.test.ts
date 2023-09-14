@@ -10,7 +10,7 @@ import * as CSU from "../CallStateUtilities";
 import * as Application from "../system/Application";
 import * as Users from "./Users";
 import * as AccessRequests from "./AccessRequests";
-import * as TestData from "../TestData.test";
+import {TestAuthData} from "../TestData.test";
 import * as TestConfig from "../TestConfiguration.test";
 import * as TestUtils from "../TestUtilities.test";
 
@@ -26,7 +26,11 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
   }
 
   beforeEach(async () => {
-    config.authenticationState = TestData.authenticationState_Owner;
+    // NOTE: Make sure that each AuthenticationState object is reset to its original state
+    TestAuthData.resetTestData();
+    // NOTE Set the ambient AuthenticationState to Archive Owner so that beforeEach(...) succeeds
+    config.authenticationState = TestAuthData.owner;
+
     const doBackup = false && (config.hasRunTests && (config.testEnvironment != "Emulators")); // LATER: Once backup is implemented, delete "false && "
     config.hasRunTests = false;
 
@@ -82,14 +86,11 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(isSystemInstalled).equals(true);
     user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
     expect(user).not.equals(null);
-    // const owner = OPA.convertNonNullish(user);
 
     const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(config.dataStorageState, config.authenticationState.providerId);
     expect(authProvider).not.equals(null);
-    // const authProviderNonNull = OPA.convertNonNullish(authProvider);
 
     // NOTE: Do NOT set the test AuthenticationState to a User other than the Archive Owner
-
     let callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
     expect(user).not.equals(null);
@@ -98,7 +99,9 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState.dataStorageState.currentWriteBatch = null; // NOTE: This should be done in the outer try-catch-finally of the calling Firebase function
     user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
     expect(user).not.equals(null);
-    TestData.authenticationState_TestUser.opaUserId = OPA.convertNonNullish(user).id;
+
+    // NOTE: Since the Test User is also the Owner, record that fact
+    TestAuthData.testUser = TestAuthData.owner;
 
     await expect(AccessRequests.requestUserAccess(callState, testMessage, testCitationId)).to.eventually.be.rejectedWith(Error);
   });
@@ -121,10 +124,9 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(config.dataStorageState, config.authenticationState.providerId);
     expect(authProvider).not.equals(null);
-    // const authProviderNonNull = OPA.convertNonNullish(authProvider);
 
-    // NOTE: Set the test AuthenticationState to a User other than the Archive Owner
-    config.authenticationState = TestData.authenticationState_TestUser;
+    // NOTE: Set the ambient AuthenticationState to a User other than the Archive Owner
+    config.authenticationState = TestAuthData.testUser;
     user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
     expect(user).equals(null);
 
@@ -136,7 +138,9 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(user).not.equals(null);
     user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
     expect(user).not.equals(null);
-    TestData.authenticationState_TestUser.opaUserId = OPA.convertNonNullish(user).id;
+
+    // NOTE: Since the TestUser is newly created, record the userId
+    TestAuthData.testUser.opaUserId = OPA.convertNonNullish(user).id;
 
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
 

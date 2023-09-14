@@ -2,7 +2,7 @@ import * as OPA from "../../base/src";
 import * as OpaDm from "../../datamodel/src";
 import {OpaDbDescriptor as OpaDb} from "../../datamodel/src";
 import * as Application from "./system/Application";
-import * as TestData from "./TestData.test";
+import {TestAuthData} from "./TestData.test";
 
 export async function performInstallForTest(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState): Promise<void> { // eslint-disable-line max-len
   OPA.assertDataStorageStateIsNotNullish(dataStorageState);
@@ -27,16 +27,16 @@ export async function performInstallForTest(dataStorageState: OpaDm.IDataStorage
   const locale = OPA.convertNonNullish(await OpaDb.Locales.queries.getById(dataStorageState, archive.defaultLocaleId));
   const timeZoneGroup = OPA.convertNonNullish(await OpaDb.TimeZoneGroups.queries.getById(dataStorageState, archive.defaultTimeZoneGroupId));
 
-  let authState = TestData.authenticationState_Admin;
+  let authState = TestAuthData.admin;
   authState.opaUserId = await OpaDb.Users.queries.createWithRole(dataStorageState, authState.firebaseAuthUserId, authProvider, authState.email, role_Admin, locale, timeZoneGroup, authState.firstName ?? "", authState.lastName ?? "", authState.displayName);
 
-  authState = TestData.authenticationState_Editor;
+  authState = TestAuthData.editor;
   authState.opaUserId = await OpaDb.Users.queries.createWithRole(dataStorageState, authState.firebaseAuthUserId, authProvider, authState.email, role_Editor, locale, timeZoneGroup, authState.firstName ?? "", authState.lastName ?? "", authState.displayName);
 
-  authState = TestData.authenticationState_Viewer;
+  authState = TestAuthData.viewer;
   authState.opaUserId = await OpaDb.Users.queries.createWithRole(dataStorageState, authState.firebaseAuthUserId, authProvider, authState.email, role_Viewer, locale, timeZoneGroup, authState.firstName ?? "", authState.lastName ?? "", authState.displayName);
 
-  authState = TestData.authenticationState_Guest;
+  authState = TestAuthData.guest;
   authState.opaUserId = await OpaDb.Users.queries.createWithRole(dataStorageState, authState.firebaseAuthUserId, authProvider, authState.email, role_Guest, locale, timeZoneGroup, authState.firstName ?? "", authState.lastName ?? "", authState.displayName);
 
   await dataStorageState.currentWriteBatch.commit();

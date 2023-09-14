@@ -10,7 +10,7 @@ import * as CSU from "../CallStateUtilities";
 import * as Application from "./Application";
 import * as Users from "../authorization/Users";
 import * as ActivityLog from "./ActivityLog";
-import * as TestData from "../TestData.test";
+import {TestAuthData} from "../TestData.test";
 import * as TestConfig from "../TestConfiguration.test";
 import * as TestUtils from "../TestUtilities.test";
 
@@ -24,7 +24,11 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
   }
 
   beforeEach(async () => {
-    config.authenticationState = TestData.authenticationState_Owner;
+    // NOTE: Make sure that each AuthenticationState object is reset to its original state
+    TestAuthData.resetTestData();
+    // NOTE Set the ambient AuthenticationState to Archive Owner so that beforeEach(...) succeeds
+    config.authenticationState = TestAuthData.owner;
+
     const doBackup = false && (config.hasRunTests && (config.testEnvironment != "Emulators")); // LATER: Once backup is implemented, delete "false && "
     config.hasRunTests = false;
 
@@ -285,15 +289,16 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
 
-    config.authenticationState = TestData.authenticationState_TestUser;
-    // LATER: Consider testing that only "firebaseAuthUserId" is set (i.e. not "userId")
-
+    // NOTE: Set the ambient AuthenticationState to a User other than the Archive Owner
+    config.authenticationState = TestAuthData.testUser;
     const callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     await Users.initializeUserAccount(callState, config.authenticationState.providerId, config.authenticationState.email);
     const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
     expect(user).not.equals(null);
-    TestData.authenticationState_TestUser.opaUserId = OPA.convertNonNullish(user).id;
     const userNonNull = OPA.convertNonNullish(user);
+
+    // NOTE: Since the TestUser is newly created, record the userId
+    TestAuthData.testUser.opaUserId = OPA.convertNonNullish(user).id;
 
     const resource0 = indexPage;
     const webLogItem0 = await ActivityLog.recordLogItem(config.dataStorageState, OpaDm.ActivityTypes.web_page_view, localhost, resource0, null, {}, null, null, null);

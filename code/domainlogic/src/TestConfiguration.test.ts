@@ -2,7 +2,7 @@ import * as firestore from "@google-cloud/firestore";
 import * as admin from "firebase-admin";
 import * as OPA from "../../base/src";
 import * as OpaDm from "../../datamodel/src";
-import * as TestData from "./TestData.test";
+import {TestAuthData} from "./TestData.test";
 import * as TestConfigurationFile from "../test-config.json";
 
 export type TestEnvironment = "Cloud" | "Emulators";
@@ -76,7 +76,7 @@ export function getTestConfiguration(): ITestConfiguration {
     timeout,
     appInitializationArgs,
     dataStorageState,
-    authenticationState: TestData.authenticationState_Owner,
+    authenticationState: TestAuthData.owner,
     hasRunTests: false,
   };
   return testConfiguration;

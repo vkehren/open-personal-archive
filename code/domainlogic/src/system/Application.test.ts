@@ -10,7 +10,7 @@ import * as CSU from "../CallStateUtilities";
 import * as Application from "./Application";
 import * as SchemaInfo from "../../../datamodel/src/PackageInfo";
 import * as ApplicationInfo from "../PackageInfo";
-import * as TestData from "../TestData.test";
+import {TestAuthData} from "../TestData.test";
 import * as TestConfig from "../TestConfiguration.test";
 
 const config = TestConfig.getTestConfiguration();
@@ -21,7 +21,11 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
   }
 
   beforeEach(async () => {
-    config.authenticationState = TestData.authenticationState_Owner;
+    // NOTE: Make sure that each AuthenticationState object is reset to its original state
+    TestAuthData.resetTestData();
+    // NOTE Set the ambient AuthenticationState to Archive Owner so that beforeEach(...) succeeds
+    config.authenticationState = TestAuthData.owner;
+
     const doBackup = false && (config.hasRunTests && (config.testEnvironment != "Emulators")); // LATER: Once backup is implemented, delete "false && "
     config.hasRunTests = false;
 
