@@ -331,50 +331,63 @@ export async function performUpgrade(callState: OpaDm.ICallState, constructorPro
  * @param {OpaDm.IAuthenticationState} authenticationState The Firebase Authentication state for the User.
  * @param {OpaDm.IAuthorizationState | null | undefined} authorizationState The OPA Authorization state for the User.
  * @param {boolean} [doBackupFirst=false] Whether to backup the data before deleting it (NOT IMPLEMENTED YET).
- * @return {Promise<void>}
+ * @return {Promise<boolean>} Was the function successful.
  */
-export async function performUninstall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState, authorizationState: OpaDm.IAuthorizationState | null | undefined, doBackupFirst = false): Promise<void> { // eslint-disable-line max-len
-  OPA.assertDataStorageStateIsNotNullish(dataStorageState);
-  OpaDm.assertAuthenticationStateIsNotNullish(authenticationState);
-  OPA.assertFirestoreIsNotNullish(dataStorageState.db);
+export async function performUninstall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState, authorizationState: OpaDm.IAuthorizationState | null | undefined, doBackupFirst = false): Promise<boolean> { // eslint-disable-line max-len
+  let wasSuccessful = true;
+  let bulkWriter = dataStorageState.currentBulkWriter;
 
-  // LATER: Figure-out if it possible to combine BulkWriter and WriteBatch, as "clearFirestoreCollection" already uses BulkWriter internally
+  try {
+    OPA.assertDataStorageStateIsNotNullish(dataStorageState);
+    OpaDm.assertAuthenticationStateIsNotNullish(authenticationState);
+    OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
-  const owner = await OpaDb.Users.queries.getById(dataStorageState, OpaDm.User_OwnerId);
-  if (!OPA.isNullish(owner)) {
-    const isInstalled = await isSystemInstalled(dataStorageState);
-    OPA.assertSystemIsInstalled(isInstalled);
-    OpaDm.assertAuthorizationStateIsNotNullish(authorizationState);
+    bulkWriter = dataStorageState.constructorProvider.bulkWriter();
+    dataStorageState.currentBulkWriter = bulkWriter;
 
-    const authorizationStateNonNull = OPA.convertNonNullish(authorizationState);
-    const authorizedRoleIds = [OpaDm.Role_OwnerId];
+    const owner = await OpaDb.Users.queries.getById(dataStorageState, OpaDm.User_OwnerId);
+    if (!OPA.isNullish(owner)) {
+      const isInstalled = await isSystemInstalled(dataStorageState);
+      OPA.assertSystemIsInstalled(isInstalled);
+      OpaDm.assertAuthorizationStateIsNotNullish(authorizationState);
 
-    authorizationStateNonNull.assertUserApproved();
-    authorizationStateNonNull.assertRoleAllowed(authorizedRoleIds);
-  }
+      const authorizationStateNonNull = OPA.convertNonNullish(authorizationState);
+      const authorizedRoleIds = [OpaDm.Role_OwnerId];
 
-  if (doBackupFirst) {
-    // LATER: Backup any existing data
-    throw new Error("Backup of existing Archive data has not been implemented yet.");
-  }
-
-  for (let i = 0; i < OpaDb.NestedCollections.length; i++) {
-    const colDesc = OpaDb.NestedCollections[i];
-
-    for (let j = 0; j < colDesc.propertyIndices.length; j++) {
-      const propertyIndexDesc = colDesc.propertyIndices[j];
-      await OPA.clearFirestoreCollection(dataStorageState, propertyIndexDesc.indexCollectionName);
+      authorizationStateNonNull.assertUserApproved();
+      authorizationStateNonNull.assertRoleAllowed(authorizedRoleIds);
     }
-    // LATER: If necessary, delete all documents from NestedCollection starting with leaves of Collection tree
-  }
 
-  for (let i = 0; i < OpaDb.RootCollections.length; i++) {
-    const colDesc = OpaDb.RootCollections[i];
-
-    for (let j = 0; j < colDesc.propertyIndices.length; j++) {
-      const propertyIndexDesc = colDesc.propertyIndices[j];
-      await OPA.clearFirestoreCollection(dataStorageState, propertyIndexDesc.indexCollectionName);
+    if (doBackupFirst) {
+      // LATER: Backup any existing data
+      throw new Error("Backup of existing Archive data has not been implemented yet.");
     }
-    await OPA.clearFirestoreCollection(dataStorageState, colDesc.collectionName);
+
+    for (let i = 0; i < OpaDb.NestedCollections.length; i++) {
+      const colDesc = OpaDb.NestedCollections[i];
+
+      for (let j = 0; j < colDesc.propertyIndices.length; j++) {
+        const propertyIndexDesc = colDesc.propertyIndices[j];
+        await OPA.clearFirestoreCollection(dataStorageState, propertyIndexDesc.indexCollectionName);
+      }
+      // LATER: If necessary, delete all documents from NestedCollection starting with leaves of Collection tree
+    }
+
+    for (let i = 0; i < OpaDb.RootCollections.length; i++) {
+      const colDesc = OpaDb.RootCollections[i];
+
+      for (let j = 0; j < colDesc.propertyIndices.length; j++) {
+        const propertyIndexDesc = colDesc.propertyIndices[j];
+        await OPA.clearFirestoreCollection(dataStorageState, propertyIndexDesc.indexCollectionName);
+      }
+      await OPA.clearFirestoreCollection(dataStorageState, colDesc.collectionName);
+    }
+  } catch (error) {
+    wasSuccessful = false;
+  } finally {
+    // NOTE: The "bulkWriter" constant is necessary to make this work
+    await OPA.convertNonNullish(bulkWriter).close();
+    dataStorageState.currentBulkWriter = null;
+    return wasSuccessful;
   }
 }

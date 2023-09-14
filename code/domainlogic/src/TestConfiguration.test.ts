@@ -54,8 +54,16 @@ export function getTestConfiguration(): ITestConfiguration {
       delete: firestore.FieldValue.delete,
       increment: firestore.FieldValue.increment,
       serverTimestamp: firestore.FieldValue.serverTimestamp,
+      bulkWriter: () => {
+        const writer = dataStorageState.db.bulkWriter();
+        writer.onWriteError((error: firestore.BulkWriterError) => {
+          return OPA.bulkWriterErrorHandler(dataStorageState, error);
+        });
+        return writer;
+      },
       writeBatch: () => (dataStorageState.db.batch()),
     },
+    currentBulkWriter: (null as firestore.BulkWriter | null),
     currentWriteBatch: (null as firestore.WriteBatch | null),
   };
 

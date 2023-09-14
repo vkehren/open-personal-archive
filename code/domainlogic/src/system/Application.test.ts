@@ -27,6 +27,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     admin.initializeApp(config.appInitializationArgs);
     config.dataStorageState.db = admin.firestore();
+    config.dataStorageState.currentBulkWriter = null;
     config.dataStorageState.currentWriteBatch = null;
 
     const isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
@@ -65,7 +66,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(isSystemInstalled).equals(true);
 
     // NOTE: Since no Archive Owner exists in the current data, the following call should complete successfully
-    await Application.performUninstall(config.dataStorageState, config.authenticationState, null, false);
+    let wasSuccessful = await Application.performUninstall(config.dataStorageState, config.authenticationState, null, false);
+    expect(wasSuccessful).equals(true);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
@@ -124,19 +126,22 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     // NOTE: Since an Archive Owner exists in the current data, the following call should throw an Error
     expect(Application.performUninstall(config.dataStorageState, config.authenticationState, null, false)).to.be.rejectedWith(Error);
     // NOTE: Since we pass the Archive Owner's Authorization State, the following call should complete successfully
-    await Application.performUninstall(config.dataStorageState, config.authenticationState, authorizationState, false);
+    wasSuccessful = await Application.performUninstall(config.dataStorageState, config.authenticationState, authorizationState, false);
+    expect(wasSuccessful).equals(true);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
     // NOTE: Since the System is no longer installed, this call should succeed
-    await Application.performUninstall(config.dataStorageState, config.authenticationState, null, false);
+    wasSuccessful = await Application.performUninstall(config.dataStorageState, config.authenticationState, null, false);
+    expect(wasSuccessful).equals(true);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
     // NOTE: Since the System is no longer installed, this call should also succeed
-    await Application.performUninstall(config.dataStorageState, config.authenticationState, authorizationState, false);
+    wasSuccessful = await Application.performUninstall(config.dataStorageState, config.authenticationState, authorizationState, false);
+    expect(wasSuccessful).equals(true);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);

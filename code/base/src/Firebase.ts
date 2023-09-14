@@ -14,6 +14,7 @@ export interface IFirebaseConstructorProvider {
   delete: () => firestore.FieldValue;
   increment: (n: number) => firestore.FieldValue;
   serverTimestamp: () => firestore.FieldValue;
+  bulkWriter: () => firestore.BulkWriter;
   writeBatch: () => firestore.WriteBatch;
 }
 
@@ -25,6 +26,7 @@ export interface IDataStorageState {
   db: firestore.Firestore;
   // LATER: Add storage;
   constructorProvider: IFirebaseConstructorProvider;
+  currentBulkWriter: firestore.BulkWriter | null;
   currentWriteBatch: firestore.WriteBatch | null;
 }
 
@@ -541,10 +543,7 @@ export async function clearFirestoreCollectionByRef(ds: IDataStorageState, colle
     throw new Error("A valid Firebase Firestore collection must be provided.");
   }
 
-  const bulkWriter = collectionRef.firestore.bulkWriter();
-  bulkWriter.onWriteError((error: firestore.BulkWriterError) => {
-    return bulkWriterErrorHandler(ds, error);
-  });
+  const bulkWriter = TC.convertNonNullish(ds.currentBulkWriter, () => ds.constructorProvider.bulkWriter());
 
   try {
     const docSnapshots = await collectionRef.listDocuments();
@@ -555,6 +554,8 @@ export async function clearFirestoreCollectionByRef(ds: IDataStorageState, colle
       await collectionRef.firestore.recursiveDelete(docData.ref, bulkWriter);
     }
   } finally {
-    await bulkWriter.close();
+    if (bulkWriter != ds.currentBulkWriter) {
+      await bulkWriter.close();
+    }
   }
 }
