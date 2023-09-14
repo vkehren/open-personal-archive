@@ -7,12 +7,16 @@ import * as TestConfigurationFile from "../test-config.json";
 
 export type TestEnvironment = "Cloud" | "Emulators";
 
+export interface IAuthenticationStateForTests extends OpaDm.IAuthenticationState {
+  opaUserId: string;
+}
+
 export interface ITestConfiguration {
   testEnvironment: TestEnvironment;
   timeout: number;
   appInitializationArgs: admin.AppOptions;
   dataStorageState: OpaDm.IDataStorageState;
-  authenticationState: OpaDm.IAuthenticationState;
+  authenticationState: IAuthenticationStateForTests;
   hasRunTests: boolean;
 }
 

@@ -1,14 +1,11 @@
 import * as OpaDm from "../../datamodel/src";
-
-export interface IAuthenticationStateForTests extends OpaDm.IAuthenticationState {
-  opaUserId: string;
-}
+import * as TestConfig from "./TestConfiguration.test";
 
 const authProviderId = "google.com";
 const opaUserId_Placeholder = "[SET_THIS_IN_TEST_CODE]";
 
 const firebaseAuthUserId_Owner = ("FB_" + OpaDm.User_OwnerId);
-export const authenticationState_Owner: IAuthenticationStateForTests = {
+export const authenticationState_Owner: TestConfig.IAuthenticationStateForTests = {
   opaUserId: OpaDm.User_OwnerId,
   firebaseAuthUserId: firebaseAuthUserId_Owner,
   providerId: authProviderId,
@@ -20,7 +17,7 @@ export const authenticationState_Owner: IAuthenticationStateForTests = {
 };
 
 const firebaseAuthUserId_Admin = ("FB_" + "OPA_User_Admin");
-export const authenticationState_Admin: IAuthenticationStateForTests = {
+export const authenticationState_Admin: TestConfig.IAuthenticationStateForTests = {
   opaUserId: opaUserId_Placeholder,
   firebaseAuthUserId: firebaseAuthUserId_Admin,
   providerId: authProviderId,
@@ -32,7 +29,7 @@ export const authenticationState_Admin: IAuthenticationStateForTests = {
 };
 
 const firebaseAuthUserId_Editor = ("FB_" + "OPA_User_Editor");
-export const authenticationState_Editor: IAuthenticationStateForTests = {
+export const authenticationState_Editor: TestConfig.IAuthenticationStateForTests = {
   opaUserId: opaUserId_Placeholder,
   firebaseAuthUserId: firebaseAuthUserId_Editor,
   providerId: authProviderId,
@@ -44,7 +41,7 @@ export const authenticationState_Editor: IAuthenticationStateForTests = {
 };
 
 const firebaseAuthUserId_Viewer = ("FB_" + "OPA_User_Viewer");
-export const authenticationState_Viewer: IAuthenticationStateForTests = {
+export const authenticationState_Viewer: TestConfig.IAuthenticationStateForTests = {
   opaUserId: opaUserId_Placeholder,
   firebaseAuthUserId: firebaseAuthUserId_Viewer,
   providerId: authProviderId,
@@ -56,7 +53,7 @@ export const authenticationState_Viewer: IAuthenticationStateForTests = {
 };
 
 const firebaseAuthUserId_Guest = ("FB_" + "OPA_User_Guest");
-export const authenticationState_Guest: IAuthenticationStateForTests = {
+export const authenticationState_Guest: TestConfig.IAuthenticationStateForTests = {
   opaUserId: opaUserId_Placeholder,
   firebaseAuthUserId: firebaseAuthUserId_Guest,
   providerId: authProviderId,
@@ -68,7 +65,7 @@ export const authenticationState_Guest: IAuthenticationStateForTests = {
 };
 
 const firebaseAuthUserId_TestUser = ("FB_" + "OPA_User_Test");
-export const authenticationState_TestUser: IAuthenticationStateForTests = {
+export const authenticationState_TestUser: TestConfig.IAuthenticationStateForTests = {
   opaUserId: opaUserId_Placeholder,
   firebaseAuthUserId: firebaseAuthUserId_TestUser,
   providerId: authProviderId,
