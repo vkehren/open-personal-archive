@@ -500,6 +500,23 @@ export function assertSystemIsNotInstalled(isInstalled: boolean, message = "The 
 }
 
 /**
+ * Handles re-trying writes using the specified maximum retry attempts.
+ * @param {IDataStorageState} ds The state container for data storage.
+ * @param {firestore.BulkWriterError} error The error that is being handled.
+ * @param {number} [maxRetryAttempts=BULK_WRITER_MAX_RETRY_ATTEMPTS] The maximum number of retry attempts.
+ * @return {boolean} Whether to retry the write again or not.
+ */
+export function bulkWriterErrorHandler(ds: IDataStorageState, error: firestore.BulkWriterError, maxRetryAttempts: number = BULK_WRITER_MAX_RETRY_ATTEMPTS): boolean {
+  if (error.failedAttempts < maxRetryAttempts) {
+    return true;
+  } else {
+    // LATER: Perhaps log this by other means, as well
+    console.log("Failed write at document: ", error.documentRef.path);
+    return false;
+  }
+}
+
+/**
  * Deletes all documents from a Firebase Firestore collection within the given DB.
  * @param {IDataStorageState} ds The state container for data storage.
  * @param {string} collectionName The collection name to clear.
@@ -510,27 +527,23 @@ export async function clearFirestoreCollection(ds: IDataStorageState, collection
   assertFirestoreIsNotNullish(ds.db);
 
   const collectionRef = ds.db.collection(collectionName);
-  return await clearFirestoreCollectionByRef(collectionRef);
+  return await clearFirestoreCollectionByRef(ds, collectionRef);
 }
 
 /**
  * Deletes all documents from a Firebase Firestore collection.
+ * @param {IDataStorageState} ds The state container for data storage.
  * @param {CollectionReference<DocumentData>} collectionRef The Firebase Firestore collection.
  * @return {Promise<void>}
  */
-export async function clearFirestoreCollectionByRef(collectionRef: firestore.CollectionReference<firestore.DocumentData>): Promise<void> {
+export async function clearFirestoreCollectionByRef(ds: IDataStorageState, collectionRef: firestore.CollectionReference<firestore.DocumentData>): Promise<void> {
   if (TC.isNullish(collectionRef)) {
     throw new Error("A valid Firebase Firestore collection must be provided.");
   }
 
   const bulkWriter = collectionRef.firestore.bulkWriter();
   bulkWriter.onWriteError((error: firestore.BulkWriterError) => {
-    if (error.failedAttempts < BULK_WRITER_MAX_RETRY_ATTEMPTS) {
-      return true;
-    } else {
-      console.log("Failed write at document: ", error.documentRef.path);
-      return false;
-    }
+    return bulkWriterErrorHandler(ds, error);
   });
 
   try {
