@@ -595,7 +595,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await expect(OpaDb.Users.queries.setToUnSuspended(config.dataStorageState, userId, testStartReason, TestData.authenticationState_Admin.opaUserId)).to.eventually.be.rejectedWith(Error);
+    await expect(OpaDb.Users.queries.setToUnSuspended(config.dataStorageState, userId, testEndReason, TestData.authenticationState_Admin.opaUserId)).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
