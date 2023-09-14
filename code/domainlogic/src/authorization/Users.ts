@@ -45,7 +45,7 @@ export async function getUserAccountDisplayModel(callState: OpaDm.ICallState | n
 
   const isSystemInstalled = await Application.isSystemInstalled(callStateNonNull.dataStorageState);
   OPA.assertSystemIsInstalled(isSystemInstalled);
-  OpaDm.assertAuthenticationStateIsNotNullish(callStateNonNull.authenticationState);
+  OPA.assertAuthenticationStateIsNotNullish(callStateNonNull.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callStateNonNull.systemState);
 
   if (!callStateNonNull.hasAuthorizationState) {
@@ -78,7 +78,7 @@ export async function getUserAccountDisplayModel(callState: OpaDm.ICallState | n
  * @return {Promise<OpaDm.IUser>}
  */
 export async function initializeUserAccount(callState: OpaDm.ICallState, authProviderId: string, authAccountName: string): Promise<OpaDm.IUser> {
-  OpaDm.assertCallStateIsNotNullish(callState);
+  OPA.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
 
@@ -86,7 +86,7 @@ export async function initializeUserAccount(callState: OpaDm.ICallState, authPro
 
   const isSystemInstalled = await Application.isSystemInstalled(callState.dataStorageState);
   OPA.assertSystemIsInstalled(isSystemInstalled);
-  OpaDm.assertAuthenticationStateIsNotNullish(callState.authenticationState);
+  OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
   OPA.assertIsFalse(callState.hasAuthorizationState, "The User account has already been initialized.");
 

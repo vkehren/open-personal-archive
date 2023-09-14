@@ -8,26 +8,9 @@ import {ITimeZone} from "./doctypes/TimeZone";
 import {ITimeZoneGroup} from "./doctypes/TimeZoneGroup";
 import {IUser} from "./doctypes/User";
 
-export interface ICallState {
-  readonly dataStorageState: IDataStorageState;
-  readonly authenticationState: IAuthenticationState;
-  readonly hasSystemState: boolean;
-  readonly systemState?: ISystemState;
-  readonly hasAuthorizationState: boolean;
-  readonly authorizationState?: IAuthorizationState;
-}
-
+export interface ICallState extends OPA.ICallStateBase<ISystemState, IAuthorizationState> { }
 export type IDataStorageState = OPA.IDataStorageState;
-
-export interface IAuthenticationState {
-  readonly firebaseAuthUserId: string;
-  readonly providerId: string;
-  readonly email: string;
-  readonly emailIsVerified: boolean;
-  readonly firstName?: string;
-  readonly lastName?: string;
-  readonly displayName?: string;
-}
+export type IAuthenticationState = OPA.IAuthenticationState;
 
 export interface ISystemState {
   readonly application: IApplication;
@@ -170,30 +153,6 @@ export class AuthorizationState implements IAuthorizationState {
     if (!this.isRoleDisallowed(disallowedRoleIds)) {
       throw new Error("The current User's Role is allowed to perform this action.");
     }
-  }
-}
-
-/**
- * Asserts that the state container for the call is NOT nullish.
- * @param {ICallState | null | undefined} callState The state container for the call.
- * @param {string} [message=default] The message to display on failure of assertion.
- * @return {void}
- */
-export function assertCallStateIsNotNullish(callState: ICallState | null | undefined, message = "The Call State must not be null."): void {
-  if (OPA.isNullish(callState)) {
-    throw new Error(message);
-  }
-}
-
-/**
- * Asserts that the state container for authentication is NOT nullish.
- * @param {IAuthenticationState | null | undefined} authenticationState The state container for authentication.
- * @param {string} [message=default] The message to display on failure of assertion.
- * @return {void}
- */
-export function assertAuthenticationStateIsNotNullish(authenticationState: IAuthenticationState | null | undefined, message = "The Authentication State must not be null."): void {
-  if (OPA.isNullish(authenticationState)) {
-    throw new Error(message);
   }
 }
 

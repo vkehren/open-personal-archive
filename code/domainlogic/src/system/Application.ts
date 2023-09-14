@@ -35,7 +35,7 @@ export async function isSystemInstalled(dataStorageState: OpaDm.IDataStorageStat
  * @return {Promise<InstallationScreenDisplayModel>}
  */
 export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallState): Promise<IInstallationScreenDisplayModel> {
-  OpaDm.assertCallStateIsNotNullish(callState);
+  OPA.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
 
@@ -60,7 +60,7 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
   }
 
   // NOTE: Handle case where OPA is installed
-  OpaDm.assertAuthenticationStateIsNotNullish(callState.authenticationState);
+  OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
   OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
@@ -126,7 +126,7 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
 
   const isInstalled = await isSystemInstalled(dataStorageState);
   OPA.assertSystemIsNotInstalled(isInstalled, "The Open Personal Archive™ (OPA) system has already been installed. Please un-install before re-installing.");
-  OpaDm.assertAuthenticationStateIsNotNullish(authenticationState);
+  OPA.assertAuthenticationStateIsNotNullish(authenticationState);
   OPA.assertIdentifierIsValid(authenticationState.firebaseAuthUserId);
   OPA.assertNonNullishOrWhitespace(authenticationState.providerId, "The Authentication Provider ID for the User's account must not be null.");
   OPA.assertNonNullishOrWhitespace(authenticationState.email, "The email account of the User must not be null.");
@@ -197,7 +197,7 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
  * @return {Promise<void>}
  */
 export async function updateInstallationSettings(callState: OpaDm.ICallState, archiveName: string | undefined, archiveDescription: string | undefined, defaultLocaleId: string | undefined, defaultTimeZoneGroupId: string | undefined, defaultTimeZoneId: string | undefined, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> { // eslint-disable-line max-len
-  OpaDm.assertCallStateIsNotNullish(callState);
+  OPA.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
 
@@ -205,7 +205,7 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
 
   const isInstalled = await isSystemInstalled(callState.dataStorageState);
   OPA.assertSystemIsInstalled(isInstalled);
-  OpaDm.assertAuthenticationStateIsNotNullish(callState.authenticationState);
+  OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
   OPA.assertIdentifierIsValid(callState.authenticationState.firebaseAuthUserId);
 
@@ -269,7 +269,7 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
  * @return {Promise<void>}
  */
 export async function performUpgrade(callState: OpaDm.ICallState, constructorProvider: OPA.IFirebaseConstructorProvider, doBackupFirst = false): Promise<void> { // eslint-disable-line max-len
-  OpaDm.assertCallStateIsNotNullish(callState);
+  OPA.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
 
@@ -277,7 +277,7 @@ export async function performUpgrade(callState: OpaDm.ICallState, constructorPro
 
   const isInstalled = await isSystemInstalled(callState.dataStorageState);
   OPA.assertSystemIsInstalled(isInstalled);
-  OpaDm.assertAuthenticationStateIsNotNullish(callState.authenticationState);
+  OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
   OPA.assertIdentifierIsValid(callState.authenticationState.firebaseAuthUserId);
 
@@ -339,7 +339,7 @@ export async function performUninstall(dataStorageState: OpaDm.IDataStorageState
 
   try {
     OPA.assertDataStorageStateIsNotNullish(dataStorageState);
-    OpaDm.assertAuthenticationStateIsNotNullish(authenticationState);
+    OPA.assertAuthenticationStateIsNotNullish(authenticationState);
     OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
     bulkWriter = dataStorageState.constructorProvider.bulkWriter();

@@ -12,7 +12,7 @@ import * as Application from "./system/Application";
 export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState): Promise<OpaDm.ICallState> {
   OPA.assertDataStorageStateIsNotNullish(dataStorageState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
-  OpaDm.assertAuthenticationStateIsNotNullish(authenticationState);
+  OPA.assertAuthenticationStateIsNotNullish(authenticationState);
   OPA.assertIdentifierIsValid(authenticationState.firebaseAuthUserId);
 
   const isSystemInstalled = await Application.isSystemInstalled(dataStorageState);

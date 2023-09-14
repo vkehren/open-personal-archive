@@ -11,7 +11,7 @@ import * as Application from "../system/Application";
  * @return {Promise<OpaDm.IAccessRequest>}
  */
 export async function requestUserAccess(callState: OpaDm.ICallState, message: string, citationId: string | null = null): Promise<OpaDm.IAccessRequest> { // eslint-disable-line max-len
-  OpaDm.assertCallStateIsNotNullish(callState);
+  OPA.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
 
@@ -19,7 +19,7 @@ export async function requestUserAccess(callState: OpaDm.ICallState, message: st
 
   const isSystemInstalled = await Application.isSystemInstalled(callState.dataStorageState);
   OPA.assertSystemIsInstalled(isSystemInstalled);
-  OpaDm.assertAuthenticationStateIsNotNullish(callState.authenticationState);
+  OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
   OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 

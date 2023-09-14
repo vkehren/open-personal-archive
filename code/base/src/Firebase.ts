@@ -30,6 +30,25 @@ export interface IDataStorageState {
   currentWriteBatch: firestore.WriteBatch | null;
 }
 
+export interface IAuthenticationState {
+  readonly firebaseAuthUserId: string;
+  readonly providerId: string;
+  readonly email: string;
+  readonly emailIsVerified: boolean;
+  readonly firstName?: string;
+  readonly lastName?: string;
+  readonly displayName?: string;
+}
+
+export interface ICallStateBase<S, A> {
+  readonly dataStorageState: IDataStorageState;
+  readonly authenticationState: IAuthenticationState;
+  readonly hasSystemState: boolean;
+  readonly systemState?: S;
+  readonly hasAuthorizationState: boolean;
+  readonly authorizationState?: A;
+}
+
 const FieldValue_MethodName_Unrecognized = "[UNRECOGNIZED]";
 const FieldValue_MethodName_ArrayRemove = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("arrayRemove") as string);
 const FieldValue_MethodName_ArrayUnion = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("arrayUnion") as string);
@@ -471,6 +490,30 @@ export function assertDocumentIsValid<T extends BT.IDocument>(document: T | null
  */
 export function assertIdentifierIsValid<T extends BT.IDocument>(id: string | null | undefined, message = "A valid document ID must be provided."): void {
   if (TC.isNullishOrWhitespace(id)) {
+    throw new Error(message);
+  }
+}
+
+/**
+ * Asserts that the state container for authentication is NOT nullish.
+ * @param {IAuthenticationState | null | undefined} authenticationState The state container for authentication.
+ * @param {string} [message=default] The message to display on failure of assertion.
+ * @return {void}
+ */
+export function assertAuthenticationStateIsNotNullish(authenticationState: IAuthenticationState | null | undefined, message = "The Authentication State must not be null."): void {
+  if (TC.isNullish(authenticationState)) {
+    throw new Error(message);
+  }
+}
+
+/**
+ * Asserts that the state container for the call is NOT nullish.
+ * @param {ICallStateBase<S, T> | null | undefined} callState The state container for the call.
+ * @param {string} [message=default] The message to display on failure of assertion.
+ * @return {void}
+ */
+export function assertCallStateIsNotNullish<S, T>(callState: ICallStateBase<S, T> | null | undefined, message = "The Call State must not be null."): void {
+  if (TC.isNullish(callState)) {
     throw new Error(message);
   }
 }
