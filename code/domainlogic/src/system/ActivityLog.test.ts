@@ -292,6 +292,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     await Users.initializeUserAccount(callState, config.authenticationState.providerId, config.authenticationState.email);
     const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
     expect(user).not.equals(null);
+    TestData.authenticationState_TestUser.opaUserId = OPA.convertNonNullish(user).id;
     const userNonNull = OPA.convertNonNullish(user);
 
     const resource0 = indexPage;

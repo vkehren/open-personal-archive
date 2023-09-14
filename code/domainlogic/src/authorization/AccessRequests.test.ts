@@ -98,6 +98,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState.dataStorageState.currentWriteBatch = null; // NOTE: This should be done in the outer try-catch-finally of the calling Firebase function
     user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
     expect(user).not.equals(null);
+    TestData.authenticationState_TestUser.opaUserId = OPA.convertNonNullish(user).id;
 
     await expect(AccessRequests.requestUserAccess(callState, testMessage, testCitationId)).to.eventually.be.rejectedWith(Error);
   });
@@ -135,6 +136,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(user).not.equals(null);
     user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
     expect(user).not.equals(null);
+    TestData.authenticationState_TestUser.opaUserId = OPA.convertNonNullish(user).id;
 
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
 
