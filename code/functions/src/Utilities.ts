@@ -1,3 +1,4 @@
+import * as firestore from "@google-cloud/firestore";
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as OPA from "../../base/src";
@@ -45,6 +46,23 @@ export async function getDataStorageStateForFirebaseApp(app: admin.app.App): Pro
     usesAdminAccess: usesAdminAccess,
     usesEmulators: usesEmulators,
     db: db,
+    constructorProvider: {
+      arrayRemove: firestore.FieldValue.arrayRemove,
+      arrayUnion: firestore.FieldValue.arrayUnion,
+      delete: firestore.FieldValue.delete,
+      increment: firestore.FieldValue.increment,
+      serverTimestamp: firestore.FieldValue.serverTimestamp,
+      bulkWriter: () => {
+        const writer = dataStorageState.db.bulkWriter();
+        writer.onWriteError((error: firestore.BulkWriterError) => {
+          return OPA.bulkWriterErrorHandler(dataStorageState, error);
+        });
+        return writer;
+      },
+      writeBatch: () => (dataStorageState.db.batch()),
+    },
+    currentBulkWriter: (null as firestore.BulkWriter | null),
+    currentWriteBatch: (null as firestore.WriteBatch | null),
   };
   return dataStorageState;
 }

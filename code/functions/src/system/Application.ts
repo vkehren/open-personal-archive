@@ -25,11 +25,11 @@ export const isInstalled = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (
     let data: any = {isInstalled, isAuthenticated: false, isAuthorized: false};
 
     if (isInstalled) {
-      archive = await OpaDb.Archive.queries.getById(dataStorageState.db, OpaDm.ArchiveId);
+      archive = await OpaDb.Archive.queries.getById(dataStorageState, OpaDm.ArchiveId);
       OPA.assertNonNullish(archive, "The Archive of the installation must not be null.");
       const archiveNonNull = OPA.convertNonNullish(archive);
 
-      locale = await OpaDb.Locales.queries.getById(dataStorageState.db, archiveNonNull.defaultLocaleId);
+      locale = await OpaDb.Locales.queries.getById(dataStorageState, archiveNonNull.defaultLocaleId);
       OPA.assertNonNullish(locale, "The default Locale for the Archive must not be null.");
       const localeNonNull = OPA.convertNonNullish(locale);
 
@@ -39,7 +39,7 @@ export const isInstalled = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (
 
     if (isUserAuthenticated) {
       const firebaseAuthUserIdNonNull = OPA.convertNonNullish(firebaseAuthUserId);
-      const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(dataStorageState.db, firebaseAuthUserIdNonNull);
+      const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(dataStorageState, firebaseAuthUserIdNonNull);
 
       if (OPA.isNullish(user)) {
         // NOTE: This error case must not be fatal here, but should be handled elsewhere
@@ -48,7 +48,7 @@ export const isInstalled = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (
         const userNonNull = OPA.convertNonNullish(user);
 
         if (!OPA.isNullish(archive)) {
-          locale = await OpaDb.Locales.queries.getById(dataStorageState.db, userNonNull.localeId);
+          locale = await OpaDb.Locales.queries.getById(dataStorageState, userNonNull.localeId);
           OPA.assertNonNullish(locale, "The Locale for the User must not be null.");
           const localeNonNull = OPA.convertNonNullish(locale);
 
@@ -60,7 +60,7 @@ export const isInstalled = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (
         const userIsAuthorized = (userNonNull.approvalState == OpaDm.ApprovalStates.approved);
         const userId = userNonNull.id;
         const displayName = (userNonNull.preferredName) ? userNonNull.preferredName : userNonNull.firstName;
-        const accessRequests = await OpaDb.AccessRequests.queries.getAllForUserId(dataStorageState.db, userId);
+        const accessRequests = await OpaDb.AccessRequests.queries.getAllForUserId(dataStorageState, userId);
         const numberOfAccessRequests = accessRequests.length;
 
         data = Object.assign(data, {isAuthenticated: true, firebaseAuthUserId: firebaseAuthUserIdNonNull, isAuthorized: userIsAuthorized, userId: userNonNull.id, displayName: displayName, numberOfAccessRequests: numberOfAccessRequests}); // eslint-disable-line max-len
