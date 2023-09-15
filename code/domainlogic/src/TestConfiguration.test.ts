@@ -8,6 +8,7 @@ import * as TestConfigurationFile from "../test-config.json";
 export type TestEnvironment = "Cloud" | "Emulators";
 
 export interface IAuthenticationStateForTests extends OpaDm.IAuthenticationState {
+  hasOpaUserId: OPA.DefaultFunc<boolean>;
   opaUserId: string;
 }
 
