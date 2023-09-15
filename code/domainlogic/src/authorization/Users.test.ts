@@ -62,7 +62,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     // LATER: Consider terminating DB, deleting App, and re-creating App
   });
 
-  test("checks that initializeUserAccount(...) fails when System is not installed", async () => {
+  const testFunc1 = () => (async () => {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
     let user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
@@ -81,8 +81,9 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
     expect(user).equals(null);
   });
+  test("checks that initializeUserAccount(...) fails when System is not installed", testFunc1());
 
-  test("checks that initializeUserAccount(...) fails but some User updates succeed when System is installed and User is Archive Owner", async () => {
+  const testFunc2 = () => (async () => {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
     let user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
@@ -737,8 +738,9 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
   });
+  test("checks that initializeUserAccount(...) fails but some User updates succeed when System is installed and User is Archive Owner", testFunc2());
 
-  test("checks that initializeUserAccount(...) succeeds and User updates succeed when System is installed and User is not Archive Owner", async () => {
+  const testFunc3 = () => (async () => {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
     let user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
@@ -1875,6 +1877,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).not.equals(null);
     expect(userNonNull.userIdOfDeleter).equals(testUserId());
   });
+  test("checks that initializeUserAccount(...) succeeds and User updates succeed when System is installed and User is not Archive Owner", testFunc3());
 
   afterEach(async () => {
     await config.dataStorageState.db.terminate();
