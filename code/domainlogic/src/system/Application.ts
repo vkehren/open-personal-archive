@@ -193,10 +193,9 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
  * @param {string | undefined} defaultLocaleId The ID of the default Locale for the Archive, if it was updated.
  * @param {string | undefined} defaultTimeZoneGroupId The ID of the default TimeZoneGroup for the Archive, if it was updated.
  * @param {string | undefined} defaultTimeZoneId The ID of the default TimeZone for the Archive, if it was updated.
- * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
  * @return {Promise<void>}
  */
-export async function updateInstallationSettings(callState: OpaDm.ICallState, archiveName: string | undefined, archiveDescription: string | undefined, defaultLocaleId: string | undefined, defaultTimeZoneGroupId: string | undefined, defaultTimeZoneId: string | undefined, constructorProvider: OPA.IFirebaseConstructorProvider): Promise<void> { // eslint-disable-line max-len
+export async function updateInstallationSettings(callState: OpaDm.ICallState, archiveName: string | undefined, archiveDescription: string | undefined, defaultLocaleId: string | undefined, defaultTimeZoneGroupId: string | undefined, defaultTimeZoneId: string | undefined): Promise<void> { // eslint-disable-line max-len
   OPA.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
@@ -264,11 +263,10 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
 /**
  * Upgrades the Open Personal Archive™ (OPA) system to the latest version.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
- * @param {OPA.IFirebaseConstructorProvider} constructorProvider The provider for Firebase FieldValue constructors.
  * @param {boolean} [doBackupFirst=false] Whether to backup the data before upgrading it (NOT IMPLEMENTED YET).
  * @return {Promise<void>}
  */
-export async function performUpgrade(callState: OpaDm.ICallState, constructorProvider: OPA.IFirebaseConstructorProvider, doBackupFirst = false): Promise<void> { // eslint-disable-line max-len
+export async function performUpgrade(callState: OpaDm.ICallState, doBackupFirst = false): Promise<void> { // eslint-disable-line max-len
   OPA.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);

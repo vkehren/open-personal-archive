@@ -200,7 +200,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
     const currentUser = OPA.convertNonNullish(callState.authorizationState).user;
     const currentLocale = OPA.convertNonNullish(callState.authorizationState).locale;
-    await expect(Application.updateInstallationSettings(callState, undefined, undefined, undefined, undefined, undefined, config.dataStorageState.constructorProvider)).to.be.rejectedWith(Error);
+    await expect(Application.updateInstallationSettings(callState, undefined, undefined, undefined, undefined, undefined)).to.be.rejectedWith(Error);
 
     let archive = await OpaDb.Archive.queries.getById(config.dataStorageState, OpaDm.ArchiveId);
     OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
@@ -219,7 +219,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     const nameUpdated = archiveOriginal.name[currentLocale.optionName] + " UPDATED";
-    await Application.updateInstallationSettings(callState, nameUpdated, undefined, undefined, undefined, undefined, config.dataStorageState.constructorProvider);
+    await Application.updateInstallationSettings(callState, nameUpdated, undefined, undefined, undefined, undefined);
 
     archive = await OpaDb.Archive.queries.getById(config.dataStorageState, OpaDm.ArchiveId);
     OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
@@ -238,7 +238,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     const descriptionUpdated = archiveOriginal.description[currentLocale.optionName] + " UPDATED";
     const defaultLocaleIdUpdated = (OpaDb.Locales.requiredDocuments.find((v) => !v.isDefault) as OpaDm.ILocale).id;
-    await Application.updateInstallationSettings(callState, undefined, descriptionUpdated, defaultLocaleIdUpdated, undefined, undefined, config.dataStorageState.constructorProvider);
+    await Application.updateInstallationSettings(callState, undefined, descriptionUpdated, defaultLocaleIdUpdated, undefined, undefined);
 
     archive = await OpaDb.Archive.queries.getById(config.dataStorageState, OpaDm.ArchiveId);
     OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
@@ -258,7 +258,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     const defaultTimeZoneGroupUpdated = (OpaDb.TimeZoneGroups.requiredDocuments.find((v) => !v.isDefault) as OpaDm.ITimeZoneGroup);
     const defaultTimeZoneGroupIdUpdated = defaultTimeZoneGroupUpdated.id;
     const defaultTimeZoneIdUpdated = defaultTimeZoneGroupUpdated.primaryTimeZoneId;
-    await Application.updateInstallationSettings(callState, undefined, undefined, undefined, defaultTimeZoneGroupIdUpdated, defaultTimeZoneIdUpdated, config.dataStorageState.constructorProvider);
+    await Application.updateInstallationSettings(callState, undefined, undefined, undefined, defaultTimeZoneGroupIdUpdated, defaultTimeZoneIdUpdated);
 
     archive = await OpaDb.Archive.queries.getById(config.dataStorageState, OpaDm.ArchiveId);
     OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
@@ -288,7 +288,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     // NOTE: Since the System version has not changed, this call should fail
     let callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    expect(Application.performUpgrade(callState, config.dataStorageState.constructorProvider)).to.be.rejectedWith(Error);
+    expect(Application.performUpgrade(callState)).to.be.rejectedWith(Error);
 
     let application = await OpaDb.Application.queries.getById(config.dataStorageState, OpaDm.ApplicationId);
     OPA.assertDocumentIsValid(application, "The Application does not exist.");
@@ -318,7 +318,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(applicationNonNull.userIdOfLatestUpgrader).equals(null);
 
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    await Application.performUpgrade(callState, config.dataStorageState.constructorProvider);
+    await Application.performUpgrade(callState);
 
     application = await OpaDb.Application.queries.getById(config.dataStorageState, OpaDm.ApplicationId);
     OPA.assertDocumentIsValid(application, "The Application does not exist.");
