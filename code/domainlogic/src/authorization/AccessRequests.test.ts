@@ -17,6 +17,7 @@ import * as TestUtils from "../TestUtilities.test";
 const config = TestConfig.getTestConfiguration();
 const ambientAuth = (): TestConfig.IAuthenticationStateForTests => (config.authenticationState);
 const ambientUserId = (): string => (ambientAuth().opaUserId);
+const testUserId = (): string => (TestAuthData.testUser.opaUserId);
 const testMessage = "Please give me access to your archive.";
 const testCitationId_Null: string | null = null;
 const testCitationId_NonNull: string = "CITATION_1234";
@@ -155,7 +156,6 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
 
     const userNonNull = OPA.convertNonNullish(user);
-    const userId = userNonNull.id;
     const hasCitationId = (!OPA.isNullish(testCitationId));
     if (!hasCitationId) {
       expect(userNonNull.requestedCitationIds.length).equals(0);
@@ -272,7 +272,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.updateHistory.length).equals(4);
     expect(accessRequestNonNull.hasBeenUpdated).equals(true);
     expect(accessRequestNonNull.dateOfLatestUpdate).not.equals(null);
-    expect(accessRequestNonNull.userIdOfLatestUpdater).equals(userId);
+    expect(accessRequestNonNull.userIdOfLatestUpdater).equals(testUserId());
     expect(accessRequestNonNull.tags.length).equals(3);
     expect(accessRequestNonNull.dateOfLatestTagging).not.equals(null);
     expect(accessRequestNonNull.userIdOfLatestTagger).equals(owner.id);
@@ -281,7 +281,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.userIdOfArchivalChanger).equals(null);
     expect(accessRequestNonNull.hasBeenViewed).equals(true);
     expect(accessRequestNonNull.dateOfLatestViewing).not.equals(null);
-    expect(accessRequestNonNull.userIdOfLatestViewer).equals(userId);
+    expect(accessRequestNonNull.userIdOfLatestViewer).equals(testUserId());
     expect(accessRequestNonNull.hasBeenDecided).equals(false);
     expect(accessRequestNonNull.approvalState).equals(OpaDm.ApprovalStates.pending);
     expect(accessRequestNonNull.dateOfDecision).equals(null);
@@ -314,7 +314,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.userIdOfArchivalChanger).equals(null);
     expect(accessRequestNonNull.hasBeenViewed).equals(true);
     expect(accessRequestNonNull.dateOfLatestViewing).not.equals(null);
-    expect(accessRequestNonNull.userIdOfLatestViewer).equals(userId);
+    expect(accessRequestNonNull.userIdOfLatestViewer).equals(testUserId());
     expect(accessRequestNonNull.hasBeenDecided).equals(false);
     expect(accessRequestNonNull.approvalState).equals(OpaDm.ApprovalStates.pending);
     expect(accessRequestNonNull.dateOfDecision).equals(null);
@@ -348,7 +348,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.userIdOfArchivalChanger).equals(null);
     expect(accessRequestNonNull.hasBeenViewed).equals(true);
     expect(accessRequestNonNull.dateOfLatestViewing).not.equals(null);
-    expect(accessRequestNonNull.userIdOfLatestViewer).equals(userId);
+    expect(accessRequestNonNull.userIdOfLatestViewer).equals(testUserId());
     expect(accessRequestNonNull.hasBeenDecided).equals(false);
     expect(accessRequestNonNull.approvalState).equals(OpaDm.ApprovalStates.pending);
     expect(accessRequestNonNull.dateOfDecision).equals(null);
@@ -373,7 +373,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.updateHistory.length).equals(7);
     expect(accessRequestNonNull.hasBeenUpdated).equals(true);
     expect(accessRequestNonNull.dateOfLatestUpdate).not.equals(null);
-    expect(accessRequestNonNull.userIdOfLatestUpdater).equals(userId);
+    expect(accessRequestNonNull.userIdOfLatestUpdater).equals(testUserId());
     expect(accessRequestNonNull.tags.length).equals(3);
     expect(accessRequestNonNull.dateOfLatestTagging).not.equals(null);
     expect(accessRequestNonNull.userIdOfLatestTagger).equals(owner.id);
@@ -382,7 +382,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.userIdOfArchivalChanger).equals(null);
     expect(accessRequestNonNull.hasBeenViewed).equals(true);
     expect(accessRequestNonNull.dateOfLatestViewing).not.equals(null);
-    expect(accessRequestNonNull.userIdOfLatestViewer).equals(userId);
+    expect(accessRequestNonNull.userIdOfLatestViewer).equals(testUserId());
     expect(accessRequestNonNull.hasBeenDecided).equals(false);
     expect(accessRequestNonNull.approvalState).equals(OpaDm.ApprovalStates.pending);
     expect(accessRequestNonNull.dateOfDecision).equals(null);
@@ -405,16 +405,16 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.updateHistory.length).equals(8);
     expect(accessRequestNonNull.hasBeenUpdated).equals(true);
     expect(accessRequestNonNull.dateOfLatestUpdate).not.equals(null);
-    expect(accessRequestNonNull.userIdOfLatestUpdater).equals(userId);
+    expect(accessRequestNonNull.userIdOfLatestUpdater).equals(testUserId());
     expect(accessRequestNonNull.tags.length).equals(3);
     expect(accessRequestNonNull.dateOfLatestTagging).not.equals(null);
     expect(accessRequestNonNull.userIdOfLatestTagger).equals(owner.id);
     expect(accessRequestNonNull.isArchived).equals(true);
     expect(accessRequestNonNull.dateOfArchivalChange).not.equals(null);
-    expect(accessRequestNonNull.userIdOfArchivalChanger).equals(userId);
+    expect(accessRequestNonNull.userIdOfArchivalChanger).equals(testUserId());
     expect(accessRequestNonNull.hasBeenViewed).equals(true);
     expect(accessRequestNonNull.dateOfLatestViewing).not.equals(null);
-    expect(accessRequestNonNull.userIdOfLatestViewer).equals(userId);
+    expect(accessRequestNonNull.userIdOfLatestViewer).equals(testUserId());
     expect(accessRequestNonNull.hasBeenDecided).equals(false);
     expect(accessRequestNonNull.approvalState).equals(OpaDm.ApprovalStates.pending);
     expect(accessRequestNonNull.dateOfDecision).equals(null);
@@ -446,7 +446,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.userIdOfArchivalChanger).equals(owner.id);
     expect(accessRequestNonNull.hasBeenViewed).equals(true);
     expect(accessRequestNonNull.dateOfLatestViewing).not.equals(null);
-    expect(accessRequestNonNull.userIdOfLatestViewer).equals(userId);
+    expect(accessRequestNonNull.userIdOfLatestViewer).equals(testUserId());
     expect(accessRequestNonNull.hasBeenDecided).equals(false);
     expect(accessRequestNonNull.approvalState).equals(OpaDm.ApprovalStates.pending);
     expect(accessRequestNonNull.dateOfDecision).equals(null);
@@ -478,7 +478,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.userIdOfArchivalChanger).equals(owner.id);
     expect(accessRequestNonNull.hasBeenViewed).equals(true);
     expect(accessRequestNonNull.dateOfLatestViewing).not.equals(null);
-    expect(accessRequestNonNull.userIdOfLatestViewer).equals(userId);
+    expect(accessRequestNonNull.userIdOfLatestViewer).equals(testUserId());
     expect(accessRequestNonNull.hasBeenDecided).equals(true);
     expect(accessRequestNonNull.approvalState).equals(OpaDm.ApprovalStates.denied);
     expect(accessRequestNonNull.dateOfDecision).not.equals(null);
@@ -510,7 +510,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.userIdOfArchivalChanger).equals(owner.id);
     expect(accessRequestNonNull.hasBeenViewed).equals(true);
     expect(accessRequestNonNull.dateOfLatestViewing).not.equals(null);
-    expect(accessRequestNonNull.userIdOfLatestViewer).equals(userId);
+    expect(accessRequestNonNull.userIdOfLatestViewer).equals(testUserId());
     expect(accessRequestNonNull.hasBeenDecided).equals(true);
     expect(accessRequestNonNull.approvalState).equals(OpaDm.ApprovalStates.approved);
     expect(accessRequestNonNull.dateOfDecision).not.equals(null);
@@ -542,7 +542,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.userIdOfArchivalChanger).equals(owner.id);
     expect(accessRequestNonNull.hasBeenViewed).equals(true);
     expect(accessRequestNonNull.dateOfLatestViewing).not.equals(null);
-    expect(accessRequestNonNull.userIdOfLatestViewer).equals(userId);
+    expect(accessRequestNonNull.userIdOfLatestViewer).equals(testUserId());
     expect(accessRequestNonNull.hasBeenDecided).equals(true);
     expect(accessRequestNonNull.approvalState).equals(OpaDm.ApprovalStates.approved);
     expect(accessRequestNonNull.dateOfDecision).not.equals(null);
@@ -565,7 +565,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.updateHistory.length).equals(12);
     expect(accessRequestNonNull.hasBeenUpdated).equals(true);
     expect(accessRequestNonNull.dateOfLatestUpdate).not.equals(null);
-    expect(accessRequestNonNull.userIdOfLatestUpdater).equals(userId);
+    expect(accessRequestNonNull.userIdOfLatestUpdater).equals(testUserId());
     expect(accessRequestNonNull.tags.length).equals(3);
     expect(accessRequestNonNull.dateOfLatestTagging).not.equals(null);
     expect(accessRequestNonNull.userIdOfLatestTagger).equals(owner.id);
@@ -574,14 +574,14 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequestNonNull.userIdOfArchivalChanger).equals(owner.id);
     expect(accessRequestNonNull.hasBeenViewed).equals(true);
     expect(accessRequestNonNull.dateOfLatestViewing).not.equals(null);
-    expect(accessRequestNonNull.userIdOfLatestViewer).equals(userId);
+    expect(accessRequestNonNull.userIdOfLatestViewer).equals(testUserId());
     expect(accessRequestNonNull.hasBeenDecided).equals(true);
     expect(accessRequestNonNull.approvalState).equals(OpaDm.ApprovalStates.approved);
     expect(accessRequestNonNull.dateOfDecision).not.equals(null);
     expect(accessRequestNonNull.userIdOfDecider).equals(owner.id);
     expect(accessRequestNonNull.isMarkedAsDeleted).equals(true);
     expect(accessRequestNonNull.dateOfDeletion).not.equals(null);
-    expect(accessRequestNonNull.userIdOfDeleter).equals(userId);
+    expect(accessRequestNonNull.userIdOfDeleter).equals(testUserId());
   });
   test("checks that requestUserAccess(...) succeeds and AccessRequest updates succeed when System is installed and User is not Archive Owner", testFunc3(testCitationId_Null));
   test("checks that requestUserAccess(...) succeeds and AccessRequest updates succeed when System is installed and User is not Archive Owner", testFunc3(testCitationId_NonNull));
