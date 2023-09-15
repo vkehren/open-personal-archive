@@ -47,7 +47,9 @@ export const RoleTypes = {
   editor: ("editor" as RoleType),
   viewer: ("viewer" as RoleType),
   guest: ("guest" as RoleType),
+  authorizers: ([] as Array<RoleType>),
 };
+RoleTypes.authorizers = [RoleTypes.owner, RoleTypes.administrator];
 
 export type ApprovalState = "pending" | "approved" | "denied";
 export const ApprovalStates = {

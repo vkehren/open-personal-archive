@@ -24,7 +24,7 @@ export interface IOpaDbDescriptor extends OPA.ICollection {
   readonly ActivityLogItems: OPA.ITypedQueryableFactoryCollectionDescriptor<ActivityLogItem.IActivityLogItem, ActivityLogItem.ActivityLogItemQuerySet, ActivityLogItem.FactoryFunc>;
   readonly AuthProviders: OPA.ITypedQueryableCollectionDescriptor<AuthProvider.IAuthenticationProvider, AuthProvider.AuthenticationProviderQuerySet>;
   readonly Locales: OPA.ITypedQueryableCollectionDescriptor<Locale.ILocale, Locale.QuerySet>;
-  readonly Roles: OPA.ITypedQueryableCollectionDescriptor<Role.IRole, Role.QuerySet>;
+  readonly Roles: OPA.ITypedQueryableCollectionDescriptor<Role.IRole, Role.RoleQuerySet>;
   readonly TimeZones: OPA.ITypedQueryableCollectionDescriptor<TimeZone.ITimeZone, TimeZone.QuerySet>;
   readonly TimeZoneGroups: OPA.ITypedQueryableCollectionDescriptor<TimeZoneGroup.ITimeZoneGroup, TimeZoneGroup.QuerySet>;
   readonly Application: OPA.ITypedQueryableCollectionDescriptor<Application.IApplication, Application.ApplicationQuerySet>;

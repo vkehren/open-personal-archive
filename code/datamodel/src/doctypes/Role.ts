@@ -38,5 +38,42 @@ export function areUpdatesValid(document: IRole, updateObject: IRolePartial): bo
   return false;
 }
 
-export type QuerySet = OPA.QuerySet<IRole>;
-export const CollectionDescriptor = new OPA.CollectionDescriptor<IRole, QuerySet, void>(SingularName, PluralName, IsSingleton, (cd) => new OPA.QuerySet(cd), null, RequiredDocuments);
+/** Class providing queries for Role collection. */
+export class RoleQuerySet extends OPA.QuerySet<IRole> {
+  /**
+   * Creates a RoleQuerySet.
+   * @param {OPA.ITypedCollectionDescriptor<IRole>} collectionDescriptor The collection descriptor to use for queries.
+   */
+  constructor(collectionDescriptor: OPA.ITypedCollectionDescriptor<IRole>) {
+    super(collectionDescriptor);
+  }
+
+  /**
+   * The typed collection descriptor to use for queries.
+   * @type {OPA.ITypedQueryableCollectionDescriptor<IRole, RoleQuerySet>}
+   */
+  get typedCollectionDescriptor(): OPA.ITypedQueryableCollectionDescriptor<IRole, RoleQuerySet> {
+    return OPA.convertTo<OPA.ITypedQueryableCollectionDescriptor<IRole, RoleQuerySet>>(this.collectionDescriptor);
+  }
+
+  /**
+   * Gets the Roles to which the RoleTypes passed in pertain.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
+   * @param {Array<BT.RoleType>} roleTypes The desired RoleTypes for which to obtain Roles.
+   * @return {Promise<Map<string, IRole>>} The relevant Roles accessible by RoleId.
+   */
+  async getForRoleTypes(ds: OPA.IDataStorageState, roleTypes: Array<BT.RoleType>): Promise<Map<string, IRole>> {
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
+
+    const rolesCollectionRef = this.collectionDescriptor.getTypedCollection(ds);
+    const getRolesForTypesQuery = rolesCollectionRef.where("type", "in", roleTypes);
+    const matchingRolesSnap = await getRolesForTypesQuery.get();
+
+    const roles = matchingRolesSnap.docs.map((doc) => this.documentProxyConstructor(doc.data()));
+    const rolesMap = OPA.createMapFromArray(roles, (role) => role.id);
+    return rolesMap;
+  }
+}
+
+export const CollectionDescriptor = new OPA.CollectionDescriptor<IRole, RoleQuerySet, void>(SingularName, PluralName, IsSingleton, (cd) => new RoleQuerySet(cd), null, RequiredDocuments);
