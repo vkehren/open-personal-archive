@@ -6,31 +6,39 @@ import * as Application from "./Application";
 /**
  * Records an ActivityLogItem for an activity that occurred in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
+ * @param {OpaDm.IAuthenticationState | null} authenticationState The Firebase Authentication state for the User.
  * @param {BT.ActivityType} activityType The type of the ActivityLogItem.
  * @param {string} requestor The URI of the requestor.
  * @param {string} resource The URI of the resource being requested.
  * @param {string | null} action The action being requested, if any.
  * @param {any} data The data for the request.
- * @param {string | null} firebaseAuthUserId The ID for the User within the Firebase Authentication system, if the User is authenticated.
- * @param {string | null} userId The ID for the User within the OPA system, if the User is authenticated.
  * @param {any | null} otherState Any other state for the request.
  * @return {Promise<OpaDm.IActivityLogItem>}
  */
-export async function recordLogItem(dataStorageState: OpaDm.IDataStorageState, activityType: OpaDm.ActivityType, requestor: string, resource: string, action: string | null, data: any, firebaseAuthUserId: string | null = null, userId: string | null = null, otherState: any | null = null): Promise<OpaDm.IActivityLogItem> { // eslint-disable-line max-len
+export async function recordLogItem(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, activityType: OpaDm.ActivityType, requestor: string, resource: string, action: string | null, data: any, otherState: any | null = null): Promise<OpaDm.IActivityLogItem> { // eslint-disable-line max-len
   OPA.assertDataStorageStateIsNotNullish(dataStorageState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
   dataStorageState.currentWriteBatch = dataStorageState.constructorProvider.writeBatch();
 
   const isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
-  // NOTE: DO NOT assert that system has been installed
+  // NOTE: DO NOT assert that system has been installed, as we need the Log to work in any case
 
-  if (isSystemInstalled && OPA.isNullishOrWhitespace(userId) && !OPA.isNullishOrWhitespace(firebaseAuthUserId)) {
-    const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(dataStorageState, OPA.convertNonNullish(firebaseAuthUserId));
+  let firebaseAuthUserId: string | null = null;
+  let userId: string | null = null;
+  if (!OPA.isNullish(authenticationState)) {
+    const authenticationStateNonNull = OPA.convertNonNullish(authenticationState);
+    const firebaseAuthUserIdNonNull = authenticationStateNonNull.firebaseAuthUserId;
+    firebaseAuthUserId = firebaseAuthUserIdNonNull;
 
-    // NOTE: Only implicitly set the "userId" when it was not specied, but the "firebaseAuthUserId" was specified
-    if (!OPA.isNullish(user)) {
-      userId = OPA.convertNonNullish(user).id;
+    // NOTE: Only check for OPA User if the System is actually installed
+    if (isSystemInstalled) {
+      // NOTE: The OPA User could still be null because an account may not have been created for the Firebase User yet
+      const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(dataStorageState, firebaseAuthUserIdNonNull);
+      if (!OPA.isNullish(user)) {
+        const userNonNull = OPA.convertNonNullish(user);
+        userId = userNonNull.id;
+      }
     }
   }
 
