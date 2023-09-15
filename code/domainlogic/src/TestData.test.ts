@@ -115,4 +115,5 @@ export const TestAuthData = {
     TestAuthData.guest = authenticationState_Guest();
     TestAuthData.testUser = authenticationState_TestUser();
   },
+  getPlaceholderIdValue: () => (opaUserId_Placeholder),
 };
