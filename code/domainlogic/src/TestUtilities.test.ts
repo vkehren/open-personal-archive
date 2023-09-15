@@ -10,8 +10,8 @@ export async function performInstallForTest(dataStorageState: OpaDm.IDataStorage
 
   // NOTE: Install the Application completely before performing any more writes
   await Application.performInstall(dataStorageState, authenticationState,
-    "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
-    "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "Owner", "de Archive");
+    "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", OpaDm.DefaultLocaleId, OpaDm.DefaultTimeZoneGroupId,
+    OPA.convertNonNullish(TestAuthData.owner.firstName), OPA.convertNonNullish(TestAuthData.owner.lastName));
 
   // NOTE: Create the writeBatch AFTER installation is complete bc data from installation is necessary for later queries in this function
   dataStorageState.currentWriteBatch = dataStorageState.constructorProvider.writeBatch();
