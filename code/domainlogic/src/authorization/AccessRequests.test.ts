@@ -45,13 +45,14 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     const isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     if (isSystemInstalled) {
-      const owner = await OpaDb.Users.queries.getById(config.dataStorageState, OpaDm.User_OwnerId);
+      // NOTE: The following line is necessary bc the System may have been installed in manner other than running tests
+      const ownerForUninstall = await OpaDb.Users.queries.getById(config.dataStorageState, OpaDm.User_OwnerId);
 
-      if (OPA.isNullish(owner)) {
+      if (OPA.isNullish(ownerForUninstall)) {
         // NOTE: Passing a valid value for "authorizationState" only matters if the Archive Owner actually exists
         await Application.performUninstall(config.dataStorageState, config.authenticationState, null, doBackup);
       } else {
-        const authorizationState = await CSU.readAuthorizationStateForFirebaseAuthUser(config.dataStorageState, OPA.convertNonNullish(owner).firebaseAuthUserId);
+        const authorizationState = await CSU.readAuthorizationStateForFirebaseAuthUser(config.dataStorageState, OPA.convertNonNullish(ownerForUninstall).firebaseAuthUserId);
         await Application.performUninstall(config.dataStorageState, config.authenticationState, authorizationState, doBackup);
       }
     }
