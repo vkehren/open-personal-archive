@@ -4,6 +4,8 @@ import {OpaDbDescriptor as OpaDb} from "../../datamodel/src";
 import * as Application from "./system/Application";
 import {TestAuthData} from "./TestData.test";
 
+export type TestFunctionType = "query" | "logic";
+
 export async function performInstallForTest(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState): Promise<void> { // eslint-disable-line max-len
   OPA.assertDataStorageStateIsNotNullish(dataStorageState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
