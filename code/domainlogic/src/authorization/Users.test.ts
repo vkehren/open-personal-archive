@@ -15,6 +15,8 @@ import * as TestConfig from "../TestConfiguration.test";
 import * as TestUtils from "../TestUtilities.test";
 
 const config = TestConfig.getTestConfiguration();
+const ambientAuth = (): TestConfig.IAuthenticationStateForTests => (config.authenticationState);
+const ambientAuthId = (): string => (ambientAuth().opaUserId);
 const testCitationId1 = "THIS_CITATION_DOES_NOT_ACTUALLY_EXIST_1";
 const testCitationId2 = "THIS_CITATION_DOES_NOT_ACTUALLY_EXIST_2";
 const testString_Hello = "Hello";
@@ -146,9 +148,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
+    config.authenticationState = TestAuthData.testUser;
     const firstName_Updated = (userNonNull.firstName + " UPDATED");
     let userUpdateObject = ({firstName: firstName_Updated} as OpaDm.IUserPartial);
-    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, userId);
+    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
@@ -188,9 +191,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
+    config.authenticationState = TestAuthData.testUser;
     const lastName_Updated = (userNonNull.lastName + " UPDATED");
     userUpdateObject = ({lastName: lastName_Updated} as OpaDm.IUserPartial);
-    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, userId);
+    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
@@ -230,9 +234,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
+    config.authenticationState = TestAuthData.testUser;
     let recentQueries_Updated = ([testString_Hello] as Array<string> | firestore.FieldValue);
     userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
-    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, userId);
+    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
@@ -272,9 +277,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
+    config.authenticationState = TestAuthData.testUser;
     recentQueries_Updated = config.dataStorageState.constructorProvider.arrayUnion(testString_World, testString_EXCLAIM);
     userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
-    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, userId);
+    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
@@ -314,9 +320,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
+    config.authenticationState = TestAuthData.testUser;
     recentQueries_Updated = config.dataStorageState.constructorProvider.arrayRemove(testString_Hello, testString_EXCLAIM);
     userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
-    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, userId);
+    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
@@ -356,9 +363,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
+    config.authenticationState = TestAuthData.testUser;
     recentQueries_Updated = [];
     userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
-    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, userId);
+    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
@@ -398,9 +406,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
+    config.authenticationState = TestAuthData.owner;
     const roleToAssign = await OpaDb.Roles.queries.getById(config.dataStorageState, OpaDm.Role_ViewerId);
     const roleToAssignNonNull = OPA.convertNonNullish(roleToAssign);
-    await expect(OpaDb.Users.queries.assignToRole(config.dataStorageState, userId, roleToAssignNonNull, owner.id)).to.eventually.be.rejectedWith(Error);
+    await expect(OpaDb.Users.queries.assignToRole(config.dataStorageState, userId, roleToAssignNonNull, ambientAuthId())).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
@@ -440,7 +449,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await expect(OpaDb.Users.queries.setToViewed(config.dataStorageState, userId, owner.id)).to.eventually.be.rejectedWith(Error);
+    config.authenticationState = TestAuthData.owner;
+    await expect(OpaDb.Users.queries.setToViewed(config.dataStorageState, userId, ambientAuthId())).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
@@ -480,7 +490,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await expect(OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, userId, OpaDm.ApprovalStates.denied, owner.id)).to.eventually.be.rejectedWith(Error);
+    config.authenticationState = TestAuthData.owner;
+    await expect(OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, userId, OpaDm.ApprovalStates.denied, ambientAuthId())).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
@@ -520,7 +531,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await expect(OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, userId, OpaDm.ApprovalStates.approved, owner.id)).to.eventually.be.rejectedWith(Error);
+    config.authenticationState = TestAuthData.owner;
+    await expect(OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, userId, OpaDm.ApprovalStates.approved, ambientAuthId())).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
@@ -560,7 +572,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await expect(OpaDb.Users.queries.setToSuspended(config.dataStorageState, userId, testStartReason, TestAuthData.admin.opaUserId)).to.eventually.be.rejectedWith(Error);
+    config.authenticationState = TestAuthData.admin;
+    await expect(OpaDb.Users.queries.setToSuspended(config.dataStorageState, userId, testStartReason, ambientAuthId())).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
@@ -600,7 +613,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await expect(OpaDb.Users.queries.setToUnSuspended(config.dataStorageState, userId, testEndReason, TestAuthData.admin.opaUserId)).to.eventually.be.rejectedWith(Error);
+    config.authenticationState = TestAuthData.admin;
+    await expect(OpaDb.Users.queries.setToUnSuspended(config.dataStorageState, userId, testEndReason, ambientAuthId())).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
@@ -640,7 +654,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await expect(OpaDb.Users.queries.markAsDeleted(config.dataStorageState, userId, TestAuthData.admin.opaUserId)).to.eventually.be.rejectedWith(Error);
+    config.authenticationState = TestAuthData.admin;
+    await expect(OpaDb.Users.queries.markAsDeleted(config.dataStorageState, userId, ambientAuthId())).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
@@ -680,7 +695,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await expect(OpaDb.Users.queries.markAsDeleted(config.dataStorageState, userId, userId)).to.eventually.be.rejectedWith(Error);
+    config.authenticationState = TestAuthData.testUser;
+    await expect(OpaDb.Users.queries.markAsDeleted(config.dataStorageState, userId, ambientAuthId())).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
@@ -758,13 +774,13 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     let userNonNull = OPA.convertNonNullish(user);
     const userId = userNonNull.id;
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(OpaDm.DefaultRoleId);
-    expect(userNonNull.firstName).equals(config.authenticationState.firstName);
-    expect(userNonNull.lastName).equals(config.authenticationState.lastName);
+    expect(userNonNull.firstName).equals(TestAuthData.testUser.firstName);
+    expect(userNonNull.lastName).equals(TestAuthData.testUser.lastName);
     expect(userNonNull.requestedCitationIds.length).equals(0);
     expect(userNonNull.viewableCitationIds.length).equals(0);
     expect(userNonNull.dateOfLatestCitationChange).equals(null);
@@ -798,20 +814,21 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
+    config.authenticationState = TestAuthData.testUser;
     const firstName_Updated = (userNonNull.firstName + " UPDATED");
     let userUpdateObject = ({firstName: firstName_Updated} as OpaDm.IUserPartial);
-    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, userId);
+    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(OpaDm.DefaultRoleId);
     expect(userNonNull.firstName).equals(firstName_Updated);
-    expect(userNonNull.lastName).equals(config.authenticationState.lastName);
+    expect(userNonNull.lastName).equals(TestAuthData.testUser.lastName);
     expect(userNonNull.requestedCitationIds.length).equals(0);
     expect(userNonNull.viewableCitationIds.length).equals(0);
     expect(userNonNull.dateOfLatestCitationChange).equals(null);
@@ -844,17 +861,18 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
+    config.authenticationState = TestAuthData.testUser;
     const lastName_Updated = (userNonNull.lastName + " UPDATED");
     userUpdateObject = ({lastName: lastName_Updated} as OpaDm.IUserPartial);
-    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, userId);
+    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(OpaDm.DefaultRoleId);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -890,17 +908,18 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
+    config.authenticationState = TestAuthData.testUser;
     let recentQueries_Updated = ([testString_Hello] as Array<string> | firestore.FieldValue);
     userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
-    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, userId);
+    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(OpaDm.DefaultRoleId);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -936,17 +955,18 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
+    config.authenticationState = TestAuthData.testUser;
     recentQueries_Updated = config.dataStorageState.constructorProvider.arrayUnion(testString_World, testString_EXCLAIM);
     userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
-    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, userId);
+    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(OpaDm.DefaultRoleId);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -982,17 +1002,18 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
+    config.authenticationState = TestAuthData.testUser;
     recentQueries_Updated = config.dataStorageState.constructorProvider.arrayRemove(testString_Hello, testString_EXCLAIM);
     userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
-    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, userId);
+    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(OpaDm.DefaultRoleId);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -1028,17 +1049,18 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
+    config.authenticationState = TestAuthData.testUser;
     recentQueries_Updated = [];
     userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
-    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, userId);
+    await OpaDb.Users.queries.update(config.dataStorageState, userId, userUpdateObject, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(OpaDm.DefaultRoleId);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -1074,18 +1096,19 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
+    config.authenticationState = TestAuthData.testUser;
     const roleToAssign = await OpaDb.Roles.queries.getById(config.dataStorageState, OpaDm.Role_AdministratorId);
     const roleToAssignNonNull = OPA.convertNonNullish(roleToAssign);
     OPA.assertIsFalse(OpaDm.DefaultRoleId == roleToAssignNonNull.id);
-    await expect(OpaDb.Users.queries.assignToRole(config.dataStorageState, userId, roleToAssignNonNull, userId)).to.eventually.be.rejectedWith(Error);
+    await expect(OpaDb.Users.queries.assignToRole(config.dataStorageState, userId, roleToAssignNonNull, ambientAuthId())).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(OpaDm.DefaultRoleId);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -1121,15 +1144,16 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await OpaDb.Users.queries.assignToRole(config.dataStorageState, userId, roleToAssignNonNull, owner.id);
+    config.authenticationState = TestAuthData.owner;
+    await OpaDb.Users.queries.assignToRole(config.dataStorageState, userId, roleToAssignNonNull, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(roleToAssignNonNull.id);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -1165,16 +1189,19 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await expect(OpaDb.Users.queries.addRequestedCitation(config.dataStorageState, userId, testCitationId1, owner.id)).to.eventually.be.rejectedWith(Error);
-    await OpaDb.Users.queries.addRequestedCitation(config.dataStorageState, userId, testCitationId1, userId);
+    config.authenticationState = TestAuthData.owner;
+    await expect(OpaDb.Users.queries.addRequestedCitation(config.dataStorageState, userId, testCitationId1, ambientAuthId())).to.eventually.be.rejectedWith(Error);
+
+    config.authenticationState = TestAuthData.testUser;
+    await OpaDb.Users.queries.addRequestedCitation(config.dataStorageState, userId, testCitationId1, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(roleToAssignNonNull.id);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -1210,16 +1237,19 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await expect(OpaDb.Users.queries.addRequestedCitation(config.dataStorageState, userId, testCitationId2, owner.id)).to.eventually.be.rejectedWith(Error);
-    await OpaDb.Users.queries.addRequestedCitation(config.dataStorageState, userId, testCitationId2, userId);
+    config.authenticationState = TestAuthData.owner;
+    await expect(OpaDb.Users.queries.addRequestedCitation(config.dataStorageState, userId, testCitationId2, ambientAuthId())).to.eventually.be.rejectedWith(Error);
+
+    config.authenticationState = TestAuthData.testUser;
+    await OpaDb.Users.queries.addRequestedCitation(config.dataStorageState, userId, testCitationId2, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(roleToAssignNonNull.id);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -1255,16 +1285,19 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await expect(OpaDb.Users.queries.addViewableCitation(config.dataStorageState, userId, testCitationId1, userId)).to.eventually.be.rejectedWith(Error);
-    await OpaDb.Users.queries.addViewableCitation(config.dataStorageState, userId, testCitationId1, owner.id);
+    config.authenticationState = TestAuthData.testUser;
+    await expect(OpaDb.Users.queries.addViewableCitation(config.dataStorageState, userId, testCitationId1, ambientAuthId())).to.eventually.be.rejectedWith(Error);
+
+    config.authenticationState = TestAuthData.owner;
+    await OpaDb.Users.queries.addViewableCitation(config.dataStorageState, userId, testCitationId1, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(roleToAssignNonNull.id);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -1300,16 +1333,19 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await expect(OpaDb.Users.queries.addViewableCitation(config.dataStorageState, userId, testCitationId2, userId)).to.eventually.be.rejectedWith(Error);
-    await OpaDb.Users.queries.addViewableCitation(config.dataStorageState, userId, testCitationId2, owner.id);
+    config.authenticationState = TestAuthData.testUser;
+    await expect(OpaDb.Users.queries.addViewableCitation(config.dataStorageState, userId, testCitationId2, ambientAuthId())).to.eventually.be.rejectedWith(Error);
+
+    config.authenticationState = TestAuthData.owner;
+    await OpaDb.Users.queries.addViewableCitation(config.dataStorageState, userId, testCitationId2, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(roleToAssignNonNull.id);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -1345,15 +1381,16 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await OpaDb.Users.queries.setToViewed(config.dataStorageState, userId, owner.id);
+    config.authenticationState = TestAuthData.owner;
+    await OpaDb.Users.queries.setToViewed(config.dataStorageState, userId, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(roleToAssignNonNull.id);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -1389,15 +1426,16 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, userId, OpaDm.ApprovalStates.denied, owner.id);
+    config.authenticationState = TestAuthData.owner;
+    await OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, userId, OpaDm.ApprovalStates.denied, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(roleToAssignNonNull.id);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -1433,15 +1471,16 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, userId, OpaDm.ApprovalStates.approved, owner.id);
+    config.authenticationState = TestAuthData.owner;
+    await OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, userId, OpaDm.ApprovalStates.approved, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(roleToAssignNonNull.id);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -1477,15 +1516,16 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await expect(OpaDb.Users.queries.setToSuspended(config.dataStorageState, userId, testStartReason, userId)).to.eventually.be.rejectedWith(Error);
+    config.authenticationState = TestAuthData.testUser;
+    await expect(OpaDb.Users.queries.setToSuspended(config.dataStorageState, userId, testStartReason, ambientAuthId())).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(roleToAssignNonNull.id);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -1521,15 +1561,16 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await OpaDb.Users.queries.setToSuspended(config.dataStorageState, userId, testStartReason, owner.id);
+    config.authenticationState = TestAuthData.owner;
+    await OpaDb.Users.queries.setToSuspended(config.dataStorageState, userId, testStartReason, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(roleToAssignNonNull.id);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -1565,15 +1606,16 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await expect(OpaDb.Users.queries.setToSuspended(config.dataStorageState, userId, testStartReason, owner.id)).to.eventually.be.rejectedWith(Error);
+    config.authenticationState = TestAuthData.owner;
+    await expect(OpaDb.Users.queries.setToSuspended(config.dataStorageState, userId, testStartReason, ambientAuthId())).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(roleToAssignNonNull.id);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -1609,15 +1651,16 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await expect(OpaDb.Users.queries.setToUnSuspended(config.dataStorageState, userId, testEndReason, userId)).to.eventually.be.rejectedWith(Error);
+    config.authenticationState = TestAuthData.testUser;
+    await expect(OpaDb.Users.queries.setToUnSuspended(config.dataStorageState, userId, testEndReason, ambientAuthId())).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(roleToAssignNonNull.id);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -1653,15 +1696,16 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await OpaDb.Users.queries.setToUnSuspended(config.dataStorageState, userId, testEndReason, owner.id);
+    config.authenticationState = TestAuthData.owner;
+    await OpaDb.Users.queries.setToUnSuspended(config.dataStorageState, userId, testEndReason, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(roleToAssignNonNull.id);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -1697,15 +1741,16 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await expect(OpaDb.Users.queries.setToUnSuspended(config.dataStorageState, userId, testEndReason, owner.id)).to.eventually.be.rejectedWith(Error);
+    config.authenticationState = TestAuthData.owner;
+    await expect(OpaDb.Users.queries.setToUnSuspended(config.dataStorageState, userId, testEndReason, ambientAuthId())).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(roleToAssignNonNull.id);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -1741,15 +1786,16 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await expect(OpaDb.Users.queries.markAsDeleted(config.dataStorageState, userId, owner.id)).to.eventually.be.rejectedWith(Error);
+    config.authenticationState = TestAuthData.owner;
+    await expect(OpaDb.Users.queries.markAsDeleted(config.dataStorageState, userId, ambientAuthId())).to.eventually.be.rejectedWith(Error);
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(roleToAssignNonNull.id);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
@@ -1785,15 +1831,16 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(userNonNull.dateOfDeletion).equals(null);
     expect(userNonNull.userIdOfDeleter).equals(null);
 
-    await OpaDb.Users.queries.markAsDeleted(config.dataStorageState, userId, userId);
+    config.authenticationState = TestAuthData.testUser;
+    await OpaDb.Users.queries.markAsDeleted(config.dataStorageState, userId, ambientAuthId());
     user = await OpaDb.Users.queries.getById(config.dataStorageState, userId);
     expect(user).not.equals(null);
 
     userNonNull = OPA.convertNonNullish(user);
-    expect(userNonNull.firebaseAuthUserId).equals(config.authenticationState.firebaseAuthUserId);
+    expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
-    expect(userNonNull.authAccountName).equals(config.authenticationState.email);
-    expect(userNonNull.authAccountNameLowered).equals(config.authenticationState.email.toLowerCase());
+    expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
+    expect(userNonNull.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
     expect(userNonNull.assignedRoleId).equals(roleToAssignNonNull.id);
     expect(userNonNull.firstName).equals(firstName_Updated);
     expect(userNonNull.lastName).equals(lastName_Updated);
