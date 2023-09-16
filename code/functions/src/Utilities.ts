@@ -1,9 +1,12 @@
 import * as firestore from "@google-cloud/firestore";
 import * as functions from "firebase-functions";
+import {CallableRequest} from "firebase-functions/v2/https";
+import * as logger from "firebase-functions/logger";
 import * as admin from "firebase-admin";
 import * as OPA from "../../base/src";
 import * as OpaDm from "../../datamodel/src";
 import * as CSU from "../../domainlogic/src/CallStateUtilities";
+import * as ActivityLog from "../../domainlogic/src/system/ActivityLog";
 
 /**
  * Gets the Call State for the Firebase context and app.
@@ -159,5 +162,89 @@ export function getFirebaseProjectUsesEmulators(): boolean {
     return true;
   } else {
     return false;
+  }
+}
+
+/**
+ * Logs a server function call in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
+ * @param {OpaDm.IAuthenticationState | null} authenticationState The Firebase Authentication state for the User.
+ * @param {CallableRequest} request The Firebase request object.
+ * @param {string} message The message for the log item.
+ * @return {Promise<OpaDm.void>}
+ */
+export async function logFunctionCall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, request: CallableRequest, message: string): Promise<void> { // eslint-disable-line max-len
+  try {
+    const activityType = OpaDm.ActivityTypes.server_function_call;
+    const requestor = request.rawRequest.ip;
+    const resource = request.rawRequest.originalUrl;
+    const errorState = {hasError: false};
+    const otherState = {message: message, logWriteState: dataStorageState.logWriteState, errorState: errorState};
+
+    logger.error(message, {structuredData: true, activityType, requestor, resource, otherState});
+    const logItem = await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, requestor, resource, null, request.data, otherState);
+
+    if (OPA.isNullishOrWhitespace(dataStorageState.logWriteState.rootLogItemId)) {
+      dataStorageState.logWriteState.rootLogItemId = logItem.id;
+    }
+  } catch (error) {
+    await logFunctionError(dataStorageState, authenticationState, request, error as Error);
+  }
+}
+
+/**
+ * Logs an error that occurred during a server function call in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
+ * @param {OpaDm.IAuthenticationState | null} authenticationState The Firebase Authentication state for the User.
+ * @param {CallableRequest} request The Firebase request object.
+ * @param {Error} error The Error that occurred.
+ * @return {Promise<OpaDm.void>}
+ */
+export async function logFunctionError(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, request: CallableRequest, error: Error): Promise<void> { // eslint-disable-line max-len
+  try {
+    const activityType = OpaDm.ActivityTypes.server_function_error;
+    const requestor = request.rawRequest.ip;
+    const resource = request.rawRequest.originalUrl;
+    const errorState = {hasError: true, name: error.name, message: error.message, stacktrace: error.stack};
+    const otherState = {message: error.message, logWriteState: dataStorageState.logWriteState, errorState: errorState};
+
+    logger.error(error.message, {structuredData: true, activityType, requestor, resource, otherState});
+    await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, requestor, resource, null, request.data, otherState);
+  } catch {
+    // NOTE: Do nothing, as we are here because an error has already pccurred
+  }
+}
+
+/**
+ * Cleans up resources upon completion of a server function call in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
+ * @param {OpaDm.IAuthenticationState | null} authenticationState The Firebase Authentication state for the User.
+ * @param {admin.app.App} app The Firebase admin app used in the call.
+ * @param {CallableRequest} request The Firebase request object.
+ * @return {Promise<OpaDm.void>}
+ */
+export async function cleanUpStateAfterCall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, adminApp: admin.app.App, request: CallableRequest): Promise<void> { // eslint-disable-line max-len
+  try {
+    if (!OPA.isNullish(dataStorageState.currentBulkWriter)) {
+      const currentBulkWriterNonNull = OPA.convertNonNullish(dataStorageState.currentBulkWriter);
+      await currentBulkWriterNonNull.close();
+      dataStorageState.currentBulkWriter = null;
+    }
+    if (!OPA.isNullish(dataStorageState.currentWriteBatch)) {
+      const currentWriteBatchNonNull = OPA.convertNonNullish(dataStorageState.currentWriteBatch);
+      await currentWriteBatchNonNull.commit();
+      dataStorageState.currentWriteBatch = null;
+    }
+    await adminApp.delete();
+
+    if (!OPA.isNullish(dataStorageState.logWriteState.rootLogItemId)) {
+      dataStorageState.logWriteState.rootLogItemId = null;
+    }
+    if (!OPA.isNullish(dataStorageState.logWriteState.externalLogItemId)) {
+      dataStorageState.logWriteState.externalLogItemId = null;
+    }
+    await dataStorageState.db.terminate();
+  } catch (error) {
+    logFunctionError(dataStorageState, authenticationState, request, error as Error);
   }
 }

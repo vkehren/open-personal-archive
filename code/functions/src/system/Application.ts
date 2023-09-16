@@ -8,11 +8,17 @@ import {Application} from "../../../domainlogic/src";
 import * as UTL from "../Utilities";
 
 export const isInstalled = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+  let adminApp = ((null as unknown) as admin.app.App);
+  let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
+  let authenticationState = ((null as unknown) as OpaDm.IAuthenticationState | null);
+
   try {
-    logger.info("isInstalled()", {structuredData: true});
-    const firebaseAdminApp = admin.app();
-    const dataStorageState = await UTL.getDataStorageStateForFirebaseApp(firebaseAdminApp);
-    const authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, firebaseAdminApp);
+    logger.info("isInstalled(...) entry", {structuredData: true});
+    adminApp = admin.app();
+    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp);
+    authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, adminApp);
+
+    await UTL.logFunctionCall(dataStorageState, authenticationState, request, "isInstalled(...) ready");
 
     const firebaseAuthUserId = (!OPA.isNullish(authenticationState)) ? OPA.convertNonNullish(authenticationState).firebaseAuthUserId : null;
     const isUserAuthenticated = (!OPA.isNullishOrWhitespace(firebaseAuthUserId));
@@ -77,31 +83,46 @@ export const isInstalled = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (
 
     return OPA.getSuccessResult(message, data);
   } catch (error) {
+    await UTL.logFunctionError(dataStorageState, authenticationState, request, error as Error);
     return OPA.getFailureResult(error as Error);
+  } finally {
+    await UTL.cleanUpStateAfterCall(dataStorageState, authenticationState, adminApp, request);
   }
 });
 
 export const getInstallationScreenDisplayModel = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+  let adminApp = ((null as unknown) as admin.app.App);
+  let callState = ((null as unknown) as OpaDm.ICallState);
+
   try {
-    logger.info("getInstallationScreenDisplayModel()", {structuredData: true});
-    const firebaseAdminApp = admin.app();
-    const callState = await UTL.getCallStateForFirebaseContextAndApp(request, firebaseAdminApp);
+    logger.info("getInstallationScreenDisplayModel(...) entry", {structuredData: true});
+    adminApp = admin.app();
+    callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp);
+
+    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, request, "getInstallationScreenDisplayModel(...) ready");
 
     const displayModel = await Application.getInstallationScreenDisplayModel(callState);
-
     return OPA.getSuccessResult("", displayModel);
   } catch (error) {
+    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error as Error);
     return OPA.getFailureResult(error as Error);
+  } finally {
+    await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, request);
   }
 });
 
 export const performInstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
-  try {
-    logger.info("performInstall()", {structuredData: true});
-    const firebaseAdminApp = admin.app();
-    const data = request.data;
-    const callState = await UTL.getCallStateForFirebaseContextAndApp(request, firebaseAdminApp);
+  let adminApp = ((null as unknown) as admin.app.App);
+  let callState = ((null as unknown) as OpaDm.ICallState);
 
+  try {
+    logger.info("performInstall(...) entry", {structuredData: true});
+    adminApp = admin.app();
+    callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp);
+
+    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, request, "performInstall(...) ready");
+
+    const data = request.data;
     const archiveName = (data.query.archiveName) ? data.query.archiveName : undefined;
     OPA.assertNonNullishOrWhitespace(archiveName, "The Archive name must not be blank.");
     const archiveDescription = (data.query.archiveDescription) ? data.query.archiveDescription : undefined;
@@ -120,17 +141,25 @@ export const performInstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, asyn
 
     return OPA.getSuccessResult("", installResult);
   } catch (error) {
+    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error as Error);
     return OPA.getFailureResult(error as Error);
+  } finally {
+    await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, request);
   }
 });
 
 export const updateInstallationSettings = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
-  try {
-    logger.info("updateInstallationSettings()", {structuredData: true});
-    const firebaseAdminApp = admin.app();
-    const data = request.data;
-    const callState = await UTL.getCallStateForFirebaseContextAndApp(request, firebaseAdminApp);
+  let adminApp = ((null as unknown) as admin.app.App);
+  let callState = ((null as unknown) as OpaDm.ICallState);
 
+  try {
+    logger.info("updateInstallationSettings(...) entry", {structuredData: true});
+    adminApp = admin.app();
+    callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp);
+
+    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, request, "updateInstallationSettings(...) ready");
+
+    const data = request.data;
     const archiveName = (data.query.archiveName) ? data.query.archiveName : undefined;
     const archiveDescription = (data.query.archiveDescription) ? data.query.archiveDescription : undefined;
     const defaultLocaleId = (data.query.defaultLocaleId) ? data.query.defaultLocaleId : undefined;
@@ -139,41 +168,57 @@ export const updateInstallationSettings = onCall({region: OPA.FIREBASE_DEFAULT_R
     await Application.updateInstallationSettings(callState, archiveName, archiveDescription, defaultLocaleId, defaultTimeZoneGroupId, defaultTimeZoneId);
 
     const displayModel = await Application.getInstallationScreenDisplayModel(callState);
-
     return OPA.getSuccessResult("", displayModel);
   } catch (error) {
+    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error as Error);
     return OPA.getFailureResult(error as Error);
+  } finally {
+    await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, request);
   }
 });
 
 export const performUpgrade = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
-  try {
-    logger.info("performUpgrade()", {structuredData: true});
-    const firebaseAdminApp = admin.app();
-    const data = request.data;
-    const callState = await UTL.getCallStateForFirebaseContextAndApp(request, firebaseAdminApp);
+  let adminApp = ((null as unknown) as admin.app.App);
+  let callState = ((null as unknown) as OpaDm.ICallState);
 
+  try {
+    logger.info("performUpgrade() entry", {structuredData: true});
+    adminApp = admin.app();
+    callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp);
+
+    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, request, "performUpgrade(...) ready");
+
+    const data = request.data;
     const doBackupFirst = OPA.convertNonNullish(OPA.getBoolean(data.query.doBackupFirst, true));
     const upgradeResult = await Application.performUpgrade(callState, doBackupFirst);
-
     return OPA.getSuccessResult("", upgradeResult);
   } catch (error) {
+    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error as Error);
     return OPA.getFailureResult(error as Error);
+  } finally {
+    await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, request);
   }
 });
 
 export const performUninstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
-  try {
-    logger.info("performUninstall()", {structuredData: true});
-    const firebaseAdminApp = admin.app();
-    const data = request.data;
-    const callState = await UTL.getCallStateForFirebaseContextAndApp(request, firebaseAdminApp);
+  let adminApp = ((null as unknown) as admin.app.App);
+  let callState = ((null as unknown) as OpaDm.ICallState);
 
+  try {
+    logger.info("performUninstall() entry", {structuredData: true});
+    adminApp = admin.app();
+    callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp);
+
+    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, request, "performUninstall(...) ready");
+
+    const data = request.data;
     const doBackupFirst = OPA.convertNonNullish(OPA.getBoolean(data.query.doBackupFirst, true));
     const uninstallResult = await Application.performUninstall(callState.dataStorageState, callState.authenticationState, callState.authorizationState, doBackupFirst);
-
     return OPA.getSuccessResult("", uninstallResult);
   } catch (error) {
+    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error as Error);
     return OPA.getFailureResult(error as Error);
+  } finally {
+    await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, request);
   }
 });
