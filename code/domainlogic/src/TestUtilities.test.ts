@@ -44,3 +44,16 @@ export async function performInstallForTest(dataStorageState: OpaDm.IDataStorage
   await dataStorageState.currentWriteBatch.commit();
   dataStorageState.currentWriteBatch = null;
 }
+
+export async function assertUserDoesNotExist(dataStorageState: OpaDm.IDataStorageState, authState: OpaDm.IAuthenticationState): Promise<void> {
+  const firebaseAuthUserId = authState.firebaseAuthUserId;
+  const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(dataStorageState, firebaseAuthUserId);
+  OPA.assertIsNullish(user, "The User was expected to NOT exist.")
+}
+
+export async function assertUserDoesExist(dataStorageState: OpaDm.IDataStorageState, authState: OpaDm.IAuthenticationState): Promise<OpaDm.IUser> {
+  const firebaseAuthUserId = authState.firebaseAuthUserId;
+  const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(dataStorageState, firebaseAuthUserId);
+  OPA.assertNonNullish(user, "The User was expected to exist.")
+  return OPA.convertNonNullish(user);
+}

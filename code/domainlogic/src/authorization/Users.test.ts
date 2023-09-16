@@ -66,8 +66,8 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
   const testFunc1 = () => (async () => {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
-    let user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
-    expect(user).equals(null);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, TestAuthData.owner);
 
     // NOTE: Construct the CallState directly because calling the utility function to do so will fail
     const callState: OpaDm.ICallState = {
@@ -79,23 +79,23 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     await expect(Users.initializeUserAccount(callState, config.authenticationState.providerId, config.authenticationState.email)).to.eventually.be.rejectedWith(Error);
     callState.dataStorageState.currentWriteBatch = null; // NOTE: This should be done in the outer try-catch-finally of the calling Firebase function
-    user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
-    expect(user).equals(null);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, TestAuthData.owner);
   });
   test("checks that initializeUserAccount(...) fails when System is not installed", testFunc1());
 
   const testFunc2 = (functionType: TestUtils.TestFunctionType) => (async () => {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
-    let user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
-    expect(user).equals(null);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, TestAuthData.owner);
 
     await TestUtils.performInstallForTest(config.dataStorageState, config.authenticationState);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
-    user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
-    expect(user).not.equals(null);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.owner);
 
     const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(config.dataStorageState, config.authenticationState.providerId);
     expect(authProvider).not.equals(null);
@@ -103,18 +103,20 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     // NOTE: Do NOT set the test AuthenticationState to a User other than the Archive Owner
     let callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
-    expect(user).not.equals(null);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.owner);
 
     await expect(Users.initializeUserAccount(callState, config.authenticationState.providerId, config.authenticationState.email)).to.eventually.be.rejectedWith(Error);
     callState.dataStorageState.currentWriteBatch = null; // NOTE: This should be done in the outer try-catch-finally of the calling Firebase function
-    user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
-    expect(user).not.equals(null);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.owner);
 
     // NOTE: Since the Test User is also the Owner, record that fact
     TestAuthData.testUser = TestAuthData.owner;
+    let user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     let userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.owner.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.owner.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.owner.email);
@@ -157,10 +159,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     let userUpdateObject = ({firstName: firstName_Updated} as OpaDm.IUserPartial);
     if (functionType == "logic") {await Users.updateUserProfile(callState, userUpdateObject);}
     else {await OpaDb.Users.queries.update(config.dataStorageState, testUserId(), userUpdateObject, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.owner.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.owner.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.owner.email);
@@ -202,10 +204,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     userUpdateObject = ({lastName: lastName_Updated} as OpaDm.IUserPartial);
     if (functionType == "logic") {await Users.updateUserProfile(callState, userUpdateObject);}
     else {await OpaDb.Users.queries.update(config.dataStorageState, testUserId(), userUpdateObject, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.owner.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.owner.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.owner.email);
@@ -247,10 +249,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
     if (functionType == "logic") {await Users.updateUserProfile(callState, userUpdateObject);}
     else {await OpaDb.Users.queries.update(config.dataStorageState, testUserId(), userUpdateObject, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.owner.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.owner.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.owner.email);
@@ -292,10 +294,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
     if (functionType == "logic") {await Users.updateUserProfile(callState, userUpdateObject);}
     else {await OpaDb.Users.queries.update(config.dataStorageState, testUserId(), userUpdateObject, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.owner.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.owner.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.owner.email);
@@ -337,10 +339,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
     if (functionType == "logic") {await Users.updateUserProfile(callState, userUpdateObject);}
     else {await OpaDb.Users.queries.update(config.dataStorageState, testUserId(), userUpdateObject, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.owner.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.owner.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.owner.email);
@@ -382,10 +384,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
     if (functionType == "logic") {await Users.updateUserProfile(callState, userUpdateObject);}
     else {await OpaDb.Users.queries.update(config.dataStorageState, testUserId(), userUpdateObject, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.owner.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.owner.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.owner.email);
@@ -427,10 +429,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     const roleToAssignNonNull = OPA.convertNonNullish(roleToAssign);
     if (functionType == "logic") {await expect(Users.assignUserToRole(callState, testUserId(), roleToAssignNonNull.id)).to.eventually.be.rejectedWith(Error);}
     else {await expect(OpaDb.Users.queries.assignToRole(config.dataStorageState, testUserId(), roleToAssignNonNull, ambientUserId())).to.eventually.be.rejectedWith(Error);}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.owner.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.owner.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.owner.email);
@@ -470,10 +472,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await expect(Users.setUserToViewed(callState, testUserId())).to.eventually.be.rejectedWith(Error);}
     else {await expect(OpaDb.Users.queries.setToViewed(config.dataStorageState, testUserId(), ambientUserId())).to.eventually.be.rejectedWith(Error);}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.owner.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.owner.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.owner.email);
@@ -513,10 +515,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await expect(Users.setUserToApprovalState(callState, testUserId(), OpaDm.ApprovalStates.denied)).to.eventually.be.rejectedWith(Error);}
     else {await expect(OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, testUserId(), OpaDm.ApprovalStates.denied, ambientUserId())).to.eventually.be.rejectedWith(Error);}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.owner.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.owner.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.owner.email);
@@ -556,10 +558,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await expect(Users.setUserToApprovalState(callState, testUserId(), OpaDm.ApprovalStates.approved)).to.eventually.be.rejectedWith(Error);}
     else {await expect(OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, testUserId(), OpaDm.ApprovalStates.approved, ambientUserId())).to.eventually.be.rejectedWith(Error);}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.owner.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.owner.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.owner.email);
@@ -599,10 +601,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await expect(Users.setUserToSuspended(callState, testUserId(), testStartReason)).to.eventually.be.rejectedWith(Error);}
     else {await expect(OpaDb.Users.queries.setToSuspended(config.dataStorageState, testUserId(), testStartReason, ambientUserId())).to.eventually.be.rejectedWith(Error);}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.owner.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.owner.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.owner.email);
@@ -642,10 +644,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await expect(Users.setUserToUnSuspended(callState, testUserId(), testEndReason)).to.eventually.be.rejectedWith(Error);}
     else {await expect(OpaDb.Users.queries.setToUnSuspended(config.dataStorageState, testUserId(), testEndReason, ambientUserId())).to.eventually.be.rejectedWith(Error);}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.owner.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.owner.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.owner.email);
@@ -685,10 +687,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await expect(Users.markUserAsDeleted(callState, testUserId())).to.eventually.be.rejectedWith(Error);}
     else {await expect(OpaDb.Users.queries.markAsDeleted(config.dataStorageState, testUserId(), ambientUserId())).to.eventually.be.rejectedWith(Error);}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.owner.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.owner.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.owner.email);
@@ -728,10 +730,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await expect(Users.markUserAsDeleted(callState, testUserId())).to.eventually.be.rejectedWith(Error);}
     else {await expect(OpaDb.Users.queries.markAsDeleted(config.dataStorageState, testUserId(), ambientUserId())).to.eventually.be.rejectedWith(Error);}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.owner.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.owner.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.owner.email);
@@ -773,15 +775,15 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
   const testFunc3 = (functionType: TestUtils.TestFunctionType) => (async () => {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
-    let user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
-    expect(user).equals(null);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, TestAuthData.owner);
 
     await TestUtils.performInstallForTest(config.dataStorageState, config.authenticationState);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
-    user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
-    expect(user).not.equals(null);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.owner);
 
     const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(config.dataStorageState, config.authenticationState.providerId);
     expect(authProvider).not.equals(null);
@@ -789,22 +791,22 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     // NOTE: Set the ambient AuthenticationState to a User other than the Archive Owner
     config.authenticationState = TestAuthData.testUser;
-    user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
-    expect(user).equals(null);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, TestAuthData.testUser);
 
     let callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
-    expect(user).equals(null);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, TestAuthData.testUser);
 
-    user = await Users.initializeUserAccount(callState, config.authenticationState.providerId, config.authenticationState.email);
-    expect(user).not.equals(null);
-    user = await OpaDb.Users.queries.getByFirebaseAuthUserId(config.dataStorageState, config.authenticationState.firebaseAuthUserId);
-    expect(user).not.equals(null);
+    await Users.initializeUserAccount(callState, config.authenticationState.providerId, config.authenticationState.email);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
+    let user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     // NOTE: Since the TestUser is newly created, record the userId
-    TestAuthData.testUser.opaUserId = OPA.convertNonNullish(user).id;
+    TestAuthData.testUser.opaUserId = user.id;
 
     let userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -849,10 +851,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await Users.setUserToViewed(callState, testUserId());}
     else {await OpaDb.Users.queries.setToViewed(config.dataStorageState, testUserId(), ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -896,10 +898,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await Users.setUserToApprovalState(callState, testUserId(), OpaDm.ApprovalStates.denied);}
     else {await OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, testUserId(), OpaDm.ApprovalStates.denied, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -943,10 +945,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await Users.setUserToApprovalState(callState, testUserId(), OpaDm.ApprovalStates.approved);}
     else {await OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, testUserId(), OpaDm.ApprovalStates.approved, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -992,10 +994,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     let userUpdateObject = ({firstName: firstName_Updated} as OpaDm.IUserPartial);
     if (functionType == "logic") {await Users.updateUserProfile(callState, userUpdateObject);}
     else {await OpaDb.Users.queries.update(config.dataStorageState, testUserId(), userUpdateObject, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -1041,10 +1043,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     userUpdateObject = ({lastName: lastName_Updated} as OpaDm.IUserPartial);
     if (functionType == "logic") {await Users.updateUserProfile(callState, userUpdateObject);}
     else {await OpaDb.Users.queries.update(config.dataStorageState, testUserId(), userUpdateObject, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -1090,10 +1092,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
     if (functionType == "logic") {await Users.updateUserProfile(callState, userUpdateObject);}
     else {await OpaDb.Users.queries.update(config.dataStorageState, testUserId(), userUpdateObject, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -1139,10 +1141,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
     if (functionType == "logic") {await Users.updateUserProfile(callState, userUpdateObject);}
     else {await OpaDb.Users.queries.update(config.dataStorageState, testUserId(), userUpdateObject, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -1188,10 +1190,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
     if (functionType == "logic") {await Users.updateUserProfile(callState, userUpdateObject);}
     else {await OpaDb.Users.queries.update(config.dataStorageState, testUserId(), userUpdateObject, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -1237,10 +1239,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     userUpdateObject = ({recentQueries: recentQueries_Updated} as OpaDm.IUserPartial);
     if (functionType == "logic") {await Users.updateUserProfile(callState, userUpdateObject);}
     else {await OpaDb.Users.queries.update(config.dataStorageState, testUserId(), userUpdateObject, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -1287,10 +1289,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     OPA.assertIsFalse(OpaDm.DefaultRoleId == roleToAssignNonNull.id);
     if (functionType == "logic") {await expect(Users.assignUserToRole(callState, testUserId(), roleToAssignNonNull.id)).to.eventually.be.rejectedWith(Error);}
     else {await expect(OpaDb.Users.queries.assignToRole(config.dataStorageState, testUserId(), roleToAssignNonNull, ambientUserId())).to.eventually.be.rejectedWith(Error);}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -1334,10 +1336,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await Users.assignUserToRole(callState, testUserId(), roleToAssignNonNull.id);}
     else {await OpaDb.Users.queries.assignToRole(config.dataStorageState, testUserId(), roleToAssignNonNull, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -1386,10 +1388,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await Users.addRequestedCitationToUser(callState, testUserId(), testCitationId1);}
     else {await OpaDb.Users.queries.addRequestedCitation(config.dataStorageState, testUserId(), testCitationId1, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -1438,10 +1440,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await Users.addRequestedCitationToUser(callState, testUserId(), testCitationId2);}
     else {await OpaDb.Users.queries.addRequestedCitation(config.dataStorageState, testUserId(), testCitationId2, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -1490,10 +1492,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await Users.addViewableCitationToUser(callState, testUserId(), testCitationId1);}
     else {await OpaDb.Users.queries.addViewableCitation(config.dataStorageState, testUserId(), testCitationId1, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -1542,10 +1544,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await Users.addViewableCitationToUser(callState, testUserId(), testCitationId2);}
     else {await OpaDb.Users.queries.addViewableCitation(config.dataStorageState, testUserId(), testCitationId2, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -1589,10 +1591,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await expect(Users.setUserToSuspended(callState, testUserId(), testStartReason)).to.eventually.be.rejectedWith(Error);}
     else {await expect(OpaDb.Users.queries.setToSuspended(config.dataStorageState, testUserId(), testStartReason, ambientUserId())).to.eventually.be.rejectedWith(Error);}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -1636,10 +1638,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await Users.setUserToSuspended(callState, testUserId(), testStartReason);}
     else {await OpaDb.Users.queries.setToSuspended(config.dataStorageState, testUserId(), testStartReason, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -1683,10 +1685,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await expect(Users.setUserToSuspended(callState, testUserId(), testStartReason)).to.eventually.be.rejectedWith(Error);}
     else {await expect(OpaDb.Users.queries.setToSuspended(config.dataStorageState, testUserId(), testStartReason, ambientUserId())).to.eventually.be.rejectedWith(Error);}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -1730,10 +1732,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await expect(Users.setUserToUnSuspended(callState, testUserId(), testEndReason)).to.eventually.be.rejectedWith(Error);}
     else {await expect(OpaDb.Users.queries.setToUnSuspended(config.dataStorageState, testUserId(), testEndReason, ambientUserId())).to.eventually.be.rejectedWith(Error);}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -1777,10 +1779,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await Users.setUserToUnSuspended(callState, testUserId(), testEndReason);}
     else {await OpaDb.Users.queries.setToUnSuspended(config.dataStorageState, testUserId(), testEndReason, ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -1824,10 +1826,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await expect(Users.setUserToUnSuspended(callState, testUserId(), testEndReason)).to.eventually.be.rejectedWith(Error);}
     else {await expect(OpaDb.Users.queries.setToUnSuspended(config.dataStorageState, testUserId(), testEndReason, ambientUserId())).to.eventually.be.rejectedWith(Error);}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -1871,10 +1873,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await expect(Users.markUserAsDeleted(callState, testUserId())).to.eventually.be.rejectedWith(Error);}
     else {await expect(OpaDb.Users.queries.markAsDeleted(config.dataStorageState, testUserId(), ambientUserId())).to.eventually.be.rejectedWith(Error);}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
@@ -1918,10 +1920,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await Users.markUserAsDeleted(callState, testUserId());}
     else {await OpaDb.Users.queries.markAsDeleted(config.dataStorageState, testUserId(), ambientUserId());}
-    user = await OpaDb.Users.queries.getById(config.dataStorageState, testUserId());
-    expect(user).not.equals(null);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     userNonNull = OPA.convertNonNullish(user);
+    expect(userNonNull.id).equals(TestAuthData.testUser.opaUserId);
     expect(userNonNull.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
     expect(userNonNull.authProviderId).equals(authProviderNonNull.id);
     expect(userNonNull.authAccountName).equals(TestAuthData.testUser.email);
