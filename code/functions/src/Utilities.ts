@@ -165,6 +165,25 @@ export function getFirebaseProjectUsesEmulators(): boolean {
   }
 }
 
+export type ExecutionState = "entry" | "ready" | "complete";
+export const ExecutionStates = {
+  entry: ("entry" as ExecutionState),
+  ready: ("ready" as ExecutionState),
+  complete: ("complete" as ExecutionState),
+};
+
+/**
+ * Gets the log message for the function call in the Open Personal Archive™ (OPA) system.
+ * @param {string} moduleName The module name.
+ * @param {string} functionName The function name.
+ * @param {ExecutionState} executionState The execution state.
+ * @return {Promise<OpaDm.void>}
+ */
+export function getFunctionCallLogMessage(moduleName: string, functionName: string, executionState: ExecutionState): string { // eslint-disable-line max-len
+  const message = (moduleName + " -> " + functionName + "() : " + executionState.toUpperCase());
+  return message;
+}
+
 /**
  * Sets the external log state for the call in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.

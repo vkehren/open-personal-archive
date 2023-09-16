@@ -6,17 +6,21 @@ import * as OpaDm from "../../../datamodel/src";
 import {AccessRequests} from "../../../domainlogic/src";
 import * as UTL from "../Utilities";
 
+const moduleName = module.filename.split(".")[0];
+
+const requestUserAccess_FunctionName = () => (OPA.getTypedPropertyKeyAsText("requestUserAccess", {requestUserAccess}));
 export const requestUserAccess = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   let adminApp = ((null as unknown) as admin.app.App);
   let callState = ((null as unknown) as OpaDm.ICallState);
+  const getLogMessage = (state: UTL.ExecutionState) => UTL.getFunctionCallLogMessage(moduleName, requestUserAccess_FunctionName(), state);
 
   try {
-    logger.info("requestUserAccess(...) entry", {structuredData: true});
+    logger.info(getLogMessage(UTL.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
     callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp);
 
     await UTL.setExternalLogState(callState.dataStorageState, request);
-    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, request, "requestUserAccess(...) ready");
+    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, request, getLogMessage(UTL.ExecutionStates.ready));
 
     const data = request.data;
     const message = (data.query.message) ? data.query.message : undefined;
