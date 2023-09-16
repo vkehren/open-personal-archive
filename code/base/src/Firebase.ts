@@ -18,6 +18,11 @@ export interface IFirebaseConstructorProvider {
   writeBatch: () => firestore.WriteBatch;
 }
 
+export interface ILogWriteState {
+  rootLogItemId: string | null;
+  externalLogItemId: string | null;
+}
+
 export interface IDataStorageState {
   appName: string;
   projectId: string;
@@ -26,8 +31,7 @@ export interface IDataStorageState {
   db: firestore.Firestore;
   // LATER: Add storage;
   constructorProvider: IFirebaseConstructorProvider;
-  rootLogItemId: string | null;
-  externalLogItemId: string | null;
+  logWriteState: ILogWriteState;
   currentBulkWriter: firestore.BulkWriter | null;
   currentWriteBatch: firestore.WriteBatch | null;
 }

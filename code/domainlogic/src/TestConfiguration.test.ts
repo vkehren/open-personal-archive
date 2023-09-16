@@ -68,8 +68,10 @@ export function getTestConfiguration(): ITestConfiguration {
       },
       writeBatch: () => (dataStorageState.db.batch()),
     },
-    rootLogItemId: (null as string | null),
-    externalLogItemId: (null as string | null),
+    logWriteState: {
+      rootLogItemId: (null as string | null),
+      externalLogItemId: (null as string | null),
+    },
     currentBulkWriter: (null as firestore.BulkWriter | null),
     currentWriteBatch: (null as firestore.WriteBatch | null),
   };

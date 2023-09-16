@@ -114,7 +114,8 @@ export class ActivityLogItemQuerySet extends OPA.QuerySet<IActivityLogItem> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc();
     const documentId = documentRef.id;
-    const document = createInstance(documentId, ds.rootLogItemId, ds.externalLogItemId, activityType, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState);
+    const logState = ds.logWriteState;
+    const document = createInstance(documentId, logState.rootLogItemId, logState.externalLogItemId, activityType, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState);
     const proxiedDocument = this.documentProxyConstructor(document);
 
     // NOTE: An ActivityLogItem should NOT be updateable
