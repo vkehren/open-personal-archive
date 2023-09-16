@@ -157,13 +157,12 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
-    const userNonNull = OPA.convertNonNullish(user);
     const hasCitationId = (!OPA.isNullish(testCitationId));
     if (!hasCitationId) {
-      expect(userNonNull.requestedCitationIds.length).equals(0);
+      expect(user.requestedCitationIds.length).equals(0);
     } else {
-      expect(userNonNull.requestedCitationIds.length).equals(1);
-      expect(userNonNull.requestedCitationIds[0]).equals(testCitationId);
+      expect(user.requestedCitationIds.length).equals(1);
+      expect(user.requestedCitationIds[0]).equals(testCitationId);
     }
 
     let accessRequestNonNull = OPA.convertNonNullish(accessRequest);
