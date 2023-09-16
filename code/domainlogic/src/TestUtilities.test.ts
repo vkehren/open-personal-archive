@@ -57,3 +57,9 @@ export async function assertUserDoesExist(dataStorageState: OpaDm.IDataStorageSt
   OPA.assertNonNullish(user, "The User was expected to exist.")
   return OPA.convertNonNullish(user);
 }
+
+export async function assertAccessRequestDoesExist(dataStorageState: OpaDm.IDataStorageState, accessRequestId: string): Promise<OpaDm.IAccessRequest> {
+  const accessRequest = await OpaDb.AccessRequests.queries.getById(dataStorageState, accessRequestId);
+  OPA.assertNonNullish(accessRequest, "The AccessRequest was expected to exist.")
+  return OPA.convertNonNullish(accessRequest);
+}

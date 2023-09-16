@@ -148,11 +148,10 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
 
-    let accessRequest: OpaDm.IAccessRequest | null = null;
-    accessRequest = await AccessRequests.requestUserAccess(callState, testMessage, testCitationId);
-    expect(accessRequest).not.equals(null);
-    accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState, accessRequest.id);
-    expect(accessRequest).not.equals(null);
+    const accessRequestNullable = await AccessRequests.requestUserAccess(callState, testMessage, testCitationId);
+    expect(accessRequestNullable).not.equals(null);
+    const accessRequestId = OPA.convertNonNullish(accessRequestNullable).id;
+    let accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
@@ -166,7 +165,6 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     }
 
     let accessRequestNonNull = OPA.convertNonNullish(accessRequest);
-    const accessRequestId = accessRequestNonNull.id;
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
     expect(accessRequestNonNull.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequestNonNull.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
@@ -196,8 +194,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     config.authenticationState = TestAuthData.owner;
     await OpaDb.AccessRequests.queries.setTags(config.dataStorageState, accessRequestId, ["a", "b", "c"], ambientUserId());
-    accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState, accessRequestId);
-    expect(accessRequestNonNull).not.equals(null);
+    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
@@ -228,8 +225,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     config.authenticationState = TestAuthData.owner;
     await OpaDb.AccessRequests.queries.setToViewed(config.dataStorageState, accessRequestId, ambientUserId());
-    accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState, accessRequestId);
-    expect(accessRequestNonNull).not.equals(null);
+    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
@@ -261,8 +257,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     config.authenticationState = TestAuthData.testUser;
     // NOTE: Set to Viewed by User who created AccessRequest so that "userIdOfLatestViewer" changes to value other than "ownerId()" for next step
     await OpaDb.AccessRequests.queries.setToViewed(config.dataStorageState, accessRequestId, ambientUserId());
-    accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState, accessRequestId);
-    expect(accessRequestNonNull).not.equals(null);
+    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
@@ -294,8 +289,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     config.authenticationState = TestAuthData.owner;
     let accessRequestUpdateObject = ({response: OpaDm.localizableStringConstructor(OpaDm.DefaultLocale, testResponse)} as OpaDm.IAccessRequestPartial);
     await OpaDb.AccessRequests.queries.update(config.dataStorageState, accessRequestId, accessRequestUpdateObject, ambientUserId());
-    accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState, accessRequestId);
-    expect(accessRequestNonNull).not.equals(null);
+    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
@@ -328,8 +322,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     const testResponse_Updated = (testResponse + " UPDATED");
     accessRequestUpdateObject = ({response: OpaDm.localizableStringConstructor(OpaDm.DefaultLocale, testResponse_Updated)} as OpaDm.IAccessRequestPartial);
     await OpaDb.AccessRequests.queries.update(config.dataStorageState, accessRequestId, accessRequestUpdateObject, ambientUserId());
-    accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState, accessRequestId);
-    expect(accessRequestNonNull).not.equals(null);
+    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
@@ -362,8 +355,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     const testMessage_Updated = (testMessage + " UPDATED");
     accessRequestUpdateObject = ({message: OpaDm.localizableStringConstructor(OpaDm.DefaultLocale, testMessage_Updated)} as OpaDm.IAccessRequestPartial);
     await OpaDb.AccessRequests.queries.update(config.dataStorageState, accessRequestId, accessRequestUpdateObject, ambientUserId());
-    accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState, accessRequestId);
-    expect(accessRequestNonNull).not.equals(null);
+    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
@@ -394,8 +386,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     config.authenticationState = TestAuthData.testUser;
     await OpaDb.AccessRequests.queries.setToArchivalOption(config.dataStorageState, accessRequestId, true, ambientUserId());
-    accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState, accessRequestId);
-    expect(accessRequestNonNull).not.equals(null);
+    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
@@ -426,8 +417,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     config.authenticationState = TestAuthData.owner;
     await OpaDb.AccessRequests.queries.setToArchivalOption(config.dataStorageState, accessRequestId, false, ambientUserId());
-    accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState, accessRequestId);
-    expect(accessRequestNonNull).not.equals(null);
+    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
@@ -458,8 +448,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     config.authenticationState = TestAuthData.owner;
     await OpaDb.AccessRequests.queries.setToDecidedOption(config.dataStorageState, accessRequestId, OpaDm.ApprovalStates.denied, ambientUserId());
-    accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState, accessRequestId);
-    expect(accessRequest).not.equals(null);
+    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
@@ -490,8 +479,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     config.authenticationState = TestAuthData.owner;
     await OpaDb.AccessRequests.queries.setToDecidedOption(config.dataStorageState, accessRequestId, OpaDm.ApprovalStates.approved, ambientUserId());
-    accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState, accessRequestId);
-    expect(accessRequest).not.equals(null);
+    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
@@ -522,8 +510,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     config.authenticationState = TestAuthData.owner;
     await expect(OpaDb.AccessRequests.queries.markAsDeleted(config.dataStorageState, accessRequestId, ambientUserId())).to.eventually.be.rejectedWith(Error);
-    accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState, accessRequestId);
-    expect(accessRequest).not.equals(null);
+    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
@@ -554,8 +541,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
 
     config.authenticationState = TestAuthData.testUser;
     await OpaDb.AccessRequests.queries.markAsDeleted(config.dataStorageState, accessRequestId, ambientUserId());
-    accessRequest = await OpaDb.AccessRequests.queries.getById(config.dataStorageState, accessRequestId);
-    expect(accessRequest).not.equals(null);
+    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     accessRequestNonNull = OPA.convertNonNullish(accessRequest);
     expect(accessRequestNonNull.archiveId).equals(OpaDm.ArchiveId);
