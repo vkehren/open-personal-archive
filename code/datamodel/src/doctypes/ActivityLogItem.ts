@@ -122,9 +122,10 @@ export class ActivityLogItemQuerySet extends OPA.QuerySet<IActivityLogItem> {
     OPA.assertNonNullish(proxiedDocument);
     OPA.assertIsTrue(proxiedDocument.id == documentId);
 
-    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
+    // NOTE: Logging should always occur on its own write batch that is immediately committed
+    const batchUpdate = ds.constructorProvider.writeBatch();
     batchUpdate.set(documentRef, proxiedDocument, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    await batchUpdate.commit();
     return documentId;
   }
 }
