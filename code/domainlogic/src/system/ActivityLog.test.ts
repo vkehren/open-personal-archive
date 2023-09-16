@@ -109,6 +109,9 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(webLogItem0.resourceCanonical).equals(resource0);
     expect(webLogItem0.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(webLogItem0.userId).equals(userId);
+    expect(webLogItem0.rootLogItemId).equals(webLogItem0.id);
+    expect(webLogItem0.externalLogItemId).equals(null);
+    config.dataStorageState.externalLogItemId = webLogItem0.id;
     const serverLogItem0 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, localhost, resource0, null, {}, null);
     expect(serverLogItem0).not.equals(null);
     expect(serverLogItem0.id).not.equals(null);
@@ -118,6 +121,22 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(serverLogItem0.resourceCanonical).equals(resource0);
     expect(serverLogItem0.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(serverLogItem0.userId).equals(userId);
+    expect(serverLogItem0.rootLogItemId).equals(serverLogItem0.id);
+    expect(serverLogItem0.externalLogItemId).equals(webLogItem0.id);
+    config.dataStorageState.rootLogItemId = serverLogItem0.id;
+    const serverLogItem0_Error = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_error, localhost, resource0, null, {}, null);
+    expect(serverLogItem0_Error).not.equals(null);
+    expect(serverLogItem0_Error.id).not.equals(null);
+    expect(serverLogItem0_Error.activityType).equals(OpaDm.ActivityTypes.server_function_error);
+    expect(serverLogItem0_Error.requestor).equals(localhost);
+    expect(serverLogItem0_Error.resource).equals(resource0);
+    expect(serverLogItem0_Error.resourceCanonical).equals(resource0);
+    expect(serverLogItem0_Error.firebaseAuthUserId).equals(firebaseAuthUserId);
+    expect(serverLogItem0_Error.userId).equals(userId);
+    expect(serverLogItem0_Error.rootLogItemId).equals(serverLogItem0.id);
+    expect(serverLogItem0_Error.externalLogItemId).equals(webLogItem0.id);
+    config.dataStorageState.rootLogItemId = null;
+    config.dataStorageState.externalLogItemId = null;
 
     const resource1 = "https://somedomainname.com";
     const resourceCanonical1 = "https://somedomainname.com/index.html";
@@ -279,6 +298,9 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(webLogItem0.resourceCanonical).equals(resource0);
     expect(webLogItem0.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(webLogItem0.userId).equals(userId);
+    expect(webLogItem0.rootLogItemId).equals(webLogItem0.id);
+    expect(webLogItem0.externalLogItemId).equals(null);
+    config.dataStorageState.externalLogItemId = webLogItem0.id;
     const serverLogItem0 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, localhost, resource0, null, {}, null);
     expect(serverLogItem0).not.equals(null);
     expect(serverLogItem0.id).not.equals(null);
@@ -288,6 +310,22 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(serverLogItem0.resourceCanonical).equals(resource0);
     expect(serverLogItem0.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(serverLogItem0.userId).equals(userId);
+    expect(serverLogItem0.rootLogItemId).equals(serverLogItem0.id);
+    expect(serverLogItem0.externalLogItemId).equals(webLogItem0.id);
+    config.dataStorageState.rootLogItemId = serverLogItem0.id;
+    const serverLogItem0_Error = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_error, localhost, resource0, null, {}, null);
+    expect(serverLogItem0_Error).not.equals(null);
+    expect(serverLogItem0_Error.id).not.equals(null);
+    expect(serverLogItem0_Error.activityType).equals(OpaDm.ActivityTypes.server_function_error);
+    expect(serverLogItem0_Error.requestor).equals(localhost);
+    expect(serverLogItem0_Error.resource).equals(resource0);
+    expect(serverLogItem0_Error.resourceCanonical).equals(resource0);
+    expect(serverLogItem0_Error.firebaseAuthUserId).equals(firebaseAuthUserId);
+    expect(serverLogItem0_Error.userId).equals(userId);
+    expect(serverLogItem0_Error.rootLogItemId).equals(serverLogItem0.id);
+    expect(serverLogItem0_Error.externalLogItemId).equals(webLogItem0.id);
+    config.dataStorageState.rootLogItemId = null;
+    config.dataStorageState.externalLogItemId = null;
 
     const resource1 = "https://somedomainname.com";
     const resourceCanonical1 = "https://somedomainname.com/index.html";
@@ -461,6 +499,9 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(webLogItem0.resourceCanonical).equals(resource0);
     expect(webLogItem0.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(webLogItem0.userId).equals(userId);
+    expect(webLogItem0.rootLogItemId).equals(webLogItem0.id);
+    expect(webLogItem0.externalLogItemId).equals(null);
+    config.dataStorageState.externalLogItemId = webLogItem0.id;
     const serverLogItem0 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, localhost, resource0, null, {}, null);
     expect(serverLogItem0).not.equals(null);
     expect(serverLogItem0.id).not.equals(null);
@@ -470,6 +511,22 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(serverLogItem0.resourceCanonical).equals(resource0);
     expect(serverLogItem0.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(serverLogItem0.userId).equals(userId);
+    expect(serverLogItem0.rootLogItemId).equals(serverLogItem0.id);
+    expect(serverLogItem0.externalLogItemId).equals(webLogItem0.id);
+    config.dataStorageState.rootLogItemId = serverLogItem0.id;
+    const serverLogItem0_Error = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_error, localhost, resource0, null, {}, null);
+    expect(serverLogItem0_Error).not.equals(null);
+    expect(serverLogItem0_Error.id).not.equals(null);
+    expect(serverLogItem0_Error.activityType).equals(OpaDm.ActivityTypes.server_function_error);
+    expect(serverLogItem0_Error.requestor).equals(localhost);
+    expect(serverLogItem0_Error.resource).equals(resource0);
+    expect(serverLogItem0_Error.resourceCanonical).equals(resource0);
+    expect(serverLogItem0_Error.firebaseAuthUserId).equals(firebaseAuthUserId);
+    expect(serverLogItem0_Error.userId).equals(userId);
+    expect(serverLogItem0_Error.rootLogItemId).equals(serverLogItem0.id);
+    expect(serverLogItem0_Error.externalLogItemId).equals(webLogItem0.id);
+    config.dataStorageState.rootLogItemId = null;
+    config.dataStorageState.externalLogItemId = null;
 
     const resource1 = "https://somedomainname.com";
     const resourceCanonical1 = "https://somedomainname.com/index.html";

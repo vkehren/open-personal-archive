@@ -7,6 +7,8 @@ const IsSingleton = false;
 const DefaultActionName = "(default)";
 
 export interface IActivityLogItem extends OPA.IDocument_Creatable {
+  readonly rootLogItemId: string;
+  readonly externalLogItemId: string | null;
   readonly activityType: BT.ActivityType;
   readonly requestor: string;
   readonly resource: string;
@@ -36,6 +38,8 @@ export function areUpdatesValid(document: IActivityLogItem, updateObject: IActiv
 /**
  * Creates an instance of the IActivityLogItem document type.
  * @param {string} id The ID for the ActivityLogItem within the OPA system.
+ * @param {string | null} rootLogItemId The ID of the root ActivityLogItem for the current call.
+ * @param {string | null} externalLogItemId The ID of the external ActivityLogItem of the requestor of the current call.
  * @param {BT.ActivityType} activityType The type of the ActivityLogItem.
  * @param {string} requestor The URI of the requestor.
  * @param {string} resource The URI of the resource being requested.
@@ -47,7 +51,7 @@ export function areUpdatesValid(document: IActivityLogItem, updateObject: IActiv
  * @param {any | null} otherState Any other state for the request.
  * @return {IActivityLogItem} The new document instance.
  */
-function createInstance(id: string, activityType: BT.ActivityType, requestor: string, resource: string, resourceCanonical: string | null, action: string | null, data: any, firebaseAuthUserId: string | null = null, userId: string | null = null, otherState: any | null = null): IActivityLogItem { // eslint-disable-line max-len
+function createInstance(id: string, rootLogItemId: string | null, externalLogItemId: string | null, activityType: BT.ActivityType, requestor: string, resource: string, resourceCanonical: string | null, action: string | null, data: any, firebaseAuthUserId: string | null = null, userId: string | null = null, otherState: any | null = null): IActivityLogItem { // eslint-disable-line max-len
   if ((activityType == "browser_page_action") && OPA.isNullishOrWhitespace(action)) {
     throw new Error("The action name must be specified when logging web page actions.")
   }
@@ -55,6 +59,8 @@ function createInstance(id: string, activityType: BT.ActivityType, requestor: st
   const now = OPA.nowToUse();
   const document: IActivityLogItem = {
     id: id,
+    rootLogItemId: (!OPA.isNullishOrWhitespace(rootLogItemId)) ? OPA.convertNonNullish(rootLogItemId) : id,
+    externalLogItemId: externalLogItemId,
     activityType: activityType,
     requestor: requestor,
     resource: resource,
@@ -108,7 +114,7 @@ export class ActivityLogItemQuerySet extends OPA.QuerySet<IActivityLogItem> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc();
     const documentId = documentRef.id;
-    const document = createInstance(documentId, activityType, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState);
+    const document = createInstance(documentId, ds.rootLogItemId, ds.externalLogItemId, activityType, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState);
     const proxiedDocument = this.documentProxyConstructor(document);
 
     // NOTE: An ActivityLogItem should NOT be updateable

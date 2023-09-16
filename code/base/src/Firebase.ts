@@ -26,6 +26,8 @@ export interface IDataStorageState {
   db: firestore.Firestore;
   // LATER: Add storage;
   constructorProvider: IFirebaseConstructorProvider;
+  rootLogItemId: string | null;
+  externalLogItemId: string | null;
   currentBulkWriter: firestore.BulkWriter | null;
   currentWriteBatch: firestore.WriteBatch | null;
 }
