@@ -18,6 +18,7 @@ export const isInstalled = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (
     dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp);
     authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, adminApp);
 
+    await UTL.setExternalLogState(dataStorageState, request);
     await UTL.logFunctionCall(dataStorageState, authenticationState, request, "isInstalled(...) ready");
 
     const firebaseAuthUserId = (!OPA.isNullish(authenticationState)) ? OPA.convertNonNullish(authenticationState).firebaseAuthUserId : null;
@@ -99,6 +100,7 @@ export const getInstallationScreenDisplayModel = onCall({region: OPA.FIREBASE_DE
     adminApp = admin.app();
     callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp);
 
+    await UTL.setExternalLogState(callState.dataStorageState, request);
     await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, request, "getInstallationScreenDisplayModel(...) ready");
 
     const displayModel = await Application.getInstallationScreenDisplayModel(callState);
@@ -120,6 +122,7 @@ export const performInstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, asyn
     adminApp = admin.app();
     callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp);
 
+    await UTL.setExternalLogState(callState.dataStorageState, request);
     await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, request, "performInstall(...) ready");
 
     const data = request.data;
@@ -157,6 +160,7 @@ export const updateInstallationSettings = onCall({region: OPA.FIREBASE_DEFAULT_R
     adminApp = admin.app();
     callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp);
 
+    await UTL.setExternalLogState(callState.dataStorageState, request);
     await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, request, "updateInstallationSettings(...) ready");
 
     const data = request.data;
@@ -186,6 +190,7 @@ export const performUpgrade = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, asyn
     adminApp = admin.app();
     callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp);
 
+    await UTL.setExternalLogState(callState.dataStorageState, request);
     await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, request, "performUpgrade(...) ready");
 
     const data = request.data;
@@ -209,6 +214,7 @@ export const performUninstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, as
     adminApp = admin.app();
     callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp);
 
+    await UTL.setExternalLogState(callState.dataStorageState, request);
     await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, request, "performUninstall(...) ready");
 
     const data = request.data;

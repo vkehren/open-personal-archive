@@ -15,6 +15,7 @@ export const requestUserAccess = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, a
     adminApp = admin.app();
     callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp);
 
+    await UTL.setExternalLogState(callState.dataStorageState, request);
     await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, request, "requestUserAccess(...) ready");
 
     const data = request.data;

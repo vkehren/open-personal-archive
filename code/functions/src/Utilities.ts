@@ -166,6 +166,18 @@ export function getFirebaseProjectUsesEmulators(): boolean {
 }
 
 /**
+ * Sets the external log state for the call in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
+ * @param {CallableRequest} request The Firebase request object.
+ * @return {Promise<OpaDm.void>}
+ */
+export async function setExternalLogState(dataStorageState: OpaDm.IDataStorageState, request: CallableRequest): Promise<void> { // eslint-disable-line max-len
+  let externalLogItemId = (request.data[OPA.getTypedPropertyKeyAsText<OPA.ILogWriteState>("externalLogItemId")] as string | null);
+  externalLogItemId = (!OPA.isNullishOrWhitespace(externalLogItemId)) ? externalLogItemId : null;
+  dataStorageState.logWriteState.externalLogItemId = externalLogItemId;
+}
+
+/**
  * Logs a server function call in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
  * @param {OpaDm.IAuthenticationState | null} authenticationState The Firebase Authentication state for the User.
