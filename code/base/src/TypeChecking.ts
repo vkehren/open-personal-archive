@@ -259,3 +259,27 @@ export function assertNonNullishOrWhitespace(value: unknown, message = "A non-nu
     throw new Error(message);
   }
 }
+
+/**
+ * Asserts that a value IS nullish.
+ * @param {unknown} value The value to check.
+ * @param {string} [message="A null value was expected."] The message to display on failure of assertion.
+ * @return {void}
+ */
+export function assertIsNullish(value: unknown, message = "A null value was expected."): void {
+  if (!isNullish(value)) {
+    throw new Error(message);
+  }
+}
+
+/**
+ * Asserts that a value IS nullish or whitespace.
+ * @param {unknown} value The value to check.
+ * @param {string} [message="A null, empty, or whitespace value was expected."] The message to display on failure of assertion.
+ * @return {void}
+ */
+export function assertIsNullishOrWhitespace(value: unknown, message = "A null, empty, or whitespace value was expected."): void {
+  if (!isNullishOrWhitespace(value)) {
+    throw new Error(message);
+  }
+}
