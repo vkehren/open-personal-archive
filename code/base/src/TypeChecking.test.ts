@@ -85,7 +85,7 @@ test("checks that passing named function to isUndefined(...) returns 'false'", (
 });
 
 test("checks that passing unnamed function to isUndefined(...) returns 'false'", () => {
-  expect(TC.isUndefined(function () {return 12345;})).toBe(false);
+  expect(TC.isUndefined(function() {return 12345;})).toBe(false);
 });
 
 test("checks that passing arrow function to isUndefined(...) returns 'false'", () => {
@@ -174,7 +174,7 @@ test("checks that passing named function to isNull(...) returns 'false'", () => 
 });
 
 test("checks that passing unnamed function to isNull(...) returns 'false'", () => {
-  expect(TC.isNull(function () {return 12345;})).toBe(false);
+  expect(TC.isNull(function() {return 12345;})).toBe(false);
 });
 
 test("checks that passing arrow function to isNull(...) returns 'false'", () => {
@@ -263,7 +263,7 @@ test("checks that passing named function to isNullish(...) returns 'false'", () 
 });
 
 test("checks that passing unnamed function to isNullish(...) returns 'false'", () => {
-  expect(TC.isNullish(function () {return 12345;})).toBe(false);
+  expect(TC.isNullish(function() {return 12345;})).toBe(false);
 });
 
 test("checks that passing arrow function to isNullish(...) returns 'false'", () => {
@@ -352,7 +352,7 @@ test("checks that passing named function to isNullishOrEmpty(...) returns 'false
 });
 
 test("checks that passing unnamed function to isNullishOrEmpty(...) returns 'false'", () => {
-  expect(TC.isNullishOrEmpty(function () {return 12345;})).toBe(false);
+  expect(TC.isNullishOrEmpty(function() {return 12345;})).toBe(false);
 });
 
 test("checks that passing arrow function to isNullishOrEmpty(...) returns 'false'", () => {
@@ -441,7 +441,7 @@ test("checks that passing named function to isNullishOrWhitespace(...) returns '
 });
 
 test("checks that passing unnamed function to isNullishOrWhitespace(...) returns 'false'", () => {
-  expect(TC.isNullishOrWhitespace(function () {return 12345;})).toBe(false);
+  expect(TC.isNullishOrWhitespace(function() {return 12345;})).toBe(false);
 });
 
 test("checks that passing arrow function to isNullishOrWhitespace(...) returns 'false'", () => {
@@ -530,7 +530,7 @@ test("checks that passing named function to isFunction(...) returns 'true'", () 
 });
 
 test("checks that passing unnamed function to isFunction(...) returns 'true'", () => {
-  expect(TC.isFunction(function () {return 12345;})).toBe(true);
+  expect(TC.isFunction(function() {return 12345;})).toBe(true);
 });
 
 test("checks that passing arrow function to isFunction(...) returns 'true'", () => {
@@ -619,7 +619,7 @@ test("checks that passing named function to isArray(...) returns 'false'", () =>
 });
 
 test("checks that passing unnamed function to isArray(...) returns 'false'", () => {
-  expect(TC.isArray(function () {return 12345;})).toBe(false);
+  expect(TC.isArray(function() {return 12345;})).toBe(false);
 });
 
 test("checks that passing arrow function to isArray(...) returns 'false'", () => {
@@ -708,7 +708,7 @@ test("checks that passing named function to isObject(...) returns 'false'", () =
 });
 
 test("checks that passing unnamed function to isObject(...) returns 'false'", () => {
-  expect(TC.isObject(function () {return 12345;})).toBe(false);
+  expect(TC.isObject(function() {return 12345;})).toBe(false);
 });
 
 test("checks that passing arrow function to isObject(...) returns 'false'", () => {
@@ -797,7 +797,7 @@ test("checks that passing named function to isRegExp(...) returns 'false'", () =
 });
 
 test("checks that passing unnamed function to isRegExp(...) returns 'false'", () => {
-  expect(TC.isRegExp(function () {return 12345;})).toBe(false);
+  expect(TC.isRegExp(function() {return 12345;})).toBe(false);
 });
 
 test("checks that passing arrow function to isRegExp(...) returns 'false'", () => {
@@ -886,7 +886,7 @@ test("checks that passing named function to isMap(...) returns 'false'", () => {
 });
 
 test("checks that passing unnamed function to isMap(...) returns 'false'", () => {
-  expect(TC.isMap(function () {return 12345;})).toBe(false);
+  expect(TC.isMap(function() {return 12345;})).toBe(false);
 });
 
 test("checks that passing arrow function to isMap(...) returns 'false'", () => {
@@ -975,7 +975,7 @@ test("checks that passing named function to isSet(...) returns 'false'", () => {
 });
 
 test("checks that passing unnamed function to isSet(...) returns 'false'", () => {
-  expect(TC.isSet(function () {return 12345;})).toBe(false);
+  expect(TC.isSet(function() {return 12345;})).toBe(false);
 });
 
 test("checks that passing arrow function to isSet(...) returns 'false'", () => {
@@ -1064,7 +1064,7 @@ test("checks that passing named function to isDate(...) returns 'false'", () => 
 });
 
 test("checks that passing unnamed function to isDate(...) returns 'false'", () => {
-  expect(TC.isDate(function () {return 12345;})).toBe(false);
+  expect(TC.isDate(function() {return 12345;})).toBe(false);
 });
 
 test("checks that passing arrow function to isDate(...) returns 'false'", () => {
@@ -1153,7 +1153,7 @@ test("checks that passing named function to isString(...) returns 'false'", () =
 });
 
 test("checks that passing unnamed function to isString(...) returns 'false'", () => {
-  expect(TC.isString(function () {return 12345;})).toBe(false);
+  expect(TC.isString(function() {return 12345;})).toBe(false);
 });
 
 test("checks that passing arrow function to isString(...) returns 'false'", () => {
@@ -1242,7 +1242,7 @@ test("checks that passing named function to isBigInt(...) returns 'false'", () =
 });
 
 test("checks that passing unnamed function to isBigInt(...) returns 'false'", () => {
-  expect(TC.isBigInt(function () {return 12345;})).toBe(false);
+  expect(TC.isBigInt(function() {return 12345;})).toBe(false);
 });
 
 test("checks that passing arrow function to isBigInt(...) returns 'false'", () => {
@@ -1331,7 +1331,7 @@ test("checks that passing named function to isNumber(...) returns 'false'", () =
 });
 
 test("checks that passing unnamed function to isNumber(...) returns 'false'", () => {
-  expect(TC.isNumber(function () {return 12345;})).toBe(false);
+  expect(TC.isNumber(function() {return 12345;})).toBe(false);
 });
 
 test("checks that passing arrow function to isNumber(...) returns 'false'", () => {
@@ -1420,7 +1420,7 @@ test("checks that passing named function to isBoolean(...) returns 'false'", () 
 });
 
 test("checks that passing unnamed function to isBoolean(...) returns 'false'", () => {
-  expect(TC.isBoolean(function () {return 12345;})).toBe(false);
+  expect(TC.isBoolean(function() {return 12345;})).toBe(false);
 });
 
 test("checks that passing arrow function to isBoolean(...) returns 'false'", () => {

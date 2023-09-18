@@ -9,8 +9,8 @@ export const FIREBASE_DEFAULT_REGION = "us-east1";
 
 /** Provides workarounds for issues constructing Firebase objects across multiple packages (see https://github.com/googleapis/nodejs-firestore/issues/760) */
 export interface IFirebaseConstructorProvider {
-  arrayRemove: (...elements: any[]) => firestore.FieldValue;
-  arrayUnion: (...elements: any[]) => firestore.FieldValue;
+  arrayRemove: (...elements: any[]) => firestore.FieldValue; // eslint-disable-line @typescript-eslint/no-explicit-any
+  arrayUnion: (...elements: any[]) => firestore.FieldValue; // eslint-disable-line @typescript-eslint/no-explicit-any
   delete: () => firestore.FieldValue;
   increment: (n: number) => firestore.FieldValue;
   serverTimestamp: () => firestore.FieldValue;
@@ -55,18 +55,24 @@ export interface ICallStateBase<S, A> {
   readonly authorizationState?: A;
 }
 
-const FieldValue_MethodName_Unrecognized = "[UNRECOGNIZED]";
-const FieldValue_MethodName_ArrayRemove = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("arrayRemove") as string);
-const FieldValue_MethodName_ArrayUnion = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("arrayUnion") as string);
-const FieldValue_MethodName_Delete = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("delete") as string);
-const FieldValue_MethodName_Increment = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("increment") as string);
-const FieldValue_MethodName_ServerTimestamp = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("serverTimestamp") as string);
+const FieldValue_MethodName_Unrecognized = "[UNRECOGNIZED]"; // eslint-disable-line camelcase
+const FieldValue_MethodName_ArrayRemove = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("arrayRemove") as string); // eslint-disable-line camelcase
+const FieldValue_MethodName_ArrayUnion = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("arrayUnion") as string); // eslint-disable-line camelcase
+const FieldValue_MethodName_Delete = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("delete") as string); // eslint-disable-line camelcase
+const FieldValue_MethodName_Increment = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("increment") as string); // eslint-disable-line camelcase
+const FieldValue_MethodName_ServerTimestamp = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("serverTimestamp") as string); // eslint-disable-line camelcase
 
 export interface FieldValueSummary {
   isFieldValue: boolean;
   fieldValueTypeName: string;
   fieldValueMethodName: string;
-  fieldValueData: any;
+  fieldValueData: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
+// NOTE: Add properties that are expected to exist in guard functions for firestore.FieldValue
+interface FieldValueShim {
+  isEqual(other: firestore.FieldValue): boolean;
+  methodName: string;
 }
 
 /**
@@ -83,9 +89,11 @@ export function replaceFieldValuesWithSummaries<T>(documentFragment: T): T {
   }
 
   const propertyNames = VC.getOwnPropertyKeys(documentFragment);
+  const documentFragmentAsRecord = (documentFragment as Record<string, unknown>);
+
   for (let i = 0; i < propertyNames.length; i++) {
     const propertyName = propertyNames[i];
-    const propertyValue = (documentFragment as any)[propertyName];
+    const propertyValue = documentFragmentAsRecord[propertyName];
 
     if (TC.isUndefined(propertyValue)) {
       continue;
@@ -98,7 +106,7 @@ export function replaceFieldValuesWithSummaries<T>(documentFragment: T): T {
     }
 
     const summary = getFieldValueSummary<firestore.FieldValue>(propertyValue);
-    (documentFragment as any)[propertyName] = summary;
+    documentFragmentAsRecord[propertyName] = summary;
   }
   return documentFragment;
 }
@@ -113,9 +121,9 @@ export function isOfFieldValue<T extends firestore.FieldValue>(fieldValue: unkno
     throw new Error("The value to check the type of must not be null or undefined.");
   }
 
-  const fieldValueAsAny = (fieldValue as any);
-  const guardFunc = (value: T) => (!TC.isNullish(fieldValueAsAny.isEqual));
-  const isFieldValue = TC.isOf(fieldValue, guardFunc);
+  const fieldValueAsShim = (fieldValue as FieldValueShim);
+  const guardFunc = () => (!TC.isNullish(fieldValueAsShim.isEqual) && !TC.isNullish(fieldValueAsShim.methodName));
+  const isFieldValue = TC.isOf<T>(fieldValue, guardFunc);
   return isFieldValue;
 }
 
@@ -125,25 +133,26 @@ export function isOfFieldValue<T extends firestore.FieldValue>(fieldValue: unkno
  * @return {any} The actual value.
  */
 export function getFieldValueSummary<T extends firestore.FieldValue>(fieldValue: unknown): FieldValueSummary {
-  if (!isOfFieldValue(fieldValue)) {
+  if (!isOfFieldValue<T>(fieldValue)) {
     throw new Error("The value specified is not a FieldValue.");
   }
 
-  if (isOfFieldValue_ArrayRemove(fieldValue)) {
-    return getFieldValueSummary_ArrayRemove(fieldValue);
-  } else if (isOfFieldValue_ArrayUnion(fieldValue)) {
-    return getFieldValueSummary_ArrayUnion(fieldValue);
-  } else if (isOfFieldValue_Delete(fieldValue)) {
-    return getFieldValueSummary_Delete(fieldValue);
-  } else if (isOfFieldValue_Increment(fieldValue)) {
-    return getFieldValueSummary_Increment(fieldValue);
-  } else if (isOfFieldValue_ServerTimestamp(fieldValue)) {
-    return getFieldValueSummary_ServerTimestamp(fieldValue);
+  if (isOfFieldValue_ArrayRemove<T>(fieldValue)) {
+    return getFieldValueSummary_ArrayRemove<T>(fieldValue);
+  } else if (isOfFieldValue_ArrayUnion<T>(fieldValue)) {
+    return getFieldValueSummary_ArrayUnion<T>(fieldValue);
+  } else if (isOfFieldValue_Delete<T>(fieldValue)) {
+    return getFieldValueSummary_Delete<T>(fieldValue);
+  } else if (isOfFieldValue_Increment<T>(fieldValue)) {
+    return getFieldValueSummary_Increment<T>(fieldValue);
+  } else if (isOfFieldValue_ServerTimestamp<T>(fieldValue)) {
+    return getFieldValueSummary_ServerTimestamp<T>(fieldValue);
   } else {
+    const fieldValueAsShim = (fieldValue as FieldValueShim);
     const unrecognizedSummary: FieldValueSummary = {
       isFieldValue: true,
       fieldValueTypeName: FieldValue_MethodName_Unrecognized,
-      fieldValueMethodName: (fieldValue as any).methodName,
+      fieldValueMethodName: fieldValueAsShim.methodName,
       fieldValueData: {},
     };
     return unrecognizedSummary;
@@ -155,7 +164,7 @@ export function getFieldValueSummary<T extends firestore.FieldValue>(fieldValue:
  * @param {unknown} fieldValue The value to check.
  * @return {boolean} The result of checking.
  */
-export function isOfFieldValue_ArrayRemove<T extends firestore.FieldValue>(fieldValue: unknown): fieldValue is T {
+export function isOfFieldValue_ArrayRemove<T extends firestore.FieldValue>(fieldValue: unknown): fieldValue is T { // eslint-disable-line camelcase
   if (TC.isNullish(fieldValue)) {
     throw new Error("The value to check the type of must not be null or undefined.");
   }
@@ -166,9 +175,9 @@ export function isOfFieldValue_ArrayRemove<T extends firestore.FieldValue>(field
     return false;
   }
 
-  const fieldValueAsAny = (fieldValue as any);
-  const guardFunc = (value: T) => (!TC.isNullish(fieldValueAsAny.methodName) && (fieldValueAsAny.methodName as string).includes(FieldValue_MethodName_ArrayRemove));
-  const isFieldValue = TC.isOf(fieldValue, guardFunc);
+  const fieldValueAsShim = ((fieldValue as unknown) as FieldValueShim);
+  const guardFunc = () => (!TC.isNullish(fieldValueAsShim.methodName) && fieldValueAsShim.methodName.includes(FieldValue_MethodName_ArrayRemove));
+  const isFieldValue = TC.isOf<T>(fieldValue, guardFunc);
   return isFieldValue;
 }
 
@@ -177,16 +186,17 @@ export function isOfFieldValue_ArrayRemove<T extends firestore.FieldValue>(field
  * @param {unknown} fieldValue The possible field value.
  * @return {any} The actual value.
  */
-export function getFieldValueSummary_ArrayRemove<T extends firestore.FieldValue>(fieldValue: unknown): FieldValueSummary {
-  if (!isOfFieldValue_ArrayRemove(fieldValue)) {
-    throw new Error("The value specified is not an \"" + FieldValue_MethodName_ArrayRemove + "\" FieldValue.");
+export function getFieldValueSummary_ArrayRemove<T extends firestore.FieldValue>(fieldValue: unknown): FieldValueSummary { // eslint-disable-line camelcase
+  if (!isOfFieldValue_ArrayRemove<T>(fieldValue)) {
+    throw new Error("The value specified is not an \"" + FieldValue_MethodName_ArrayRemove + "\" FieldValue."); // eslint-disable-line camelcase
   }
 
-  const data = {elements: [...((fieldValue as any).elements)]};
+  const fieldValueAsShim = ((fieldValue as unknown) as FieldValueShim);
+  const data = {elements: [...((fieldValue as any).elements)]}; // eslint-disable-line @typescript-eslint/no-explicit-any
   const summary: FieldValueSummary = {
     isFieldValue: true,
     fieldValueTypeName: FieldValue_MethodName_ArrayRemove,
-    fieldValueMethodName: (fieldValue as any).methodName,
+    fieldValueMethodName: fieldValueAsShim.methodName,
     fieldValueData: data,
   };
   return summary;
@@ -197,7 +207,7 @@ export function getFieldValueSummary_ArrayRemove<T extends firestore.FieldValue>
  * @param {unknown} fieldValue The value to check.
  * @return {boolean} The result of checking.
  */
-export function isOfFieldValue_ArrayUnion<T extends firestore.FieldValue>(fieldValue: unknown): fieldValue is T {
+export function isOfFieldValue_ArrayUnion<T extends firestore.FieldValue>(fieldValue: unknown): fieldValue is T { // eslint-disable-line camelcase
   if (TC.isNullish(fieldValue)) {
     throw new Error("The value to check the type of must not be null or undefined.");
   }
@@ -208,9 +218,9 @@ export function isOfFieldValue_ArrayUnion<T extends firestore.FieldValue>(fieldV
     return false;
   }
 
-  const fieldValueAsAny = (fieldValue as any);
-  const guardFunc = (value: T) => (!TC.isNullish(fieldValueAsAny.methodName) && (fieldValueAsAny.methodName as string).includes(FieldValue_MethodName_ArrayUnion));
-  const isFieldValue = TC.isOf(fieldValue, guardFunc);
+  const fieldValueAsShim = ((fieldValue as unknown) as FieldValueShim);
+  const guardFunc = () => (!TC.isNullish(fieldValueAsShim.methodName) && fieldValueAsShim.methodName.includes(FieldValue_MethodName_ArrayUnion));
+  const isFieldValue = TC.isOf<T>(fieldValue, guardFunc);
   return isFieldValue;
 }
 
@@ -219,16 +229,17 @@ export function isOfFieldValue_ArrayUnion<T extends firestore.FieldValue>(fieldV
  * @param {unknown} fieldValue The possible field value.
  * @return {any} The actual value.
  */
-export function getFieldValueSummary_ArrayUnion<T extends firestore.FieldValue>(fieldValue: unknown): FieldValueSummary {
-  if (!isOfFieldValue_ArrayUnion(fieldValue)) {
-    throw new Error("The value specified is not an \"" + FieldValue_MethodName_ArrayUnion + "\" FieldValue.");
+export function getFieldValueSummary_ArrayUnion<T extends firestore.FieldValue>(fieldValue: unknown): FieldValueSummary { // eslint-disable-line camelcase
+  if (!isOfFieldValue_ArrayUnion<T>(fieldValue)) {
+    throw new Error("The value specified is not an \"" + FieldValue_MethodName_ArrayUnion + "\" FieldValue."); // eslint-disable-line camelcase
   }
 
-  const data = {elements: [...((fieldValue as any).elements)]};
+  const fieldValueAsShim = ((fieldValue as unknown) as FieldValueShim);
+  const data = {elements: [...((fieldValue as any).elements)]}; // eslint-disable-line @typescript-eslint/no-explicit-any
   const summary: FieldValueSummary = {
     isFieldValue: true,
     fieldValueTypeName: FieldValue_MethodName_ArrayUnion,
-    fieldValueMethodName: (fieldValue as any).methodName,
+    fieldValueMethodName: fieldValueAsShim.methodName,
     fieldValueData: data,
   };
   return summary;
@@ -239,7 +250,7 @@ export function getFieldValueSummary_ArrayUnion<T extends firestore.FieldValue>(
  * @param {unknown} fieldValue The value to check.
  * @return {boolean} The result of checking.
  */
-export function isOfFieldValue_Delete<T extends firestore.FieldValue>(fieldValue: unknown): fieldValue is T {
+export function isOfFieldValue_Delete<T extends firestore.FieldValue>(fieldValue: unknown): fieldValue is T { // eslint-disable-line camelcase
   if (TC.isNullish(fieldValue)) {
     throw new Error("The value to check the type of must not be null or undefined.");
   }
@@ -250,9 +261,9 @@ export function isOfFieldValue_Delete<T extends firestore.FieldValue>(fieldValue
     return false;
   }
 
-  const fieldValueAsAny = (fieldValue as any);
-  const guardFunc = (value: T) => (!TC.isNullish(fieldValueAsAny.methodName) && (fieldValueAsAny.methodName as string).includes(FieldValue_MethodName_Delete));
-  const isFieldValue = TC.isOf(fieldValue, guardFunc);
+  const fieldValueAsShim = ((fieldValue as unknown) as FieldValueShim);
+  const guardFunc = () => (!TC.isNullish(fieldValueAsShim.methodName) && fieldValueAsShim.methodName.includes(FieldValue_MethodName_Delete));
+  const isFieldValue = TC.isOf<T>(fieldValue, guardFunc);
   return isFieldValue;
 }
 
@@ -261,16 +272,17 @@ export function isOfFieldValue_Delete<T extends firestore.FieldValue>(fieldValue
  * @param {unknown} fieldValue The possible field value.
  * @return {any} The actual value.
  */
-export function getFieldValueSummary_Delete<T extends firestore.FieldValue>(fieldValue: unknown): FieldValueSummary {
-  if (!isOfFieldValue_Delete(fieldValue)) {
-    throw new Error("The value specified is not an \"" + FieldValue_MethodName_Delete + "\" FieldValue.");
+export function getFieldValueSummary_Delete<T extends firestore.FieldValue>(fieldValue: unknown): FieldValueSummary { // eslint-disable-line camelcase
+  if (!isOfFieldValue_Delete<T>(fieldValue)) {
+    throw new Error("The value specified is not an \"" + FieldValue_MethodName_Delete + "\" FieldValue."); // eslint-disable-line camelcase
   }
 
+  const fieldValueAsShim = ((fieldValue as unknown) as FieldValueShim);
   const data = {};
   const summary: FieldValueSummary = {
     isFieldValue: true,
     fieldValueTypeName: FieldValue_MethodName_Delete,
-    fieldValueMethodName: (fieldValue as any).methodName,
+    fieldValueMethodName: fieldValueAsShim.methodName,
     fieldValueData: data,
   };
   return summary;
@@ -281,7 +293,7 @@ export function getFieldValueSummary_Delete<T extends firestore.FieldValue>(fiel
  * @param {unknown} fieldValue The value to check.
  * @return {boolean} The result of checking.
  */
-export function isOfFieldValue_Increment<T extends firestore.FieldValue>(fieldValue: unknown): fieldValue is T {
+export function isOfFieldValue_Increment<T extends firestore.FieldValue>(fieldValue: unknown): fieldValue is T { // eslint-disable-line camelcase
   if (TC.isNullish(fieldValue)) {
     throw new Error("The value to check the type of must not be null or undefined.");
   }
@@ -292,9 +304,9 @@ export function isOfFieldValue_Increment<T extends firestore.FieldValue>(fieldVa
     return false;
   }
 
-  const fieldValueAsAny = (fieldValue as any);
-  const guardFunc = (value: T) => (!TC.isNullish(fieldValueAsAny.methodName) && (fieldValueAsAny.methodName as string).includes(FieldValue_MethodName_Increment));
-  const isFieldValue = TC.isOf(fieldValue, guardFunc);
+  const fieldValueAsShim = ((fieldValue as unknown) as FieldValueShim);
+  const guardFunc = () => (!TC.isNullish(fieldValueAsShim.methodName) && fieldValueAsShim.methodName.includes(FieldValue_MethodName_Increment));
+  const isFieldValue = TC.isOf<T>(fieldValue, guardFunc);
   return isFieldValue;
 }
 
@@ -303,16 +315,17 @@ export function isOfFieldValue_Increment<T extends firestore.FieldValue>(fieldVa
  * @param {unknown} fieldValue The possible field value.
  * @return {any} The actual value.
  */
-export function getFieldValueSummary_Increment<T extends firestore.FieldValue>(fieldValue: unknown): FieldValueSummary {
-  if (!isOfFieldValue_Increment(fieldValue)) {
-    throw new Error("The value specified is not an \"" + FieldValue_MethodName_Increment + "\" FieldValue.");
+export function getFieldValueSummary_Increment<T extends firestore.FieldValue>(fieldValue: unknown): FieldValueSummary { // eslint-disable-line camelcase
+  if (!isOfFieldValue_Increment<T>(fieldValue)) {
+    throw new Error("The value specified is not an \"" + FieldValue_MethodName_Increment + "\" FieldValue."); // eslint-disable-line camelcase
   }
 
-  const data = {operand: (fieldValue as any).operand};
+  const fieldValueAsShim = ((fieldValue as unknown) as FieldValueShim);
+  const data = {operand: (fieldValue as any).operand}; // eslint-disable-line @typescript-eslint/no-explicit-any
   const summary: FieldValueSummary = {
     isFieldValue: true,
     fieldValueTypeName: FieldValue_MethodName_Increment,
-    fieldValueMethodName: (fieldValue as any).methodName,
+    fieldValueMethodName: fieldValueAsShim.methodName,
     fieldValueData: data,
   };
   return summary;
@@ -323,7 +336,7 @@ export function getFieldValueSummary_Increment<T extends firestore.FieldValue>(f
  * @param {unknown} fieldValue The value to check.
  * @return {boolean} The result of checking.
  */
-export function isOfFieldValue_ServerTimestamp<T extends firestore.FieldValue>(fieldValue: unknown): fieldValue is T {
+export function isOfFieldValue_ServerTimestamp<T extends firestore.FieldValue>(fieldValue: unknown): fieldValue is T { // eslint-disable-line camelcase
   if (TC.isNullish(fieldValue)) {
     throw new Error("The value to check the type of must not be null or undefined.");
   }
@@ -334,9 +347,9 @@ export function isOfFieldValue_ServerTimestamp<T extends firestore.FieldValue>(f
     return false;
   }
 
-  const fieldValueAsAny = (fieldValue as any);
-  const guardFunc = (value: T) => (!TC.isNullish(fieldValueAsAny.methodName) && (fieldValueAsAny.methodName as string).includes(FieldValue_MethodName_ServerTimestamp));
-  const isFieldValue = TC.isOf(fieldValue, guardFunc);
+  const fieldValueAsShim = ((fieldValue as unknown) as FieldValueShim);
+  const guardFunc = () => (!TC.isNullish(fieldValueAsShim.methodName) && fieldValueAsShim.methodName.includes(FieldValue_MethodName_ServerTimestamp));
+  const isFieldValue = TC.isOf<T>(fieldValue, guardFunc);
   return isFieldValue;
 }
 
@@ -345,16 +358,17 @@ export function isOfFieldValue_ServerTimestamp<T extends firestore.FieldValue>(f
  * @param {unknown} fieldValue The possible field value.
  * @return {any} The actual value.
  */
-export function getFieldValueSummary_ServerTimestamp<T extends firestore.FieldValue>(fieldValue: unknown): FieldValueSummary {
-  if (!isOfFieldValue_ServerTimestamp(fieldValue)) {
-    throw new Error("The value specified is not an \"" + FieldValue_MethodName_ServerTimestamp + "\" FieldValue.");
+export function getFieldValueSummary_ServerTimestamp<T extends firestore.FieldValue>(fieldValue: unknown): FieldValueSummary { // eslint-disable-line camelcase
+  if (!isOfFieldValue_ServerTimestamp<T>(fieldValue)) {
+    throw new Error("The value specified is not an \"" + FieldValue_MethodName_ServerTimestamp + "\" FieldValue."); // eslint-disable-line camelcase
   }
 
+  const fieldValueAsShim = ((fieldValue as unknown) as FieldValueShim);
   const data = {};
   const summary: FieldValueSummary = {
     isFieldValue: true,
     fieldValueTypeName: FieldValue_MethodName_ServerTimestamp,
-    fieldValueMethodName: (fieldValue as any).methodName,
+    fieldValueMethodName: fieldValueAsShim.methodName,
     fieldValueData: data,
   };
   return summary;
@@ -494,7 +508,8 @@ export function assertDocumentIsValid<T extends BT.IDocument>(document: T | null
  * @param {string} [message=default] The message to display on failure of assertion.
  * @return {void}
  */
-export function assertIdentifierIsValid<T extends BT.IDocument>(id: string | null | undefined, message = "A valid document ID must be provided."): void {
+export function assertIdentifierIsValid(id: string | null | undefined, message = "A valid document ID must be provided."): void {
+  // LATER: Rename "id" to "idSource" and allow caller to pass IDocument (or typed string or IDocument getter) as "idSource"
   if (TC.isNullishOrWhitespace(id)) {
     throw new Error(message);
   }

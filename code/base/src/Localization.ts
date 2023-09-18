@@ -86,7 +86,7 @@ export function assertIsValidLocalizable<T>(localizable: BT.ILocalizable<T>, all
  * @param {string} locale The locale.
  * @return {[boolean, string]} Whether the locale is valid and if not, a message describing the reason why not.
  */
-function isValidLocaleInternal<T>(locale: string): [boolean, string] {
+function isValidLocaleInternal(locale: string): [boolean, string] {
   if (TC.isNullishOrWhitespace(locale)) {
     return [false, "The locale must be a valid value (i.e. NOT undefined, null, empty, or whitespace)."];
   }
@@ -103,7 +103,7 @@ function isValidLocaleInternal<T>(locale: string): [boolean, string] {
  * @param {string} locale The locale.
  * @return {boolean} Whether the locale is valid.
  */
-export function isValidLocale<T>(locale: string): boolean {
+export function isValidLocale(locale: string): boolean {
   const result = isValidLocaleInternal(locale);
   return result[0];
 }
@@ -113,7 +113,7 @@ export function isValidLocale<T>(locale: string): boolean {
  * @param {string} locale The locale.
  * @return {void}
  */
-export function assertIsValidLocale<T>(locale: string): void {
+export function assertIsValidLocale(locale: string): void {
   const result = isValidLocaleInternal(locale);
   if (!result[0]) {
     throw new Error(result[1]);

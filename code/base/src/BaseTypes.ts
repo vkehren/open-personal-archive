@@ -85,6 +85,8 @@ export interface ITimeRangeCollection {
   merge(timestamp: ITimestamp): ITimeRangeMergeResult;
 }
 
+
+/* eslint-disable camelcase */
 // NOTE: The types and interfaces below are useful for creating typed Firebase Firestore Documents
 
 /**
@@ -96,6 +98,7 @@ export type DateToUse = Date;
  * Use this Date now() function while issue with Firebase Firestore Timestamps is still unresolved (see https://github.com/jloosli/node-firestore-import-export/issues/46)
  * @constant
  * @type {function}
+ * @return {DateToUse} The current date and time.
  */
 export const nowToUse = (): DateToUse => firestore.Timestamp.now().toDate();
 
@@ -298,11 +301,11 @@ export function promoteDocumentsToCreatable<IN extends IDocument, OUT extends IN
 
 /**
  * Gets the User ID values from the incoming objects using properties from type T.
- * @param {Array<any>} objs The objects to evaluate.
+ * @param {Array<unknown>} objs The objects to evaluate.
  * @param {IdFunc<T>} userIdFunc The function that gets the User ID value from an object of type T.
  * @return {Array<string>} The result.
  */
-export function extractUserIdsFromObjects<T>(objs: Array<any>, userIdFunc: IdFunc<T>): Array<string> {
+export function extractUserIdsFromObjects<T>(objs: Array<unknown>, userIdFunc: IdFunc<T>): Array<string> {
   TC.assertNonNullish(objs);
   const userIds = ([] as Array<string>);
 

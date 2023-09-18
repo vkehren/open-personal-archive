@@ -79,11 +79,11 @@ export function getOwnPropertyKeys(obj: unknown): Array<BT.KeyText> {
 
 /**
  * Gets the property key specified directly on type T as text.
- * @param {keyof T} typedKey A property key that exists on type T.
+ * @param {BT.TypedKeyText<T>} typedKey A property key that exists on type T.
  * @param {T | undefined} [obj=undefined] An object of type T.
  * @return {BT.KeyText} The property key as text.
  */
-export function getTypedPropertyKeyAsText<T>(typedKey: BT.TypedKeyText<T>, obj: T | undefined = undefined): BT.KeyText {
+export function getTypedPropertyKeyAsText<T>(typedKey: BT.TypedKeyText<T>, obj: T | undefined = undefined): BT.KeyText { // eslint-disable-line @typescript-eslint/no-unused-vars
   const propertyKeyAsText = (typedKey as BT.KeyText);
   return propertyKeyAsText;
 }
@@ -95,7 +95,7 @@ export function getTypedPropertyKeyAsText<T>(typedKey: BT.TypedKeyText<T>, obj: 
  */
 export function getTypedPropertyKeysAsText<T>(obj: T): BT.ContainerOfTypedKeyText<T> {
   const propertyKeys = getOwnPropertyKeys(obj);
-  const containerOfKeyText = new Object();
+  const containerOfKeyText = {};
   propertyKeys.forEach((propertyKey) => {
     Object.defineProperty(containerOfKeyText, propertyKey, {value: (propertyKey as BT.TypedKeyText<T>), writable: false});
   });

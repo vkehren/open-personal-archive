@@ -160,7 +160,7 @@ export function compareVersionNumbers(firstVersionNumber: Array<number>, secondV
  * @param {number} missingNumberValue The number to use when a number part is missing a value relative to the other version number (default is "0").
  * @return {number} The result of comparison (i.e. -1, 0, or 1).
  */
-export function compareVersionNumberStrings(firstVersionNumber: string, secondVersionNumber: string, partSeparator = Default_Version_PartSeparator, missingNumberValue = Default_Version_MissingNumberValue): number {
+export function compareVersionNumberStrings(firstVersionNumber: string, secondVersionNumber: string, partSeparator = Default_Version_PartSeparator, missingNumberValue = Default_Version_MissingNumberValue): number { // eslint-disable-line max-len
   const firstVersionNumberParts = convertVersionNumberStringToNumberParts(firstVersionNumber, partSeparator);
   const secondVersionNumberParts = convertVersionNumberStringToNumberParts(secondVersionNumber, partSeparator);
   const compareResult = compareVersionNumbers(firstVersionNumberParts, secondVersionNumberParts, missingNumberValue);

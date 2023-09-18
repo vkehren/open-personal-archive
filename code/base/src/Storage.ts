@@ -18,11 +18,11 @@ export interface IPropertyIndexDescriptor {
   indexCollectionName: string;
   indexedCollectionName: string;
   indexedPropertyName: string;
-  getDocumentId(propertyValue: any): string;
-  getDocumentPath(propertyValue: any): string;
+  getDocumentId(propertyValue: any): string; // eslint-disable-line @typescript-eslint/no-explicit-any
+  getDocumentPath(propertyValue: any): string; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
-export const getPropertyIndexDocumentId = (propertyIndex: IPropertyIndexDescriptor, propertyValue: any): string => (propertyIndex.indexedCollectionName + "/" + propertyIndex.indexedPropertyName + "/" + propertyValue);
-export const getPropertyIndexDocumentPath = (propertyIndex: IPropertyIndexDescriptor, propertyValue: any): string => (propertyIndex.indexCollectionName + "/" + getPropertyIndexDocumentId(propertyIndex, propertyValue));
+export const getPropertyIndexDocumentId = (propertyIndex: IPropertyIndexDescriptor, propertyValue: any): string => (propertyIndex.indexedCollectionName + "/" + propertyIndex.indexedPropertyName + "/" + propertyValue); // eslint-disable-line max-len, @typescript-eslint/no-explicit-any
+export const getPropertyIndexDocumentPath = (propertyIndex: IPropertyIndexDescriptor, propertyValue: any): string => (propertyIndex.indexCollectionName + "/" + getPropertyIndexDocumentId(propertyIndex, propertyValue)); // eslint-disable-line max-len, @typescript-eslint/no-explicit-any
 
 /**
  * Constructs a Property Index Descriptor object for the given arguments.
@@ -32,9 +32,9 @@ export const getPropertyIndexDocumentPath = (propertyIndex: IPropertyIndexDescri
  * @return {IPropertyIndexDescriptor} The resulting Property Index Descriptor.
  */
 export function createPropertyIndexDescriptor(indexCollectionName: string, indexedCollectionName: string, indexedPropertyName: string): IPropertyIndexDescriptor {
-  const propertyIndex: IPropertyIndexDescriptor = {indexCollectionName, indexedCollectionName, indexedPropertyName, getDocumentId: (propertyValue: any) => (""), getDocumentPath: (propertyValue: any) => ("")};
-  propertyIndex.getDocumentId = (propertyValue: any) => getPropertyIndexDocumentId(propertyIndex, propertyValue);
-  propertyIndex.getDocumentPath = (propertyValue: any) => getPropertyIndexDocumentPath(propertyIndex, propertyValue);
+  const propertyIndex = ({indexCollectionName, indexedCollectionName, indexedPropertyName} as IPropertyIndexDescriptor);
+  propertyIndex.getDocumentId = (propertyValue: any) => getPropertyIndexDocumentId(propertyIndex, propertyValue); // eslint-disable-line @typescript-eslint/no-explicit-any
+  propertyIndex.getDocumentPath = (propertyValue: any) => getPropertyIndexDocumentPath(propertyIndex, propertyValue); // eslint-disable-line @typescript-eslint/no-explicit-any
   return propertyIndex;
 }
 
@@ -95,12 +95,12 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
    * @param {string} singularName The name for a single document of the type T.
    * @param {string} pluralName The name for multiple documents of the type T.
    * @param {boolean} isSingleton Whether the collection is ONLY allowed to contain a single document of type T or not.
-   * @param {QR.QuerySetConstructor<Q, T>} [querySetConstructor] The function that constructs the object containing the set of queries useful for reading and editing document instances of type T.
+   * @param {QR.QuerySetConstructor<Q, T>} querySetConstructor The function that constructs the object containing the set of queries useful for reading and editing document instances of type T.
    * @param {ICollectionDescriptor | null} [parentCollectionDescriptor=null] The descriptor of the parent collection, if one exists.
-   * @param {Array<T> | (() => Array<T>)} [requiredDocuments=[]] The list of documents that must exist in a valid installation of the system.
-   * @param {F} [factoryFunction=null] The factory function that creates a document instance of type T.
+   * @param {Array<T> | BT.DefaultFunc<Array<T>>} [requiredDocuments=([] as Array<T>)] The list of documents that must exist in a valid installation of the system.
+   * @param {F | null} [factoryFunction=null] The factory function that creates a document instance of type T.
    */
-  constructor(singularName: string, pluralName: string, isSingleton: boolean, querySetConstructor: QR.QuerySetConstructor<Q, T>, parentCollectionDescriptor: ICollectionDescriptor | null = null, requiredDocuments: Array<T> | (() => Array<T>) = [], factoryFunction: F | null = null) { // eslint-disable-line max-len
+  constructor(singularName: string, pluralName: string, isSingleton: boolean, querySetConstructor: QR.QuerySetConstructor<Q, T>, parentCollectionDescriptor: ICollectionDescriptor | null = null, requiredDocuments: Array<T> | BT.DefaultFunc<Array<T>> = ([] as Array<T>), factoryFunction: F | null = null) { // eslint-disable-line max-len
     let rootDescriptor = parentCollectionDescriptor;
     while (!TC.isNullish(rootDescriptor)) {
       if (rootDescriptor == this) {
