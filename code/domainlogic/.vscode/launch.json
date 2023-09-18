@@ -25,6 +25,11 @@
       ],
       "skipFiles": [
         "<node_internals>/**"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/lib/base/src/**/*.js",
+        "${workspaceFolder}/lib/datamodel/src/**/*.js",
+        "${workspaceFolder}/lib/domainlogic/src/**/*.js"
       ]
     }
   ]
