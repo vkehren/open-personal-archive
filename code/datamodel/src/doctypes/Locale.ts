@@ -1,7 +1,7 @@
 import * as OPA from "../../../base/src";
 import * as BT from "../BaseTypes";
-import * as CollectionData_Full from "./Locales.json";
-import * as CollectionData_Min from "./Locales.min.json";
+import * as CollectionData_Full from "./Locales.json"; // eslint-disable-line camelcase
+import * as CollectionData_Min from "./Locales.min.json"; // eslint-disable-line camelcase
 
 /**
  * Dynamically gets the required documents.
@@ -9,7 +9,7 @@ import * as CollectionData_Min from "./Locales.min.json";
  * @return {Array<ILocale>}
  */
 function getRequiredDocuments(dateOfCreation: OPA.DateToUse | null = null): Array<ILocale> {
-  const collectionData = (BT.DataConfiguration.Locale_UseMin) ? CollectionData_Min : CollectionData_Full;
+  const collectionData = (BT.DataConfiguration.Locale_UseMin) ? CollectionData_Min : CollectionData_Full; // eslint-disable-line camelcase
   const requiredDocuments: Array<ILocale> = OPA.promoteDocumentsToCreatable(collectionData.requiredDocuments, dateOfCreation);
   return requiredDocuments;
 }
@@ -31,7 +31,7 @@ export interface ILocale extends OPA.IDocument_Creatable {
   readonly isDefault: boolean;
 }
 
-type ILocalePartial = any;
+type ILocalePartial = unknown;
 /**
  * Checks whether the specified updates to the specified Locale document are valid.
  * @param {ILocale} document The Locale document being updated.

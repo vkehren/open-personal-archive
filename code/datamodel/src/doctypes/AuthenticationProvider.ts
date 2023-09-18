@@ -8,7 +8,7 @@ export const AuthenticationProvider_GoogleId = "OPA_AuthenticationProvider_Googl
 export const AuthenticationProvider_RequiredIds = [AuthenticationProvider_GoogleId]; // eslint-disable-line camelcase
 const RequiredDocuments: Array<IAuthenticationProvider> = OPA.promoteDocumentsToCreatable(CollectionData.requiredDocuments, null);
 const DefaultDocument = (RequiredDocuments.find((v) => v.isDefault) as IAuthenticationProvider | undefined);
-export const DefaultAuthenticationProviderId = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNonNullish(DefaultDocument).id : AuthenticationProvider_GoogleId;
+export const DefaultAuthenticationProviderId = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNonNullish(DefaultDocument).id : AuthenticationProvider_GoogleId; // eslint-disable-line camelcase
 
 export interface IAuthenticationProvider extends OPA.IDocument_Creatable {
   readonly id: string;
@@ -18,7 +18,7 @@ export interface IAuthenticationProvider extends OPA.IDocument_Creatable {
   readonly isDefault: boolean;
 }
 
-type IAuthenticationProviderPartial = any;
+type IAuthenticationProviderPartial = unknown;
 /**
  * Checks whether the specified updates to the specified AuthenticationProvider document are valid.
  * @param {IAuthenticationProvider} document The AuthenticationProvider document being updated.

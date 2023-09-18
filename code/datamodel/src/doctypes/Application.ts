@@ -1,6 +1,8 @@
 import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../../base/src";
 
+/* eslint-disable camelcase */
+
 const SingularName = "Application";
 const PluralName = "Applications";
 const IsSingleton = true;
@@ -52,7 +54,7 @@ export function areUpdatesValid(document: IApplication, updateObject: IApplicati
   // NOTE: updateObject MUST NOT erase read-only history of upgrades
   const upgradeHistory_KeyText = OPA.getTypedPropertyKeysAsText(document).upgradeHistory;
   const upgradeHistory_IsUpdated = propertyNames_ForUpdate.includes(upgradeHistory_KeyText);
-  const upgradeHistory_Value = (updateObject as any)[upgradeHistory_KeyText];
+  const upgradeHistory_Value = (updateObject as Record<string, unknown>)[upgradeHistory_KeyText];
 
   if (upgradeHistory_IsUpdated && !OPA.isOfFieldValue_ArrayUnion<firestore.FieldValue>(upgradeHistory_Value)) {
     return false;
@@ -94,8 +96,8 @@ export function createSingleton(applicationVersion: string, schemaVersion: strin
     userIdOfLatestUpgrader: null,
   };
 
-  const documentCopy = (OPA.copyObject(document) as any);
-  delete documentCopy.upgradeHistory;
+  const documentCopy = OPA.copyObject(document);
+  delete ((documentCopy as unknown) as Record<string, unknown>).upgradeHistory;
   document.upgradeHistory.push(documentCopy);
   return document;
 }
@@ -143,7 +145,7 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     batchUpdate.set(documentRef, proxiedDocument, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
     return documentId;
   }
 
@@ -175,7 +177,7 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
   }
 }
 

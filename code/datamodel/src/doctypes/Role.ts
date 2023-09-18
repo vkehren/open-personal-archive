@@ -13,7 +13,7 @@ export const Role_GuestId = "OPA_Role_Guest"; // eslint-disable-line camelcase
 export const Role_RequiredIds = [Role_OwnerId, Role_AdministratorId, Role_EditorId, Role_ViewerId, Role_GuestId]; // eslint-disable-line camelcase
 const RequiredDocuments: Array<IRole> = OPA.promoteDocumentsToCreatable(CollectionData.requiredDocuments.map((value) => ({...{type: (value.type as BT.RoleType)}, ...value})), null); // eslint-disable-line max-len
 const DefaultDocument = (RequiredDocuments.find((v) => v.isDefault) as IRole | undefined);
-export const DefaultRoleId = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNonNullish(DefaultDocument).id : Role_GuestId;
+export const DefaultRoleId = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNonNullish(DefaultDocument).id : Role_GuestId; // eslint-disable-line camelcase
 
 export interface IRole extends OPA.IDocument_Creatable {
   readonly id: string;
@@ -23,7 +23,7 @@ export interface IRole extends OPA.IDocument_Creatable {
   readonly isDefault: boolean;
 }
 
-type IRolePartial = any;
+type IRolePartial = unknown;
 /**
  * Checks whether the specified updates to the specified Role document are valid.
  * @param {IRole} document The Role document being updated.

@@ -1,9 +1,11 @@
 import * as OPA from "../../base/src";
 
 export const DefaultIndexCollection = "Indices";
-export const localizableStringConstructor = function (locale: string, desiredValue: string | null = null, defaultValue: string = ""): OPA.ILocalizable<string> {
+
+// LATER: Move the following to base package
+export const localizableStringConstructor = function(locale: string, desiredValue: string | null = null, defaultValue = ""): OPA.ILocalizable<string> {
   OPA.assertNonNullishOrWhitespace(locale);
-  const localizableString = ({} as any);
+  const localizableString = ({} as Record<string, unknown> & OPA.ILocalizable<string>);
   localizableString[locale] = (!OPA.isNullishOrWhitespace(desiredValue) ? OPA.convertNonNullish(desiredValue) : defaultValue);
   localizableString[OPA.Default_Locale] = localizableString[locale]; // NOTE: The base library default locale is actually "en"
   return localizableString;
@@ -15,7 +17,8 @@ export const DataConfiguration = {
   TimeZone_UseMin: false,
 };
 
-export const PropertyNames_ForUnDelete_ByUser: Array<string | symbol> = [
+// LATER: Move the following to base package
+export const PropertyNames_ForUnDelete_ByUser: Array<string | symbol> = [ // eslint-disable-line camelcase
   OPA.IUpdateable_HasBeenUpdated_PropertyName,
   OPA.IUpdateable_DateOfLatestUpdate_PropertyName,
   OPA.IUpdateable_ByUser_UserIdOfLatestUpdater_PropertyName,

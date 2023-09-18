@@ -6,6 +6,8 @@ import {ILocale} from "./Locale";
 import {IRole, Role_OwnerId} from "./Role"; // eslint-disable-line camelcase
 import {ITimeZoneGroup} from "./TimeZoneGroup";
 
+/* eslint-disable camelcase */
+
 const SingularName = "User";
 const PluralName = "Users";
 const IsSingleton = false;
@@ -36,12 +38,12 @@ interface ICitationAccessorPartial {
   userIdOfLatestCitationChanger: string | null;
 }
 
-type UpdateHistoryItem = IUserPartial | OPA.IUpdateable_ByUser | OPA.IAssignableToRole_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState> | OPA.ISuspendable_ByUser | OPA.IDeleteable_ByUser;
+type UpdateHistoryItem = IUserPartial | OPA.IUpdateable_ByUser | OPA.IAssignableToRole_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState> | OPA.ISuspendable_ByUser | OPA.IDeleteable_ByUser; // eslint-disable-line max-len
 interface IUserPartial_WithHistory extends IUserPartial, OPA.IUpdateable {
   updateHistory: Array<UpdateHistoryItem> | firestore.FieldValue;
 }
 
-export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable_ByUser, OPA.IDocument_AssignableToRole_ByUser, IDocument_CitationAccessor, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Suspendable_ByUser, OPA.IDocument_Deleteable_ByUser {
+export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable_ByUser, OPA.IDocument_AssignableToRole_ByUser, IDocument_CitationAccessor, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Suspendable_ByUser, OPA.IDocument_Deleteable_ByUser { // eslint-disable-line max-len
   readonly id: string;
   readonly firebaseAuthUserId: string;
   readonly authProviderId: string;
@@ -93,14 +95,14 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   const viewableCitationIds_UpdateUsesInterface = requestedCitationIds_UpdateUsesInterface;
   const viewableCitationIds_IsUpdatedDirectly = (!viewableCitationIds_UpdateUsesInterface && propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).viewableCitationIds));
 
-  if (id_IsUpdated || firebaseAuthUserId_IsUpdated || authProviderId_IsUpdated || authAccountName_IsUpdated || authAccountNameLowered_IsUpdated || assignedRoleId_IsUpdatedDirectly || requestedCitationIds_IsUpdatedDirectly || viewableCitationIds_IsUpdatedDirectly) {
+  if (id_IsUpdated || firebaseAuthUserId_IsUpdated || authProviderId_IsUpdated || authAccountName_IsUpdated || authAccountNameLowered_IsUpdated || assignedRoleId_IsUpdatedDirectly || requestedCitationIds_IsUpdatedDirectly || viewableCitationIds_IsUpdatedDirectly) { // eslint-disable-line max-len
     return false;
   }
 
   // NOTE: updateObject MUST NOT erase read-only history of changes
   const updateHistory_KeyText = OPA.getTypedPropertyKeysAsText(document).updateHistory;
   const updateHistory_IsUpdated = propertyNames_ForUpdate.includes(updateHistory_KeyText);
-  const updateHistory_Value = (updateObject as any)[updateHistory_KeyText];
+  const updateHistory_Value = (updateObject as Record<string, unknown>)[updateHistory_KeyText];
 
   if (updateHistory_IsUpdated && !OPA.isOfFieldValue_ArrayUnion<firestore.FieldValue>(updateHistory_Value)) {
     return false;
@@ -117,7 +119,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
     }
   }
 
-  if (true) {
+  if (true) { // eslint-disable-line no-constant-condition
     const updateObject_Creatable = (updateObject as OPA.ICreatable_ByUser);
 
     if (!OPA.isNullish(updateObject_Creatable.dateOfCreation) || !OPA.isNullish(updateObject_Creatable.userIdOfCreator)) {
@@ -130,7 +132,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
     }
   }
 
-  if (true) {
+  if (true) { // eslint-disable-line no-constant-condition
     if (OPA.isUndefined(updateObject_AssignableToRole.assignedRoleId)) {
       const dateIsSet = !OPA.isUndefined(updateObject_AssignableToRole.dateOfLatestRoleAssignment);
       const userIsSet = !OPA.isUndefined(updateObject_AssignableToRole.userIdOfLatestRoleAssigner);
@@ -152,8 +154,8 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
     }
   }
 
-  if (true) {
-    // NOTE: Unlike most interfaces used in this fuction, ICitationAccessor only requires that one of the two array properties is updated 
+  if (true) { // eslint-disable-line no-constant-condition
+    // NOTE: Unlike most interfaces used in this fuction, ICitationAccessor only requires that one of the two array properties is updated
     if (OPA.isUndefined(updateObject_CitationAccessor.requestedCitationIds) && OPA.isUndefined(updateObject_CitationAccessor.viewableCitationIds)) {
       const dateIsSet = !OPA.isUndefined(updateObject_CitationAccessor.dateOfLatestCitationChange);
       const userIsSet = !OPA.isUndefined(updateObject_CitationAccessor.userIdOfLatestCitationChanger);
@@ -178,7 +180,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
     }
   }
 
-  if (true) {
+  if (true) { // eslint-disable-line no-constant-condition
     const updateObject_Viewable = (updateObject as OPA.IViewable_ByUser);
 
     if (OPA.isUndefined(updateObject_Viewable.hasBeenViewed)) {
@@ -209,7 +211,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
     }
   }
 
-  if (true) {
+  if (true) { // eslint-disable-line no-constant-condition
     const updateObject_Approvable = (updateObject as OPA.IApprovable_ByUser<BT.ApprovalState>);
 
     if (OPA.isUndefined(updateObject_Approvable.hasBeenDecided)) {
@@ -246,7 +248,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
     }
   }
 
-  if (true) {
+  if (true) { // eslint-disable-line no-constant-condition
     const updateObject_Suspendable = (updateObject as OPA.ISuspendable_ByUser);
 
     if (OPA.isUndefined(updateObject_Suspendable.isSuspended) || OPA.isUndefined(updateObject_Suspendable.hasSuspensionStarted) || OPA.isUndefined(updateObject_Suspendable.hasSuspensionEnded)) {
@@ -308,7 +310,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
     }
   }
 
-  if (true) {
+  if (true) { // eslint-disable-line no-constant-condition
     const updateObject_Deleteable = (updateObject as OPA.IDeleteable_ByUser);
 
     if (OPA.isUndefined(updateObject_Deleteable.isMarkedAsDeleted)) {
@@ -407,8 +409,8 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     userIdOfDeleter: null,
   };
 
-  const documentCopy = (OPA.copyObject(document) as any);
-  delete documentCopy.updateHistory;
+  const documentCopy = OPA.copyObject(document);
+  delete ((documentCopy as unknown) as Record<string, unknown>).updateHistory;
   document.updateHistory.push(documentCopy);
   return document;
 }
@@ -473,8 +475,8 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     userIdOfDeleter: null,
   };
 
-  const documentCopy = (OPA.copyObject(document) as any);
-  delete documentCopy.updateHistory;
+  const documentCopy = OPA.copyObject(document);
+  delete ((documentCopy as unknown) as Record<string, unknown>).updateHistory;
   document.updateHistory.push(documentCopy);
   return document;
 }
@@ -489,25 +491,24 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     super(collectionDescriptor);
     this.documentProxyConstructor = (user: IUser): IUser => {
       return new Proxy(user, {
-        get(target, propertyName, receiver) {
+        get(target, propertyName, receiver) { // eslint-disable-line @typescript-eslint/no-unused-vars
           if (propertyName == OPA.getTypedPropertyKeyAsText<IUser>("authAccountNameLowered")) {
             return target.authAccountName.toLowerCase();
-          }
-          else if (propertyName == OPA.ISuspendable_IsSuspended_PropertyName) {
+          } else if (propertyName == OPA.ISuspendable_IsSuspended_PropertyName) {
             return OPA.isSuspended(target);
           } else {
-            return Reflect.get(arguments[0], arguments[1], arguments[2]);
+            return Reflect.get(arguments[0], arguments[1], arguments[2]); // eslint-disable-line prefer-rest-params
           }
         },
-        set(target, propertyName, propertyValue, receiver) {
+        set(target, propertyName, propertyValue, receiver) { // eslint-disable-line @typescript-eslint/no-unused-vars
           if (propertyName == OPA.getTypedPropertyKeyAsText<IUser>("authAccountNameLowered")) {
             throw new Error("The \"" + OPA.getTypedPropertyKeyAsText<IUser>("authAccountNameLowered") + "\" property is not settable.");
           } else if (propertyName == OPA.ISuspendable_IsSuspended_PropertyName) {
             throw new Error("The \"" + OPA.ISuspendable_IsSuspended_PropertyName + "\" property is not settable.");
           } else {
-            return Reflect.set(arguments[0], arguments[1], arguments[2], arguments[3]);
+            return Reflect.set(arguments[0], arguments[1], arguments[2], arguments[3]); // eslint-disable-line prefer-rest-params
           }
-        }
+        },
       });
     };
   }
@@ -605,7 +606,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const authAccountNameLoweredIndexCollectionRef = ds.db.collection(Index_User_AuthAccountNameLowered.indexCollectionName);
     const authAccountNameLoweredIndexDocRef = authAccountNameLoweredIndexCollectionRef.doc(Index_User_AuthAccountNameLowered.getDocumentId(proxiedOwner.authAccountNameLowered));
     batchUpdate.set(authAccountNameLoweredIndexDocRef, {value: ownerId});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
     return proxiedOwner;
   }
 
@@ -649,7 +650,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const authAccountNameLoweredIndexCollectionRef = ds.db.collection(Index_User_AuthAccountNameLowered.indexCollectionName);
     const authAccountNameLoweredIndexDocRef = authAccountNameLoweredIndexCollectionRef.doc(Index_User_AuthAccountNameLowered.getDocumentId(proxiedDocument.authAccountNameLowered));
     batchUpdate.set(authAccountNameLoweredIndexDocRef, {value: documentId});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
     return documentId;
   }
 
@@ -681,7 +682,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
   }
 
   /**
@@ -714,7 +715,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
   }
 
   /**
@@ -733,7 +734,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
-    const updateObject_CitationAccessor = ({requestedCitationIds: ds.constructorProvider.arrayUnion(requestedCitationId), dateOfLatestCitationChange: now, userIdOfLatestCitationChanger: userIdOfLatestUpdater} as ICitationAccessorPartial);
+    const updateObject_CitationAccessor = ({requestedCitationIds: ds.constructorProvider.arrayUnion(requestedCitationId), dateOfLatestCitationChange: now, userIdOfLatestCitationChanger: userIdOfLatestUpdater} as ICitationAccessorPartial); // eslint-disable-line max-len
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_CitationAccessor};
     const updateObject_ForHistory = OPA.replaceFieldValuesWithSummaries({...updateObject});
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject_ForHistory);
@@ -748,7 +749,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
   }
 
   /**
@@ -767,7 +768,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
-    const updateObject_CitationAccessor = ({viewableCitationIds: ds.constructorProvider.arrayUnion(viewableCitationId), dateOfLatestCitationChange: now, userIdOfLatestCitationChanger: userIdOfLatestUpdater} as ICitationAccessorPartial);
+    const updateObject_CitationAccessor = ({viewableCitationIds: ds.constructorProvider.arrayUnion(viewableCitationId), dateOfLatestCitationChange: now, userIdOfLatestCitationChanger: userIdOfLatestUpdater} as ICitationAccessorPartial); // eslint-disable-line max-len
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_CitationAccessor};
     const updateObject_ForHistory = OPA.replaceFieldValuesWithSummaries({...updateObject});
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject_ForHistory);
@@ -782,7 +783,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
   }
 
   /**
@@ -813,7 +814,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
   }
 
   /**
@@ -845,7 +846,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
   }
 
   /**
@@ -870,7 +871,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfSuspensionStarter} as OPA.IUpdateable_ByUser);
-    const updateObject_Suspendable = ({isSuspended: true, hasSuspensionStarted: true, hasSuspensionEnded: false, reasonForSuspensionStart: reason, reasonForSuspensionEnd: null, dateOfSuspensionStart: now, dateOfSuspensionEnd: null, userIdOfSuspensionStarter, userIdOfSuspensionEnder: null} as OPA.ISuspendable_ByUser);
+    const updateObject_Suspendable = ({isSuspended: true, hasSuspensionStarted: true, hasSuspensionEnded: false, reasonForSuspensionStart: reason, reasonForSuspensionEnd: null, dateOfSuspensionStart: now, dateOfSuspensionEnd: null, userIdOfSuspensionStarter, userIdOfSuspensionEnder: null} as OPA.ISuspendable_ByUser); // eslint-disable-line max-len
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Suspendable};
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
@@ -882,7 +883,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
   }
 
   /**
@@ -910,7 +911,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfSuspensionEnder} as OPA.IUpdateable_ByUser);
-    const updateObject_Suspendable = ({isSuspended: false, hasSuspensionStarted: true, hasSuspensionEnded: true, reasonForSuspensionStart, reasonForSuspensionEnd: reason, dateOfSuspensionStart, dateOfSuspensionEnd: now, userIdOfSuspensionStarter, userIdOfSuspensionEnder} as OPA.ISuspendable_ByUser);
+    const updateObject_Suspendable = ({isSuspended: false, hasSuspensionStarted: true, hasSuspensionEnded: true, reasonForSuspensionStart, reasonForSuspensionEnd: reason, dateOfSuspensionStart, dateOfSuspensionEnd: now, userIdOfSuspensionStarter, userIdOfSuspensionEnder} as OPA.ISuspendable_ByUser); // eslint-disable-line max-len
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Suspendable};
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
@@ -922,7 +923,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
   }
 
   /**
@@ -953,7 +954,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
   }
 }
 

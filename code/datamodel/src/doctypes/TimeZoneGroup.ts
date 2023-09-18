@@ -1,7 +1,7 @@
 import * as OPA from "../../../base/src";
 import * as BT from "../BaseTypes";
-import * as CollectionData_Full from "./TimeZoneGroups.json";
-import * as CollectionData_Min from "./TimeZoneGroups.min.json";
+import * as CollectionData_Full from "./TimeZoneGroups.json"; // eslint-disable-line camelcase
+import * as CollectionData_Min from "./TimeZoneGroups.min.json"; // eslint-disable-line camelcase
 
 /**
  * Dynamically gets the required documents.
@@ -9,7 +9,7 @@ import * as CollectionData_Min from "./TimeZoneGroups.min.json";
  * @return {Array<ILocale>}
  */
 function getRequiredDocuments(dateOfCreation: OPA.DateToUse | null = null): Array<ITimeZoneGroup> {
-  const collectionData = (BT.DataConfiguration.TimeZoneGroup_UseMin) ? CollectionData_Min : CollectionData_Full;
+  const collectionData = (BT.DataConfiguration.TimeZoneGroup_UseMin) ? CollectionData_Min : CollectionData_Full; // eslint-disable-line camelcase
   const requiredDocuments: Array<ITimeZoneGroup> = OPA.promoteDocumentsToCreatable(collectionData.requiredDocuments, dateOfCreation);
   return requiredDocuments;
 }
@@ -32,7 +32,7 @@ export interface ITimeZoneGroup extends OPA.IDocument_Creatable {
   readonly isDefault: boolean;
 }
 
-type ITimeZoneGroupPartial = any;
+type ITimeZoneGroupPartial = unknown;
 /**
  * Checks whether the specified updates to the specified TimeZoneGroup document are valid.
  * @param {ITimeZoneGroup} document The TimeZoneGroup document being updated.

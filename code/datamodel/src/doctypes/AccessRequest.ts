@@ -5,6 +5,8 @@ import {SingletonId} from "./Archive";
 import {ILocale, DefaultLocale} from "./Locale";
 import {IUser} from "./User";
 
+/* eslint-disable camelcase */
+
 const SingularName = "AccessRequest";
 const PluralName = "AccessRequests";
 const IsSingleton = false;
@@ -14,14 +16,14 @@ export interface IAccessRequestPartial {
   response?: OPA.ILocalizable<string>;
 }
 
-type UpdateHistoryItem = IAccessRequestPartial | OPA.IUpdateable_ByUser | OPA.ITaggable_ByUser | OPA.IArchivable_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState> | OPA.IDeleteable_ByUser;
+type UpdateHistoryItem = IAccessRequestPartial | OPA.IUpdateable_ByUser | OPA.ITaggable_ByUser | OPA.IArchivable_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState> | OPA.IDeleteable_ByUser; // eslint-disable-line max-len
 interface IAccessRequestPartial_WithHistory extends IAccessRequestPartial, OPA.IUpdateable_ByUser {
   updateHistory: Array<UpdateHistoryItem> | firestore.FieldValue;
 }
 
 // NOTE: Use "IDocument_Creatable_ByUser" because we must record the User who created the AccessRequest (i.e. the owner of the AccessRequest)
 // NOTE: Use "IDocument_Updateable_ByUser" because the User creating the AccessRequest updates the "message", but the Decider updates the "response"
-export interface IAccessRequest extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser, OPA.IDocument_Taggable_ByUser, OPA.IDocument_Archivable_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Deleteable_ByUser {
+export interface IAccessRequest extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser, OPA.IDocument_Taggable_ByUser, OPA.IDocument_Archivable_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Deleteable_ByUser { // eslint-disable-line max-len
   readonly id: string;
   readonly archiveId: string; // NOTE: This field stores information necessary to extend the OPA system to manage multiple Archives
   readonly isSpecificToCitation: boolean;
@@ -62,7 +64,7 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
   // NOTE: updateObject MUST NOT erase read-only history of changes
   const updateHistory_KeyText = OPA.getTypedPropertyKeysAsText(document).updateHistory;
   const updateHistory_IsUpdated = propertyNames_ForUpdate.includes(updateHistory_KeyText);
-  const updateHistory_Value = (updateObject as any)[updateHistory_KeyText];
+  const updateHistory_Value = (updateObject as Record<string, unknown>)[updateHistory_KeyText];
 
   if (updateHistory_IsUpdated && !OPA.isOfFieldValue_ArrayUnion<firestore.FieldValue>(updateHistory_Value)) {
     return false;
@@ -77,7 +79,7 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
     }
   }
 
-  if (true) {
+  if (true) { // eslint-disable-line no-constant-condition
     const updateObject_Creatable = (updateObject as OPA.ICreatable_ByUser);
 
     if (!OPA.isNullish(updateObject_Creatable.dateOfCreation) || !OPA.isNullish(updateObject_Creatable.userIdOfCreator)) {
@@ -90,7 +92,7 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
     }
   }
 
-  if (true) {
+  if (true) { // eslint-disable-line no-constant-condition
     const updateObject_Taggable = (updateObject as OPA.ITaggable_ByUser);
 
     if (OPA.isUndefined(updateObject_Taggable.tags)) {
@@ -115,7 +117,7 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
     }
   }
 
-  if (true) {
+  if (true) { // eslint-disable-line no-constant-condition
     const updateObject_Archivable = (updateObject as OPA.IArchivable_ByUser);
 
     if (OPA.isUndefined(updateObject_Archivable.isArchived)) {
@@ -146,7 +148,7 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
     }
   }
 
-  if (true) {
+  if (true) { // eslint-disable-line no-constant-condition
     const updateObject_Viewable = (updateObject as OPA.IViewable_ByUser);
 
     if (OPA.isUndefined(updateObject_Viewable.hasBeenViewed)) {
@@ -177,7 +179,7 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
     }
   }
 
-  if (true) {
+  if (true) { // eslint-disable-line no-constant-condition
     const updateObject_Approvable = (updateObject as OPA.IApprovable_ByUser<BT.ApprovalState>);
 
     if (OPA.isUndefined(updateObject_Approvable.hasBeenDecided)) {
@@ -214,7 +216,7 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
     }
   }
 
-  if (true) {
+  if (true) { // eslint-disable-line no-constant-condition
     const updateObject_Deleteable = (updateObject as OPA.IDeleteable_ByUser);
 
     if (OPA.isUndefined(updateObject_Deleteable.isMarkedAsDeleted)) {
@@ -315,8 +317,8 @@ function createInstance(id: string, user: IUser, locale: ILocale, message: strin
     userIdOfDeleter: null,
   };
 
-  const documentCopy = (OPA.copyObject(document) as any);
-  delete documentCopy.updateHistory;
+  const documentCopy = OPA.copyObject(document);
+  delete ((documentCopy as unknown) as Record<string, unknown>).updateHistory;
   document.updateHistory.push(documentCopy);
   return document;
 }
@@ -356,7 +358,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
 
     const matchingAccessRequests = matchingAccessRequestsSnap.docs.map((doc) => doc.data());
     const proxiedAccessRequests = matchingAccessRequests.map((document) => this.documentProxyConstructor(document));
-    return proxiedAccessRequests
+    return proxiedAccessRequests;
   }
 
   /**
@@ -385,7 +387,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
     batchUpdate.set(documentRef, proxiedDocument, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
     return documentId;
   }
 
@@ -417,7 +419,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
   }
 
   /**
@@ -449,7 +451,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
   }
 
   /**
@@ -481,7 +483,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
   }
 
   /**
@@ -512,7 +514,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
   }
 
   /**
@@ -544,7 +546,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
   }
 
   /**
@@ -575,7 +577,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc(documentId);
     batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();}
+    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
   }
 }
 
