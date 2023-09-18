@@ -9,7 +9,7 @@ import * as UTL from "../Utilities";
 
 const moduleName = module.filename.split(".")[0];
 
-const isInstalled_FunctionName = () => (OPA.getTypedPropertyKeyAsText("isInstalled", {isInstalled}));
+const isInstalled_FunctionName = () => (OPA.getTypedPropertyKeyAsText("isInstalled", {isInstalled})); // eslint-disable-line camelcase
 export const isInstalled = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   let adminApp = ((null as unknown) as admin.app.App);
   let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
@@ -33,7 +33,7 @@ export const isInstalled = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (
 
     let archive: OpaDm.IArchive | null = null;
     let locale: OpaDm.ILocale | null = null;
-    let data: any = {isInstalled, isAuthenticated: false, isAuthorized: false};
+    let data = {isInstalled, isAuthenticated: false, isAuthorized: false};
 
     if (isInstalled) {
       archive = await OpaDb.Archive.queries.getById(dataStorageState, OpaDm.ArchiveId);
@@ -95,7 +95,7 @@ export const isInstalled = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (
   }
 });
 
-const getInstallationScreenDisplayModel_FunctionName = () => (OPA.getTypedPropertyKeyAsText("getInstallationScreenDisplayModel", {getInstallationScreenDisplayModel}));
+const getInstallationScreenDisplayModel_FunctionName = () => (OPA.getTypedPropertyKeyAsText("getInstallationScreenDisplayModel", {getInstallationScreenDisplayModel})); // eslint-disable-line camelcase
 export const getInstallationScreenDisplayModel = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   let adminApp = ((null as unknown) as admin.app.App);
   let callState = ((null as unknown) as OpaDm.ICallState);
@@ -119,7 +119,7 @@ export const getInstallationScreenDisplayModel = onCall({region: OPA.FIREBASE_DE
   }
 });
 
-const performInstall_FunctionName = () => (OPA.getTypedPropertyKeyAsText("performInstall", {performInstall}));
+const performInstall_FunctionName = () => (OPA.getTypedPropertyKeyAsText("performInstall", {performInstall})); // eslint-disable-line camelcase
 export const performInstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   let adminApp = ((null as unknown) as admin.app.App);
   let callState = ((null as unknown) as OpaDm.ICallState);
@@ -159,7 +159,7 @@ export const performInstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, asyn
   }
 });
 
-const updateInstallationSettings_FunctionName = () => (OPA.getTypedPropertyKeyAsText("updateInstallationSettings", {updateInstallationSettings}));
+const updateInstallationSettings_FunctionName = () => (OPA.getTypedPropertyKeyAsText("updateInstallationSettings", {updateInstallationSettings})); // eslint-disable-line camelcase
 export const updateInstallationSettings = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   let adminApp = ((null as unknown) as admin.app.App);
   let callState = ((null as unknown) as OpaDm.ICallState);
@@ -191,7 +191,7 @@ export const updateInstallationSettings = onCall({region: OPA.FIREBASE_DEFAULT_R
   }
 });
 
-const performUpgrade_FunctionName = () => (OPA.getTypedPropertyKeyAsText("performUpgrade", {performUpgrade}));
+const performUpgrade_FunctionName = () => (OPA.getTypedPropertyKeyAsText("performUpgrade", {performUpgrade})); // eslint-disable-line camelcase
 export const performUpgrade = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   let adminApp = ((null as unknown) as admin.app.App);
   let callState = ((null as unknown) as OpaDm.ICallState);
@@ -217,7 +217,7 @@ export const performUpgrade = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, asyn
   }
 });
 
-const performUninstall_FunctionName = () => (OPA.getTypedPropertyKeyAsText("performUninstall", {performUninstall}));
+const performUninstall_FunctionName = () => (OPA.getTypedPropertyKeyAsText("performUninstall", {performUninstall})); // eslint-disable-line camelcase
 export const performUninstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   let adminApp = ((null as unknown) as admin.app.App);
   let callState = ((null as unknown) as OpaDm.ICallState);

@@ -250,7 +250,7 @@ export async function logFunctionError(dataStorageState: OpaDm.IDataStorageState
  * Cleans up resources upon completion of a server function call in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
  * @param {OpaDm.IAuthenticationState | null} authenticationState The Firebase Authentication state for the User.
- * @param {admin.app.App} app The Firebase admin app used in the call.
+ * @param {admin.app.App} adminApp The Firebase admin app used in the call.
  * @param {CallableRequest} request The Firebase request object.
  * @return {Promise<OpaDm.void>}
  */
