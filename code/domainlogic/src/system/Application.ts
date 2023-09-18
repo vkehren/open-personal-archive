@@ -177,7 +177,7 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   const authProviderNonNull = OPA.convertNonNullish(authProvider);
   const localeDefaultNonNull = OPA.convertNonNullish(localeDefault);
   const timeZoneGroupDefaultNonNull = OPA.convertNonNullish(timeZoneGroupDefault);
-  const userOwner = await OpaDb.Users.queries.createArchiveOwner(dataStorageState, ownerFirebaseAuthUserId, authProviderNonNull, ownerAccountName, localeDefaultNonNull, timeZoneGroupDefaultNonNull, ownerFirstName, ownerLastName);
+  const userOwner = await OpaDb.Users.queries.createArchiveOwner(dataStorageState, ownerFirebaseAuthUserId, authProviderNonNull, ownerAccountName, localeDefaultNonNull, timeZoneGroupDefaultNonNull, ownerFirstName, ownerLastName); // eslint-disable-line max-len
 
   // 4) Create the Archive document for the Archive
   await OpaDb.Archive.queries.create(dataStorageState, archiveName, archiveDescription, pathToStorageFolder, userOwner, localeDefaultNonNull, timeZoneGroupDefaultNonNull);
@@ -386,6 +386,6 @@ export async function performUninstall(dataStorageState: OpaDm.IDataStorageState
     // NOTE: The "bulkWriter" constant is necessary to make this work
     await OPA.convertNonNullish(bulkWriter).close();
     dataStorageState.currentBulkWriter = null;
-    return wasSuccessful;
   }
+  return wasSuccessful;
 }

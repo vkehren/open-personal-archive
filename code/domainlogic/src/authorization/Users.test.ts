@@ -14,6 +14,8 @@ import {TestAuthData} from "../TestData.test";
 import * as TestConfig from "../TestConfiguration.test";
 import * as TestUtils from "../TestUtilities.test";
 
+/* eslint-disable brace-style, camelcase */
+
 const config = TestConfig.getTestConfiguration();
 const ambientAuth = (): TestConfig.IAuthenticationStateForTests => (config.authenticationState);
 const ambientUserId = (): string => (ambientAuth().opaUserId);
@@ -27,7 +29,7 @@ const testString_EXCLAIM = "!";
 const testStartReason = "START reason";
 const testEndReason = "END reason";
 
-describe("Tests using Firebase " + config.testEnvironment, function () {
+describe("Tests using Firebase " + config.testEnvironment, function() {
   if (!OPA.isNullish(config.timeout)) {
     this.timeout(OPA.convertNonNullish(config.timeout)); // eslint-disable-line no-invalid-this
   }
@@ -64,7 +66,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
   });
 
   const testFunc1 = () => (async () => {
-    let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
+    const isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
     await TestUtils.assertUserDoesNotExist(config.dataStorageState, config.authenticationState);
     await TestUtils.assertUserDoesNotExist(config.dataStorageState, TestAuthData.owner);
@@ -125,7 +127,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(user.lastName).equals(TestAuthData.owner.lastName);
     expect(user.recentQueries.length).equals(0);
     expect(user.updateHistory.length).equals(1);
-    expect((user.updateHistory[0] as any).updateHistory).equals(undefined);
+    expect((user.updateHistory[0] as OpaDm.IUser).updateHistory).equals(undefined);
     expect(user.hasBeenUpdated).equals(false);
     expect(user.dateOfLatestUpdate).equals(null);
     expect(user.userIdOfLatestUpdater).equals(null);
@@ -804,7 +806,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(user.userIdOfLatestCitationChanger).equals(null);
     expect(user.recentQueries.length).equals(0);
     expect(user.updateHistory.length).equals(1);
-    expect((user.updateHistory[0] as any).updateHistory).equals(undefined);
+    expect((user.updateHistory[0] as OpaDm.IUser).updateHistory).equals(undefined);
     expect(user.hasBeenUpdated).equals(false);
     expect(user.dateOfLatestUpdate).equals(null);
     expect(user.userIdOfLatestUpdater).equals(null);

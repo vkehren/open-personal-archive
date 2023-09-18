@@ -11,11 +11,11 @@ import * as Application from "./Application";
  * @param {string} requestor The URI of the requestor.
  * @param {string} resource The URI of the resource being requested.
  * @param {string | null} action The action being requested, if any.
- * @param {any} data The data for the request.
- * @param {any | null} otherState Any other state for the request.
+ * @param {Record<string, unknown>} data The data for the request.
+ * @param {Record<string, unknown> | null} otherState Any other state for the request.
  * @return {Promise<OpaDm.IActivityLogItem>}
  */
-export async function recordLogItem(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, activityType: OpaDm.ActivityType, requestor: string, resource: string, action: string | null, data: any, otherState: any | null = null): Promise<OpaDm.IActivityLogItem> { // eslint-disable-line max-len
+export async function recordLogItem(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, activityType: OpaDm.ActivityType, requestor: string, resource: string, action: string | null, data: Record<string, unknown>, otherState: Record<string, unknown> | null = null): Promise<OpaDm.IActivityLogItem> { // eslint-disable-line max-len
   OPA.assertDataStorageStateIsNotNullish(dataStorageState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
@@ -56,7 +56,7 @@ export async function recordLogItem(dataStorageState: OpaDm.IDataStorageState, a
       }
     } else if (resourceCanonical.endsWith("/")) {
       resourceCanonical += "index.html";
-    } else if (resourceCanonical.endsWith(".com") || resourceCanonical.endsWith(".org") || resourceCanonical.endsWith(".net") || resourceCanonical.endsWith(".edu") || resourceCanonical.endsWith(".app") || resourceCanonical.endsWith(".web")) {
+    } else if (resourceCanonical.endsWith(".com") || resourceCanonical.endsWith(".org") || resourceCanonical.endsWith(".net") || resourceCanonical.endsWith(".edu") || resourceCanonical.endsWith(".app") || resourceCanonical.endsWith(".web")) { // eslint-disable-line max-len
       resourceCanonical += "/index.html";
     }
   }

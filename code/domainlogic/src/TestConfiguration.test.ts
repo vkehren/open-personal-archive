@@ -32,7 +32,7 @@ export function getTestConfiguration(): ITestConfiguration {
 
   const testEnvironment: TestEnvironment = (TestConfigurationFile.use_emulators) ? "Emulators" : "Cloud";
   let timeout: number | null | undefined = TestConfigurationFile.timeout;
-  let appInitializationArgs: any = {projectId: ""};
+  let appInitializationArgs = {projectId: ""};
 
   if (testEnvironment == "Emulators") {
     const emulatorsConfig = TestConfigurationFile.test_emulators;

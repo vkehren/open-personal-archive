@@ -14,6 +14,8 @@ import {TestAuthData} from "../TestData.test";
 import * as TestConfig from "../TestConfiguration.test";
 import * as TestUtils from "../TestUtilities.test";
 
+/* eslint-disable brace-style, camelcase */
+
 const config = TestConfig.getTestConfiguration();
 const ambientAuth = (): TestConfig.IAuthenticationStateForTests => (config.authenticationState);
 const ambientUserId = (): string => (ambientAuth().opaUserId);
@@ -21,10 +23,10 @@ const ownerId = (): string => (TestAuthData.owner.opaUserId);
 const testUserId = (): string => (TestAuthData.testUser.opaUserId);
 const testMessage = "Please give me access to your archive.";
 const testCitationId_Null: string | null = null;
-const testCitationId_NonNull: string = "CITATION_1234";
+const testCitationId_NonNull = "CITATION_1234";
 const testResponse = "OK.";
 
-describe("Tests using Firebase " + config.testEnvironment, function () {
+describe("Tests using Firebase " + config.testEnvironment, function() {
   if (!OPA.isNullish(config.timeout)) {
     this.timeout(OPA.convertNonNullish(config.timeout)); // eslint-disable-line no-invalid-this
   }
@@ -61,7 +63,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
   });
 
   const testFunc1 = (testCitationId: string | null) => (async () => {
-    let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
+    const isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
     await TestUtils.assertUserDoesNotExist(config.dataStorageState, config.authenticationState);
     await TestUtils.assertUserDoesNotExist(config.dataStorageState, TestAuthData.owner);
@@ -96,7 +98,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(authProvider).not.equals(null);
 
     // NOTE: Do NOT set the test AuthenticationState to a User other than the Archive Owner
-    let callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    const callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
     await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.owner);
 
@@ -170,7 +172,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage);
     expect(accessRequest.response[OpaDm.DefaultLocale]).equals("");
     expect(accessRequest.updateHistory.length).equals(1);
-    expect((accessRequest.updateHistory[0] as any).updateHistory).equals(undefined);
+    expect((accessRequest.updateHistory[0] as OpaDm.IAccessRequest).updateHistory).equals(undefined);
     expect(accessRequest.hasBeenUpdated).equals(false);
     expect(accessRequest.dateOfLatestUpdate).equals(null);
     expect(accessRequest.userIdOfLatestUpdater).equals(null);

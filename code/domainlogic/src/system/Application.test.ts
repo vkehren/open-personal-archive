@@ -15,7 +15,7 @@ import * as TestConfig from "../TestConfiguration.test";
 
 const config = TestConfig.getTestConfiguration();
 
-describe("Tests using Firebase " + config.testEnvironment, function () {
+describe("Tests using Firebase " + config.testEnvironment, function() {
   if (!OPA.isNullish(config.timeout)) {
     this.timeout(OPA.convertNonNullish(config.timeout)); // eslint-disable-line no-invalid-this
   }
@@ -121,8 +121,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     const timeZoneDocumentRef = timeZoneCollectionRef.doc(timeZone.id);
     await timeZoneDocumentRef.set(timeZone, {merge: true});
 
-    await OpaDb.Users.queries.createArchiveOwner(config.dataStorageState, config.authenticationState.firebaseAuthUserId,
-      authProvider, config.authenticationState.firebaseAuthUserId + "@gmail.com", locale, timeZoneGroup, "Archive", "la Owner");
+    await OpaDb.Users.queries.createArchiveOwner(config.dataStorageState, config.authenticationState.firebaseAuthUserId, authProvider, config.authenticationState.firebaseAuthUserId + "@gmail.com", locale, timeZoneGroup, "Archive", "la Owner"); // eslint-disable-line max-len
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -156,8 +155,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
-      "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "Owner", "de Archive");
+    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "Owner", "de Archive"); // eslint-disable-line max-len
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -181,23 +179,21 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(archives.length).equals(1);
 
     // NOTE: Since the System is already installed, this call should fail
-    expect(Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
-      "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "Owner", "de Archive")).to.be.rejectedWith(Error);
+    expect(Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "Owner", "de Archive")).to.be.rejectedWith(Error); // eslint-disable-line max-len
   });
 
   test("checks that updateInstallationSettings(...) works properly", async () => {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
-      "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "Owner", "de Archive");
+    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "Owner", "de Archive"); // eslint-disable-line max-len
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
 
     let callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     OpaDm.assertSystemStateIsNotNullish(callState.systemState);
-    let archiveOriginal = OPA.convertNonNullish(callState.systemState).archive;
+    const archiveOriginal = OPA.convertNonNullish(callState.systemState).archive;
     OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
     const currentUser = OPA.convertNonNullish(callState.authorizationState).user;
     const currentLocale = OPA.convertNonNullish(callState.authorizationState).locale;
@@ -213,7 +209,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(archiveNonNull.defaultTimeZoneGroupId).equals(archiveOriginal.defaultTimeZoneGroupId);
     expect(archiveNonNull.defaultTimeZoneId).equals(archiveOriginal.defaultTimeZoneId);
     expect(archiveNonNull.updateHistory.length).equals(1);
-    expect((archiveNonNull.updateHistory[0] as any).updateHistory).equals(undefined);
+    expect((archiveNonNull.updateHistory[0] as OpaDm.IArchive).updateHistory).equals(undefined);
     expect(archiveNonNull.hasBeenUpdated).equals(false);
     expect(archiveNonNull.dateOfLatestUpdate).equals(null);
     expect(archiveNonNull.userIdOfLatestUpdater).equals(null);
@@ -281,8 +277,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files",
-      "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "Owner", "de Archive");
+    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "Owner", "de Archive"); // eslint-disable-line max-len
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -312,7 +307,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(applicationNonNull.applicationVersion).equals(oldVersion);
     expect(applicationNonNull.schemaVersion).equals(oldVersion);
     expect(applicationNonNull.upgradeHistory.length).equals(1);
-    expect((applicationNonNull.upgradeHistory[0] as any).upgradeHistory).equals(undefined);
+    expect((applicationNonNull.upgradeHistory[0] as OpaDm.IApplication).upgradeHistory).equals(undefined);
     expect(applicationNonNull.dateOfInstallation.valueOf()).equals(oldDateOfInstallation.valueOf());
     expect(applicationNonNull.hasBeenUpgraded).equals(false);
     expect(applicationNonNull.dateOfLatestUpgrade).equals(null);

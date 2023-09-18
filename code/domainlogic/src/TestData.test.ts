@@ -1,6 +1,8 @@
 import * as OpaDm from "../../datamodel/src";
 import * as TestConfig from "./TestConfiguration.test";
 
+/* eslint-disable camelcase */
+
 const authProviderId = "google.com";
 const opaUserId_Placeholder = "[SET_THIS_IN_TEST_CODE]";
 
@@ -107,7 +109,7 @@ export const TestAuthData = {
   viewer: authenticationState_Viewer(),
   guest: authenticationState_Guest(),
   testUser: authenticationState_TestUser(),
-  resetTestData: () => {
+  resetTestData: (): void => {
     TestAuthData.owner = authenticationState_Owner();
     TestAuthData.admin = authenticationState_Admin();
     TestAuthData.editor = authenticationState_Editor();
@@ -115,5 +117,5 @@ export const TestAuthData = {
     TestAuthData.guest = authenticationState_Guest();
     TestAuthData.testUser = authenticationState_TestUser();
   },
-  getPlaceholderIdValue: () => (opaUserId_Placeholder),
+  getPlaceholderIdValue: (): string => (opaUserId_Placeholder),
 };

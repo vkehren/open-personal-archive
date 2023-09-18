@@ -18,7 +18,7 @@ const config = TestConfig.getTestConfiguration();
 const localhost = "localhost";
 const indexPage = "index.html";
 
-describe("Tests using Firebase " + config.testEnvironment, function () {
+describe("Tests using Firebase " + config.testEnvironment, function() {
   if (!OPA.isNullish(config.timeout)) {
     this.timeout(OPA.convertNonNullish(config.timeout)); // eslint-disable-line no-invalid-this
   }
@@ -55,7 +55,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
   });
 
   const testFunc1 = (authState: OPA.DefaultFunc<TestConfig.IAuthenticationStateForTests | null>) => (async () => {
-    let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
+    const isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
     // NOTE: For most tests, it would be incorrect to set the AuthState to null, but here we must be able to run the tests for that situation
@@ -124,7 +124,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(serverLogItem0.rootLogItemId).equals(serverLogItem0.id);
     expect(serverLogItem0.externalLogItemId).equals(webLogItem0.id);
     config.dataStorageState.logWriteState.rootLogItemId = serverLogItem0.id;
-    const serverLogItem0_Error = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_error, localhost, resource0, null, {}, null);
+    const serverLogItem0_Error = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_error, localhost, resource0, null, {}, null); // eslint-disable-line camelcase, max-len
     expect(serverLogItem0_Error).not.equals(null);
     expect(serverLogItem0_Error.id).not.equals(null);
     expect(serverLogItem0_Error.activityType).equals(OpaDm.ActivityTypes.server_function_error);
@@ -313,7 +313,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(serverLogItem0.rootLogItemId).equals(serverLogItem0.id);
     expect(serverLogItem0.externalLogItemId).equals(webLogItem0.id);
     config.dataStorageState.logWriteState.rootLogItemId = serverLogItem0.id;
-    const serverLogItem0_Error = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_error, localhost, resource0, null, {}, null);
+    const serverLogItem0_Error = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_error, localhost, resource0, null, {}, null); // eslint-disable-line camelcase, max-len
     expect(serverLogItem0_Error).not.equals(null);
     expect(serverLogItem0_Error.id).not.equals(null);
     expect(serverLogItem0_Error.activityType).equals(OpaDm.ActivityTypes.server_function_error);
@@ -514,7 +514,7 @@ describe("Tests using Firebase " + config.testEnvironment, function () {
     expect(serverLogItem0.rootLogItemId).equals(serverLogItem0.id);
     expect(serverLogItem0.externalLogItemId).equals(webLogItem0.id);
     config.dataStorageState.logWriteState.rootLogItemId = serverLogItem0.id;
-    const serverLogItem0_Error = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_error, localhost, resource0, null, {}, null);
+    const serverLogItem0_Error = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_error, localhost, resource0, null, {}, null); // eslint-disable-line camelcase, max-len
     expect(serverLogItem0_Error).not.equals(null);
     expect(serverLogItem0_Error.id).not.equals(null);
     expect(serverLogItem0_Error.activityType).equals(OpaDm.ActivityTypes.server_function_error);

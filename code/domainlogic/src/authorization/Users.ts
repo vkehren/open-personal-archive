@@ -108,7 +108,7 @@ export async function initializeUserAccount(callState: OpaDm.ICallState, authPro
   const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getById(callState.dataStorageState, systemState.archive.defaultTimeZoneGroupId);
   OPA.assertDocumentIsValid(timeZoneGroup, "The required TimeZoneGroup does not exist.");
 
-  const userId = await OpaDb.Users.queries.createWithRole(callState.dataStorageState, firebaseAuthUserId, OPA.convertNonNullish(authProvider), authAccountName, OPA.convertNonNullish(assignedRole), OPA.convertNonNullish(locale), OPA.convertNonNullish(timeZoneGroup), firstName, lastName);
+  const userId = await OpaDb.Users.queries.createWithRole(callState.dataStorageState, firebaseAuthUserId, OPA.convertNonNullish(authProvider), authAccountName, OPA.convertNonNullish(assignedRole), OPA.convertNonNullish(locale), OPA.convertNonNullish(timeZoneGroup), firstName, lastName);// eslint-disable-line max-len
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
@@ -397,8 +397,11 @@ export async function setUserToSuspensionState(callState: OpaDm.ICallState, user
   authorizationState.assertUserApproved();
   authorizationState.assertRoleAllowed(authorizerIds);
 
-  if (suspend) {await OpaDb.Users.queries.setToSuspended(callState.dataStorageState, userIdToSet, reason, authorizationState.user.id);}
-  else {await OpaDb.Users.queries.setToUnSuspended(callState.dataStorageState, userIdToSet, reason, authorizationState.user.id);}
+  if (suspend) {
+    await OpaDb.Users.queries.setToSuspended(callState.dataStorageState, userIdToSet, reason, authorizationState.user.id);
+  } else {
+    await OpaDb.Users.queries.setToUnSuspended(callState.dataStorageState, userIdToSet, reason, authorizationState.user.id);
+  }
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
