@@ -53,8 +53,8 @@ export function areUpdatesValid_ForDocument(original: IDocument, updated: IDocum
   if (!BT.isIdentifierValid(original.id)) {
     return false;
   }
-  if (BT.isIdentifierValid(updated.id)) {
-    if (original.id != updated.id) {
+  if (!TC.isNullish(updated.id)) {
+    if (updated.id != original.id) {
       return false;
     }
   }
