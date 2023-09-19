@@ -312,23 +312,22 @@ export function promoteDocumentsToCreatable<IN extends IDocument, OUT extends IN
 
 /**
  * Returns whether the ID is valid.
- * @param {IdNullable} id The ID to check.
+ * @param {DefaultFunc<IdNullable> | IdNullable} id The ID to check.
  * @return {boolean}
  */
-export function isIdentifierValid(id: IdNullable): boolean {
-  // LATER: Rename "id" to "idSource" and allow caller to pass IDocument (or typed string or IDocument getter) as "idSource"
-  const isValid = (!TC.isNullishOrWhitespace(id));
+export function isIdentifierValid(id: DefaultFunc<IdNullable> | IdNullable): boolean {
+  const idToCheck = (TC.isFunction(id)) ? (id as DefaultFunc<IdNullable>)() : id;
+  const isValid = (!TC.isNullishOrWhitespace(idToCheck));
   return isValid;
 }
 
 /**
  * Asserts that the ID is valid.
- * @param {IdNullable} id The ID to check.
+ * @param {DefaultFunc<IdNullable> | IdNullable} id The ID to check.
  * @param {string} [message=default] The message to display on failure of assertion.
  * @return {void}
  */
-export function assertIdentifierIsValid(id: IdNullable, message = "A valid ID must be provided."): void {
-  // LATER: Rename "id" to "idSource" and allow caller to pass IDocument (or typed string or IDocument getter) as "idSource"
+export function assertIdentifierIsValid(id: DefaultFunc<IdNullable> | IdNullable, message = "A valid ID must be provided."): void {
   if (!isIdentifierValid(id)) {
     throw new Error(message);
   }
