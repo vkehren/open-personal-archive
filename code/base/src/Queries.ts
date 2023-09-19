@@ -62,7 +62,7 @@ export class QuerySet<T extends BT.IDocument> implements IQuerySet<T> {
   async getById(ds: FB.IDataStorageState, id: string): Promise<T | null> {
     FB.assertDataStorageStateIsNotNullish(ds);
     FB.assertFirestoreIsNotNullish(ds.db);
-    FB.assertIdentifierIsValid(id);
+    BT.assertIdentifierIsValid(id);
 
     let documentSnap: firestore.DocumentSnapshot<T> | null = null;
 

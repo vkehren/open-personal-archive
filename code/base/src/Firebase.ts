@@ -499,20 +499,7 @@ export function assertDocumentIsValid<T extends BT.IDocument>(document: T | null
   }
 
   const documentNonNull = TC.convertNonNullish(document);
-  assertIdentifierIsValid(documentNonNull.id, invalidIdMessage);
-}
-
-/**
- * Asserts that the Firebase Firestore document ID is NOT nullish.
- * @param {string | null | undefined} id The Firebase Firestore document ID.
- * @param {string} [message=default] The message to display on failure of assertion.
- * @return {void}
- */
-export function assertIdentifierIsValid(id: string | null | undefined, message = "A valid document ID must be provided."): void {
-  // LATER: Rename "id" to "idSource" and allow caller to pass IDocument (or typed string or IDocument getter) as "idSource"
-  if (TC.isNullishOrWhitespace(id)) {
-    throw new Error(message);
-  }
+  BT.assertIdentifierIsValid(documentNonNull.id, invalidIdMessage);
 }
 
 /**

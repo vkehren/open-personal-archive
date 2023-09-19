@@ -260,11 +260,11 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
 
   // NOTE: Only the Viewers and Deciders can update the response
   if (!OPA.isUndefined(updateObject.response) && !OPA.areEqual(document.response, updateObject.response)) {
-    let userIdsOfViewers = OPA.extractUserIdsFromObjects<OPA.IViewable_ByUser>(document.updateHistory, (doc) => doc.userIdOfLatestViewer);
+    let userIdsOfViewers = OPA.getIdentifiersFromObjects<OPA.IViewable_ByUser>(document.updateHistory, (doc) => doc.userIdOfLatestViewer);
     userIdsOfViewers = userIdsOfViewers.filter((userId) => (userId != document.userIdOfCreator));
     const userNotViewer = (!userIdsOfViewers.includes(OPA.convertNonNullish(updateObject_Updateable.userIdOfLatestUpdater)));
 
-    let userIdsOfDeciders = OPA.extractUserIdsFromObjects<OPA.IApprovable_ByUser<BT.ApprovalState>>(document.updateHistory, (doc) => doc.userIdOfDecider);
+    let userIdsOfDeciders = OPA.getIdentifiersFromObjects<OPA.IApprovable_ByUser<BT.ApprovalState>>(document.updateHistory, (doc) => doc.userIdOfDecider);
     userIdsOfDeciders = userIdsOfDeciders.filter((userId) => (userId != document.userIdOfCreator));
     const userNotDecider = (!userIdsOfDeciders.includes(OPA.convertNonNullish(updateObject_Updateable.userIdOfLatestUpdater)));
 

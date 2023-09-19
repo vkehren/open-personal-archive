@@ -311,27 +311,49 @@ export function promoteDocumentsToCreatable<IN extends IDocument, OUT extends IN
 }
 
 /**
- * Gets the User ID values from the incoming objects using properties from type T.
- * @param {Array<unknown>} objs The objects to evaluate.
- * @param {IdFunc<T>} userIdFunc The function that gets the User ID value from an object of type T.
- * @return {Array<string>} The result.
+ * Returns whether the ID is valid.
+ * @param {string | null | undefined} id The ID to check.
+ * @return {boolean}
  */
-export function extractUserIdsFromObjects<T>(objs: Array<unknown>, userIdFunc: IdFunc<T>): Array<string> {
+export function isIdentifierValid(id: string | null | undefined): boolean {
+  // LATER: Rename "id" to "idSource" and allow caller to pass IDocument (or typed string or IDocument getter) as "idSource"
+  const isValid = (!TC.isNullishOrWhitespace(id));
+  return isValid;
+}
+
+/**
+ * Asserts that the ID is valid.
+ * @param {string | null | undefined} id The ID to check.
+ * @param {string} [message=default] The message to display on failure of assertion.
+ * @return {void}
+ */
+export function assertIdentifierIsValid(id: string | null | undefined, message = "A valid ID must be provided."): void {
+  // LATER: Rename "id" to "idSource" and allow caller to pass IDocument (or typed string or IDocument getter) as "idSource"
+  if (!isIdentifierValid(id)) {
+    throw new Error(message);
+  }
+}
+
+/**
+ * Gets the valid ID values from the incoming objects using an ID getter function of type T.
+ * @param {Array<unknown>} objs The objects to evaluate.
+ * @param {IdFunc<T>} idFunc The function that gets the ID value from an object of type T.
+ * @return {Array<string>} The resulting list of IDs.
+ */
+export function getIdentifiersFromObjects<T>(objs: Array<unknown>, idGetterFunc: IdFunc<T>): Array<string> {
   TC.assertNonNullish(objs);
-  const userIds = ([] as Array<string>);
+  const ids = ([] as Array<string>);
 
   for (let i = 0; i < objs.length; i++) {
     const obj = objs[i];
-    const guardFunc = (value: T): boolean => {
-      const userId = userIdFunc(value);
-      return !TC.isNullish(userId);
-    };
+    const id = idGetterFunc(obj as T);
 
-    if (TC.isOf<T>(obj, guardFunc)) {
-      const userId = userIdFunc(obj);
-      const userIdNonNull = TC.convertNonNullish(userId);
-      userIds.push(userIdNonNull);
+    if (!isIdentifierValid(id)) {
+      continue;
     }
+
+    const idNonNull = TC.convertNonNullish(id);
+    ids.push(idNonNull);
   }
-  return userIds;
+  return ids;
 }
