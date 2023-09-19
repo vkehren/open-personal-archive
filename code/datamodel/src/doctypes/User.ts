@@ -961,9 +961,9 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
 export type FactoryFunc = (...[params]: Parameters<typeof createInstance>) => ReturnType<typeof createInstance>;
 export const CollectionDescriptor = new OPA.CollectionDescriptor<IUser, UserQuerySet, FactoryFunc>(SingularName, PluralName, IsSingleton, (cd) => new UserQuerySet(cd), null, [], createInstance);
 
-export const Index_User_FirebaseAuthUserId = OPA.createPropertyIndexDescriptor(BT.DefaultIndexCollection, PluralName, "firebaseAuthUserId");
+export const Index_User_FirebaseAuthUserId = OPA.createPropertyIndexDescriptor(OPA.DEFAULT_UNIQUENESS_INDEX_COLLECTION, PluralName, "firebaseAuthUserId");
 CollectionDescriptor.propertyIndices.push(Index_User_FirebaseAuthUserId);
-export const Index_User_AuthAccountName = OPA.createPropertyIndexDescriptor(BT.DefaultIndexCollection, PluralName, "authAccountName");
+export const Index_User_AuthAccountName = OPA.createPropertyIndexDescriptor(OPA.DEFAULT_UNIQUENESS_INDEX_COLLECTION, PluralName, "authAccountName");
 CollectionDescriptor.propertyIndices.push(Index_User_AuthAccountName);
-export const Index_User_AuthAccountNameLowered = OPA.createPropertyIndexDescriptor(BT.DefaultIndexCollection, PluralName, "authAccountNameLowered");
+export const Index_User_AuthAccountNameLowered = OPA.createPropertyIndexDescriptor(OPA.DEFAULT_UNIQUENESS_INDEX_COLLECTION, PluralName, "authAccountNameLowered");
 CollectionDescriptor.propertyIndices.push(Index_User_AuthAccountNameLowered);

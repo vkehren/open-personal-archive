@@ -1,5 +1,7 @@
-export const DefaultIndexCollection = "Indices";
-
+/** Controls whether the entire set of required Documents are loaded, or only the set needed for testing (i.e. the "min" or "minimal" set).
+ * @constant
+ * @type {{}}
+ */
 export const DataConfiguration = {
   Locale_UseMin: false,
   TimeZoneGroup_UseMin: false,
