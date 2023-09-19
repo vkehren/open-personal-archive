@@ -13,9 +13,6 @@ import * as User from "./doctypes/User";
 // User Created
 import * as AccessRequest from "./doctypes/AccessRequest";
 
-export const name = "open-personal-archive-data-model";
-export const schemaVersion = "0.0.0.1";
-
 // NOTE: If the CollectionDescriptor represents a singleton, export the singleton factory function directly later below
 // NOTE: If the CollectionDescriptor represents pre-loaded system data, do NOT export ANY instance factory function (but do export required ID values)
 // NOTE: If the CollectionDescriptor represents data that will dynamically be created during usage of system, expose factory function via ITypedFactoryCollectionDescriptor<T, F> interface
@@ -62,3 +59,4 @@ export {IApplication, IApplicationPartial, SingletonId as ApplicationId} from ".
 export {IArchive, IArchivePartial, SingletonId as ArchiveId} from "./doctypes/Archive";
 export {IUser, IUserPartial, User_OwnerId} from "./doctypes/User"; // eslint-disable-line camelcase
 export {IAccessRequest, IAccessRequestPartial} from "./doctypes/AccessRequest";
+export * as PackageInfo from "./PackageInfo";

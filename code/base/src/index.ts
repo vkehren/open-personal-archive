@@ -10,3 +10,4 @@ export * from "./TimeRange";
 export * from "./TimeRangeCollection";
 export * from "./TypeChecking";
 export * from "./ValueChecking";
+export * as PackageInfo from "./PackageInfo";

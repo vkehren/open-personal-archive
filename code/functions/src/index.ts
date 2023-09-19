@@ -41,3 +41,4 @@ if (useCorsHandler) {
 // NOTE: Export API functions
 export * from "./system/Application";
 export * from "./authorization/AccessRequests";
+export * as PackageInfo from "./PackageInfo";
