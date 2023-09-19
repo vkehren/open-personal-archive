@@ -25,7 +25,6 @@ interface IArchivePartial_WithHistory extends IArchivePartial, OPA.IUpdateable_B
 }
 
 export interface IArchive extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser {
-  readonly id: string;
   readonly ownerId: string;
   readonly pathToStorageFolder: string;
   name: OPA.ILocalizable<string>;
@@ -46,6 +45,10 @@ export function areUpdatesValid(document: IArchive, updateObject: IArchivePartia
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+    return false;
+  }
+
   // NOTE: updateObject MUST implement IUpdateable_ByUser, so check immediately and do NOT use "if (true) {...}"
   const updateObject_Updateable = (updateObject as OPA.IUpdateable_ByUser);
 
@@ -55,11 +58,10 @@ export function areUpdatesValid(document: IArchive, updateObject: IArchivePartia
 
   // NOTE: updateObject MUST NOT change read-only data
   const propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
-  const id_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).id);
   const ownerId_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).ownerId);
   const pathToStorageFolder_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).pathToStorageFolder);
 
-  if (id_IsUpdated || ownerId_IsUpdated || pathToStorageFolder_IsUpdated) {
+  if (ownerId_IsUpdated || pathToStorageFolder_IsUpdated) {
     return false;
   }
 

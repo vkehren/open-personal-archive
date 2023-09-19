@@ -11,7 +11,6 @@ const DefaultDocument = (RequiredDocuments.find((v) => v.isDefault) as IAuthenti
 export const DefaultAuthenticationProviderId = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNonNullish(DefaultDocument).id : AuthenticationProvider_GoogleId; // eslint-disable-line camelcase
 
 export interface IAuthenticationProvider extends OPA.IDocument_Creatable {
-  readonly id: string;
   readonly name: string;
   readonly externalId: string;
   readonly displayOrder: number;
@@ -28,6 +27,10 @@ type IAuthenticationProviderPartial = unknown;
 export function areUpdatesValid(document: IAuthenticationProvider, updateObject: IAuthenticationProviderPartial): boolean {
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
+
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+    return false;
+  }
 
   // NOTE: Currently, AuthenticationProviders are not updateable
   return false;

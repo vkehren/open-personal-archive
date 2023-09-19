@@ -19,7 +19,6 @@ interface IApplicationPartial_WithHistory extends IApplicationPartial, OPA.IUpgr
 }
 
 export interface IApplication extends OPA.IDocument_Upgradeable_ByUser {
-  readonly id: string;
   applicationVersion: string;
   schemaVersion: string;
   readonly upgradeHistory: Array<UpgradeHistoryItem>;
@@ -36,6 +35,10 @@ export function areUpdatesValid(document: IApplication, updateObject: IApplicati
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+    return false;
+  }
+
   // NOTE: updateObject MUST implement IUpgradeable_ByUser, so check immediately and do NOT use "if (true) {...}"
   const updateObject_Updateable = (updateObject as OPA.IUpgradeable_ByUser);
 
@@ -44,10 +47,9 @@ export function areUpdatesValid(document: IApplication, updateObject: IApplicati
   }
 
   const propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
-  const id_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).id);
   const dateOfInstallation_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).dateOfInstallation);
 
-  if (id_IsUpdated || dateOfInstallation_IsUpdated) {
+  if (dateOfInstallation_IsUpdated) {
     return false;
   }
 

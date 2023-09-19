@@ -20,7 +20,6 @@ const IsSingleton = false;
 // const RequiredDocuments = getRequiredDocuments();
 
 export interface ITimeZone extends OPA.IDocument_Creatable {
-  readonly id: string;
   readonly name: string;
   readonly countryCode: string;
   readonly geoCoordinates: string;
@@ -38,6 +37,10 @@ type ITimeZonePartial = unknown;
 export function areUpdatesValid(document: ITimeZone, updateObject: ITimeZonePartial): boolean {
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
+
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+    return false;
+  }
 
   // NOTE: Currently, TimeZones are not updateable
   return false;

@@ -23,7 +23,6 @@ export const DefaultLocaleId = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNo
 export const DefaultLocale = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNonNullish(DefaultDocument).optionName : "en-US";
 
 export interface ILocale extends OPA.IDocument_Creatable {
-  readonly id: string;
   readonly optionName: string;
   readonly optionBaseName: string;
   readonly displayName: string;
@@ -41,6 +40,10 @@ type ILocalePartial = unknown;
 export function areUpdatesValid(document: ILocale, updateObject: ILocalePartial): boolean {
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
+
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+    return false;
+  }
 
   // NOTE: Currently, Locales are not updateable
   return false;

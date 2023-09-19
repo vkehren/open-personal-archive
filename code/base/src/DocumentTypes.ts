@@ -40,6 +40,27 @@ export function assertDocumentIsValid<T extends IDocument>(document: T | null | 
   BT.assertIdentifierIsValid(documentNonNull.id, invalidIdMessage);
 }
 
+/**
+ * Returns whether the updates to the object are valid from the perspective of the IDocument interface.
+ * @param {IDocument} original The original object.
+ * @param {IDocument} updated The updated object.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForDocument(original: IDocument, updated: IDocument): boolean {
+  TC.assertNonNullish(original, "The original object must not be null.");
+  TC.assertNonNullish(updated, "The updated object must not be null.");
+
+  if (!BT.isIdentifierValid(original.id)) {
+    return false;
+  }
+  if (BT.isIdentifierValid(updated.id)) {
+    if (original.id != updated.id) {
+      return false;
+    }
+  }
+  return true;
+}
+
 
 // ICreatable
 export const ICreatable_DateOfCreation_PropertyName = VC.getTypedPropertyKeyAsText<ICreatable>("dateOfCreation"); // eslint-disable-line camelcase

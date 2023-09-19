@@ -24,7 +24,6 @@ interface IAccessRequestPartial_WithHistory extends IAccessRequestPartial, OPA.I
 // NOTE: Use "IDocument_Creatable_ByUser" because we must record the User who created the AccessRequest (i.e. the owner of the AccessRequest)
 // NOTE: Use "IDocument_Updateable_ByUser" because the User creating the AccessRequest updates the "message", but the Decider updates the "response"
 export interface IAccessRequest extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser, OPA.IDocument_Taggable_ByUser, OPA.IDocument_Archivable_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Deleteable_ByUser { // eslint-disable-line max-len
-  readonly id: string;
   readonly archiveId: string; // NOTE: This field stores information necessary to extend the OPA system to manage multiple Archives
   readonly isSpecificToCitation: boolean;
   readonly citationId: string | null;
@@ -43,6 +42,10 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+    return false;
+  }
+
   // NOTE: updateObject MUST implement IUpdateable_ByUser, so check immediately and do NOT use "if (true) {...}"
   const updateObject_Updateable = (updateObject as OPA.IUpdateable_ByUser);
 
@@ -52,12 +55,11 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
 
   // NOTE: updateObject MUST NOT change read-only data
   const propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
-  const id_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).id);
   const archiveId_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).archiveId);
   const isSpecificToCitation_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).isSpecificToCitation);
   const citationId_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).citationId);
 
-  if (id_IsUpdated || archiveId_IsUpdated || isSpecificToCitation_IsUpdated || citationId_IsUpdated) {
+  if (archiveId_IsUpdated || isSpecificToCitation_IsUpdated || citationId_IsUpdated) {
     return false;
   }
 

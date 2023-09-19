@@ -31,6 +31,10 @@ export function areUpdatesValid(document: IActivityLogItem, updateObject: IActiv
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+    return false;
+  }
+
   // NOTE: Currently, ActivityLogItems are not updateable
   return false;
 }

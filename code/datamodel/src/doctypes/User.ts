@@ -44,7 +44,6 @@ interface IUserPartial_WithHistory extends IUserPartial, OPA.IUpdateable {
 }
 
 export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable_ByUser, OPA.IDocument_AssignableToRole_ByUser, IDocument_CitationAccessor, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Suspendable_ByUser, OPA.IDocument_Deleteable_ByUser { // eslint-disable-line max-len
-  readonly id: string;
   readonly firebaseAuthUserId: string;
   readonly authProviderId: string;
   readonly authAccountName: string;
@@ -69,6 +68,10 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+    return false;
+  }
+
   const docIsArchiveOwner = ((document.id == User_OwnerId) || (document.assignedRoleId == Role_OwnerId));
 
   // NOTE: updateObject MUST implement IUpdateable_ByUser, so check immediately and do NOT use "if (true) {...}"
@@ -83,7 +86,6 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   const updateObject_CitationAccessor = (updateObject as ICitationAccessorPartial);
 
   const propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
-  const id_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).id);
   const firebaseAuthUserId_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).firebaseAuthUserId);
   const authProviderId_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).authProviderId);
   const authAccountName_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).authAccountName);
@@ -95,7 +97,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   const viewableCitationIds_UpdateUsesInterface = requestedCitationIds_UpdateUsesInterface;
   const viewableCitationIds_IsUpdatedDirectly = (!viewableCitationIds_UpdateUsesInterface && propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).viewableCitationIds));
 
-  if (id_IsUpdated || firebaseAuthUserId_IsUpdated || authProviderId_IsUpdated || authAccountName_IsUpdated || authAccountNameLowered_IsUpdated || assignedRoleId_IsUpdatedDirectly || requestedCitationIds_IsUpdatedDirectly || viewableCitationIds_IsUpdatedDirectly) { // eslint-disable-line max-len
+  if (firebaseAuthUserId_IsUpdated || authProviderId_IsUpdated || authAccountName_IsUpdated || authAccountNameLowered_IsUpdated || assignedRoleId_IsUpdatedDirectly || requestedCitationIds_IsUpdatedDirectly || viewableCitationIds_IsUpdatedDirectly) { // eslint-disable-line max-len
     return false;
   }
 

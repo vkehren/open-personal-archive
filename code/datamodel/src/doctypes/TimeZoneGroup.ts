@@ -22,7 +22,6 @@ const DefaultDocument = (RequiredDocuments.find((v) => v.isDefault) as ITimeZone
 export const DefaultTimeZoneGroupId = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNonNullish(DefaultDocument).id : "OPA_TimeZoneGroup_PST_-08:00";
 
 export interface ITimeZoneGroup extends OPA.IDocument_Creatable {
-  readonly id: string;
   readonly name: string;
   readonly abbreviation: string;
   readonly utcOffset: string;
@@ -42,6 +41,10 @@ type ITimeZoneGroupPartial = unknown;
 export function areUpdatesValid(document: ITimeZoneGroup, updateObject: ITimeZoneGroupPartial): boolean {
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
+
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+    return false;
+  }
 
   // NOTE: Currently, TimeZoneGroups are not updateable
   return false;

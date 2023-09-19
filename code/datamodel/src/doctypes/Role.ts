@@ -16,7 +16,6 @@ const DefaultDocument = (RequiredDocuments.find((v) => v.isDefault) as IRole | u
 export const DefaultRoleId = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNonNullish(DefaultDocument).id : Role_GuestId; // eslint-disable-line camelcase
 
 export interface IRole extends OPA.IDocument_Creatable {
-  readonly id: string;
   readonly name: string;
   readonly type: BT.RoleType;
   readonly displayOrder: number;
@@ -33,6 +32,10 @@ type IRolePartial = unknown;
 export function areUpdatesValid(document: IRole, updateObject: IRolePartial): boolean {
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
+
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+    return false;
+  }
 
   // NOTE: Currently, Roles are not updateable
   return false;
