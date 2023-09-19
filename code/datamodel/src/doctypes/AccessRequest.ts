@@ -72,7 +72,7 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
 
   // NOTE: updateObject MUST NOT change data of already deleted document BEYOND the minimum necessary to un-delete document
   if (document.isMarkedAsDeleted) {
-    const propertyNames_NotForUnDelete = propertyNames_ForUpdate.filter((propertyName) => !BT.PropertyNames_ForUnDelete_ByUser.includes(propertyName));
+    const propertyNames_NotForUnDelete = propertyNames_ForUpdate.filter((propertyName) => !OPA.IDeleteable_ByUser_UnDelete_ExactValidSet_PropertyNames.includes(propertyName));
 
     if (propertyNames_NotForUnDelete.length > 0) {
       return false;

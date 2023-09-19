@@ -111,7 +111,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   // NOTE: updateObject MUST NOT change data of already deleted document BEYOND the minimum necessary to un-delete document
   if (document.isMarkedAsDeleted) {
     let propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
-    propertyNames_ForUpdate = propertyNames_ForUpdate.filter((propertyName) => !BT.PropertyNames_ForUnDelete_ByUser.includes(propertyName));
+    propertyNames_ForUpdate = propertyNames_ForUpdate.filter((propertyName) => !OPA.IDeleteable_ByUser_UnDelete_ExactValidSet_PropertyNames.includes(propertyName));
 
     // NOTE: Any property updates beyond those necessary for un-delete are invalid
     if (propertyNames_ForUpdate.length > 0) {
