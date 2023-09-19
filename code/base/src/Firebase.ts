@@ -486,22 +486,6 @@ export function assertFirestoreIsNotNullish(db: firestore.Firestore | null | und
 }
 
 /**
- * Asserts that the Firebase Firestore document and its corresponding ID is NOT nullish.
- * @param {T | null | undefined} document The Firebase Firestore document.
- * @param {string} [invalidDocMessage=default] The message to display on failure of document assertion.
- * @param {string} [invalidIdMessage=default] The message to display on failure of ID property assertion.
- * @return {void}
- */
-export function assertDocumentIsValid<T extends BT.IDocument>(document: T | null | undefined, invalidDocMessage = "A valid document must be provided.", invalidIdMessage = "A valid document ID must be provided."): void { // eslint-disable-line max-len
-  if (TC.isNullish(document)) {
-    throw new Error(invalidDocMessage);
-  }
-
-  const documentNonNull = TC.convertNonNullish(document);
-  BT.assertIdentifierIsValid(documentNonNull.id, invalidIdMessage);
-}
-
-/**
  * Asserts that the state container for authentication is NOT nullish.
  * @param {IAuthenticationState | null | undefined} authenticationState The state container for authentication.
  * @param {string} [message=default] The message to display on failure of assertion.

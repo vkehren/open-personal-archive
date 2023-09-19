@@ -1,6 +1,7 @@
 export * from "./Application";
 export * from "./BaseTypes";
 export * from "./Collections";
+export * from "./DocumentTypes";
 export * from "./Firebase";
 export * from "./Localization";
 export * from "./Messaging";
