@@ -2,8 +2,6 @@ import * as firestore from "@google-cloud/firestore";
 import * as TC from "./TypeChecking";
 import * as VC from "./ValueChecking";
 
-// export const name = "BaseTypes";
-
 export type KeyText = string; // NOTE: " | symbol" causes Firebase Firestore query errors
 export type TypedKeyText<T> = (keyof T) & (KeyText);
 export type ContainerOfTypedKeyText<T> = {

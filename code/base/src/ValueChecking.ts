@@ -1,8 +1,6 @@
 import * as BT from "./BaseTypes";
 import * as TC from "./TypeChecking";
 
-// export const name = "ValueChecking";
-
 /**
  * @constant
  * @type {string}

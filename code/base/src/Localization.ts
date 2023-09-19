@@ -2,7 +2,6 @@ import * as BT from "./BaseTypes";
 import * as TC from "./TypeChecking";
 import * as VC from "./ValueChecking";
 
-// export const name = "Localization";
 const LocaleValidityRegExp = /^[a-zA-Z]{2}/;
 
 /**

@@ -1,5 +1,3 @@
-export const name = "open-personal-archive-base";
-
 export * from "./Application";
 export * from "./BaseTypes";
 export * from "./Collections";

@@ -3,7 +3,6 @@ import * as BT from "./BaseTypes";
 import * as TC from "./TypeChecking";
 import * as VC from "./ValueChecking";
 
-// export const name = "Firebase";
 export const BULK_WRITER_MAX_RETRY_ATTEMPTS = 4;
 export const FIREBASE_DEFAULT_REGION = "us-east1";
 

@@ -4,7 +4,6 @@ import * as VC from "./ValueChecking";
 
 // NOTE: The reason for this module is to draw sharp distinctions between types, which the "typeof" operator does NOT do,
 //       as the "typeof" operator will return "object" for Array, Object, Date, and null.
-// export const name = "TypeChecking";
 const UndefinedType = "undefined";
 const NullType = "null";
 const FunctionType = "function";

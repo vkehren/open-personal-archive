@@ -4,8 +4,6 @@ import * as FB from "./Firebase";
 import * as ST from "./Storage";
 import * as TC from "./TypeChecking";
 
-// export const name = "Queries";
-
 export type QuerySetConstructor<Q extends IQuerySet<T>, T extends BT.IDocument> = (collectionDescriptor: ST.ITypedCollectionDescriptor<T>) => Q;
 
 export interface IQuerySet<T extends BT.IDocument> {

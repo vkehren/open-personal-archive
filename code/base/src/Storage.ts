@@ -4,8 +4,6 @@ import * as FB from "./Firebase";
 import * as QR from "./Queries";
 import * as TC from "./TypeChecking";
 
-// export const name = "Storage";
-
 export const CollectionDescriptors: BT.IDictionary<ICollectionDescriptor> = {};
 
 export interface INestedCollectionStep {
