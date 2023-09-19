@@ -1,5 +1,6 @@
 import * as firestore from "@google-cloud/firestore";
 import * as BT from "./BaseTypes";
+import * as DT from "./DocumentTypes";
 import * as FB from "./Firebase";
 import * as QR from "./Queries";
 import * as TC from "./TypeChecking";
@@ -48,7 +49,7 @@ export interface ICollectionDescriptor {
   getCollectionGroup(ds: FB.IDataStorageState): firestore.CollectionGroup<firestore.DocumentData>;
 }
 
-export interface ITypedCollectionDescriptor<T extends BT.IDocument> extends ICollectionDescriptor {
+export interface ITypedCollectionDescriptor<T extends DT.IDocument> extends ICollectionDescriptor {
   readonly requiredDocuments: Array<T>;
   castTo(document: unknown): T;
   getTypedCollection(ds: FB.IDataStorageState, pathFromRoot?: Array<INestedCollectionStep>): firestore.CollectionReference<T>;
@@ -56,20 +57,20 @@ export interface ITypedCollectionDescriptor<T extends BT.IDocument> extends ICol
   loadRequiredDocuments(ds: FB.IDataStorageState, eraseExistingDocs: boolean, pathFromRoot?: Array<INestedCollectionStep>): Promise<void>;
 }
 
-export interface ITypedQueryableCollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet<T>> extends ITypedCollectionDescriptor<T>, ICollectionDescriptor { // eslint-disable-line max-len
+export interface ITypedQueryableCollectionDescriptor<T extends DT.IDocument, Q extends QR.IQuerySet<T>> extends ITypedCollectionDescriptor<T>, ICollectionDescriptor { // eslint-disable-line max-len
   readonly queries: Q;
 }
 
-export interface ITypedFactoryCollectionDescriptor<T extends BT.IDocument, F> extends ITypedCollectionDescriptor<T>, ICollectionDescriptor {
+export interface ITypedFactoryCollectionDescriptor<T extends DT.IDocument, F> extends ITypedCollectionDescriptor<T>, ICollectionDescriptor {
   readonly canCreateInstance: boolean;
   readonly createInstance: F;
 }
 
-export interface ITypedQueryableFactoryCollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet<T>, F> extends ITypedFactoryCollectionDescriptor<T, F>, ITypedQueryableCollectionDescriptor<T, Q>, ITypedCollectionDescriptor<T>, ICollectionDescriptor { // eslint-disable-line max-len
+export interface ITypedQueryableFactoryCollectionDescriptor<T extends DT.IDocument, Q extends QR.IQuerySet<T>, F> extends ITypedFactoryCollectionDescriptor<T, F>, ITypedQueryableCollectionDescriptor<T, Q>, ITypedCollectionDescriptor<T>, ICollectionDescriptor { // eslint-disable-line max-len
 }
 
 /** Class providing consistent, type-safe values for use in queries. */
-export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet<T>, F> implements ITypedQueryableFactoryCollectionDescriptor<T, Q, F>, ITypedFactoryCollectionDescriptor<T, F>, ITypedQueryableCollectionDescriptor<T, Q>, ITypedCollectionDescriptor<T>, ICollectionDescriptor { // eslint-disable-line max-len
+export class CollectionDescriptor<T extends DT.IDocument, Q extends QR.IQuerySet<T>, F> implements ITypedQueryableFactoryCollectionDescriptor<T, Q, F>, ITypedFactoryCollectionDescriptor<T, F>, ITypedQueryableCollectionDescriptor<T, Q>, ITypedCollectionDescriptor<T>, ICollectionDescriptor { // eslint-disable-line max-len
   private _singularName: string;
   private _pluralName: string;
   private _isSingleton: boolean;
@@ -189,7 +190,7 @@ export class CollectionDescriptor<T extends BT.IDocument, Q extends QR.IQuerySet
    */
   castTo(document: unknown): T {
     const typedDocument = (document as (T | null | undefined));
-    FB.assertDocumentIsValid(typedDocument);
+    DT.assertDocumentIsValid(typedDocument);
 
     const typedDocumentNonNull = TC.convertNonNullish(typedDocument);
     return typedDocumentNonNull;

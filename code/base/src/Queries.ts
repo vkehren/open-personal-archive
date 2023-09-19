@@ -1,12 +1,13 @@
 import * as firestore from "@google-cloud/firestore";
 import * as BT from "./BaseTypes";
+import * as DT from "./DocumentTypes";
 import * as FB from "./Firebase";
 import * as ST from "./Storage";
 import * as TC from "./TypeChecking";
 
-export type QuerySetConstructor<Q extends IQuerySet<T>, T extends BT.IDocument> = (collectionDescriptor: ST.ITypedCollectionDescriptor<T>) => Q;
+export type QuerySetConstructor<Q extends IQuerySet<T>, T extends DT.IDocument> = (collectionDescriptor: ST.ITypedCollectionDescriptor<T>) => Q;
 
-export interface IQuerySet<T extends BT.IDocument> {
+export interface IQuerySet<T extends DT.IDocument> {
   readonly collectionDescriptor: ST.ITypedCollectionDescriptor<T>;
   documentProxyConstructor: BT.ProxyFunc<T>;
   getById(ds: FB.IDataStorageState, id: string): Promise<T | null>;
@@ -14,7 +15,7 @@ export interface IQuerySet<T extends BT.IDocument> {
 }
 
 /** Base class for providing queries for a collection. */
-export class QuerySet<T extends BT.IDocument> implements IQuerySet<T> {
+export class QuerySet<T extends DT.IDocument> implements IQuerySet<T> {
   private _collectionDescriptor: ST.ITypedCollectionDescriptor<T>;
   private _documentProxyConstructor: BT.ProxyFunc<T>;
 
@@ -66,7 +67,7 @@ export class QuerySet<T extends BT.IDocument> implements IQuerySet<T> {
 
     if (this.collectionDescriptor.isNestedCollection) {
       const collectionGroup = this.collectionDescriptor.getTypedCollectionGroup(ds);
-      const querySnap = await collectionGroup.where(BT.IDocument_DocumentId_PropertyName, "==", id).get();
+      const querySnap = await collectionGroup.where(DT.IDocument_DocumentId_PropertyName, "==", id).get();
       documentSnap = (querySnap.docs.length > 0) ? querySnap.docs[0] : null;
     } else {
       const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
