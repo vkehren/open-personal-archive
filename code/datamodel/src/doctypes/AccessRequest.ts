@@ -291,8 +291,8 @@ function createInstance(id: string, user: IUser, locale: ILocale, message: strin
     archiveId: SingletonId,
     isSpecificToCitation: (!OPA.isNullishOrWhitespace(citationId)),
     citationId: citationId,
-    message: BT.localizableStringConstructor(locale.optionName, message),
-    response: BT.localizableStringConstructor(DefaultLocale, ""), // NOTE: The Decider sets the response (and determines its Locale)
+    message: OPA.localizableStringConstructor(locale.optionName, message),
+    response: OPA.localizableStringConstructor(DefaultLocale, ""), // NOTE: The Decider sets the response (and determines its Locale)
     updateHistory: ([] as Array<UpdateHistoryItem>),
     dateOfCreation: now,
     userIdOfCreator: user.id,

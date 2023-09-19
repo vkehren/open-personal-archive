@@ -1,15 +1,4 @@
-import * as OPA from "../../base/src";
-
 export const DefaultIndexCollection = "Indices";
-
-// LATER: Move the following to base package
-export const localizableStringConstructor = function(locale: string, desiredValue: string | null = null, defaultValue = ""): OPA.ILocalizable<string> {
-  OPA.assertNonNullishOrWhitespace(locale);
-  const localizableString = ({} as Record<string, unknown> & OPA.ILocalizable<string>);
-  localizableString[locale] = (!OPA.isNullishOrWhitespace(desiredValue) ? OPA.convertNonNullish(desiredValue) : defaultValue);
-  localizableString[OPA.Default_Locale] = localizableString[locale]; // NOTE: The base library default locale is actually "en"
-  return localizableString;
-};
 
 export const DataConfiguration = {
   Locale_UseMin: false,

@@ -33,6 +33,21 @@ export const Default_AllowWhitespaceValue = true; // eslint-disable-line camelca
 export const Default_Locale = "en"; // eslint-disable-line camelcase
 
 /**
+ * Constructs an ILocalizable<string> and sets the desired value for the specified Locale (as well as the Default Locale).
+ * @param {string} locale The Locale to set the value of in the newly constructed object (in addition to setting the value of the Default Locale).
+ * @param {string | null} [desiredValue=null] The value to set to.
+ * @param {string} [defaultValue=""] The default value to set to, if a non-null desired value is not provided.
+ * @return {BT.ILocalizable<string>}
+ */
+export function localizableStringConstructor(locale: string, desiredValue: string | null = null, defaultValue = ""): BT.ILocalizable<string> {
+  TC.assertNonNullishOrWhitespace(locale);
+  const localizableString = ({} as Record<string, unknown> & BT.ILocalizable<string>);
+  localizableString[locale] = (!TC.isNullishOrWhitespace(desiredValue) ? TC.convertNonNullish(desiredValue) : defaultValue);
+  localizableString[Default_Locale] = localizableString[locale];
+  return localizableString;
+}
+
+/**
  * Takes in a Localizable object and checks that it is valid.
  * @param {Interfaces.Localizable<T>} localizable The Localizable object.
  * @param {boolean} [allowUndefinedValue=Default_AllowUndefinedValue] Whether to interpret "undefined" as a valid value for a given locale.
