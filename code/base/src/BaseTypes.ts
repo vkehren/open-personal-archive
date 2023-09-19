@@ -337,7 +337,7 @@ export function assertIdentifierIsValid(id: IdNullable, message = "A valid ID mu
 /**
  * Gets the valid ID values from the incoming objects using an ID getter function of type T.
  * @param {Array<unknown>} objs The objects to evaluate.
- * @param {IdFunc<T>} idFunc The function that gets the ID value from an object of type T.
+ * @param {IdFunc<T>} idGetterFunc The function that gets the ID value from an object of type T.
  * @return {Array<Id>} The resulting list of IDs.
  */
 export function getIdentifiersFromObjects<T>(objs: Array<unknown>, idGetterFunc: IdFunc<T>): Array<Id> {
