@@ -658,6 +658,8 @@ export function areUpdatesValid_ForViewable_ByUser(original: IViewable_ByUser, u
 
 
 // IApprovable
+// For Auth updates: (Required = false, UnSetable = false, SetableBySelf = false, SetableByOther = true)
+// For Data updates: (Required = false, UnSetable = false, SetableBySelf = true, SetableByOther = true)
 export const IApprovable_HasBeenDecided_PropertyName = VC.getTypedPropertyKeyAsText<IApprovable<string>>("hasBeenDecided"); // eslint-disable-line camelcase
 export const IApprovable_ApprovalState_PropertyName = VC.getTypedPropertyKeyAsText<IApprovable<string>>("approvalState"); // eslint-disable-line camelcase
 export const IApprovable_DateOfDecision_PropertyName = VC.getTypedPropertyKeyAsText<IApprovable<string>>("dateOfDecision"); // eslint-disable-line camelcase
@@ -672,6 +674,75 @@ export interface IApprovable_ByUser<T> extends IApprovable<T> {
 }
 export interface IDocument_Approvable<T> extends IDocument, IApprovable<T> { }
 export interface IDocument_Approvable_ByUser<T> extends IDocument_Approvable<T>, IApprovable_ByUser<T> { }
+
+/**
+ * Returns whether the updates to the object are valid from the perspective of the IApprovable<BT.ApprovalState> interface.
+ * @param {IApprovable<BT.ApprovalState>} original The original object.
+ * @param {IApprovable<BT.ApprovalState>} updated The updated object.
+ * @param {boolean} isReadOnly Whether the properties of the IApprovable<BT.ApprovalState> interface are read-only or not.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForApprovable(original: IApprovable<BT.ApprovalState>, updated: IApprovable<BT.ApprovalState>, isReadOnly: boolean): boolean {
+  TC.assertNonNullish(original, "The original object must not be null.");
+  TC.assertNonNullish(updated, "The updated object must not be null.");
+
+  // NOTE: These values may both be false or both be true, but not one of each
+  const priorExistencesMatch = (((!original.hasBeenDecided) == (original.approvalState == BT.ApprovalStates.pending)) && ((!original.hasBeenDecided) == TC.isNullish(original.dateOfDecision)));
+  if (!priorExistencesMatch) {
+    return false;
+  }
+  // NOTE: These values may optionally exist on any update
+  const existencesMatch = ((TC.isNullish(updated.hasBeenDecided) == TC.isNullish(updated.approvalState)) && (TC.isNullish(updated.hasBeenDecided) == TC.isNullish(updated.dateOfDecision)));
+  if (!existencesMatch) {
+    return false;
+  }
+  if (!TC.isNullish(updated.hasBeenDecided)) {
+    const stateValid = (updated.hasBeenDecided); // NOTE: This value must be "true" for updates
+    if (!stateValid) {
+      return false;
+    }
+    const approvalStateValid = (BT.ApprovalStates.decided.includes(updated.approvalState));
+    if (!approvalStateValid) {
+      return false;
+    }
+    if (isReadOnly) {
+      return false;
+    }
+  }
+  if (!TC.isNullish(updated.dateOfDecision)) {
+    const datesValid = (TC.isNullish(original.dateOfDecision) || (TC.convertNonNullish(updated.dateOfDecision) > TC.convertNonNullish(original.dateOfDecision)));
+    if (!datesValid) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Returns whether the updates to the object are valid from the perspective of the IApprovable_ByUser<BT.ApprovalState> interface.
+ * @param {IApprovable_ByUser<BT.ApprovalState>} original The original object.
+ * @param {IApprovable_ByUser<BT.ApprovalState>} updated The updated object.
+ * @param {boolean} isReadOnly Whether the properties of the IApprovable_ByUser<BT.ApprovalState> interface are read-only or not.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForApprovable_ByUser(original: IApprovable_ByUser<BT.ApprovalState>, updated: IApprovable_ByUser<BT.ApprovalState>, isReadOnly: boolean): boolean {
+  if (!areUpdatesValid_ForApprovable(original, updated, isReadOnly)) {
+    return false;
+  }
+
+  // NOTE: These values may both be null or both be non-null, but not one of each
+  const priorExistencesMatch = (TC.isNullish(original.userIdOfDecider) == TC.isNullish(original.dateOfDecision));
+  if (!priorExistencesMatch) {
+    return false;
+  }
+  // NOTE: These values may optionally exist on any update
+  const existencesMatch = (TC.isNullish(updated.userIdOfDecider) == TC.isNullish(updated.dateOfDecision));
+  if (!existencesMatch) {
+    return false;
+  }
+  // NOTE: The "userIdOf..." value must be validated via AuthorizationState, not here
+  return true;
+}
 
 
 // ISuspendable

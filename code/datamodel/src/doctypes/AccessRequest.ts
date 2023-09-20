@@ -59,6 +59,9 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
   if (!OPA.areUpdatesValid_ForViewable_ByUser(document, updateObject as OPA.IViewable_ByUser, ((updateObject as OPA.IViewable_ByUser).userIdOfLatestViewer == document.userIdOfCreator))) {
     return false;
   }
+  if (!OPA.areUpdatesValid_ForApprovable_ByUser(document, updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>, ((updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>).userIdOfDecider == document.userIdOfCreator))) {
+    return false;
+  }
   const userIdOfLatestUpdater = (updateObject as OPA.IUpdateable_ByUser).userIdOfLatestUpdater;
 
   // NOTE: updateObject MUST NOT change read-only data
@@ -86,43 +89,6 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
 
     if (propertyNames_NotForUnDelete.length > 0) {
       return false;
-    }
-  }
-
-  if (true) { // eslint-disable-line no-constant-condition
-    const updateObject_Approvable = (updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>);
-
-    if (OPA.isUndefined(updateObject_Approvable.hasBeenDecided)) {
-      const stateIsSet = !OPA.isUndefined(updateObject_Approvable.approvalState);
-      const dateIsSet = !OPA.isUndefined(updateObject_Approvable.dateOfDecision);
-      const userIsSet = !OPA.isUndefined(updateObject_Approvable.userIdOfDecider);
-
-      if (stateIsSet || dateIsSet || userIsSet) {
-        return false;
-      }
-    } else if (OPA.isNullish(updateObject_Approvable.hasBeenDecided)) {
-      throw new Error("The \"hasBeenDecided\" property must not be set to null.");
-    } else if (updateObject_Approvable.hasBeenDecided) {
-      const stateNotSet = OPA.isNullish(updateObject_Approvable.approvalState);
-      const dateNotSet = OPA.isNullish(updateObject_Approvable.dateOfDecision);
-      const userNotSet = OPA.isNullish(updateObject_Approvable.userIdOfDecider);
-      const stateNotDecided = !OPA.ApprovalStates.decided.includes(updateObject_Approvable.approvalState);
-      const isSelfApproved = (updateObject_Approvable.userIdOfDecider == document.userIdOfCreator);
-
-      if (stateNotSet || dateNotSet || userNotSet || stateNotDecided || isSelfApproved) {
-        return false;
-      }
-    } else {
-      const docIsDecided = document.hasBeenDecided;
-      const stateNotSet = OPA.isNullish(updateObject_Approvable.approvalState);
-      const dateIsSet = !OPA.isNullish(updateObject_Approvable.dateOfDecision);
-      const userIsSet = !OPA.isNullish(updateObject_Approvable.userIdOfDecider);
-      const stateNotPending = (updateObject_Approvable.approvalState != OPA.ApprovalStates.pending);
-      const userCanUnDecide = false;
-
-      if ((docIsDecided && !userCanUnDecide) || stateNotSet || stateNotPending || dateIsSet || userIsSet) {
-        return false;
-      }
     }
   }
 

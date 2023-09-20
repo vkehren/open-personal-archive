@@ -82,6 +82,9 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   if (!OPA.areUpdatesValid_ForViewable_ByUser(document, updateObject as OPA.IViewable_ByUser, ((updateObject as OPA.IViewable_ByUser).userIdOfLatestViewer == document.id))) {
     return false;
   }
+  if (!OPA.areUpdatesValid_ForApprovable_ByUser(document, updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>, (((updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>).userIdOfDecider == document.id) || (document.id == User_OwnerId)))) {
+    return false;
+  }
   const userIdOfLatestUpdater = (updateObject as OPA.IUpdateable_ByUser).userIdOfLatestUpdater;
   const docIsArchiveOwner = ((document.id == User_OwnerId) || (document.assignedRoleId == Role_OwnerId));
 
@@ -143,43 +146,6 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
       const isViewableSelfAssigned = (!OPA.isNullish(updateObject_CitationAccessor.viewableCitationIds) && (updateObject_CitationAccessor.userIdOfLatestCitationChanger == document.id));
 
       if ((dateNotSet && dateNotCreation) || (userNotSet && dateNotCreation) || isRequestedNotSelfAssigned || isViewableSelfAssigned) {
-        return false;
-      }
-    }
-  }
-
-  if (true) { // eslint-disable-line no-constant-condition
-    const updateObject_Approvable = (updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>);
-
-    if (OPA.isUndefined(updateObject_Approvable.hasBeenDecided)) {
-      const stateIsSet = !OPA.isUndefined(updateObject_Approvable.approvalState);
-      const dateIsSet = !OPA.isUndefined(updateObject_Approvable.dateOfDecision);
-      const userIsSet = !OPA.isUndefined(updateObject_Approvable.userIdOfDecider);
-
-      if (stateIsSet || dateIsSet || userIsSet) {
-        return false;
-      }
-    } else if (OPA.isNullish(updateObject_Approvable.hasBeenDecided)) {
-      throw new Error("The \"hasBeenDecided\" property must not be set to null.");
-    } else if (updateObject_Approvable.hasBeenDecided) {
-      const stateNotSet = OPA.isNullish(updateObject_Approvable.approvalState);
-      const dateNotSet = OPA.isNullish(updateObject_Approvable.dateOfDecision);
-      const userNotSet = OPA.isNullish(updateObject_Approvable.userIdOfDecider);
-      const stateNotDecided = !OPA.ApprovalStates.decided.includes(updateObject_Approvable.approvalState);
-      const isSelfApproved = (updateObject_Approvable.userIdOfDecider == document.id);
-
-      if (stateNotSet || dateNotSet || userNotSet || stateNotDecided || isSelfApproved || docIsArchiveOwner) {
-        return false;
-      }
-    } else {
-      const docIsDecided = document.hasBeenDecided;
-      const stateNotSet = OPA.isNullish(updateObject_Approvable.approvalState);
-      const dateIsSet = !OPA.isNullish(updateObject_Approvable.dateOfDecision);
-      const userIsSet = !OPA.isNullish(updateObject_Approvable.userIdOfDecider);
-      const stateNotPending = (updateObject_Approvable.approvalState != OPA.ApprovalStates.pending);
-      const userCanUnDecide = false;
-
-      if ((docIsDecided && !userCanUnDecide) || stateNotSet || stateNotPending || dateIsSet || userIsSet || docIsArchiveOwner) {
         return false;
       }
     }
