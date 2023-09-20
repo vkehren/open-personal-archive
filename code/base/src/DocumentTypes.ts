@@ -54,7 +54,8 @@ export function areUpdatesValid_ForDocument(original: IDocument, updated: IDocum
     return false;
   }
   if (!TC.isNullish(updated.id)) {
-    if (updated.id != original.id) {
+    const idsMatch = (updated.id == original.id);
+    if (!idsMatch) {
       return false;
     }
   }
