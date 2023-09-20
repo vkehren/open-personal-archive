@@ -784,26 +784,28 @@ export function isSuspended<T extends ISuspendable>(document: T): boolean {
 
 
 // IDeleteable
+// For Auth updates: (Required = false, UnSetable = true but unset must be only changes, SetableBySelf = true, SetableByOther = false)
+// For Data updates: (Required = false, UnSetable = true but unset must be only changes, SetableBySelf = true, SetableByOther = true)
 export const IDeleteable_IsMarkedAsDeleted_PropertyName = VC.getTypedPropertyKeyAsText<IDeleteable>("isMarkedAsDeleted"); // eslint-disable-line camelcase
-export const IDeleteable_DateOfDeletion_PropertyName = VC.getTypedPropertyKeyAsText<IDeleteable>("dateOfDeletion"); // eslint-disable-line camelcase
+export const IDeleteable_DateOfDeletionChange_PropertyName = VC.getTypedPropertyKeyAsText<IDeleteable>("dateOfDeletionChange"); // eslint-disable-line camelcase
 export const IDeleteable_UnDelete_ExactValidSet_PropertyNames: Array<string> = [ // eslint-disable-line camelcase
   IUpdateable_HasBeenUpdated_PropertyName,
   IUpdateable_DateOfLatestUpdate_PropertyName,
   IDeleteable_IsMarkedAsDeleted_PropertyName,
-  IDeleteable_DateOfDeletion_PropertyName,
+  IDeleteable_DateOfDeletionChange_PropertyName,
 ];
 export interface IDeleteable {
   readonly isMarkedAsDeleted: boolean;
-  readonly dateOfDeletion: BT.DateToUse | null;
+  readonly dateOfDeletionChange: BT.DateToUse | null;
 }
-export const IDeleteable_ByUser_UserIdOfDeleter_PropertyName = VC.getTypedPropertyKeyAsText<IDeleteable_ByUser>("userIdOfDeleter"); // eslint-disable-line camelcase
+export const IDeleteable_ByUser_UserIdOfDeletionChanger_PropertyName = VC.getTypedPropertyKeyAsText<IDeleteable_ByUser>("userIdOfDeletionChanger"); // eslint-disable-line camelcase
 export const IDeleteable_ByUser_UnDelete_ExactValidSet_PropertyNames: Array<string> = [ // eslint-disable-line camelcase
   ...IDeleteable_UnDelete_ExactValidSet_PropertyNames,
   IUpdateable_ByUser_UserIdOfLatestUpdater_PropertyName,
-  IDeleteable_ByUser_UserIdOfDeleter_PropertyName,
+  IDeleteable_ByUser_UserIdOfDeletionChanger_PropertyName,
 ];
 export interface IDeleteable_ByUser extends IDeleteable {
-  readonly userIdOfDeleter: BT.Id | null;
+  readonly userIdOfDeletionChanger: BT.Id | null;
 }
 export interface IDocument_Deleteable extends IDocument, IDeleteable { }
 export interface IDocument_Deleteable_ByUser extends IDocument_Deleteable, IDeleteable_ByUser { }

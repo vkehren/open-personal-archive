@@ -217,8 +217,8 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
     const updateObject_Deleteable = (updateObject as OPA.IDeleteable_ByUser);
 
     if (OPA.isUndefined(updateObject_Deleteable.isMarkedAsDeleted)) {
-      const dateIsSet = !OPA.isUndefined(updateObject_Deleteable.dateOfDeletion);
-      const userIsSet = !OPA.isUndefined(updateObject_Deleteable.userIdOfDeleter);
+      const dateIsSet = !OPA.isUndefined(updateObject_Deleteable.dateOfDeletionChange);
+      const userIsSet = !OPA.isUndefined(updateObject_Deleteable.userIdOfDeletionChanger);
 
       if (dateIsSet || userIsSet) {
         return false;
@@ -227,17 +227,17 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
       throw new Error("The \"isMarkedAsDeleted\" property must not be set to null.");
     } else if (updateObject_Deleteable.isMarkedAsDeleted) {
       const docIsDeleted = document.isMarkedAsDeleted;
-      const dateNotSet = OPA.isNullish(updateObject_Deleteable.dateOfDeletion);
-      const userNotSet = OPA.isNullish(updateObject_Deleteable.userIdOfDeleter);
-      const userNotCreator = (updateObject_Deleteable.userIdOfDeleter != document.id);
+      const dateNotSet = OPA.isNullish(updateObject_Deleteable.dateOfDeletionChange);
+      const userNotSet = OPA.isNullish(updateObject_Deleteable.userIdOfDeletionChanger);
+      const userNotCreator = (updateObject_Deleteable.userIdOfDeletionChanger != document.id);
 
       if (docIsDeleted || dateNotSet || userNotSet || userNotCreator || docIsArchiveOwner) {
         return false;
       }
     } else {
       const docIsDeleted = document.isMarkedAsDeleted;
-      const dateIsSet = !OPA.isNullish(updateObject_Deleteable.dateOfDeletion);
-      const userIsSet = !OPA.isNullish(updateObject_Deleteable.userIdOfDeleter);
+      const dateIsSet = !OPA.isNullish(updateObject_Deleteable.dateOfDeletionChange);
+      const userIsSet = !OPA.isNullish(updateObject_Deleteable.userIdOfDeletionChanger);
       const userCanUnDelete = (userIdOfLatestUpdater == document.id);
 
       if ((docIsDeleted && !userCanUnDelete) || dateIsSet || userIsSet || docIsArchiveOwner) {
@@ -308,8 +308,8 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     userIdOfSuspensionStarter: null,
     userIdOfSuspensionEnder: null,
     isMarkedAsDeleted: false,
-    dateOfDeletion: null,
-    userIdOfDeleter: null,
+    dateOfDeletionChange: null,
+    userIdOfDeletionChanger: null,
   };
 
   const documentCopy = OPA.copyObject(document);
@@ -374,8 +374,8 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     userIdOfSuspensionStarter: null,
     userIdOfSuspensionEnder: null,
     isMarkedAsDeleted: false,
-    dateOfDeletion: null,
-    userIdOfDeleter: null,
+    dateOfDeletionChange: null,
+    userIdOfDeletionChanger: null,
   };
 
   const documentCopy = OPA.copyObject(document);
@@ -843,7 +843,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDeleter} as OPA.IUpdateable_ByUser);
-    const updateObject_Deleteable = ({isMarkedAsDeleted: true, dateOfDeletion: now, userIdOfDeleter} as OPA.IDeleteable_ByUser);
+    const updateObject_Deleteable = ({isMarkedAsDeleted: true, dateOfDeletionChange: now, userIdOfDeletionChanger: userIdOfDeleter} as OPA.IDeleteable_ByUser);
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Deleteable};
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);

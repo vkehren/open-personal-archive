@@ -96,8 +96,8 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
     const updateObject_Deleteable = (updateObject as OPA.IDeleteable_ByUser);
 
     if (OPA.isUndefined(updateObject_Deleteable.isMarkedAsDeleted)) {
-      const dateIsSet = !OPA.isUndefined(updateObject_Deleteable.dateOfDeletion);
-      const userIsSet = !OPA.isUndefined(updateObject_Deleteable.userIdOfDeleter);
+      const dateIsSet = !OPA.isUndefined(updateObject_Deleteable.dateOfDeletionChange);
+      const userIsSet = !OPA.isUndefined(updateObject_Deleteable.userIdOfDeletionChanger);
 
       if (dateIsSet || userIsSet) {
         return false;
@@ -106,17 +106,17 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
       throw new Error("The \"isMarkedAsDeleted\" property must not be set to null.");
     } else if (updateObject_Deleteable.isMarkedAsDeleted) {
       const docIsDeleted = document.isMarkedAsDeleted;
-      const dateNotSet = OPA.isNullish(updateObject_Deleteable.dateOfDeletion);
-      const userNotSet = OPA.isNullish(updateObject_Deleteable.userIdOfDeleter);
-      const userNotCreator = (updateObject_Deleteable.userIdOfDeleter != document.userIdOfCreator);
+      const dateNotSet = OPA.isNullish(updateObject_Deleteable.dateOfDeletionChange);
+      const userNotSet = OPA.isNullish(updateObject_Deleteable.userIdOfDeletionChanger);
+      const userNotCreator = (updateObject_Deleteable.userIdOfDeletionChanger != document.userIdOfCreator);
 
       if (docIsDeleted || dateNotSet || userNotSet || userNotCreator) {
         return false;
       }
     } else {
       const docIsDeleted = document.isMarkedAsDeleted;
-      const dateIsSet = !OPA.isNullish(updateObject_Deleteable.dateOfDeletion);
-      const userIsSet = !OPA.isNullish(updateObject_Deleteable.userIdOfDeleter);
+      const dateIsSet = !OPA.isNullish(updateObject_Deleteable.dateOfDeletionChange);
+      const userIsSet = !OPA.isNullish(updateObject_Deleteable.userIdOfDeletionChanger);
       const userCanUnDelete = (userIdOfLatestUpdater == document.userIdOfCreator);
 
       if ((docIsDeleted && !userCanUnDelete) || dateIsSet || userIsSet) {
@@ -189,8 +189,8 @@ function createInstance(id: string, user: IUser, locale: ILocale, message: strin
     dateOfDecision: null,
     userIdOfDecider: null,
     isMarkedAsDeleted: false,
-    dateOfDeletion: null,
-    userIdOfDeleter: null,
+    dateOfDeletionChange: null,
+    userIdOfDeletionChanger: null,
   };
 
   const documentCopy = OPA.copyObject(document);
@@ -439,7 +439,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IAccessRequestPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDeleter} as OPA.IUpdateable_ByUser);
-    const updateObject_Deleteable = ({isMarkedAsDeleted: true, dateOfDeletion: now, userIdOfDeleter} as OPA.IDeleteable_ByUser);
+    const updateObject_Deleteable = ({isMarkedAsDeleted: true, dateOfDeletionChange: now, userIdOfDeletionChanger: userIdOfDeleter} as OPA.IDeleteable_ByUser);
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Deleteable};
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);

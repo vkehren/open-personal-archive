@@ -151,8 +151,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -195,8 +195,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -239,8 +239,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -283,8 +283,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -327,8 +327,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -371,8 +371,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -415,8 +415,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -459,8 +459,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -501,8 +501,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -543,8 +543,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -585,8 +585,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.admin;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -627,8 +627,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.admin;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -669,8 +669,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.admin;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -711,8 +711,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -753,8 +753,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
   });
   test("checks that initializeUserAccount(...) fails but some User updates succeed when System is installed and User is Archive Owner", testFunc2("query"));
   test("checks that initializeUserAccount(...) fails but some User updates succeed when System is installed and User is Archive Owner", testFunc2("logic"));
@@ -830,8 +830,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -876,8 +876,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -922,8 +922,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -968,8 +968,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1016,8 +1016,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1064,8 +1064,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1112,8 +1112,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1160,8 +1160,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1208,8 +1208,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1256,8 +1256,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1305,8 +1305,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1351,8 +1351,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1402,8 +1402,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1453,8 +1453,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1504,8 +1504,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1555,8 +1555,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1601,8 +1601,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(null);
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1647,8 +1647,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(ownerId());
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1693,8 +1693,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(ownerId());
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1739,8 +1739,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(ownerId());
     expect(user.userIdOfSuspensionEnder).equals(null);
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1785,8 +1785,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(ownerId());
     expect(user.userIdOfSuspensionEnder).equals(ownerId());
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1831,8 +1831,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(ownerId());
     expect(user.userIdOfSuspensionEnder).equals(ownerId());
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1877,8 +1877,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(ownerId());
     expect(user.userIdOfSuspensionEnder).equals(ownerId());
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletion).equals(null);
-    expect(user.userIdOfDeleter).equals(null);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -1923,8 +1923,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(ownerId());
     expect(user.userIdOfSuspensionEnder).equals(ownerId());
     expect(user.isMarkedAsDeleted).equals(true);
-    expect(user.dateOfDeletion).not.equals(null);
-    expect(user.userIdOfDeleter).equals(testUserId());
+    expect(user.dateOfDeletionChange).not.equals(null);
+    expect(user.userIdOfDeletionChanger).equals(testUserId());
   });
   test("checks that initializeUserAccount(...) succeeds and User updates succeed when System is installed and User is not Archive Owner", testFunc3("query"));
   test("checks that initializeUserAccount(...) succeeds and User updates succeed when System is installed and User is not Archive Owner", testFunc3("logic"));

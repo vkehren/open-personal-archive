@@ -191,8 +191,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
-    expect(accessRequest.dateOfDeletion).equals(null);
-    expect(accessRequest.userIdOfDeleter).equals(null);
+    expect(accessRequest.dateOfDeletionChange).equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     await OpaDb.AccessRequests.queries.setTags(config.dataStorageState, accessRequestId, ["a", "b", "c"], ambientUserId());
@@ -221,8 +221,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
-    expect(accessRequest.dateOfDeletion).equals(null);
-    expect(accessRequest.userIdOfDeleter).equals(null);
+    expect(accessRequest.dateOfDeletionChange).equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     await OpaDb.AccessRequests.queries.setToViewed(config.dataStorageState, accessRequestId, ambientUserId());
@@ -251,8 +251,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
-    expect(accessRequest.dateOfDeletion).equals(null);
-    expect(accessRequest.userIdOfDeleter).equals(null);
+    expect(accessRequest.dateOfDeletionChange).equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     await expect(OpaDb.AccessRequests.queries.setToViewed(config.dataStorageState, accessRequestId, ambientUserId())).to.eventually.be.rejectedWith(Error);
@@ -286,8 +286,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
-    expect(accessRequest.dateOfDeletion).equals(null);
-    expect(accessRequest.userIdOfDeleter).equals(null);
+    expect(accessRequest.dateOfDeletionChange).equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     let accessRequestUpdateObject = ({response: OPA.localizableStringConstructor(OpaDm.DefaultLocale, testResponse)} as OpaDm.IAccessRequestPartial);
@@ -317,8 +317,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
-    expect(accessRequest.dateOfDeletion).equals(null);
-    expect(accessRequest.userIdOfDeleter).equals(null);
+    expect(accessRequest.dateOfDeletionChange).equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     const testResponse_Updated = (testResponse + " UPDATED");
@@ -349,8 +349,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
-    expect(accessRequest.dateOfDeletion).equals(null);
-    expect(accessRequest.userIdOfDeleter).equals(null);
+    expect(accessRequest.dateOfDeletionChange).equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     const testMessage_Updated = (testMessage + " UPDATED");
@@ -381,8 +381,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
-    expect(accessRequest.dateOfDeletion).equals(null);
-    expect(accessRequest.userIdOfDeleter).equals(null);
+    expect(accessRequest.dateOfDeletionChange).equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     await expect(OpaDb.AccessRequests.queries.setToArchivalOption(config.dataStorageState, accessRequestId, true, ambientUserId())).to.eventually.be.rejectedWith(Error);
@@ -415,8 +415,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
-    expect(accessRequest.dateOfDeletion).equals(null);
-    expect(accessRequest.userIdOfDeleter).equals(null);
+    expect(accessRequest.dateOfDeletionChange).equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     await OpaDb.AccessRequests.queries.setToArchivalOption(config.dataStorageState, accessRequestId, false, ambientUserId());
@@ -445,8 +445,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
-    expect(accessRequest.dateOfDeletion).equals(null);
-    expect(accessRequest.userIdOfDeleter).equals(null);
+    expect(accessRequest.dateOfDeletionChange).equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
     // NOTE: Set-and-UnSet a second time to verify logic
     config.authenticationState = TestAuthData.owner;
@@ -476,8 +476,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
-    expect(accessRequest.dateOfDeletion).equals(null);
-    expect(accessRequest.userIdOfDeleter).equals(null);
+    expect(accessRequest.dateOfDeletionChange).equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     await OpaDb.AccessRequests.queries.setToArchivalOption(config.dataStorageState, accessRequestId, false, ambientUserId());
@@ -506,8 +506,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
-    expect(accessRequest.dateOfDeletion).equals(null);
-    expect(accessRequest.userIdOfDeleter).equals(null);
+    expect(accessRequest.dateOfDeletionChange).equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     await OpaDb.AccessRequests.queries.setToDecidedOption(config.dataStorageState, accessRequestId, OPA.ApprovalStates.denied, ambientUserId());
@@ -536,8 +536,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfDecision).not.equals(null);
     expect(accessRequest.userIdOfDecider).equals(ownerId());
     expect(accessRequest.isMarkedAsDeleted).equals(false);
-    expect(accessRequest.dateOfDeletion).equals(null);
-    expect(accessRequest.userIdOfDeleter).equals(null);
+    expect(accessRequest.dateOfDeletionChange).equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     await OpaDb.AccessRequests.queries.setToDecidedOption(config.dataStorageState, accessRequestId, OPA.ApprovalStates.approved, ambientUserId());
@@ -566,8 +566,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfDecision).not.equals(null);
     expect(accessRequest.userIdOfDecider).equals(ownerId());
     expect(accessRequest.isMarkedAsDeleted).equals(false);
-    expect(accessRequest.dateOfDeletion).equals(null);
-    expect(accessRequest.userIdOfDeleter).equals(null);
+    expect(accessRequest.dateOfDeletionChange).equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
     await expect(OpaDb.AccessRequests.queries.markAsDeleted(config.dataStorageState, accessRequestId, ambientUserId())).to.eventually.be.rejectedWith(Error);
@@ -596,8 +596,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfDecision).not.equals(null);
     expect(accessRequest.userIdOfDecider).equals(ownerId());
     expect(accessRequest.isMarkedAsDeleted).equals(false);
-    expect(accessRequest.dateOfDeletion).equals(null);
-    expect(accessRequest.userIdOfDeleter).equals(null);
+    expect(accessRequest.dateOfDeletionChange).equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     await OpaDb.AccessRequests.queries.markAsDeleted(config.dataStorageState, accessRequestId, ambientUserId());
@@ -626,8 +626,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfDecision).not.equals(null);
     expect(accessRequest.userIdOfDecider).equals(ownerId());
     expect(accessRequest.isMarkedAsDeleted).equals(true);
-    expect(accessRequest.dateOfDeletion).not.equals(null);
-    expect(accessRequest.userIdOfDeleter).equals(testUserId());
+    expect(accessRequest.dateOfDeletionChange).not.equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(testUserId());
   });
   test("checks that requestUserAccess(...) succeeds and AccessRequest updates succeed when System is installed and User is not Archive Owner", testFunc3(testCitationId_Null));
   test("checks that requestUserAccess(...) succeeds and AccessRequest updates succeed when System is installed and User is not Archive Owner", testFunc3(testCitationId_NonNull));
