@@ -77,11 +77,13 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObject as OPA.IUpdateable_ByUser)) {
     return false;
   }
+  if (!OPA.areUpdatesValid_ForAssignableToRole_ByUser(document, updateObject as OPA.IAssignableToRole_ByUser, (document.id == User_OwnerId), {dateOfCreation: document.dateOfCreation, userIdOfCreator: document.id})) {
+    return false;
+  }
   const userIdOfLatestUpdater = (updateObject as OPA.IUpdateable_ByUser).userIdOfLatestUpdater;
   const docIsArchiveOwner = ((document.id == User_OwnerId) || (document.assignedRoleId == Role_OwnerId));
 
   // NOTE: updateObject MUST NOT change read-only data
-  const updateObject_AssignableToRole = (updateObject as OPA.IAssignableToRole_ByUser);
   const updateObject_CitationAccessor = (updateObject as ICitationAccessorPartial);
 
   const propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
@@ -89,14 +91,12 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   const authProviderId_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).authProviderId);
   const authAccountName_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).authAccountName);
   const authAccountNameLowered_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).authAccountNameLowered);
-  const assignedRoleId_UpdateUsesInterface = (!OPA.isNullish(updateObject_AssignableToRole.dateOfLatestRoleAssignment));
-  const assignedRoleId_IsUpdatedDirectly = (!assignedRoleId_UpdateUsesInterface && propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).assignedRoleId));
   const requestedCitationIds_UpdateUsesInterface = (!OPA.isNullish(updateObject_CitationAccessor.dateOfLatestCitationChange));
   const requestedCitationIds_IsUpdatedDirectly = (!requestedCitationIds_UpdateUsesInterface && propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).requestedCitationIds));
   const viewableCitationIds_UpdateUsesInterface = requestedCitationIds_UpdateUsesInterface;
   const viewableCitationIds_IsUpdatedDirectly = (!viewableCitationIds_UpdateUsesInterface && propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).viewableCitationIds));
 
-  if (firebaseAuthUserId_IsUpdated || authProviderId_IsUpdated || authAccountName_IsUpdated || authAccountNameLowered_IsUpdated || assignedRoleId_IsUpdatedDirectly || requestedCitationIds_IsUpdatedDirectly || viewableCitationIds_IsUpdatedDirectly) { // eslint-disable-line max-len
+  if (firebaseAuthUserId_IsUpdated || authProviderId_IsUpdated || authAccountName_IsUpdated || authAccountNameLowered_IsUpdated || requestedCitationIds_IsUpdatedDirectly || viewableCitationIds_IsUpdatedDirectly) { // eslint-disable-line max-len
     return false;
   }
 
@@ -121,28 +121,6 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   }
 
   if (true) { // eslint-disable-line no-constant-condition
-    if (OPA.isUndefined(updateObject_AssignableToRole.assignedRoleId)) {
-      const dateIsSet = !OPA.isUndefined(updateObject_AssignableToRole.dateOfLatestRoleAssignment);
-      const userIsSet = !OPA.isUndefined(updateObject_AssignableToRole.userIdOfLatestRoleAssigner);
-
-      if (dateIsSet || userIsSet) {
-        return false;
-      }
-    } else if (OPA.isNullish(updateObject_AssignableToRole.assignedRoleId)) {
-      throw new Error("The \"assignedRoleId\" property must not be set to null.");
-    } else {
-      const dateNotSet = OPA.isNullish(updateObject_AssignableToRole.dateOfLatestRoleAssignment);
-      const userNotSet = OPA.isNullish(updateObject_AssignableToRole.userIdOfLatestRoleAssigner);
-      const dateNotCreation = (document.dateOfCreation != updateObject_AssignableToRole.dateOfLatestRoleAssignment);
-      const isSelfAssigned = (updateObject_AssignableToRole.userIdOfLatestRoleAssigner == document.id);
-
-      if (dateNotSet || (userNotSet && dateNotCreation) || isSelfAssigned || docIsArchiveOwner) {
-        return false;
-      }
-    }
-  }
-
-  if (true) { // eslint-disable-line no-constant-condition
     // NOTE: Unlike most interfaces used in this fuction, ICitationAccessor only requires that one of the two array properties is updated
     if (OPA.isUndefined(updateObject_CitationAccessor.requestedCitationIds) && OPA.isUndefined(updateObject_CitationAccessor.viewableCitationIds)) {
       const dateIsSet = !OPA.isUndefined(updateObject_CitationAccessor.dateOfLatestCitationChange);
@@ -158,7 +136,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
     } else {
       const dateNotSet = OPA.isNullish(updateObject_CitationAccessor.dateOfLatestCitationChange);
       const userNotSet = OPA.isNullish(updateObject_CitationAccessor.userIdOfLatestCitationChanger);
-      const dateNotCreation = (document.dateOfCreation != updateObject_AssignableToRole.dateOfLatestRoleAssignment);
+      const dateNotCreation = (document.dateOfCreation != (updateObject as OPA.IAssignableToRole_ByUser).dateOfLatestRoleAssignment);
       const isRequestedNotSelfAssigned = (!OPA.isNullish(updateObject_CitationAccessor.requestedCitationIds) && (updateObject_CitationAccessor.userIdOfLatestCitationChanger != document.id));
       const isViewableSelfAssigned = (!OPA.isNullish(updateObject_CitationAccessor.viewableCitationIds) && (updateObject_CitationAccessor.userIdOfLatestCitationChanger == document.id));
 

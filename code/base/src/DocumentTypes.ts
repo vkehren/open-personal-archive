@@ -342,6 +342,71 @@ export interface IAssignableToRole_ByUser extends IAssignableToRole {
 export interface IDocument_AssignableToRole extends IDocument, IAssignableToRole { }
 export interface IDocument_AssignableToRole_ByUser extends IDocument_AssignableToRole, IAssignableToRole_ByUser { }
 
+/**
+ * Returns whether the updates to the object are valid from the perspective of the IAssignableToRole interface.
+ * @param {IAssignableToRole} original The original object.
+ * @param {IAssignableToRole} updated The updated object.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForAssignableToRole(original: IAssignableToRole, updated: IAssignableToRole, isReadOnly: boolean): boolean {
+  TC.assertNonNullish(original, "The original object must not be null.");
+  TC.assertNonNullish(updated, "The updated object must not be null.");
+
+  // NOTE: These values must exist on any original
+  const priorExistencesValid = (!TC.isNullish(original.assignedRoleId) && !TC.isNullish(original.dateOfLatestRoleAssignment));
+  if (!priorExistencesValid) {
+    return false;
+  }
+  // NOTE: These values may optionally exist on any update
+  const existencesMatch = (TC.isNullish(updated.assignedRoleId) == TC.isNullish(updated.dateOfLatestRoleAssignment));
+  if (!existencesMatch) {
+    return false;
+  }
+  if (!TC.isNullish(updated.assignedRoleId)) {
+    if (isReadOnly && (updated.assignedRoleId != original.assignedRoleId)) {
+      return false;
+    }
+  }
+  if (!TC.isNullish(updated.dateOfLatestRoleAssignment)) {
+    const datesValid = (TC.convertNonNullish(updated.dateOfLatestRoleAssignment) > TC.convertNonNullish(original.dateOfLatestRoleAssignment));
+    if (!datesValid) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Returns whether the updates to the object are valid from the perspective of the IAssignableToRole_ByUser interface.
+ * @param {IAssignableToRole_ByUser} original The original object.
+ * @param {IAssignableToRole_ByUser} updated The updated object.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForAssignableToRole_ByUser(original: IAssignableToRole_ByUser, updated: IAssignableToRole_ByUser, isReadOnly: boolean, creationInfo: ICreatable_ByUser): boolean {
+  if (!areUpdatesValid_ForAssignableToRole(original, updated, isReadOnly)) {
+    return false;
+  }
+
+  // NOTE: When the System assigns the Role at creation, the "userId..." should be null
+  const priorExistencesValid = (!TC.isNullish(original.userIdOfLatestRoleAssigner) || (VC.areDatesEqual(original.dateOfLatestRoleAssignment, creationInfo.dateOfCreation)));
+  if (!priorExistencesValid) {
+    return false;
+  }
+  // NOTE: These values may optionally exist on any update
+  const existencesMatch = (TC.isNullish(updated.userIdOfLatestRoleAssigner) == TC.isNullish(updated.dateOfLatestRoleAssignment));
+  if (!existencesMatch) {
+    return false;
+  }
+  // NOTE: The "userIdOf..." value may also be validated via AuthorizationState elsewhere
+  if (!TC.isNullish(updated.userIdOfLatestRoleAssigner)) {
+    const isSelfAssigned = (updated.userIdOfLatestRoleAssigner == creationInfo.userIdOfCreator);
+    if (isSelfAssigned) {
+      return false;
+    }
+  }
+  return true;
+}
+
 
 // ITaggable
 export const ITaggable_Tags_PropertyName = VC.getTypedPropertyKeyAsText<ITaggable>("tags"); // eslint-disable-line camelcase
