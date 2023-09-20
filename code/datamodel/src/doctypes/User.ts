@@ -335,7 +335,6 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     authProviderId: authProvider.id,
     authAccountName: authAccountName,
     authAccountNameLowered: authAccountName.toLowerCase(), // NOTE: Here this is data property, but all QuerySet functions proxy this into a computed property
-    assignedRoleId: assignedRole.id,
     localeId: locale.id,
     timeZoneGroupId: timeZoneGroup.id,
     timeZoneId: timeZoneGroup.primaryTimeZoneId,
@@ -352,6 +351,7 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     hasBeenUpdated: false,
     dateOfLatestUpdate: null,
     userIdOfLatestUpdater: null,
+    assignedRoleId: assignedRole.id,
     dateOfLatestRoleAssignment: now,
     userIdOfLatestRoleAssigner: null,
     hasBeenViewed: false,
@@ -401,7 +401,6 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     authProviderId: authProvider.id,
     authAccountName: authAccountName,
     authAccountNameLowered: authAccountName.toLowerCase(), // NOTE: Here this is data property, but all QuerySet functions proxy this into a computed property
-    assignedRoleId: Role_OwnerId,
     localeId: locale.id,
     timeZoneGroupId: timeZoneGroup.id,
     timeZoneId: timeZoneGroup.primaryTimeZoneId,
@@ -418,6 +417,7 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     hasBeenUpdated: false,
     dateOfLatestUpdate: null,
     userIdOfLatestUpdater: null,
+    assignedRoleId: Role_OwnerId,
     dateOfLatestRoleAssignment: now,
     userIdOfLatestRoleAssigner: null,
     hasBeenViewed: true,
