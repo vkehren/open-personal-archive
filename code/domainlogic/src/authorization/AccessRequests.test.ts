@@ -187,7 +187,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfLatestViewing).equals(null);
     expect(accessRequest.userIdOfLatestViewer).equals(null);
     expect(accessRequest.hasBeenDecided).equals(false);
-    expect(accessRequest.approvalState).equals(OpaDm.ApprovalStates.pending);
+    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.pending);
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
@@ -217,7 +217,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfLatestViewing).equals(null);
     expect(accessRequest.userIdOfLatestViewer).equals(null);
     expect(accessRequest.hasBeenDecided).equals(false);
-    expect(accessRequest.approvalState).equals(OpaDm.ApprovalStates.pending);
+    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.pending);
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
@@ -247,7 +247,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfLatestViewing).not.equals(null);
     expect(accessRequest.userIdOfLatestViewer).equals(ownerId());
     expect(accessRequest.hasBeenDecided).equals(false);
-    expect(accessRequest.approvalState).equals(OpaDm.ApprovalStates.pending);
+    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.pending);
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
@@ -282,7 +282,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfLatestViewing).not.equals(null);
     expect(accessRequest.userIdOfLatestViewer).equals(adminId());
     expect(accessRequest.hasBeenDecided).equals(false);
-    expect(accessRequest.approvalState).equals(OpaDm.ApprovalStates.pending);
+    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.pending);
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
@@ -313,7 +313,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfLatestViewing).not.equals(null);
     expect(accessRequest.userIdOfLatestViewer).equals(adminId());
     expect(accessRequest.hasBeenDecided).equals(false);
-    expect(accessRequest.approvalState).equals(OpaDm.ApprovalStates.pending);
+    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.pending);
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
@@ -345,7 +345,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfLatestViewing).not.equals(null);
     expect(accessRequest.userIdOfLatestViewer).equals(adminId());
     expect(accessRequest.hasBeenDecided).equals(false);
-    expect(accessRequest.approvalState).equals(OpaDm.ApprovalStates.pending);
+    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.pending);
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
@@ -377,7 +377,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfLatestViewing).not.equals(null);
     expect(accessRequest.userIdOfLatestViewer).equals(adminId());
     expect(accessRequest.hasBeenDecided).equals(false);
-    expect(accessRequest.approvalState).equals(OpaDm.ApprovalStates.pending);
+    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.pending);
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
@@ -411,7 +411,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfLatestViewing).not.equals(null);
     expect(accessRequest.userIdOfLatestViewer).equals(adminId());
     expect(accessRequest.hasBeenDecided).equals(false);
-    expect(accessRequest.approvalState).equals(OpaDm.ApprovalStates.pending);
+    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.pending);
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
@@ -441,7 +441,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfLatestViewing).not.equals(null);
     expect(accessRequest.userIdOfLatestViewer).equals(adminId());
     expect(accessRequest.hasBeenDecided).equals(false);
-    expect(accessRequest.approvalState).equals(OpaDm.ApprovalStates.pending);
+    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.pending);
     expect(accessRequest.dateOfDecision).equals(null);
     expect(accessRequest.userIdOfDecider).equals(null);
     expect(accessRequest.isMarkedAsDeleted).equals(false);
@@ -449,7 +449,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.userIdOfDeleter).equals(null);
 
     config.authenticationState = TestAuthData.owner;
-    await OpaDb.AccessRequests.queries.setToDecidedOption(config.dataStorageState, accessRequestId, OpaDm.ApprovalStates.denied, ambientUserId());
+    await OpaDb.AccessRequests.queries.setToDecidedOption(config.dataStorageState, accessRequestId, OPA.ApprovalStates.denied, ambientUserId());
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
@@ -471,7 +471,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfLatestViewing).not.equals(null);
     expect(accessRequest.userIdOfLatestViewer).equals(adminId());
     expect(accessRequest.hasBeenDecided).equals(true);
-    expect(accessRequest.approvalState).equals(OpaDm.ApprovalStates.denied);
+    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.denied);
     expect(accessRequest.dateOfDecision).not.equals(null);
     expect(accessRequest.userIdOfDecider).equals(ownerId());
     expect(accessRequest.isMarkedAsDeleted).equals(false);
@@ -479,7 +479,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.userIdOfDeleter).equals(null);
 
     config.authenticationState = TestAuthData.owner;
-    await OpaDb.AccessRequests.queries.setToDecidedOption(config.dataStorageState, accessRequestId, OpaDm.ApprovalStates.approved, ambientUserId());
+    await OpaDb.AccessRequests.queries.setToDecidedOption(config.dataStorageState, accessRequestId, OPA.ApprovalStates.approved, ambientUserId());
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
@@ -501,7 +501,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfLatestViewing).not.equals(null);
     expect(accessRequest.userIdOfLatestViewer).equals(adminId());
     expect(accessRequest.hasBeenDecided).equals(true);
-    expect(accessRequest.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.approved);
     expect(accessRequest.dateOfDecision).not.equals(null);
     expect(accessRequest.userIdOfDecider).equals(ownerId());
     expect(accessRequest.isMarkedAsDeleted).equals(false);
@@ -531,7 +531,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfLatestViewing).not.equals(null);
     expect(accessRequest.userIdOfLatestViewer).equals(adminId());
     expect(accessRequest.hasBeenDecided).equals(true);
-    expect(accessRequest.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.approved);
     expect(accessRequest.dateOfDecision).not.equals(null);
     expect(accessRequest.userIdOfDecider).equals(ownerId());
     expect(accessRequest.isMarkedAsDeleted).equals(false);
@@ -561,7 +561,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfLatestViewing).not.equals(null);
     expect(accessRequest.userIdOfLatestViewer).equals(adminId());
     expect(accessRequest.hasBeenDecided).equals(true);
-    expect(accessRequest.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.approved);
     expect(accessRequest.dateOfDecision).not.equals(null);
     expect(accessRequest.userIdOfDecider).equals(ownerId());
     expect(accessRequest.isMarkedAsDeleted).equals(true);

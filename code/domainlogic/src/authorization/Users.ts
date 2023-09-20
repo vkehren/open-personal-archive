@@ -318,7 +318,7 @@ export async function setUserToViewed(callState: OpaDm.ICallState, userIdToSet: 
  * @param {OpaDm.ApprovalState} approvalState The ApprovalState to set to.
  * @return {Promise<OpaDm.IUser>}
  */
-export async function setUserToApprovalState(callState: OpaDm.ICallState, userIdToSet: string, approvalState: OpaDm.ApprovalState): Promise<OpaDm.IUser> {
+export async function setUserToApprovalState(callState: OpaDm.ICallState, userIdToSet: string, approvalState: OPA.ApprovalState): Promise<OpaDm.IUser> {
   OPA.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
@@ -356,7 +356,7 @@ export async function setUserToApprovalState(callState: OpaDm.ICallState, userId
  * @return {Promise<OpaDm.IUser>}
  */
 export async function setUserToApproved(callState: OpaDm.ICallState, userIdToSet: string): Promise<OpaDm.IUser> {
-  return await setUserToApprovalState(callState, userIdToSet, OpaDm.ApprovalStates.approved);
+  return await setUserToApprovalState(callState, userIdToSet, OPA.ApprovalStates.approved);
 }
 
 /**
@@ -366,7 +366,7 @@ export async function setUserToApproved(callState: OpaDm.ICallState, userIdToSet
  * @return {Promise<OpaDm.IUser>}
  */
 export async function setUserToDenied(callState: OpaDm.ICallState, userIdToSet: string): Promise<OpaDm.IUser> {
-  return await setUserToApprovalState(callState, userIdToSet, OpaDm.ApprovalStates.denied);
+  return await setUserToApprovalState(callState, userIdToSet, OPA.ApprovalStates.denied);
 }
 
 /**

@@ -34,13 +34,3 @@ export const RoleTypes = {
   authorizers: ([] as Array<RoleType>),
 };
 RoleTypes.authorizers = [RoleTypes.owner, RoleTypes.administrator];
-
-export type ApprovalState = "pending" | "approved" | "denied";
-export const ApprovalStates = {
-  default: ("pending" as ApprovalState),
-  pending: ("pending" as ApprovalState),
-  approved: ("approved" as ApprovalState),
-  denied: ("denied" as ApprovalState),
-  decided: ([] as Array<ApprovalState>),
-};
-ApprovalStates.decided = [ApprovalStates.approved, ApprovalStates.denied];

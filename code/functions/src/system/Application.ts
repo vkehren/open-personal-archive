@@ -68,7 +68,7 @@ export const isInstalled = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (
           data = Object.assign(data, {archiveName: archiveName});
         }
 
-        const userIsAuthorized = (userNonNull.approvalState == OpaDm.ApprovalStates.approved);
+        const userIsAuthorized = (userNonNull.approvalState == OPA.ApprovalStates.approved);
         const userId = userNonNull.id;
         const displayName = (userNonNull.preferredName) ? userNonNull.preferredName : userNonNull.firstName;
         const accessRequests = await OpaDb.AccessRequests.queries.getAllForUserId(dataStorageState, userId);

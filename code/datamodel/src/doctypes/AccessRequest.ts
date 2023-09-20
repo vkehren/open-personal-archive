@@ -1,6 +1,5 @@
 import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../../base/src";
-import * as BT from "../BaseTypes";
 import {SingletonId} from "./Archive";
 import {ILocale, DefaultLocale} from "./Locale";
 import {IUser} from "./User";
@@ -16,14 +15,14 @@ export interface IAccessRequestPartial {
   response?: OPA.ILocalizable<string>;
 }
 
-type UpdateHistoryItem = IAccessRequestPartial | OPA.IUpdateable_ByUser | OPA.ITaggable_ByUser | OPA.IArchivable_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState> | OPA.IDeleteable_ByUser; // eslint-disable-line max-len
+type UpdateHistoryItem = IAccessRequestPartial | OPA.IUpdateable_ByUser | OPA.ITaggable_ByUser | OPA.IArchivable_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<OPA.ApprovalState> | OPA.IDeleteable_ByUser; // eslint-disable-line max-len
 interface IAccessRequestPartial_WithHistory extends IAccessRequestPartial, OPA.IUpdateable_ByUser {
   updateHistory: Array<UpdateHistoryItem> | firestore.FieldValue;
 }
 
 // NOTE: Use "IDocument_Creatable_ByUser" because we must record the User who created the AccessRequest (i.e. the owner of the AccessRequest)
 // NOTE: Use "IDocument_Updateable_ByUser" because the User creating the AccessRequest updates the "message", but the Decider updates the "response"
-export interface IAccessRequest extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser, OPA.IDocument_Taggable_ByUser, OPA.IDocument_Archivable_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Deleteable_ByUser { // eslint-disable-line max-len
+export interface IAccessRequest extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser, OPA.IDocument_Taggable_ByUser, OPA.IDocument_Archivable_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<OPA.ApprovalState>, OPA.IDocument_Deleteable_ByUser { // eslint-disable-line max-len
   readonly archiveId: string; // NOTE: This field stores information necessary to extend the OPA system to manage multiple Archives
   readonly isSpecificToCitation: boolean;
   readonly citationId: string | null;
@@ -91,7 +90,7 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
   }
 
   if (true) { // eslint-disable-line no-constant-condition
-    const updateObject_Approvable = (updateObject as OPA.IApprovable_ByUser<BT.ApprovalState>);
+    const updateObject_Approvable = (updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>);
 
     if (OPA.isUndefined(updateObject_Approvable.hasBeenDecided)) {
       const stateIsSet = !OPA.isUndefined(updateObject_Approvable.approvalState);
@@ -107,7 +106,7 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
       const stateNotSet = OPA.isNullish(updateObject_Approvable.approvalState);
       const dateNotSet = OPA.isNullish(updateObject_Approvable.dateOfDecision);
       const userNotSet = OPA.isNullish(updateObject_Approvable.userIdOfDecider);
-      const stateNotDecided = !BT.ApprovalStates.decided.includes(updateObject_Approvable.approvalState);
+      const stateNotDecided = !OPA.ApprovalStates.decided.includes(updateObject_Approvable.approvalState);
       const isSelfApproved = (updateObject_Approvable.userIdOfDecider == document.userIdOfCreator);
 
       if (stateNotSet || dateNotSet || userNotSet || stateNotDecided || isSelfApproved) {
@@ -118,7 +117,7 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
       const stateNotSet = OPA.isNullish(updateObject_Approvable.approvalState);
       const dateIsSet = !OPA.isNullish(updateObject_Approvable.dateOfDecision);
       const userIsSet = !OPA.isNullish(updateObject_Approvable.userIdOfDecider);
-      const stateNotPending = (updateObject_Approvable.approvalState != BT.ApprovalStates.pending);
+      const stateNotPending = (updateObject_Approvable.approvalState != OPA.ApprovalStates.pending);
       const userCanUnDecide = false;
 
       if ((docIsDecided && !userCanUnDecide) || stateNotSet || stateNotPending || dateIsSet || userIsSet) {
@@ -175,7 +174,7 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
     userIdsOfViewers = userIdsOfViewers.filter((userId) => (userId != document.userIdOfCreator));
     const userNotViewer = (!userIdsOfViewers.includes(OPA.convertNonNullish(userIdOfLatestUpdater)));
 
-    let userIdsOfDeciders = OPA.getIdentifiersFromObjects<OPA.IApprovable_ByUser<BT.ApprovalState>>(document.updateHistory, (doc) => doc.userIdOfDecider);
+    let userIdsOfDeciders = OPA.getIdentifiersFromObjects<OPA.IApprovable_ByUser<OPA.ApprovalState>>(document.updateHistory, (doc) => doc.userIdOfDecider);
     userIdsOfDeciders = userIdsOfDeciders.filter((userId) => (userId != document.userIdOfCreator));
     const userNotDecider = (!userIdsOfDeciders.includes(OPA.convertNonNullish(userIdOfLatestUpdater)));
 
@@ -220,7 +219,7 @@ function createInstance(id: string, user: IUser, locale: ILocale, message: strin
     dateOfLatestViewing: null,
     userIdOfLatestViewer: null,
     hasBeenDecided: false,
-    approvalState: BT.ApprovalStates.pending,
+    approvalState: OPA.ApprovalStates.pending,
     dateOfDecision: null,
     userIdOfDecider: null,
     isMarkedAsDeleted: false,
@@ -432,18 +431,18 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    * Updates the AccessRequest stored on the server by constructing an IApprovable_ByUser<T> object.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the AccessRequest within the OPA system.
-   * @param {BT.ApprovalState} approvalState The ApprovalState for the AccessRequest.
+   * @param {OPA.ApprovalState} approvalState The ApprovalState for the AccessRequest.
    * @param {string} userIdOfDecider The ID for the Decider within the OPA system.
    * @return {Promise<void>}
    */
-  async setToDecidedOption(ds: OPA.IDataStorageState, documentId: string, approvalState: BT.ApprovalState, userIdOfDecider: string): Promise<void> {
+  async setToDecidedOption(ds: OPA.IDataStorageState, documentId: string, approvalState: OPA.ApprovalState, userIdOfDecider: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IAccessRequestPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDecider} as OPA.IUpdateable_ByUser);
-    const updateObject_Approvable = ({hasBeenDecided: true, approvalState, dateOfDecision: now, userIdOfDecider} as OPA.IApprovable_ByUser<BT.ApprovalState>);
+    const updateObject_Approvable = ({hasBeenDecided: true, approvalState, dateOfDecision: now, userIdOfDecider} as OPA.IApprovable_ByUser<OPA.ApprovalState>);
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Approvable};
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);

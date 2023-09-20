@@ -97,6 +97,16 @@ export interface ITimeRangeCollection {
   merge(timestamp: ITimestamp): ITimeRangeMergeResult;
 }
 
+export type ApprovalState = "pending" | "approved" | "denied";
+export const ApprovalStates = {
+  default: ("pending" as ApprovalState),
+  pending: ("pending" as ApprovalState),
+  approved: ("approved" as ApprovalState),
+  denied: ("denied" as ApprovalState),
+  decided: ([] as Array<ApprovalState>),
+};
+ApprovalStates.decided = [ApprovalStates.approved, ApprovalStates.denied];
+
 /**
  * Returns whether the ID is valid.
  * @param {DefaultFunc<IdNullable> | IdNullable} id The ID to check.

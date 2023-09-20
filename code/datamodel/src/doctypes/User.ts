@@ -1,6 +1,5 @@
 import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../../base/src";
-import * as BT from "../BaseTypes";
 import {IAuthenticationProvider} from "./AuthenticationProvider";
 import {ILocale} from "./Locale";
 import {IRole, Role_OwnerId} from "./Role"; // eslint-disable-line camelcase
@@ -38,12 +37,12 @@ interface ICitationAccessorPartial {
   userIdOfLatestCitationChanger: string | null;
 }
 
-type UpdateHistoryItem = IUserPartial | OPA.IUpdateable_ByUser | OPA.IAssignableToRole_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<BT.ApprovalState> | OPA.ISuspendable_ByUser | OPA.IDeleteable_ByUser; // eslint-disable-line max-len
+type UpdateHistoryItem = IUserPartial | OPA.IUpdateable_ByUser | OPA.IAssignableToRole_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<OPA.ApprovalState> | OPA.ISuspendable_ByUser | OPA.IDeleteable_ByUser; // eslint-disable-line max-len
 interface IUserPartial_WithHistory extends IUserPartial, OPA.IUpdateable {
   updateHistory: Array<UpdateHistoryItem> | firestore.FieldValue;
 }
 
-export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable_ByUser, OPA.IDocument_AssignableToRole_ByUser, IDocument_CitationAccessor, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<BT.ApprovalState>, OPA.IDocument_Suspendable_ByUser, OPA.IDocument_Deleteable_ByUser { // eslint-disable-line max-len
+export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable_ByUser, OPA.IDocument_AssignableToRole_ByUser, IDocument_CitationAccessor, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<OPA.ApprovalState>, OPA.IDocument_Suspendable_ByUser, OPA.IDocument_Deleteable_ByUser { // eslint-disable-line max-len
   readonly firebaseAuthUserId: string;
   readonly authProviderId: string;
   readonly authAccountName: string;
@@ -150,7 +149,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   }
 
   if (true) { // eslint-disable-line no-constant-condition
-    const updateObject_Approvable = (updateObject as OPA.IApprovable_ByUser<BT.ApprovalState>);
+    const updateObject_Approvable = (updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>);
 
     if (OPA.isUndefined(updateObject_Approvable.hasBeenDecided)) {
       const stateIsSet = !OPA.isUndefined(updateObject_Approvable.approvalState);
@@ -166,7 +165,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
       const stateNotSet = OPA.isNullish(updateObject_Approvable.approvalState);
       const dateNotSet = OPA.isNullish(updateObject_Approvable.dateOfDecision);
       const userNotSet = OPA.isNullish(updateObject_Approvable.userIdOfDecider);
-      const stateNotDecided = !BT.ApprovalStates.decided.includes(updateObject_Approvable.approvalState);
+      const stateNotDecided = !OPA.ApprovalStates.decided.includes(updateObject_Approvable.approvalState);
       const isSelfApproved = (updateObject_Approvable.userIdOfDecider == document.id);
 
       if (stateNotSet || dateNotSet || userNotSet || stateNotDecided || isSelfApproved || docIsArchiveOwner) {
@@ -177,7 +176,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
       const stateNotSet = OPA.isNullish(updateObject_Approvable.approvalState);
       const dateIsSet = !OPA.isNullish(updateObject_Approvable.dateOfDecision);
       const userIsSet = !OPA.isNullish(updateObject_Approvable.userIdOfDecider);
-      const stateNotPending = (updateObject_Approvable.approvalState != BT.ApprovalStates.pending);
+      const stateNotPending = (updateObject_Approvable.approvalState != OPA.ApprovalStates.pending);
       const userCanUnDecide = false;
 
       if ((docIsDecided && !userCanUnDecide) || stateNotSet || stateNotPending || dateIsSet || userIsSet || docIsArchiveOwner) {
@@ -330,7 +329,7 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     dateOfLatestViewing: null,
     userIdOfLatestViewer: null,
     hasBeenDecided: false,
-    approvalState: BT.ApprovalStates.pending,
+    approvalState: OPA.ApprovalStates.pending,
     dateOfDecision: null,
     userIdOfDecider: null,
     isSuspended: false, // NOTE: Here this is data property, but all QuerySet functions proxy this into a computed property
@@ -396,7 +395,7 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     dateOfLatestViewing: now,
     userIdOfLatestViewer: User_OwnerId,
     hasBeenDecided: true,
-    approvalState: BT.ApprovalStates.approved,
+    approvalState: OPA.ApprovalStates.approved,
     dateOfDecision: now,
     userIdOfDecider: User_OwnerId,
     isSuspended: false, // NOTE: Here this is data property, but all QuerySet functions proxy this into a computed property
@@ -759,18 +758,18 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
    * Updates the User stored on the server by constructing an IApprovable_ByUser<T> object.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the User within the OPA system.
-   * @param {BT.ApprovalState} approvalState The ApprovalState for the User.
+   * @param {OPA.ApprovalState} approvalState The ApprovalState for the User.
    * @param {string} userIdOfDecider The ID for the Decider within the OPA system.
    * @return {Promise<void>}
    */
-  async setToDecidedOption(ds: OPA.IDataStorageState, documentId: string, approvalState: BT.ApprovalState, userIdOfDecider: string): Promise<void> {
+  async setToDecidedOption(ds: OPA.IDataStorageState, documentId: string, approvalState: OPA.ApprovalState, userIdOfDecider: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDecider} as OPA.IUpdateable_ByUser);
-    const updateObject_Approvable = ({hasBeenDecided: true, approvalState, dateOfDecision: now, userIdOfDecider} as OPA.IApprovable_ByUser<BT.ApprovalState>);
+    const updateObject_Approvable = ({hasBeenDecided: true, approvalState, dateOfDecision: now, userIdOfDecider} as OPA.IApprovable_ByUser<OPA.ApprovalState>);
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Approvable};
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);

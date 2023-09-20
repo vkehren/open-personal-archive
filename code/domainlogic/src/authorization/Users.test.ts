@@ -137,7 +137,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(testUserId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(testUserId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -181,7 +181,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(testUserId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(testUserId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -225,7 +225,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(testUserId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(testUserId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -269,7 +269,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(testUserId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(testUserId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -313,7 +313,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(testUserId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(testUserId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -357,7 +357,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(testUserId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(testUserId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -401,7 +401,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(testUserId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(testUserId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -445,7 +445,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(testUserId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(testUserId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -487,7 +487,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(testUserId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(testUserId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -506,8 +506,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    if (functionType == "logic") {await expect(Users.setUserToApprovalState(callState, testUserId(), OpaDm.ApprovalStates.denied)).to.eventually.be.rejectedWith(Error);}
-    else {await expect(OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, testUserId(), OpaDm.ApprovalStates.denied, ambientUserId())).to.eventually.be.rejectedWith(Error);}
+    if (functionType == "logic") {await expect(Users.setUserToApprovalState(callState, testUserId(), OPA.ApprovalStates.denied)).to.eventually.be.rejectedWith(Error);}
+    else {await expect(OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, testUserId(), OPA.ApprovalStates.denied, ambientUserId())).to.eventually.be.rejectedWith(Error);}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     expect(user.id).equals(TestAuthData.owner.opaUserId);
@@ -529,7 +529,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(testUserId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(testUserId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -548,8 +548,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    if (functionType == "logic") {await expect(Users.setUserToApprovalState(callState, testUserId(), OpaDm.ApprovalStates.approved)).to.eventually.be.rejectedWith(Error);}
-    else {await expect(OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, testUserId(), OpaDm.ApprovalStates.approved, ambientUserId())).to.eventually.be.rejectedWith(Error);}
+    if (functionType == "logic") {await expect(Users.setUserToApprovalState(callState, testUserId(), OPA.ApprovalStates.approved)).to.eventually.be.rejectedWith(Error);}
+    else {await expect(OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, testUserId(), OPA.ApprovalStates.approved, ambientUserId())).to.eventually.be.rejectedWith(Error);}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     expect(user.id).equals(TestAuthData.owner.opaUserId);
@@ -571,7 +571,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(testUserId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(testUserId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -613,7 +613,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(testUserId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(testUserId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -655,7 +655,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(testUserId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(testUserId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -697,7 +697,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(testUserId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(testUserId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -739,7 +739,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(testUserId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(testUserId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -816,7 +816,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).equals(null);
     expect(user.userIdOfLatestViewer).equals(null);
     expect(user.hasBeenDecided).equals(false);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.pending);
+    expect(user.approvalState).equals(OPA.ApprovalStates.pending);
     expect(user.dateOfDecision).equals(null);
     expect(user.userIdOfDecider).equals(null);
     expect(OPA.isSuspended(user)).equals(false);
@@ -862,7 +862,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(false);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.pending);
+    expect(user.approvalState).equals(OPA.ApprovalStates.pending);
     expect(user.dateOfDecision).equals(null);
     expect(user.userIdOfDecider).equals(null);
     expect(OPA.isSuspended(user)).equals(false);
@@ -881,8 +881,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    if (functionType == "logic") {await Users.setUserToApprovalState(callState, testUserId(), OpaDm.ApprovalStates.denied);}
-    else {await OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, testUserId(), OpaDm.ApprovalStates.denied, ambientUserId());}
+    if (functionType == "logic") {await Users.setUserToApprovalState(callState, testUserId(), OPA.ApprovalStates.denied);}
+    else {await OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, testUserId(), OPA.ApprovalStates.denied, ambientUserId());}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     expect(user.id).equals(TestAuthData.testUser.opaUserId);
@@ -908,7 +908,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.denied);
+    expect(user.approvalState).equals(OPA.ApprovalStates.denied);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -927,8 +927,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    if (functionType == "logic") {await Users.setUserToApprovalState(callState, testUserId(), OpaDm.ApprovalStates.approved);}
-    else {await OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, testUserId(), OpaDm.ApprovalStates.approved, ambientUserId());}
+    if (functionType == "logic") {await Users.setUserToApprovalState(callState, testUserId(), OPA.ApprovalStates.approved);}
+    else {await OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, testUserId(), OPA.ApprovalStates.approved, ambientUserId());}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     expect(user.id).equals(TestAuthData.testUser.opaUserId);
@@ -954,7 +954,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -1002,7 +1002,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -1050,7 +1050,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -1098,7 +1098,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -1146,7 +1146,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -1194,7 +1194,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -1242,7 +1242,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -1291,7 +1291,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -1337,7 +1337,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -1388,7 +1388,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -1439,7 +1439,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -1490,7 +1490,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -1541,7 +1541,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -1587,7 +1587,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -1633,7 +1633,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(true);
@@ -1679,7 +1679,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(true);
@@ -1725,7 +1725,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(true);
@@ -1771,7 +1771,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -1817,7 +1817,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -1863,7 +1863,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(false);
@@ -1909,7 +1909,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestViewing).not.equals(null);
     expect(user.userIdOfLatestViewer).equals(ownerId());
     expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OpaDm.ApprovalStates.approved);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
     expect(user.dateOfDecision).not.equals(null);
     expect(user.userIdOfDecider).equals(ownerId());
     expect(OPA.isSuspended(user)).equals(false);

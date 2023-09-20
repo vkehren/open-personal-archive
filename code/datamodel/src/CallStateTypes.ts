@@ -1,5 +1,4 @@
 import * as OPA from "../../base/src";
-import * as BT from "./BaseTypes";
 import {IApplication} from "./doctypes/Application";
 import {IArchive} from "./doctypes/Archive";
 import {ILocale} from "./doctypes/Locale";
@@ -100,7 +99,7 @@ export class AuthorizationState implements IAuthorizationState {
    * @return {boolean} Whether the current User's account has been approved.
    */
   isUserApproved(): boolean {
-    return (this._user.approvalState == BT.ApprovalStates.approved);
+    return (this._user.approvalState == OPA.ApprovalStates.approved);
   }
 
   /**
