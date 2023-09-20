@@ -425,6 +425,67 @@ export interface ITaggable_ByUser extends ITaggable {
 export interface IDocument_Taggable extends IDocument, ITaggable { }
 export interface IDocument_Taggable_ByUser extends IDocument_Taggable, ITaggable_ByUser { }
 
+/**
+ * Returns whether the updates to the object are valid from the perspective of the ITaggable interface.
+ * @param {ITaggable} original The original object.
+ * @param {ITaggable} updated The updated object.
+ * @param {boolean} isReadOnly Whether the properties of the ITaggable interface are read-only or not.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForTaggable(original: ITaggable, updated: ITaggable, isReadOnly: boolean): boolean {
+  TC.assertNonNullish(original, "The original object must not be null.");
+  TC.assertNonNullish(updated, "The updated object must not be null.");
+
+  // NOTE: These values may both be false or both be true, but not one of each
+  const priorExistencesMatch = (VC.isEmpty(original.tags) == TC.isNullish(original.dateOfLatestTagging));
+  if (!priorExistencesMatch) {
+    return false;
+  }
+  // NOTE: These values may optionally exist on any update
+  const existencesMatch = (TC.isNullish(updated.tags) == TC.isNullish(updated.dateOfLatestTagging));
+  if (!existencesMatch) {
+    return false;
+  }
+  if (!TC.isNullish(updated.tags)) {
+    if (isReadOnly) {
+      return false;
+    }
+  }
+  if (!TC.isNullish(updated.dateOfLatestTagging)) {
+    const datesValid = (TC.isNullish(original.dateOfLatestTagging) || (TC.convertNonNullish(updated.dateOfLatestTagging) > TC.convertNonNullish(original.dateOfLatestTagging)));
+    if (!datesValid) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Returns whether the updates to the object are valid from the perspective of the ITaggable_ByUser interface.
+ * @param {ITaggable_ByUser} original The original object.
+ * @param {ITaggable_ByUser} updated The updated object.
+ * @param {boolean} isReadOnly Whether the properties of the ITaggable_ByUser interface are read-only or not.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForTaggable_ByUser(original: ITaggable_ByUser, updated: ITaggable_ByUser, isReadOnly: boolean): boolean {
+  if (!areUpdatesValid_ForTaggable(original, updated, isReadOnly)) {
+    return false;
+  }
+
+  // NOTE: These values may both be null or both be non-null, but not one of each
+  const priorExistencesMatch = (TC.isNullish(original.userIdOfLatestTagger) == TC.isNullish(original.dateOfLatestTagging));
+  if (!priorExistencesMatch) {
+    return false;
+  }
+  // NOTE: These values may optionally exist on any update
+  const existencesMatch = (TC.isNullish(updated.userIdOfLatestTagger) == TC.isNullish(updated.dateOfLatestTagging));
+  if (!existencesMatch) {
+    return false;
+  }
+  // NOTE: The "userIdOf..." value must be validated via AuthorizationState, not here
+  return true;
+}
+
 
 // IArchivable
 export const IArchivable_IsArchived_PropertyName = VC.getTypedPropertyKeyAsText<IArchivable>("isArchived"); // eslint-disable-line camelcase

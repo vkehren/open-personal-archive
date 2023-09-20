@@ -51,6 +51,9 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
   if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObject as OPA.IUpdateable_ByUser)) {
     return false;
   }
+  if (!OPA.areUpdatesValid_ForTaggable_ByUser(document, updateObject as OPA.ITaggable_ByUser, ((updateObject as OPA.ITaggable_ByUser).userIdOfLatestTagger == document.userIdOfCreator))) {
+    return false;
+  }
   const userIdOfLatestUpdater = (updateObject as OPA.IUpdateable_ByUser).userIdOfLatestUpdater;
 
   // NOTE: updateObject MUST NOT change read-only data
@@ -78,31 +81,6 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
 
     if (propertyNames_NotForUnDelete.length > 0) {
       return false;
-    }
-  }
-
-  if (true) { // eslint-disable-line no-constant-condition
-    const updateObject_Taggable = (updateObject as OPA.ITaggable_ByUser);
-
-    if (OPA.isUndefined(updateObject_Taggable.tags)) {
-      const dateIsSet = !OPA.isUndefined(updateObject_Taggable.dateOfLatestTagging);
-      const userIsSet = !OPA.isUndefined(updateObject_Taggable.userIdOfLatestTagger);
-
-      if (dateIsSet || userIsSet) {
-        return false;
-      }
-    } else if (OPA.isNullish(updateObject_Taggable.tags)) {
-      throw new Error("The \"tags\" property must not be set to null.");
-    } else if (!OPA.isOf<Array<string>>(updateObject_Taggable.tags, (value) => !OPA.isUndefined(value.splice))) {
-      throw new Error("The \"tags\" property can only be set to a value of type \"Array<string>\".");
-    } else {
-      const dateNotSet = OPA.isNullish(updateObject_Taggable.dateOfLatestTagging);
-      const userNotSet = OPA.isNullish(updateObject_Taggable.userIdOfLatestTagger);
-      const isSelfTagged = (updateObject_Taggable.userIdOfLatestTagger == document.userIdOfCreator);
-
-      if (dateNotSet || userNotSet || isSelfTagged) {
-        return false;
-      }
     }
   }
 
