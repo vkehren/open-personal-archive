@@ -435,7 +435,7 @@ export async function setUserToUnSuspended(callState: OpaDm.ICallState, userIdTo
 }
 
 /**
- * Updates the Deleted status of the specified User in the Open Personal Archive™ (OPA) system.
+ * Sets the Deletion status to "true" for the specified User in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
  * @param {string} userIdToSet The User to set the status of.
  * @return {Promise<OpaDm.IUser>}
@@ -461,6 +461,43 @@ export async function markUserAsDeleted(callState: OpaDm.ICallState, userIdToSet
   authorizationState.assertRoleAllowed(authorizerIds);
 
   await OpaDb.Users.queries.markAsDeleted(callState.dataStorageState, userIdToSet, authorizationState.user.id);
+  await callState.dataStorageState.currentWriteBatch.commit();
+  callState.dataStorageState.currentWriteBatch = null;
+
+  const userReRead = await OpaDb.Users.queries.getById(callState.dataStorageState, userIdToSet);
+  OPA.assertDocumentIsValid(userReRead, "The requested User does not exist.");
+  const userReReadNonNull = OPA.convertNonNullish(userReRead);
+
+  return userReReadNonNull;
+}
+
+/**
+ * Sets the Deletion status to "false" for the specified User in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} userIdToSet The User to set the status of.
+ * @return {Promise<OpaDm.IUser>}
+ */
+export async function markUserAsUnDeleted(callState: OpaDm.ICallState, userIdToSet: string): Promise<OpaDm.IUser> {
+  OPA.assertCallStateIsNotNullish(callState);
+  OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
+  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+
+  callState.dataStorageState.currentWriteBatch = callState.dataStorageState.constructorProvider.writeBatch();
+
+  const isSystemInstalled = await Application.isSystemInstalled(callState.dataStorageState);
+  OPA.assertSystemIsInstalled(isSystemInstalled);
+  OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
+  OpaDm.assertSystemStateIsNotNullish(callState.systemState);
+  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+
+  const authorizationState = OPA.convertNonNullish(callState.authorizationState);
+  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
+  const authorizerIds = [...authorizersById.keys()];
+
+  authorizationState.assertUserApproved();
+  authorizationState.assertRoleAllowed(authorizerIds);
+
+  await OpaDb.Users.queries.markAsUnDeleted(callState.dataStorageState, userIdToSet, authorizationState.user.id);
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
