@@ -218,8 +218,8 @@ export function areUpdatesValid_ForUpgradeable(original: IUpgradeable, updated: 
       return false;
     }
   }
-  if (original.hasBeenUpgraded && !TC.isNullish(updated.dateOfLatestUpgrade)) {
-    const datesValid = (TC.convertNonNullish(updated.dateOfLatestUpgrade) > TC.convertNonNullish(original.dateOfLatestUpgrade));
+  if (!TC.isNullish(updated.dateOfLatestUpgrade)) {
+    const datesValid = (TC.isNullish(original.dateOfLatestUpgrade) || (TC.convertNonNullish(updated.dateOfLatestUpgrade) > TC.convertNonNullish(original.dateOfLatestUpgrade)));
     if (!datesValid) {
       return false;
     }
@@ -293,8 +293,8 @@ export function areUpdatesValid_ForUpdateable(original: IUpdateable, updated: IU
       return false;
     }
   }
-  if (original.hasBeenUpdated && !TC.isNullish(updated.dateOfLatestUpdate)) {
-    const datesValid = (TC.convertNonNullish(updated.dateOfLatestUpdate) > TC.convertNonNullish(original.dateOfLatestUpdate));
+  if (!TC.isNullish(updated.dateOfLatestUpdate)) {
+    const datesValid = (TC.isNullish(original.dateOfLatestUpdate) || (TC.convertNonNullish(updated.dateOfLatestUpdate) > TC.convertNonNullish(original.dateOfLatestUpdate)));
     if (!datesValid) {
       return false;
     }
