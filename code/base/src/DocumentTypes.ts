@@ -520,8 +520,8 @@ export function areUpdatesValid_ForArchivable(original: IArchivable, updated: IA
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
-  // NOTE: These values may both be false or both be true, or the latter false regardless
-  const priorExistencesMatch = (((!original.isArchived) == TC.isNullish(original.dateOfArchivalChange)) || (!TC.isNullish(original.dateOfArchivalChange)));
+  // NOTE: These values represent conditional IF operator, as in IF(isSet, hasDate)
+  const priorExistencesMatch = ((!original.isArchived) || (!TC.isNullish(original.dateOfArchivalChange)));
   if (!priorExistencesMatch) {
     return false;
   }
