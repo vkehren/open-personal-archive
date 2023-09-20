@@ -346,6 +346,7 @@ export interface IDocument_AssignableToRole_ByUser extends IDocument_AssignableT
  * Returns whether the updates to the object are valid from the perspective of the IAssignableToRole interface.
  * @param {IAssignableToRole} original The original object.
  * @param {IAssignableToRole} updated The updated object.
+ * @param {boolean} isReadOnly Whether the properties of the IAssignableToRole interface are read-only or not.
  * @return {boolean} Whether the updates are valid or not.
  */
 export function areUpdatesValid_ForAssignableToRole(original: IAssignableToRole, updated: IAssignableToRole, isReadOnly: boolean): boolean {
@@ -380,6 +381,8 @@ export function areUpdatesValid_ForAssignableToRole(original: IAssignableToRole,
  * Returns whether the updates to the object are valid from the perspective of the IAssignableToRole_ByUser interface.
  * @param {IAssignableToRole_ByUser} original The original object.
  * @param {IAssignableToRole_ByUser} updated The updated object.
+ * @param {boolean} isReadOnly Whether the properties of the IAssignableToRole_ByUser interface are read-only or not.
+ * @param {ICreatable_ByUser} creationInfo The creation info for the original object.
  * @return {boolean} Whether the updates are valid or not.
  */
 export function areUpdatesValid_ForAssignableToRole_ByUser(original: IAssignableToRole_ByUser, updated: IAssignableToRole_ByUser, isReadOnly: boolean, creationInfo: ICreatable_ByUser): boolean {
