@@ -83,8 +83,8 @@ export interface IDocument_Creatable_ByNullableUser extends IDocument_Creatable,
 
 /**
  * Returns whether the updates to the object are valid from the perspective of the ICreatable interface.
- * @param {IDocument} original The original object.
- * @param {IDocument} updated The updated object.
+ * @param {ICreatable} original The original object.
+ * @param {ICreatable} updated The updated object.
  * @return {boolean} Whether the updates are valid or not.
  */
 export function areUpdatesValid_ForCreatable(original: ICreatable, updated: ICreatable): boolean {
@@ -105,8 +105,8 @@ export function areUpdatesValid_ForCreatable(original: ICreatable, updated: ICre
 
 /**
  * Returns whether the updates to the object are valid from the perspective of the ICreatable_ByUser interface.
- * @param {IDocument} original The original object.
- * @param {IDocument} updated The updated object.
+ * @param {ICreatable_ByUser} original The original object.
+ * @param {ICreatable_ByUser} updated The updated object.
  * @return {boolean} Whether the updates are valid or not.
  */
 export function areUpdatesValid_ForCreatable_ByUser(original: ICreatable_ByUser, updated: ICreatable_ByUser): boolean {
@@ -132,8 +132,8 @@ export function areUpdatesValid_ForCreatable_ByUser(original: ICreatable_ByUser,
 
 /**
  * Returns whether the updates to the object are valid from the perspective of the ICreatable_ByNullableUser interface.
- * @param {IDocument} original The original object.
- * @param {IDocument} updated The updated object.
+ * @param {ICreatable_ByNullableUser} original The original object.
+ * @param {ICreatable_ByNullableUser} updated The updated object.
  * @return {boolean} Whether the updates are valid or not.
  */
 export function areUpdatesValid_ForCreatable_ByNullableUser(original: ICreatable_ByNullableUser, updated: ICreatable_ByNullableUser): boolean {
