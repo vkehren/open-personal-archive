@@ -48,13 +48,10 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
   if (!OPA.areUpdatesValid_ForCreatable_ByUser(document, updateObject as OPA.ICreatable_ByUser)) {
     return false;
   }
-
-  // NOTE: updateObject MUST implement IUpdateable_ByUser, so check immediately and do NOT use "if (true) {...}"
-  const updateObject_Updateable = (updateObject as OPA.IUpdateable_ByUser);
-
-  if (!updateObject_Updateable.hasBeenUpdated || OPA.isNullish(updateObject_Updateable.dateOfLatestUpdate) || OPA.isNullish(updateObject_Updateable.userIdOfLatestUpdater)) {
+  if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObject as OPA.IUpdateable_ByUser)) {
     return false;
   }
+  const userIdOfLatestUpdater = (updateObject as OPA.IUpdateable_ByUser).userIdOfLatestUpdater;
 
   // NOTE: updateObject MUST NOT change read-only data
   const propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
@@ -233,7 +230,7 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
       const docIsDeleted = document.isMarkedAsDeleted;
       const dateIsSet = !OPA.isNullish(updateObject_Deleteable.dateOfDeletion);
       const userIsSet = !OPA.isNullish(updateObject_Deleteable.userIdOfDeleter);
-      const userCanUnDelete = (updateObject_Updateable.userIdOfLatestUpdater == document.userIdOfCreator);
+      const userCanUnDelete = (userIdOfLatestUpdater == document.userIdOfCreator);
 
       if ((docIsDeleted && !userCanUnDelete) || dateIsSet || userIsSet) {
         return false;
@@ -243,7 +240,7 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
 
   // NOTE: Only the Creator can update the message
   if (!OPA.isUndefined(updateObject.message) && !OPA.areEqual(document.message, updateObject.message)) {
-    const userNotCreator = (updateObject_Updateable.userIdOfLatestUpdater != document.userIdOfCreator);
+    const userNotCreator = (userIdOfLatestUpdater != document.userIdOfCreator);
 
     if (userNotCreator) {
       return false;
@@ -254,11 +251,11 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
   if (!OPA.isUndefined(updateObject.response) && !OPA.areEqual(document.response, updateObject.response)) {
     let userIdsOfViewers = OPA.getIdentifiersFromObjects<OPA.IViewable_ByUser>(document.updateHistory, (doc) => doc.userIdOfLatestViewer);
     userIdsOfViewers = userIdsOfViewers.filter((userId) => (userId != document.userIdOfCreator));
-    const userNotViewer = (!userIdsOfViewers.includes(OPA.convertNonNullish(updateObject_Updateable.userIdOfLatestUpdater)));
+    const userNotViewer = (!userIdsOfViewers.includes(OPA.convertNonNullish(userIdOfLatestUpdater)));
 
     let userIdsOfDeciders = OPA.getIdentifiersFromObjects<OPA.IApprovable_ByUser<BT.ApprovalState>>(document.updateHistory, (doc) => doc.userIdOfDecider);
     userIdsOfDeciders = userIdsOfDeciders.filter((userId) => (userId != document.userIdOfCreator));
-    const userNotDecider = (!userIdsOfDeciders.includes(OPA.convertNonNullish(updateObject_Updateable.userIdOfLatestUpdater)));
+    const userNotDecider = (!userIdsOfDeciders.includes(OPA.convertNonNullish(userIdOfLatestUpdater)));
 
     if (userNotViewer && userNotDecider) {
       return false;

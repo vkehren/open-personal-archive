@@ -74,15 +74,11 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   if (!OPA.areUpdatesValid_ForCreatable(document, updateObject as OPA.ICreatable)) {
     return false;
   }
-
-  const docIsArchiveOwner = ((document.id == User_OwnerId) || (document.assignedRoleId == Role_OwnerId));
-
-  // NOTE: updateObject MUST implement IUpdateable_ByUser, so check immediately and do NOT use "if (true) {...}"
-  const updateObject_Updateable = (updateObject as OPA.IUpdateable_ByUser);
-
-  if (!updateObject_Updateable.hasBeenUpdated || OPA.isNullish(updateObject_Updateable.dateOfLatestUpdate) || OPA.isNullish(updateObject_Updateable.userIdOfLatestUpdater)) {
+  if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObject as OPA.IUpdateable_ByUser)) {
     return false;
   }
+  const userIdOfLatestUpdater = (updateObject as OPA.IUpdateable_ByUser).userIdOfLatestUpdater;
+  const docIsArchiveOwner = ((document.id == User_OwnerId) || (document.assignedRoleId == Role_OwnerId));
 
   // NOTE: updateObject MUST NOT change read-only data
   const updateObject_AssignableToRole = (updateObject as OPA.IAssignableToRole_ByUser);
@@ -327,7 +323,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
       const docIsDeleted = document.isMarkedAsDeleted;
       const dateIsSet = !OPA.isNullish(updateObject_Deleteable.dateOfDeletion);
       const userIsSet = !OPA.isNullish(updateObject_Deleteable.userIdOfDeleter);
-      const userCanUnDelete = (updateObject_Updateable.userIdOfLatestUpdater == document.id);
+      const userCanUnDelete = (userIdOfLatestUpdater == document.id);
 
       if ((docIsDeleted && !userCanUnDelete) || dateIsSet || userIsSet || docIsArchiveOwner) {
         return false;
