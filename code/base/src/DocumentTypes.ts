@@ -64,6 +64,7 @@ export function areUpdatesValid_ForDocument(original: IDocument, updated: IDocum
 
 
 // ICreatable
+// For ANY updates: (Required = true, UnSetable = false, SetableBySelf = true, SetableByOther = false)
 export const ICreatable_DateOfCreation_PropertyName = VC.getTypedPropertyKeyAsText<ICreatable>("dateOfCreation"); // eslint-disable-line camelcase
 export interface ICreatable {
   // NOTE: Do not include "hasBeenCreated" because any object that exists has been created
@@ -179,6 +180,7 @@ export function promoteDocumentsToCreatable<IN extends IDocument, OUT extends IN
 
 
 // IUpgradeable
+// For ANY updates: (Required = false, UnSetable = false, SetableBySelf = true, SetableByOther = true)
 export const IUpgradeable_HasBeenUpgraded_PropertyName = VC.getTypedPropertyKeyAsText<IUpgradeable>("hasBeenUpgraded"); // eslint-disable-line camelcase
 export const IUpgradeable_DateOfLatestUpgrade_PropertyName = VC.getTypedPropertyKeyAsText<IUpgradeable>("dateOfLatestUpgrade"); // eslint-disable-line camelcase
 export interface IUpgradeable {
@@ -254,6 +256,7 @@ export function areUpdatesValid_ForUpgradeable_ByUser(original: IUpgradeable_ByU
 
 
 // IUpdateable
+// For ANY updates: (Required = true, UnSetable = false, SetableBySelf = true, SetableByOther = true)
 export const IUpdateable_HasBeenUpdated_PropertyName = VC.getTypedPropertyKeyAsText<IUpdateable>("hasBeenUpdated"); // eslint-disable-line camelcase
 export const IUpdateable_DateOfLatestUpdate_PropertyName = VC.getTypedPropertyKeyAsText<IUpdateable>("dateOfLatestUpdate"); // eslint-disable-line camelcase
 export interface IUpdateable {
@@ -329,6 +332,7 @@ export function areUpdatesValid_ForUpdateable_ByUser(original: IUpdateable_ByUse
 
 
 // IAssignableToRole
+// For Auth updates: (Required = false, UnSetable = false, SetableBySelf = false, SetableByOther = true)
 export const IAssignableToRole_AssignedRoleId_PropertyName = VC.getTypedPropertyKeyAsText<IAssignableToRole>("assignedRoleId"); // eslint-disable-line camelcase
 export const IAssignableToRole_DateOfLatestRoleAssignment_PropertyName = VC.getTypedPropertyKeyAsText<IAssignableToRole>("dateOfLatestRoleAssignment"); // eslint-disable-line camelcase
 export interface IAssignableToRole {
@@ -412,6 +416,8 @@ export function areUpdatesValid_ForAssignableToRole_ByUser(original: IAssignable
 
 
 // ITaggable
+// For Auth updates: (Required = false, UnSetable = true, SetableBySelf = false, SetableByOther = true)
+// For Data updates: (Required = false, UnSetable = true, SetableBySelf = true, SetableByOther = true)
 export const ITaggable_Tags_PropertyName = VC.getTypedPropertyKeyAsText<ITaggable>("tags"); // eslint-disable-line camelcase
 export const ITaggable_DateOfLatestTagging_PropertyName = VC.getTypedPropertyKeyAsText<ITaggable>("dateOfLatestTagging"); // eslint-disable-line camelcase
 export interface ITaggable {
@@ -488,6 +494,8 @@ export function areUpdatesValid_ForTaggable_ByUser(original: ITaggable_ByUser, u
 
 
 // IArchivable
+// For Auth updates: (Required = false, UnSetable = true, SetableBySelf = false, SetableByOther = true)
+// For Data updates: (Required = false, UnSetable = true, SetableBySelf = true, SetableByOther = true)
 export const IArchivable_IsArchived_PropertyName = VC.getTypedPropertyKeyAsText<IArchivable>("isArchived"); // eslint-disable-line camelcase
 export const IArchivable_DateOfArchivalChange_PropertyName = VC.getTypedPropertyKeyAsText<IArchivable>("dateOfArchivalChange"); // eslint-disable-line camelcase
 export interface IArchivable {
