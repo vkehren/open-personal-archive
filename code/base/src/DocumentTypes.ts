@@ -192,6 +192,66 @@ export interface IUpgradeable_ByUser extends IUpgradeable {
 export interface IDocument_Upgradeable extends IDocument, IUpgradeable { }
 export interface IDocument_Upgradeable_ByUser extends IDocument_Upgradeable, IUpgradeable_ByUser { }
 
+/**
+ * Returns whether the updates to the object are valid from the perspective of the IUpgradeable interface.
+ * @param {IUpgradeable} original The original object.
+ * @param {IUpgradeable} updated The updated object.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForUpgradeable(original: IUpgradeable, updated: IUpgradeable): boolean {
+  TC.assertNonNullish(original, "The original object must not be null.");
+  TC.assertNonNullish(updated, "The updated object must not be null.");
+
+  // NOTE: These values may both be false or both be true, but not one of each
+  const priorExistencesMatch = ((!original.hasBeenUpgraded) == TC.isNullish(original.dateOfLatestUpgrade));
+  if (!priorExistencesMatch) {
+    return false;
+  }
+  // NOTE: These values may optionally exist on any update
+  const existencesMatch = (TC.isNullish(updated.hasBeenUpgraded) == TC.isNullish(updated.dateOfLatestUpgrade));
+  if (!existencesMatch) {
+    return false;
+  }
+  if (!TC.isNullish(updated.hasBeenUpgraded)) {
+    const stateValid = (updated.hasBeenUpgraded); // NOTE: This value must be "true" for updates
+    if (!stateValid) {
+      return false;
+    }
+  }
+  if (original.hasBeenUpgraded && !TC.isNullish(updated.dateOfLatestUpgrade)) {
+    const datesValid = (TC.convertNonNullish(updated.dateOfLatestUpgrade) > TC.convertNonNullish(original.dateOfLatestUpgrade));
+    if (!datesValid) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Returns whether the updates to the object are valid from the perspective of the IUpgradeable_ByUser interface.
+ * @param {IUpgradeable_ByUser} original The original object.
+ * @param {IUpgradeable_ByUser} updated The updated object.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForUpgradeable_ByUser(original: IUpgradeable_ByUser, updated: IUpgradeable_ByUser): boolean {
+  if (!areUpdatesValid_ForUpgradeable(original, updated)) {
+    return false;
+  }
+
+  // NOTE: These values may both be null or both be non-null, but not one of each
+  const priorExistencesMatch = (TC.isNullish(original.userIdOfLatestUpgrader) == TC.isNullish(original.dateOfLatestUpgrade));
+  if (!priorExistencesMatch) {
+    return false;
+  }
+  // NOTE: These values may optionally exist on any update
+  const existencesMatch = (TC.isNullish(updated.userIdOfLatestUpgrader) == TC.isNullish(updated.dateOfLatestUpgrade));
+  if (!existencesMatch) {
+    return false;
+  }
+  // NOTE: The "userIdOf..." value must be validated via AuthorizationState, not here
+  return true;
+}
+
 
 // IUpdateable
 export const IUpdateable_HasBeenUpdated_PropertyName = VC.getTypedPropertyKeyAsText<IUpdateable>("hasBeenUpdated"); // eslint-disable-line camelcase

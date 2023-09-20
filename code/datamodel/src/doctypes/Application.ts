@@ -38,14 +38,12 @@ export function areUpdatesValid(document: IApplication, updateObject: IApplicati
   if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
     return false;
   }
-
-  // NOTE: updateObject MUST implement IUpgradeable_ByUser, so check immediately and do NOT use "if (true) {...}"
-  const updateObject_Updateable = (updateObject as OPA.IUpgradeable_ByUser);
-
-  if (!updateObject_Updateable.hasBeenUpgraded || OPA.isNullish(updateObject_Updateable.dateOfLatestUpgrade) || OPA.isNullish(updateObject_Updateable.userIdOfLatestUpgrader)) {
+  if (!OPA.areUpdatesValid_ForUpgradeable_ByUser(document, updateObject as OPA.IUpgradeable_ByUser)) {
     return false;
   }
+  // NOTE: If any properties are added that can be updated without upgrading, implement IUpdateable_ByUser on Application
 
+  // NOTE: updateObject MUST NOT change read-only data
   const propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
   const dateOfInstallation_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).dateOfInstallation);
 
