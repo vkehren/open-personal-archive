@@ -45,6 +45,9 @@ export function areUpdatesValid(document: ITimeZoneGroup, updateObject: ITimeZon
   if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
     return false;
   }
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject as OPA.ICreatable)) {
+    return false;
+  }
 
   // NOTE: Currently, TimeZoneGroups are not updateable
   return false;

@@ -34,6 +34,9 @@ export function areUpdatesValid(document: IActivityLogItem, updateObject: IActiv
   if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
     return false;
   }
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject as OPA.ICreatable)) {
+    return false;
+  }
 
   // NOTE: Currently, ActivityLogItems are not updateable
   return false;

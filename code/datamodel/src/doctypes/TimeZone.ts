@@ -41,6 +41,9 @@ export function areUpdatesValid(document: ITimeZone, updateObject: ITimeZonePart
   if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
     return false;
   }
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject as OPA.ICreatable)) {
+    return false;
+  }
 
   // NOTE: Currently, TimeZones are not updateable
   return false;

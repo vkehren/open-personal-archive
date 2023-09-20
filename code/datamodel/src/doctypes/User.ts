@@ -71,6 +71,9 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
     return false;
   }
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject as OPA.ICreatable)) {
+    return false;
+  }
 
   const docIsArchiveOwner = ((document.id == User_OwnerId) || (document.assignedRoleId == Role_OwnerId));
 
@@ -118,19 +121,6 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
     // NOTE: Any property updates beyond those necessary for un-delete are invalid
     if (propertyNames_ForUpdate.length > 0) {
       return false;
-    }
-  }
-
-  if (true) { // eslint-disable-line no-constant-condition
-    const updateObject_Creatable = (updateObject as OPA.ICreatable_ByUser);
-
-    if (!OPA.isNullish(updateObject_Creatable.dateOfCreation) || !OPA.isNullish(updateObject_Creatable.userIdOfCreator)) {
-      const dateMatchesDoc = (updateObject_Creatable.dateOfCreation == document.dateOfCreation);
-      const userMatchesDoc = (updateObject_Creatable.userIdOfCreator == document.id);
-
-      if (!dateMatchesDoc || !userMatchesDoc) {
-        return false;
-      }
     }
   }
 

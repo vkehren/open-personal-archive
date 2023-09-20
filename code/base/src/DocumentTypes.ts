@@ -82,6 +82,80 @@ export interface IDocument_Creatable_ByUser extends IDocument_Creatable, ICreata
 export interface IDocument_Creatable_ByNullableUser extends IDocument_Creatable, ICreatable_ByNullableUser { }
 
 /**
+ * Returns whether the updates to the object are valid from the perspective of the ICreatable interface.
+ * @param {IDocument} original The original object.
+ * @param {IDocument} updated The updated object.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForCreatable(original: ICreatable, updated: ICreatable): boolean {
+  TC.assertNonNullish(original, "The original object must not be null.");
+  TC.assertNonNullish(updated, "The updated object must not be null.");
+
+  if (TC.isNullish(original.dateOfCreation)) {
+    return false;
+  }
+  if (!TC.isNullish(updated.dateOfCreation)) {
+    const datesMatch = (updated.dateOfCreation == original.dateOfCreation);
+    if (!datesMatch) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Returns whether the updates to the object are valid from the perspective of the ICreatable_ByUser interface.
+ * @param {IDocument} original The original object.
+ * @param {IDocument} updated The updated object.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForCreatable_ByUser(original: ICreatable_ByUser, updated: ICreatable_ByUser): boolean {
+  if (!areUpdatesValid_ForCreatable(original, updated)) {
+    return false;
+  }
+
+  if (TC.isNullish(original.userIdOfCreator)) {
+    return false;
+  }
+  const existencesMatch = (TC.isNullish(updated.userIdOfCreator) == TC.isNullish(updated.dateOfCreation));
+  if (!existencesMatch) {
+    return false;
+  }
+  if (!TC.isNullish(updated.userIdOfCreator)) {
+    const userIdsMatch = (updated.userIdOfCreator == original.userIdOfCreator);
+    if (!userIdsMatch) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Returns whether the updates to the object are valid from the perspective of the ICreatable_ByNullableUser interface.
+ * @param {IDocument} original The original object.
+ * @param {IDocument} updated The updated object.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForCreatable_ByNullableUser(original: ICreatable_ByNullableUser, updated: ICreatable_ByNullableUser): boolean {
+  if (!areUpdatesValid_ForCreatable(original, updated)) {
+    return false;
+  }
+
+  // NOTE: The original "userIdOfCreator" can be null
+  if (!TC.isNullish(updated.userIdOfCreator)) {
+    const existencesMatch = (!TC.isNullish(updated.dateOfCreation));
+    if (!existencesMatch) {
+      return false;
+    }
+    const userIdsMatch = (updated.userIdOfCreator == original.userIdOfCreator);
+    if (!userIdsMatch) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
  * Sets the ICreatable properies on the incoming documents and returns the typed result.
  * @param {Array<IN>} documents The documents to promote to ICreatable.
  * @param {DateToUse | null} [dateOfCreation=null] The date to use as the value for the "dateOfCreation" property.

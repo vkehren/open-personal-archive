@@ -44,6 +44,9 @@ export function areUpdatesValid(document: ILocale, updateObject: ILocalePartial)
   if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
     return false;
   }
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject as OPA.ICreatable)) {
+    return false;
+  }
 
   // NOTE: Currently, Locales are not updateable
   return false;

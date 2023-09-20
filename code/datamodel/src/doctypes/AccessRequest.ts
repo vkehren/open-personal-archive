@@ -45,6 +45,9 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
   if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
     return false;
   }
+  if (!OPA.areUpdatesValid_ForCreatable_ByUser(document, updateObject as OPA.ICreatable_ByUser)) {
+    return false;
+  }
 
   // NOTE: updateObject MUST implement IUpdateable_ByUser, so check immediately and do NOT use "if (true) {...}"
   const updateObject_Updateable = (updateObject as OPA.IUpdateable_ByUser);
@@ -78,19 +81,6 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
 
     if (propertyNames_NotForUnDelete.length > 0) {
       return false;
-    }
-  }
-
-  if (true) { // eslint-disable-line no-constant-condition
-    const updateObject_Creatable = (updateObject as OPA.ICreatable_ByUser);
-
-    if (!OPA.isNullish(updateObject_Creatable.dateOfCreation) || !OPA.isNullish(updateObject_Creatable.userIdOfCreator)) {
-      const dateMatchesDoc = (updateObject_Creatable.dateOfCreation == document.dateOfCreation);
-      const userMatchesDoc = (updateObject_Creatable.userIdOfCreator == document.userIdOfCreator);
-
-      if (!dateMatchesDoc || !userMatchesDoc) {
-        return false;
-      }
     }
   }
 

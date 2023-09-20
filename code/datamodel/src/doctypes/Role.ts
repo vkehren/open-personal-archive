@@ -36,6 +36,9 @@ export function areUpdatesValid(document: IRole, updateObject: IRolePartial): bo
   if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
     return false;
   }
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject as OPA.ICreatable)) {
+    return false;
+  }
 
   // NOTE: Currently, Roles are not updateable
   return false;

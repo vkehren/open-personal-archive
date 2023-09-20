@@ -48,6 +48,9 @@ export function areUpdatesValid(document: IArchive, updateObject: IArchivePartia
   if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
     return false;
   }
+  if (!OPA.areUpdatesValid_ForCreatable_ByUser(document, updateObject as OPA.ICreatable_ByUser)) {
+    return false;
+  }
 
   // NOTE: updateObject MUST implement IUpdateable_ByUser, so check immediately and do NOT use "if (true) {...}"
   const updateObject_Updateable = (updateObject as OPA.IUpdateable_ByUser);
