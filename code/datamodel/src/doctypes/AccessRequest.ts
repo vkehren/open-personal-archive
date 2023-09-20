@@ -54,6 +54,9 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
   if (!OPA.areUpdatesValid_ForTaggable_ByUser(document, updateObject as OPA.ITaggable_ByUser, ((updateObject as OPA.ITaggable_ByUser).userIdOfLatestTagger == document.userIdOfCreator))) {
     return false;
   }
+  if (!OPA.areUpdatesValid_ForArchivable_ByUser(document, updateObject as OPA.IArchivable_ByUser, ((updateObject as OPA.IArchivable_ByUser).userIdOfArchivalChanger == document.userIdOfCreator))) {
+    return false;
+  }
   const userIdOfLatestUpdater = (updateObject as OPA.IUpdateable_ByUser).userIdOfLatestUpdater;
 
   // NOTE: updateObject MUST NOT change read-only data
@@ -81,37 +84,6 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
 
     if (propertyNames_NotForUnDelete.length > 0) {
       return false;
-    }
-  }
-
-  if (true) { // eslint-disable-line no-constant-condition
-    const updateObject_Archivable = (updateObject as OPA.IArchivable_ByUser);
-
-    if (OPA.isUndefined(updateObject_Archivable.isArchived)) {
-      const dateIsSet = !OPA.isUndefined(updateObject_Archivable.dateOfArchivalChange);
-      const userIsSet = !OPA.isUndefined(updateObject_Archivable.userIdOfArchivalChanger);
-
-      if (dateIsSet || userIsSet) {
-        return false;
-      }
-    } else if (OPA.isNullish(updateObject_Archivable.isArchived)) {
-      throw new Error("The \"isArchived\" property must not be set to null.");
-    } else if (updateObject_Archivable.isArchived) {
-      const dateNotSet = OPA.isNullish(updateObject_Archivable.dateOfArchivalChange);
-      const userNotSet = OPA.isNullish(updateObject_Archivable.userIdOfArchivalChanger);
-
-      if (dateNotSet || userNotSet) {
-        return false;
-      }
-    } else {
-      const docIsArchived = document.isArchived;
-      const dateNotSet = OPA.isNullish(updateObject_Archivable.dateOfArchivalChange);
-      const userNotSet = OPA.isNullish(updateObject_Archivable.userIdOfArchivalChanger);
-      const userCanUnArchive = true;
-
-      if ((docIsArchived && !userCanUnArchive) || dateNotSet || userNotSet) {
-        return false;
-      }
     }
   }
 

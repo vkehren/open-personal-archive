@@ -20,6 +20,7 @@ const config = TestConfig.getTestConfiguration();
 const ambientAuth = (): TestConfig.IAuthenticationStateForTests => (config.authenticationState);
 const ambientUserId = (): string => (ambientAuth().opaUserId);
 const ownerId = (): string => (TestAuthData.owner.opaUserId);
+const adminId = (): string => (TestAuthData.admin.opaUserId);
 const testUserId = (): string => (TestAuthData.testUser.opaUserId);
 const testMessage = "Please give me access to your archive.";
 const testCitationId_Null: string | null = null;
@@ -380,6 +381,10 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.userIdOfDeleter).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
+    await expect(OpaDb.AccessRequests.queries.setToArchivalOption(config.dataStorageState, accessRequestId, true, ambientUserId())).to.eventually.be.rejectedWith(Error);
+    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
+
+    config.authenticationState = TestAuthData.admin;
     await OpaDb.AccessRequests.queries.setToArchivalOption(config.dataStorageState, accessRequestId, true, ambientUserId());
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
@@ -391,13 +396,13 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.updateHistory.length).equals(8);
     expect(accessRequest.hasBeenUpdated).equals(true);
     expect(accessRequest.dateOfLatestUpdate).not.equals(null);
-    expect(accessRequest.userIdOfLatestUpdater).equals(testUserId());
+    expect(accessRequest.userIdOfLatestUpdater).equals(adminId());
     expect(accessRequest.tags.length).equals(3);
     expect(accessRequest.dateOfLatestTagging).not.equals(null);
     expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
     expect(accessRequest.isArchived).equals(true);
     expect(accessRequest.dateOfArchivalChange).not.equals(null);
-    expect(accessRequest.userIdOfArchivalChanger).equals(testUserId());
+    expect(accessRequest.userIdOfArchivalChanger).equals(adminId());
     expect(accessRequest.hasBeenViewed).equals(true);
     expect(accessRequest.dateOfLatestViewing).not.equals(null);
     expect(accessRequest.userIdOfLatestViewer).equals(testUserId());

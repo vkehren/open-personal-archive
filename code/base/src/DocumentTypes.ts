@@ -501,6 +501,71 @@ export interface IArchivable_ByUser extends IArchivable {
 export interface IDocument_Archivable extends IDocument, IArchivable { }
 export interface IDocument_Archivable_ByUser extends IDocument_Archivable, IArchivable_ByUser { }
 
+/**
+ * Returns whether the updates to the object are valid from the perspective of the IArchivable interface.
+ * @param {IArchivable} original The original object.
+ * @param {IArchivable} updated The updated object.
+ * @param {boolean} isReadOnly Whether the properties of the IArchivable interface are read-only or not.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForArchivable(original: IArchivable, updated: IArchivable, isReadOnly: boolean): boolean {
+  TC.assertNonNullish(original, "The original object must not be null.");
+  TC.assertNonNullish(updated, "The updated object must not be null.");
+
+  // NOTE: These values may both be false or both be true, or the latter false regardless
+  const priorExistencesMatch = (((!original.isArchived) == TC.isNullish(original.dateOfArchivalChange)) || (!TC.isNullish(original.dateOfArchivalChange)));
+  if (!priorExistencesMatch) {
+    return false;
+  }
+  // NOTE: These values may optionally exist on any update
+  const existencesMatch = (TC.isNullish(updated.isArchived) == TC.isNullish(updated.dateOfArchivalChange));
+  if (!existencesMatch) {
+    return false;
+  }
+  if (!TC.isNullish(updated.isArchived)) {
+    const stateValid = (updated.isArchived != original.isArchived); // NOTE: This value must change for updates
+    if (!stateValid) {
+      return false;
+    }
+    if (isReadOnly) {
+      return false;
+    }
+  }
+  if (!TC.isNullish(updated.dateOfArchivalChange)) {
+    const datesValid = (TC.isNullish(original.dateOfArchivalChange) || (TC.convertNonNullish(updated.dateOfArchivalChange) > TC.convertNonNullish(original.dateOfArchivalChange)));
+    if (!datesValid) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Returns whether the updates to the object are valid from the perspective of the IArchivable_ByUser interface.
+ * @param {IArchivable_ByUser} original The original object.
+ * @param {IArchivable_ByUser} updated The updated object.
+ * @param {boolean} isReadOnly Whether the properties of the IArchivable_ByUser interface are read-only or not.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForArchivable_ByUser(original: IArchivable_ByUser, updated: IArchivable_ByUser, isReadOnly: boolean): boolean {
+  if (!areUpdatesValid_ForArchivable(original, updated, isReadOnly)) {
+    return false;
+  }
+
+  // NOTE: These values may both be null or both be non-null, but not one of each
+  const priorExistencesMatch = (TC.isNullish(original.userIdOfArchivalChanger) == TC.isNullish(original.dateOfArchivalChange));
+  if (!priorExistencesMatch) {
+    return false;
+  }
+  // NOTE: These values may optionally exist on any update
+  const existencesMatch = (TC.isNullish(updated.userIdOfArchivalChanger) == TC.isNullish(updated.dateOfArchivalChange));
+  if (!existencesMatch) {
+    return false;
+  }
+  // NOTE: The "userIdOf..." value must be validated via AuthorizationState, not here
+  return true;
+}
+
 
 // IViewable
 export const IViewable_HasBeenViewed_PropertyName = VC.getTypedPropertyKeyAsText<IViewable>("hasBeenViewed"); // eslint-disable-line camelcase
