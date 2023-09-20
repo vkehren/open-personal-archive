@@ -57,6 +57,9 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
   if (!OPA.areUpdatesValid_ForArchivable_ByUser(document, updateObject as OPA.IArchivable_ByUser, ((updateObject as OPA.IArchivable_ByUser).userIdOfArchivalChanger == document.userIdOfCreator))) {
     return false;
   }
+  if (!OPA.areUpdatesValid_ForViewable_ByUser(document, updateObject as OPA.IViewable_ByUser, ((updateObject as OPA.IViewable_ByUser).userIdOfLatestViewer == document.userIdOfCreator))) {
+    return false;
+  }
   const userIdOfLatestUpdater = (updateObject as OPA.IUpdateable_ByUser).userIdOfLatestUpdater;
 
   // NOTE: updateObject MUST NOT change read-only data
@@ -84,37 +87,6 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
 
     if (propertyNames_NotForUnDelete.length > 0) {
       return false;
-    }
-  }
-
-  if (true) { // eslint-disable-line no-constant-condition
-    const updateObject_Viewable = (updateObject as OPA.IViewable_ByUser);
-
-    if (OPA.isUndefined(updateObject_Viewable.hasBeenViewed)) {
-      const dateIsSet = !OPA.isUndefined(updateObject_Viewable.dateOfLatestViewing);
-      const userIsSet = !OPA.isUndefined(updateObject_Viewable.userIdOfLatestViewer);
-
-      if (dateIsSet || userIsSet) {
-        return false;
-      }
-    } else if (OPA.isNullish(updateObject_Viewable.hasBeenViewed)) {
-      throw new Error("The \"hasBeenViewed\" property must not be set to null.");
-    } else if (updateObject_Viewable.hasBeenViewed) {
-      const dateNotSet = OPA.isNullish(updateObject_Viewable.dateOfLatestViewing);
-      const userNotSet = OPA.isNullish(updateObject_Viewable.userIdOfLatestViewer);
-
-      if (dateNotSet || userNotSet) {
-        return false;
-      }
-    } else {
-      const docIsViewed = document.hasBeenViewed;
-      const dateIsSet = !OPA.isNullish(updateObject_Viewable.dateOfLatestViewing);
-      const userIsSet = !OPA.isNullish(updateObject_Viewable.userIdOfLatestViewer);
-      const userCanUnView = false;
-
-      if ((docIsViewed && !userCanUnView) || dateIsSet || userIsSet) {
-        return false;
-      }
     }
   }
 

@@ -80,6 +80,9 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   if (!OPA.areUpdatesValid_ForAssignableToRole_ByUser(document, updateObject as OPA.IAssignableToRole_ByUser, (document.id == User_OwnerId), {dateOfCreation: document.dateOfCreation, userIdOfCreator: document.id})) {
     return false;
   }
+  if (!OPA.areUpdatesValid_ForViewable_ByUser(document, updateObject as OPA.IViewable_ByUser, ((updateObject as OPA.IViewable_ByUser).userIdOfLatestViewer == document.id))) {
+    return false;
+  }
   const userIdOfLatestUpdater = (updateObject as OPA.IUpdateable_ByUser).userIdOfLatestUpdater;
   const docIsArchiveOwner = ((document.id == User_OwnerId) || (document.assignedRoleId == Role_OwnerId));
 
@@ -141,37 +144,6 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
       const isViewableSelfAssigned = (!OPA.isNullish(updateObject_CitationAccessor.viewableCitationIds) && (updateObject_CitationAccessor.userIdOfLatestCitationChanger == document.id));
 
       if ((dateNotSet && dateNotCreation) || (userNotSet && dateNotCreation) || isRequestedNotSelfAssigned || isViewableSelfAssigned) {
-        return false;
-      }
-    }
-  }
-
-  if (true) { // eslint-disable-line no-constant-condition
-    const updateObject_Viewable = (updateObject as OPA.IViewable_ByUser);
-
-    if (OPA.isUndefined(updateObject_Viewable.hasBeenViewed)) {
-      const dateIsSet = !OPA.isUndefined(updateObject_Viewable.dateOfLatestViewing);
-      const userIsSet = !OPA.isUndefined(updateObject_Viewable.userIdOfLatestViewer);
-
-      if (dateIsSet || userIsSet) {
-        return false;
-      }
-    } else if (OPA.isNullish(updateObject_Viewable.hasBeenViewed)) {
-      throw new Error("The \"hasBeenViewed\" property must not be set to null.");
-    } else if (updateObject_Viewable.hasBeenViewed) {
-      const dateNotSet = OPA.isNullish(updateObject_Viewable.dateOfLatestViewing);
-      const userNotSet = OPA.isNullish(updateObject_Viewable.userIdOfLatestViewer);
-
-      if (dateNotSet || userNotSet || docIsArchiveOwner) {
-        return false;
-      }
-    } else {
-      const docIsViewed = document.hasBeenViewed;
-      const dateIsSet = !OPA.isNullish(updateObject_Viewable.dateOfLatestViewing);
-      const userIsSet = !OPA.isNullish(updateObject_Viewable.userIdOfLatestViewer);
-      const userCanUnView = false;
-
-      if ((docIsViewed && !userCanUnView) || dateIsSet || userIsSet || docIsArchiveOwner) {
         return false;
       }
     }

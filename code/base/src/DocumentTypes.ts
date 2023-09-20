@@ -576,6 +576,8 @@ export function areUpdatesValid_ForArchivable_ByUser(original: IArchivable_ByUse
 
 
 // IViewable
+// For Auth updates: (Required = false, UnSetable = false, SetableBySelf = false, SetableByOther = true)
+// For Data updates: (Required = false, UnSetable = false, SetableBySelf = true, SetableByOther = true)
 export const IViewable_HasBeenViewed_PropertyName = VC.getTypedPropertyKeyAsText<IViewable>("hasBeenViewed"); // eslint-disable-line camelcase
 export const IViewable_DateOfLatestViewing_PropertyName = VC.getTypedPropertyKeyAsText<IViewable>("dateOfLatestViewing"); // eslint-disable-line camelcase
 export interface IViewable {
@@ -588,6 +590,71 @@ export interface IViewable_ByUser extends IViewable {
 }
 export interface IDocument_Viewable extends IDocument, IViewable { }
 export interface IDocument_Viewable_ByUser extends IDocument_Viewable, IViewable_ByUser { }
+
+/**
+ * Returns whether the updates to the object are valid from the perspective of the IViewable interface.
+ * @param {IViewable} original The original object.
+ * @param {IViewable} updated The updated object.
+ * @param {boolean} isReadOnly Whether the properties of the IViewable interface are read-only or not.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForViewable(original: IViewable, updated: IViewable, isReadOnly: boolean): boolean {
+  TC.assertNonNullish(original, "The original object must not be null.");
+  TC.assertNonNullish(updated, "The updated object must not be null.");
+
+  // NOTE: These values may both be false or both be true, but not one of each
+  const priorExistencesMatch = ((!original.hasBeenViewed) == TC.isNullish(original.dateOfLatestViewing));
+  if (!priorExistencesMatch) {
+    return false;
+  }
+  // NOTE: These values may optionally exist on any update
+  const existencesMatch = (TC.isNullish(updated.hasBeenViewed) == TC.isNullish(updated.dateOfLatestViewing));
+  if (!existencesMatch) {
+    return false;
+  }
+  if (!TC.isNullish(updated.hasBeenViewed)) {
+    const stateValid = (updated.hasBeenViewed); // NOTE: This value must be "true" for updates
+    if (!stateValid) {
+      return false;
+    }
+    if (isReadOnly) {
+      return false;
+    }
+  }
+  if (!TC.isNullish(updated.dateOfLatestViewing)) {
+    const datesValid = (TC.isNullish(original.dateOfLatestViewing) || (TC.convertNonNullish(updated.dateOfLatestViewing) > TC.convertNonNullish(original.dateOfLatestViewing)));
+    if (!datesValid) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Returns whether the updates to the object are valid from the perspective of the IViewable_ByUser interface.
+ * @param {IViewable_ByUser} original The original object.
+ * @param {IViewable_ByUser} updated The updated object.
+ * @param {boolean} isReadOnly Whether the properties of the IViewable_ByUser interface are read-only or not.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForViewable_ByUser(original: IViewable_ByUser, updated: IViewable_ByUser, isReadOnly: boolean): boolean {
+  if (!areUpdatesValid_ForViewable(original, updated, isReadOnly)) {
+    return false;
+  }
+
+  // NOTE: These values may both be null or both be non-null, but not one of each
+  const priorExistencesMatch = (TC.isNullish(original.userIdOfLatestViewer) == TC.isNullish(original.dateOfLatestViewing));
+  if (!priorExistencesMatch) {
+    return false;
+  }
+  // NOTE: These values may optionally exist on any update
+  const existencesMatch = (TC.isNullish(updated.userIdOfLatestViewer) == TC.isNullish(updated.dateOfLatestViewing));
+  if (!existencesMatch) {
+    return false;
+  }
+  // NOTE: The "userIdOf..." value must be validated via AuthorizationState, not here
+  return true;
+}
 
 
 // IApprovable
