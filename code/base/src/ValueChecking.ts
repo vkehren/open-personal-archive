@@ -161,3 +161,42 @@ export function assertIsFalse(value: boolean, message = "The value expected to b
     throw new Error(message);
   }
 }
+
+/**
+ * Returns whether two Dates are value-wise equivalent.
+ * @param {Date | null | undefined} date1 The first date.
+ * @param {Date | null | undefined} date2 The second date.
+ * @param {boolean} [verbose=false] Whether to print debug info to the console or not.
+ * @return {boolean}
+ */
+export function areDatesEqual(date1: Date | null | undefined, date2: Date | null | undefined, verbose = false): boolean {
+  if (TC.isNullish(date1) != TC.isNullish(date2)) {
+    return false;
+  }
+  if (TC.isNullish(date1)) {
+    return true;
+  }
+  const date1NonNull = TC.convertNonNullish(date1);
+  const date2NonNull = TC.convertNonNullish(date2);
+  // NOTE: While "<", ">", "<=", ">=" seem to provide value-wise results, "==" seems to test objects are the same instance
+  const areEqual = ((date1NonNull <= date2NonNull) && (date1NonNull >= date2NonNull));
+  if (verbose) {
+    console.log("Dates are equal using == is " + (date1NonNull == date2NonNull));
+    console.log("Dates are equal using <= and >= is " + areEqual);
+  }
+  return areEqual;
+}
+
+/**
+ * Asserts that two Dates are value-wise equivalent.
+ * @param {Date | null | undefined} date1 The first date.
+ * @param {Date | null | undefined} date2 The second date.
+ * @param {string} [message="The two Dates are not value-wise equivalent."] The message to display on failure of assertion.
+ * @param {boolean} [verbose=false] Whether to print debug info to the console or not.
+ * @return {void}
+ */
+export function assertDatesAreEqual(date1: Date | null | undefined, date2: Date | null | undefined, message = "The two Dates are not value-wise equivalent.", verbose = false): void {
+  if (!areDatesEqual(date1, date2, verbose)) {
+    throw new Error(message);
+  }
+}

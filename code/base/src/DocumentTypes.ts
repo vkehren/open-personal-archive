@@ -95,7 +95,7 @@ export function areUpdatesValid_ForCreatable(original: ICreatable, updated: ICre
     return false;
   }
   if (!TC.isNullish(updated.dateOfCreation)) {
-    const datesMatch = (updated.dateOfCreation == original.dateOfCreation);
+    const datesMatch = VC.areDatesEqual(updated.dateOfCreation, original.dateOfCreation);
     if (!datesMatch) {
       return false;
     }
