@@ -67,6 +67,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
+  const docIsArchiveOwner = ((document.id == User_OwnerId) || (document.assignedRoleId == Role_OwnerId));
   if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
     return false;
   }
@@ -76,19 +77,18 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObject as OPA.IUpdateable_ByUser)) {
     return false;
   }
-  if (!OPA.areUpdatesValid_ForAssignableToRole_ByUser(document, updateObject as OPA.IAssignableToRole_ByUser, (document.id == User_OwnerId), {dateOfCreation: document.dateOfCreation, userIdOfCreator: document.id})) { // eslint-disable-line max-len
+  if (!OPA.areUpdatesValid_ForAssignableToRole_ByUser(document, updateObject as OPA.IAssignableToRole_ByUser, docIsArchiveOwner, {dateOfCreation: document.dateOfCreation, userIdOfCreator: document.id})) { // eslint-disable-line max-len
     return false;
   }
   if (!OPA.areUpdatesValid_ForViewable_ByUser(document, updateObject as OPA.IViewable_ByUser, ((updateObject as OPA.IViewable_ByUser).userIdOfLatestViewer == document.id))) {
     return false;
   }
-  if (!OPA.areUpdatesValid_ForApprovable_ByUser(document, updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>, (((updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>).userIdOfDecider == document.id) || (document.id == User_OwnerId)))) { // eslint-disable-line max-len
+  if (!OPA.areUpdatesValid_ForApprovable_ByUser(document, updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>, (((updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>).userIdOfDecider == document.id) || docIsArchiveOwner))) { // eslint-disable-line max-len
     return false;
   }
-  if (!OPA.areUpdatesValid_ForDeleteable_ByUser(document, updateObject as OPA.IDeleteable_ByUser, (((updateObject as OPA.IDeleteable_ByUser).userIdOfDeletionChanger != document.id) || (document.id == User_OwnerId)))) { // eslint-disable-line max-len
+  if (!OPA.areUpdatesValid_ForDeleteable_ByUser(document, updateObject as OPA.IDeleteable_ByUser, (((updateObject as OPA.IDeleteable_ByUser).userIdOfDeletionChanger != document.id) || docIsArchiveOwner))) { // eslint-disable-line max-len
     return false;
   }
-  const docIsArchiveOwner = ((document.id == User_OwnerId) || (document.assignedRoleId == Role_OwnerId));
 
   // NOTE: updateObject MUST NOT change read-only data
   const updateObject_CitationAccessor = (updateObject as ICitationAccessorPartial);
