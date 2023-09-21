@@ -205,9 +205,10 @@ export interface IDocument_Upgradeable_ByUser_WithHistory<T> extends IDocument_U
  * Returns whether the updates to the object are valid from the perspective of the IUpgradeable interface.
  * @param {IUpgradeable} original The original object.
  * @param {IUpgradeable} updated The updated object.
+ * @param {boolean} [preventUpdates=false] Whether updates to properties of the IUpgradeable interface should be prevented or not.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForUpgradeable(original: IUpgradeable, updated: IUpgradeable): boolean {
+export function areUpdatesValid_ForUpgradeable(original: IUpgradeable, updated: IUpgradeable, preventUpdates = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
@@ -226,6 +227,9 @@ export function areUpdatesValid_ForUpgradeable(original: IUpgradeable, updated: 
     if (!stateValid) {
       return false;
     }
+    if (preventUpdates) {
+      return false;
+    }
   }
   if (!TC.isNullish(updated.dateOfLatestUpgrade)) {
     const datesValid = (TC.isNullish(original.dateOfLatestUpgrade) || (TC.convertNonNullish(updated.dateOfLatestUpgrade) > TC.convertNonNullish(original.dateOfLatestUpgrade)));
@@ -240,10 +244,11 @@ export function areUpdatesValid_ForUpgradeable(original: IUpgradeable, updated: 
  * Returns whether the updates to the object are valid from the perspective of the IUpgradeable_ByUser interface.
  * @param {IUpgradeable_ByUser} original The original object.
  * @param {IUpgradeable_ByUser} updated The updated object.
+ * @param {boolean} [preventUpdates=false] Whether updates to properties of the IUpgradeable_ByUser interface should be prevented or not.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForUpgradeable_ByUser(original: IUpgradeable_ByUser, updated: IUpgradeable_ByUser): boolean {
-  if (!areUpdatesValid_ForUpgradeable(original, updated)) {
+export function areUpdatesValid_ForUpgradeable_ByUser(original: IUpgradeable_ByUser, updated: IUpgradeable_ByUser, preventUpdates = false): boolean {
+  if (!areUpdatesValid_ForUpgradeable(original, updated, preventUpdates)) {
     return false;
   }
 
@@ -288,9 +293,10 @@ export interface IDocument_Updateable_ByUser_WithHistory<T> extends IDocument_Up
  * Returns whether the updates to the object are valid from the perspective of the IUpdateable interface.
  * @param {IUpdateable} original The original object.
  * @param {IUpdateable} updated The updated object.
+ * @param {boolean} [preventUpdates=false] Whether updates to properties of the IUpdateable interface should be prevented or not.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForUpdateable(original: IUpdateable, updated: IUpdateable): boolean {
+export function areUpdatesValid_ForUpdateable(original: IUpdateable, updated: IUpdateable, preventUpdates = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
@@ -309,6 +315,9 @@ export function areUpdatesValid_ForUpdateable(original: IUpdateable, updated: IU
     if (!stateValid) {
       return false;
     }
+    if (preventUpdates) {
+      return false;
+    }
   }
   if (!TC.isNullish(updated.dateOfLatestUpdate)) {
     const datesValid = (TC.isNullish(original.dateOfLatestUpdate) || (TC.convertNonNullish(updated.dateOfLatestUpdate) > TC.convertNonNullish(original.dateOfLatestUpdate)));
@@ -323,10 +332,11 @@ export function areUpdatesValid_ForUpdateable(original: IUpdateable, updated: IU
  * Returns whether the updates to the object are valid from the perspective of the IUpdateable_ByUser interface.
  * @param {IUpdateable_ByUser} original The original object.
  * @param {IUpdateable_ByUser} updated The updated object.
+ * @param {boolean} [preventUpdates=false] Whether updates to properties of the IUpdateable_ByUser interface should be prevented or not.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForUpdateable_ByUser(original: IUpdateable_ByUser, updated: IUpdateable_ByUser): boolean {
-  if (!areUpdatesValid_ForUpdateable(original, updated)) {
+export function areUpdatesValid_ForUpdateable_ByUser(original: IUpdateable_ByUser, updated: IUpdateable_ByUser, preventUpdates = false): boolean {
+  if (!areUpdatesValid_ForUpdateable(original, updated, preventUpdates)) {
     return false;
   }
 
