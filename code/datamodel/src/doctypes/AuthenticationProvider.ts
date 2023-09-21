@@ -34,10 +34,11 @@ export function areUpdatesValid(document: IAuthenticationProvider, updateObject:
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument, IAuthenticationProvider_ReadOnlyPropertyNames)) {
+  const updateObjectAsUnknown = (updateObject as unknown);
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObjectAsUnknown as OPA.IDocument, IAuthenticationProvider_ReadOnlyPropertyNames)) {
     return false;
   }
-  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject as OPA.ICreatable)) {
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObjectAsUnknown as OPA.ICreatable)) {
     return false;
   }
 

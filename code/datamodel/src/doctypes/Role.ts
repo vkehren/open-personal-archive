@@ -39,10 +39,11 @@ export function areUpdatesValid(document: IRole, updateObject: IRolePartial): bo
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument, IRole_ReadOnlyPropertyNames)) {
+  const updateObjectAsUnknown = (updateObject as unknown);
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObjectAsUnknown as OPA.IDocument, IRole_ReadOnlyPropertyNames)) {
     return false;
   }
-  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject as OPA.ICreatable)) {
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObjectAsUnknown as OPA.ICreatable)) {
     return false;
   }
 

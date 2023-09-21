@@ -48,13 +48,14 @@ export function areUpdatesValid(document: IArchive, updateObject: IArchivePartia
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument, IArchive_ReadOnlyPropertyNames)) {
+  const updateObjectAsUnknown = (updateObject as unknown);
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObjectAsUnknown as OPA.IDocument, IArchive_ReadOnlyPropertyNames)) {
     return false;
   }
-  if (!OPA.areUpdatesValid_ForCreatable_ByUser(document, updateObject as OPA.ICreatable_ByUser)) {
+  if (!OPA.areUpdatesValid_ForCreatable_ByUser(document, updateObjectAsUnknown as OPA.ICreatable_ByUser)) {
     return false;
   }
-  if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObject as OPA.IUpdateable_ByUser)) {
+  if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObjectAsUnknown as OPA.IUpdateable_ByUser)) {
     return false;
   }
 

@@ -37,10 +37,11 @@ export function areUpdatesValid(document: IApplication, updateObject: IApplicati
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument, IApplication_ReadOnlyPropertyNames)) {
+  const updateObjectAsUnknown = (updateObject as unknown);
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObjectAsUnknown as OPA.IDocument, IApplication_ReadOnlyPropertyNames)) {
     return false;
   }
-  if (!OPA.areUpdatesValid_ForUpgradeable_ByUser(document, updateObject as OPA.IUpgradeable_ByUser)) {
+  if (!OPA.areUpdatesValid_ForUpgradeable_ByUser(document, updateObjectAsUnknown as OPA.IUpgradeable_ByUser)) {
     return false;
   }
   // NOTE: If any properties are added that can be updated without upgrading, implement IUpdateable_ByUser on Application
