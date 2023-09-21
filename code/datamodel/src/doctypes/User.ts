@@ -76,13 +76,13 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObject as OPA.IUpdateable_ByUser)) {
     return false;
   }
-  if (!OPA.areUpdatesValid_ForAssignableToRole_ByUser(document, updateObject as OPA.IAssignableToRole_ByUser, (document.id == User_OwnerId), {dateOfCreation: document.dateOfCreation, userIdOfCreator: document.id})) {
+  if (!OPA.areUpdatesValid_ForAssignableToRole_ByUser(document, updateObject as OPA.IAssignableToRole_ByUser, (document.id == User_OwnerId), {dateOfCreation: document.dateOfCreation, userIdOfCreator: document.id})) { // eslint-disable-line max-len
     return false;
   }
   if (!OPA.areUpdatesValid_ForViewable_ByUser(document, updateObject as OPA.IViewable_ByUser, ((updateObject as OPA.IViewable_ByUser).userIdOfLatestViewer == document.id))) {
     return false;
   }
-  if (!OPA.areUpdatesValid_ForApprovable_ByUser(document, updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>, (((updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>).userIdOfDecider == document.id) || (document.id == User_OwnerId)))) {
+  if (!OPA.areUpdatesValid_ForApprovable_ByUser(document, updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>, (((updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>).userIdOfDecider == document.id) || (document.id == User_OwnerId)))) { // eslint-disable-line max-len
     return false;
   }
   const userIdOfLatestUpdater = (updateObject as OPA.IUpdateable_ByUser).userIdOfLatestUpdater;
