@@ -86,6 +86,9 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   if (!OPA.areUpdatesValid_ForApprovable_ByUser(document, updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>, (((updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>).userIdOfDecider == document.id) || docIsArchiveOwner))) { // eslint-disable-line max-len
     return false;
   }
+  if (!OPA.areUpdatesValid_ForSuspendable_ByUser(document, updateObject as OPA.ISuspendable_ByUser, (((updateObject as OPA.ISuspendable_ByUser).userIdOfSuspensionStarter == document.id) || ((updateObject as OPA.ISuspendable_ByUser).userIdOfSuspensionEnder == document.id) || docIsArchiveOwner))) { // eslint-disable-line max-len
+    return false;
+  }
   if (!OPA.areUpdatesValid_ForDeleteable_ByUser(document, updateObject as OPA.IDeleteable_ByUser, (((updateObject as OPA.IDeleteable_ByUser).userIdOfDeletionChanger != document.id) || docIsArchiveOwner))) { // eslint-disable-line max-len
     return false;
   }
@@ -137,68 +140,6 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
       const isViewableSelfAssigned = (!OPA.isNullish(updateObject_CitationAccessor.viewableCitationIds) && (updateObject_CitationAccessor.userIdOfLatestCitationChanger == document.id));
 
       if ((dateNotSet && dateNotCreation) || (userNotSet && dateNotCreation) || isRequestedNotSelfAssigned || isViewableSelfAssigned) {
-        return false;
-      }
-    }
-  }
-
-  if (true) { // eslint-disable-line no-constant-condition
-    const updateObject_Suspendable = (updateObject as OPA.ISuspendable_ByUser);
-
-    if (OPA.isUndefined(updateObject_Suspendable.isSuspended) || OPA.isUndefined(updateObject_Suspendable.hasSuspensionStarted) || OPA.isUndefined(updateObject_Suspendable.hasSuspensionEnded)) {
-      const stateIsSet = !OPA.isUndefined(updateObject_Suspendable.isSuspended);
-      const startedIsSet = !OPA.isUndefined(updateObject_Suspendable.hasSuspensionStarted);
-      const endedIsSet = !OPA.isUndefined(updateObject_Suspendable.hasSuspensionEnded);
-      const startReasonIsSet = !OPA.isUndefined(updateObject_Suspendable.reasonForSuspensionStart);
-      const endReasonIsSet = !OPA.isUndefined(updateObject_Suspendable.reasonForSuspensionEnd);
-      const startDateIsSet = !OPA.isUndefined(updateObject_Suspendable.dateOfSuspensionStart);
-      const endDateIsSet = !OPA.isUndefined(updateObject_Suspendable.dateOfSuspensionEnd);
-      const startUserIsSet = !OPA.isUndefined(updateObject_Suspendable.userIdOfSuspensionStarter);
-      const endUserIsSet = !OPA.isUndefined(updateObject_Suspendable.userIdOfSuspensionEnder);
-
-      if (stateIsSet || startedIsSet || endedIsSet || startReasonIsSet || endReasonIsSet || startDateIsSet || endDateIsSet || startUserIsSet || endUserIsSet) {
-        return false;
-      }
-    } else if (OPA.isNullish(updateObject_Suspendable.hasSuspensionStarted)) {
-      throw new Error("The \"hasSuspensionStarted\" property must not be set to null.");
-    } else if (OPA.isNullish(updateObject_Suspendable.hasSuspensionEnded)) {
-      throw new Error("The \"hasSuspensionEnded\" property must not be set to null.");
-    } else if (OPA.isSuspended(updateObject_Suspendable) != updateObject_Suspendable.isSuspended) {
-      throw new Error("The \"isSuspended\" property has been set to an incorrect value.");
-    } else if (updateObject_Suspendable.hasSuspensionEnded) {
-      const startedNotSet = OPA.isNullish(updateObject_Suspendable.hasSuspensionStarted);
-      // NOTE: Allow both reasons to be value, null, or undefined
-      const startDateNotSet = OPA.isNullish(updateObject_Suspendable.dateOfSuspensionStart);
-      const endDateNotSet = OPA.isNullish(updateObject_Suspendable.dateOfSuspensionEnd);
-      const startUserNotSet = OPA.isNullish(updateObject_Suspendable.userIdOfSuspensionStarter);
-      const endUserNotSet = OPA.isNullish(updateObject_Suspendable.userIdOfSuspensionEnder);
-      const isSelfEnded = (updateObject_Suspendable.userIdOfSuspensionEnder == document.id);
-
-      if (startedNotSet || startDateNotSet || endDateNotSet || startUserNotSet || endUserNotSet || isSelfEnded || docIsArchiveOwner) {
-        return false;
-      }
-    } else if (updateObject_Suspendable.hasSuspensionStarted) {
-      const endedNotSet = OPA.isNullish(updateObject_Suspendable.hasSuspensionEnded);
-      // NOTE: Allow start reason to be value, null, or undefined
-      const endReasonIsSet = !OPA.isNullish(updateObject_Suspendable.reasonForSuspensionEnd);
-      const startDateNotSet = OPA.isNullish(updateObject_Suspendable.dateOfSuspensionStart);
-      const endDateIsSet = !OPA.isNullish(updateObject_Suspendable.dateOfSuspensionEnd);
-      const startUserNotSet = OPA.isNullish(updateObject_Suspendable.userIdOfSuspensionStarter);
-      const endUserIsSet = !OPA.isNullish(updateObject_Suspendable.userIdOfSuspensionEnder);
-      const isSelfStarted = (updateObject_Suspendable.userIdOfSuspensionStarter == document.id);
-
-      if (endedNotSet || endReasonIsSet || startDateNotSet || endDateIsSet || startUserNotSet || endUserIsSet || isSelfStarted || docIsArchiveOwner) {
-        return false;
-      }
-    } else {
-      const startReasonIsSet = !OPA.isNullish(updateObject_Suspendable.reasonForSuspensionStart);
-      const endReasonIsSet = !OPA.isNullish(updateObject_Suspendable.reasonForSuspensionEnd);
-      const startDateIsSet = !OPA.isNullish(updateObject_Suspendable.dateOfSuspensionStart);
-      const endDateIsSet = !OPA.isNullish(updateObject_Suspendable.dateOfSuspensionEnd);
-      const startUserIsSet = !OPA.isNullish(updateObject_Suspendable.userIdOfSuspensionStarter);
-      const endUserIsSet = !OPA.isNullish(updateObject_Suspendable.userIdOfSuspensionEnder);
-
-      if (startReasonIsSet || endReasonIsSet || startDateIsSet || endDateIsSet || startUserIsSet || endUserIsSet || docIsArchiveOwner) {
         return false;
       }
     }

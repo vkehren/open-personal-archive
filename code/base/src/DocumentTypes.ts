@@ -760,6 +760,7 @@ export function areUpdatesValid_ForApprovable_ByUser(original: IApprovable_ByUse
 
 
 // ISuspendable
+// For Auth updates: (Required = false, UnSetable = true, SetableBySelf = false, SetableByOther = true)
 export const ISuspendable_IsSuspended_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("isSuspended"); // eslint-disable-line camelcase
 export const ISuspendable_HasSuspensionStarted_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("hasSuspensionStarted"); // eslint-disable-line camelcase
 export const ISuspendable_HasSuspensionEnded_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("hasSuspensionEnded"); // eslint-disable-line camelcase
@@ -794,6 +795,77 @@ export function isSuspended<T extends ISuspendable>(document: T): boolean {
   TC.assertNonNullish(document);
   const isSuspended = (document.hasSuspensionStarted && !document.hasSuspensionEnded);
   return isSuspended;
+}
+
+/**
+ * Returns whether the updates to the object are valid from the perspective of the ISuspendable interface.
+ * @param {ISuspendable} original The original object.
+ * @param {ISuspendable} updated The updated object.
+ * @param {boolean} isReadOnly Whether the properties of the ISuspendable interface are read-only or not.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForSuspendable(original: ISuspendable, updated: ISuspendable, isReadOnly: boolean): boolean {
+  TC.assertNonNullish(original, "The original object must not be null.");
+  TC.assertNonNullish(updated, "The updated object must not be null.");
+
+  // NOTE: These values represent conditional IF operator, as in IF(isSet, hasDate)
+  const priorExistencesValidStart = ((!original.hasSuspensionStarted) || (!TC.isNullish(original.dateOfSuspensionStart)));
+  const priorExistencesValidEnd = ((!original.hasSuspensionEnded) || (!TC.isNullish(original.dateOfSuspensionEnd)));
+  if (!(priorExistencesValidStart && priorExistencesValidEnd)) {
+    return false;
+  }
+  // NOTE: These values may optionally exist on any update
+  const existencesValidStart = ((!updated.hasSuspensionStarted) || (!TC.isNullish(updated.dateOfSuspensionStart)));
+  const existencesValidEnd = ((!updated.hasSuspensionEnded) || (!TC.isNullish(updated.dateOfSuspensionEnd)));
+  if (!(existencesValidStart && existencesValidEnd)) {
+    return false;
+  }
+  if ((!TC.isNullish(updated.hasSuspensionStarted)) || (!TC.isNullish(updated.hasSuspensionEnded))) {
+    const stateValidStart = (updated.hasSuspensionStarted != original.hasSuspensionStarted); // NOTE: This value must change for updates
+    const stateValidEnd = (updated.hasSuspensionEnded != original.hasSuspensionEnded); // NOTE: This value must change for updates
+    if (!(stateValidStart || stateValidEnd)) {
+      return false;
+    }
+    if (isReadOnly) {
+      return false;
+    }
+  }
+  if ((!TC.isNullish(updated.dateOfSuspensionStart)) || (!TC.isNullish(updated.dateOfSuspensionEnd))) {
+    const datesValidStart = (TC.isNullish(original.dateOfSuspensionStart) || (TC.convertNonNullish(updated.dateOfSuspensionStart) > TC.convertNonNullish(original.dateOfSuspensionStart)));
+    const datesValidEnd = (TC.isNullish(original.dateOfSuspensionEnd) || (TC.convertNonNullish(updated.dateOfSuspensionEnd) > TC.convertNonNullish(original.dateOfSuspensionEnd)));
+    if (!(datesValidStart || datesValidEnd)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Returns whether the updates to the object are valid from the perspective of the ISuspendable_ByUser interface.
+ * @param {ISuspendable_ByUser} original The original object.
+ * @param {ISuspendable_ByUser} updated The updated object.
+ * @param {boolean} isReadOnly Whether the properties of the ISuspendable_ByUser interface are read-only or not.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForSuspendable_ByUser(original: ISuspendable_ByUser, updated: ISuspendable_ByUser, isReadOnly: boolean): boolean {
+  if (!areUpdatesValid_ForSuspendable(original, updated, isReadOnly)) {
+    return false;
+  }
+
+  // NOTE: These values may both be null or both be non-null, but not one of each
+  const priorExistencesValidStart = (TC.isNullish(original.userIdOfSuspensionStarter) == TC.isNullish(original.dateOfSuspensionStart));
+  const priorExistencesValidEnd = (TC.isNullish(original.userIdOfSuspensionEnder) == TC.isNullish(original.dateOfSuspensionEnd));
+  if (!(priorExistencesValidStart && priorExistencesValidEnd)) {
+    return false;
+  }
+  // NOTE: These values may optionally exist on any update
+  const existencesMatchStart = (TC.isNullish(updated.userIdOfSuspensionStarter) == TC.isNullish(updated.dateOfSuspensionStart));
+  const existencesMatchEnd = (TC.isNullish(updated.userIdOfSuspensionEnder) == TC.isNullish(updated.dateOfSuspensionEnd));
+  if (!(existencesMatchStart && existencesMatchEnd)) {
+    return false;
+  }
+  // NOTE: The "userIdOf..." value must be validated via AuthorizationState, not here
+  return true;
 }
 
 
