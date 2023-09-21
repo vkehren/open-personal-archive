@@ -194,6 +194,38 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfDeletionChange).equals(null);
     expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
+    config.authenticationState = TestAuthData.testUser;
+    const invalidUpdateObject = (({updateHistory: "BLANK"} as unknown) as OpaDm.IAccessRequestPartial)
+    await expect(OpaDb.AccessRequests.queries.update(config.dataStorageState, accessRequestId, invalidUpdateObject, ambientUserId())).to.eventually.be.rejectedWith(Error);
+    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
+
+    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
+    expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
+    expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage);
+    expect(accessRequest.response[OpaDm.DefaultLocale]).equals("");
+    expect(accessRequest.updateHistory.length).equals(1);
+    expect((accessRequest.updateHistory[0] as OpaDm.IAccessRequest).updateHistory).equals(undefined);
+    expect(accessRequest.hasBeenUpdated).equals(false);
+    expect(accessRequest.dateOfLatestUpdate).equals(null);
+    expect(accessRequest.userIdOfLatestUpdater).equals(null);
+    expect(accessRequest.tags.length).equals(0);
+    expect(accessRequest.dateOfLatestTagging).equals(null);
+    expect(accessRequest.userIdOfLatestTagger).equals(null);
+    expect(accessRequest.isArchived).equals(false);
+    expect(accessRequest.dateOfArchivalChange).equals(null);
+    expect(accessRequest.userIdOfArchivalChanger).equals(null);
+    expect(accessRequest.hasBeenViewed).equals(false);
+    expect(accessRequest.dateOfLatestViewing).equals(null);
+    expect(accessRequest.userIdOfLatestViewer).equals(null);
+    expect(accessRequest.hasBeenDecided).equals(false);
+    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.pending);
+    expect(accessRequest.dateOfDecision).equals(null);
+    expect(accessRequest.userIdOfDecider).equals(null);
+    expect(accessRequest.isMarkedAsDeleted).equals(false);
+    expect(accessRequest.dateOfDeletionChange).equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(null);
+
     config.authenticationState = TestAuthData.owner;
     await OpaDb.AccessRequests.queries.setTags(config.dataStorageState, accessRequestId, ["a", "b", "c"], ambientUserId());
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);

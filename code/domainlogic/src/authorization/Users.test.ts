@@ -155,6 +155,48 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
+    const invalidUpdateObject = (({updateHistory: "BLANK"} as unknown) as OpaDm.IUserPartial)
+    await expect(OpaDb.Users.queries.update(config.dataStorageState, testUserId(), invalidUpdateObject, ambientUserId())).to.eventually.be.rejectedWith(Error);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
+
+    expect(user.id).equals(TestAuthData.owner.opaUserId);
+    expect(user.firebaseAuthUserId).equals(TestAuthData.owner.firebaseAuthUserId);
+    expect(user.authProviderId).equals(authProviderNonNull.id);
+    expect(user.authAccountName).equals(TestAuthData.owner.email);
+    expect(user.authAccountNameLowered).equals(TestAuthData.owner.email.toLowerCase());
+    expect(user.assignedRoleId).equals(OpaDm.Role_OwnerId);
+    expect(user.firstName).equals(TestAuthData.owner.firstName);
+    expect(user.lastName).equals(TestAuthData.owner.lastName);
+    expect(user.recentQueries.length).equals(0);
+    expect(user.updateHistory.length).equals(1);
+    expect((user.updateHistory[0] as OpaDm.IUser).updateHistory).equals(undefined);
+    expect(user.hasBeenUpdated).equals(false);
+    expect(user.dateOfLatestUpdate).equals(null);
+    expect(user.userIdOfLatestUpdater).equals(null);
+    expect(user.dateOfLatestRoleAssignment).not.equals(null);
+    expect(user.userIdOfLatestRoleAssigner).equals(null);
+    expect(user.hasBeenViewed).equals(true);
+    expect(user.dateOfLatestViewing).not.equals(null);
+    expect(user.userIdOfLatestViewer).equals(testUserId());
+    expect(user.hasBeenDecided).equals(true);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
+    expect(user.dateOfDecision).not.equals(null);
+    expect(user.userIdOfDecider).equals(testUserId());
+    expect(OPA.isSuspended(user)).equals(false);
+    expect(user.isSuspended).equals(false);
+    expect(user.hasSuspensionStarted).equals(false);
+    expect(user.hasSuspensionEnded).equals(false);
+    expect(user.reasonForSuspensionStart).equals(null);
+    expect(user.reasonForSuspensionEnd).equals(null);
+    expect(user.dateOfSuspensionStart).equals(null);
+    expect(user.dateOfSuspensionEnd).equals(null);
+    expect(user.userIdOfSuspensionStarter).equals(null);
+    expect(user.userIdOfSuspensionEnder).equals(null);
+    expect(user.isMarkedAsDeleted).equals(false);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
+
+    config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     const firstName_Updated = (user.firstName + " UPDATED");
     let userUpdateObject = ({firstName: firstName_Updated} as OpaDm.IUserPartial);
@@ -790,6 +832,52 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
 
     // NOTE: Since the TestUser is newly created, record the userId
     TestAuthData.testUser.opaUserId = user.id;
+
+    expect(user.id).equals(TestAuthData.testUser.opaUserId);
+    expect(user.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
+    expect(user.authProviderId).equals(authProviderNonNull.id);
+    expect(user.authAccountName).equals(TestAuthData.testUser.email);
+    expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
+    expect(user.assignedRoleId).equals(OpaDm.DefaultRoleId);
+    expect(user.firstName).equals(TestAuthData.testUser.firstName);
+    expect(user.lastName).equals(TestAuthData.testUser.lastName);
+    expect(user.requestedCitationIds.length).equals(0);
+    expect(user.viewableCitationIds.length).equals(0);
+    expect(user.dateOfLatestCitationChange).equals(null);
+    expect(user.userIdOfLatestCitationChanger).equals(null);
+    expect(user.recentQueries.length).equals(0);
+    expect(user.updateHistory.length).equals(1);
+    expect((user.updateHistory[0] as OpaDm.IUser).updateHistory).equals(undefined);
+    expect(user.hasBeenUpdated).equals(false);
+    expect(user.dateOfLatestUpdate).equals(null);
+    expect(user.userIdOfLatestUpdater).equals(null);
+    expect(user.dateOfLatestRoleAssignment).not.equals(null);
+    expect(user.userIdOfLatestRoleAssigner).equals(null);
+    expect(user.hasBeenViewed).equals(false);
+    expect(user.dateOfLatestViewing).equals(null);
+    expect(user.userIdOfLatestViewer).equals(null);
+    expect(user.hasBeenDecided).equals(false);
+    expect(user.approvalState).equals(OPA.ApprovalStates.pending);
+    expect(user.dateOfDecision).equals(null);
+    expect(user.userIdOfDecider).equals(null);
+    expect(OPA.isSuspended(user)).equals(false);
+    expect(user.isSuspended).equals(false);
+    expect(user.hasSuspensionStarted).equals(false);
+    expect(user.hasSuspensionEnded).equals(false);
+    expect(user.reasonForSuspensionStart).equals(null);
+    expect(user.reasonForSuspensionEnd).equals(null);
+    expect(user.dateOfSuspensionStart).equals(null);
+    expect(user.dateOfSuspensionEnd).equals(null);
+    expect(user.userIdOfSuspensionStarter).equals(null);
+    expect(user.userIdOfSuspensionEnder).equals(null);
+    expect(user.isMarkedAsDeleted).equals(false);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
+
+    config.authenticationState = TestAuthData.testUser;
+    const invalidUpdateObject = (({updateHistory: "BLANK"} as unknown) as OpaDm.IUserPartial)
+    await expect(OpaDb.Users.queries.update(config.dataStorageState, testUserId(), invalidUpdateObject, ambientUserId())).to.eventually.be.rejectedWith(Error);
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     expect(user.id).equals(TestAuthData.testUser.opaUserId);
     expect(user.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);

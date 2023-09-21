@@ -150,16 +150,20 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
+    // NOTE: Get the document earlier to check validity before and after setting "upgradeHistory" to also make sure it was not set on the "updateObject" passed in
     const documentId = SingletonId;
+    const document = await this.getByIdWithAssert(ds, documentId);
+
     const now = OPA.nowToUse();
     const updateObject_Upgradeable = ({hasBeenUpgraded: true, dateOfLatestUpgrade: now, userIdOfLatestUpgrader} as OPA.IUpgradeable_ByUser);
     updateObject = {...updateObject, ...updateObject_Upgradeable};
+    let areValid = areUpdatesValid(document, updateObject);
+    OPA.assertIsTrue(areValid, "The requested update is invalid.");
+
     const updateObject_ForHistory = OPA.replaceFieldValuesWithSummaries({...updateObject});
     const upgradeHistory = ds.constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, upgradeHistory} as IApplicationPartial_WithHistory);
-
-    const document = await this.getByIdWithAssert(ds, documentId);
-    const areValid = areUpdatesValid(document, updateObject_WithHistory);
+    areValid = areUpdatesValid(document, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
