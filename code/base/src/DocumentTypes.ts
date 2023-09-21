@@ -823,3 +823,81 @@ export interface IDeleteable_ByUser extends IDeleteable {
 }
 export interface IDocument_Deleteable extends IDocument, IDeleteable { }
 export interface IDocument_Deleteable_ByUser extends IDocument_Deleteable, IDeleteable_ByUser { }
+
+/**
+ * Returns whether the updates to the object are valid from the perspective of the IDeleteable interface.
+ * @param {IDeleteable} original The original object.
+ * @param {IDeleteable} updated The updated object.
+ * @param {boolean} isReadOnly Whether the properties of the IDeleteable interface are read-only or not.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForDeleteable(original: IDeleteable, updated: IDeleteable, isReadOnly: boolean): boolean {
+  TC.assertNonNullish(original, "The original object must not be null.");
+  TC.assertNonNullish(updated, "The updated object must not be null.");
+
+  // NOTE: These values represent conditional IF operator, as in IF(isSet, hasDate)
+  const priorExistencesMatch = ((!original.isMarkedAsDeleted) || (!TC.isNullish(original.dateOfDeletionChange)));
+  if (!priorExistencesMatch) {
+    return false;
+  }
+  // NOTE: These values may optionally exist on any update
+  const existencesMatch = (TC.isNullish(updated.isMarkedAsDeleted) == TC.isNullish(updated.dateOfDeletionChange));
+  if (!existencesMatch) {
+    return false;
+  }
+  if (!TC.isNullish(updated.isMarkedAsDeleted)) {
+    const stateValid = (updated.isMarkedAsDeleted != original.isMarkedAsDeleted); // NOTE: This value must change for updates
+    if (!stateValid) {
+      return false;
+    }
+    if (isReadOnly) {
+      return false;
+    }
+    // NOTE: Un-deletion must be performed as a solitary action
+    if (!updated.isMarkedAsDeleted) {
+      const isDeleteable_ByUser = (TC.isOf<IDeleteable_ByUser>(updated, (value) => !TC.isNullish(value.userIdOfDeletionChanger)));
+      const propertyNames_ValidSet = (isDeleteable_ByUser) ? IDeleteable_ByUser_UnDelete_ExactValidSet_PropertyNames : IDeleteable_UnDelete_ExactValidSet_PropertyNames;
+      // NOTE: The "updateHistory" property should always be updated when other updates are made, so ignore it in the list of changes
+      const propertyNames_ForUpdate = VC.getOwnPropertyKeys(updated).filter((value) => (value != IUpdateable_WithHistory_UpdateHistory_PropertyName));
+      if (propertyNames_ValidSet.length != propertyNames_ForUpdate.length) {
+        return false;
+      }
+      if (propertyNames_ForUpdate.filter((value) => propertyNames_ValidSet.includes(value)).length != propertyNames_ForUpdate.length) {
+        return false;
+      }
+    }
+  }
+  if (!TC.isNullish(updated.dateOfDeletionChange)) {
+    const datesValid = (TC.isNullish(original.dateOfDeletionChange) || (TC.convertNonNullish(updated.dateOfDeletionChange) > TC.convertNonNullish(original.dateOfDeletionChange)));
+    if (!datesValid) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Returns whether the updates to the object are valid from the perspective of the IDeleteable_ByUser interface.
+ * @param {IDeleteable_ByUser} original The original object.
+ * @param {IDeleteable_ByUser} updated The updated object.
+ * @param {boolean} isReadOnly Whether the properties of the IDeleteable_ByUser interface are read-only or not.
+ * @return {boolean} Whether the updates are valid or not.
+ */
+export function areUpdatesValid_ForDeleteable_ByUser(original: IDeleteable_ByUser, updated: IDeleteable_ByUser, isReadOnly: boolean): boolean {
+  if (!areUpdatesValid_ForDeleteable(original, updated, isReadOnly)) {
+    return false;
+  }
+
+  // NOTE: These values may both be null or both be non-null, but not one of each
+  const priorExistencesMatch = (TC.isNullish(original.userIdOfDeletionChanger) == TC.isNullish(original.dateOfDeletionChange));
+  if (!priorExistencesMatch) {
+    return false;
+  }
+  // NOTE: These values may optionally exist on any update
+  const existencesMatch = (TC.isNullish(updated.userIdOfDeletionChanger) == TC.isNullish(updated.dateOfDeletionChange));
+  if (!existencesMatch) {
+    return false;
+  }
+  // NOTE: The "userIdOf..." value must be validated via AuthorizationState, not here
+  return true;
+}

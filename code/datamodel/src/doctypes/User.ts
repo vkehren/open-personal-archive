@@ -85,7 +85,9 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   if (!OPA.areUpdatesValid_ForApprovable_ByUser(document, updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>, (((updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>).userIdOfDecider == document.id) || (document.id == User_OwnerId)))) { // eslint-disable-line max-len
     return false;
   }
-  const userIdOfLatestUpdater = (updateObject as OPA.IUpdateable_ByUser).userIdOfLatestUpdater;
+  if (!OPA.areUpdatesValid_ForDeleteable_ByUser(document, updateObject as OPA.IDeleteable_ByUser, (((updateObject as OPA.IDeleteable_ByUser).userIdOfDeletionChanger != document.id) || (document.id == User_OwnerId)))) { // eslint-disable-line max-len
+    return false;
+  }
   const docIsArchiveOwner = ((document.id == User_OwnerId) || (document.assignedRoleId == Role_OwnerId));
 
   // NOTE: updateObject MUST NOT change read-only data
@@ -112,17 +114,6 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
 
   if (updateHistory_IsUpdated && !OPA.isOfFieldValue_ArrayUnion<firestore.FieldValue>(updateHistory_Value)) {
     return false;
-  }
-
-  // NOTE: updateObject MUST NOT change data of already deleted document BEYOND the minimum necessary to un-delete document
-  if (document.isMarkedAsDeleted) {
-    let propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
-    propertyNames_ForUpdate = propertyNames_ForUpdate.filter((propertyName) => !OPA.IDeleteable_ByUser_UnDelete_ExactValidSet_PropertyNames.includes(propertyName));
-
-    // NOTE: Any property updates beyond those necessary for un-delete are invalid
-    if (propertyNames_ForUpdate.length > 0) {
-      return false;
-    }
   }
 
   if (true) { // eslint-disable-line no-constant-condition
@@ -208,39 +199,6 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
       const endUserIsSet = !OPA.isNullish(updateObject_Suspendable.userIdOfSuspensionEnder);
 
       if (startReasonIsSet || endReasonIsSet || startDateIsSet || endDateIsSet || startUserIsSet || endUserIsSet || docIsArchiveOwner) {
-        return false;
-      }
-    }
-  }
-
-  if (true) { // eslint-disable-line no-constant-condition
-    const updateObject_Deleteable = (updateObject as OPA.IDeleteable_ByUser);
-
-    if (OPA.isUndefined(updateObject_Deleteable.isMarkedAsDeleted)) {
-      const dateIsSet = !OPA.isUndefined(updateObject_Deleteable.dateOfDeletionChange);
-      const userIsSet = !OPA.isUndefined(updateObject_Deleteable.userIdOfDeletionChanger);
-
-      if (dateIsSet || userIsSet) {
-        return false;
-      }
-    } else if (OPA.isNullish(updateObject_Deleteable.isMarkedAsDeleted)) {
-      throw new Error("The \"isMarkedAsDeleted\" property must not be set to null.");
-    } else if (updateObject_Deleteable.isMarkedAsDeleted) {
-      const docIsDeleted = document.isMarkedAsDeleted;
-      const dateNotSet = OPA.isNullish(updateObject_Deleteable.dateOfDeletionChange);
-      const userNotSet = OPA.isNullish(updateObject_Deleteable.userIdOfDeletionChanger);
-      const userNotCreator = (updateObject_Deleteable.userIdOfDeletionChanger != document.id);
-
-      if (docIsDeleted || dateNotSet || userNotSet || userNotCreator || docIsArchiveOwner) {
-        return false;
-      }
-    } else {
-      const docIsDeleted = document.isMarkedAsDeleted;
-      const dateIsSet = !OPA.isNullish(updateObject_Deleteable.dateOfDeletionChange);
-      const userIsSet = !OPA.isNullish(updateObject_Deleteable.userIdOfDeletionChanger);
-      const userCanUnDelete = (userIdOfLatestUpdater == document.id);
-
-      if ((docIsDeleted && !userCanUnDelete) || dateIsSet || userIsSet || docIsArchiveOwner) {
         return false;
       }
     }

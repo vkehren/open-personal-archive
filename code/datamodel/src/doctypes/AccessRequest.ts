@@ -62,6 +62,9 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
   if (!OPA.areUpdatesValid_ForApprovable_ByUser(document, updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>, ((updateObject as OPA.IApprovable_ByUser<OPA.ApprovalState>).userIdOfDecider == document.userIdOfCreator))) { // eslint-disable-line max-len
     return false;
   }
+  if (!OPA.areUpdatesValid_ForDeleteable_ByUser(document, updateObject as OPA.IDeleteable_ByUser, ((updateObject as OPA.IDeleteable_ByUser).userIdOfDeletionChanger != document.userIdOfCreator))) {
+    return false;
+  }
   const userIdOfLatestUpdater = (updateObject as OPA.IUpdateable_ByUser).userIdOfLatestUpdater;
 
   // NOTE: updateObject MUST NOT change read-only data
@@ -81,48 +84,6 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
 
   if (updateHistory_IsUpdated && !OPA.isOfFieldValue_ArrayUnion<firestore.FieldValue>(updateHistory_Value)) {
     return false;
-  }
-
-  // NOTE: updateObject MUST NOT change data of already deleted document BEYOND the minimum necessary to un-delete document
-  if (document.isMarkedAsDeleted) {
-    const propertyNames_NotForUnDelete = propertyNames_ForUpdate.filter((propertyName) => !OPA.IDeleteable_ByUser_UnDelete_ExactValidSet_PropertyNames.includes(propertyName));
-
-    if (propertyNames_NotForUnDelete.length > 0) {
-      return false;
-    }
-  }
-
-  if (true) { // eslint-disable-line no-constant-condition
-    const updateObject_Deleteable = (updateObject as OPA.IDeleteable_ByUser);
-
-    if (OPA.isUndefined(updateObject_Deleteable.isMarkedAsDeleted)) {
-      const dateIsSet = !OPA.isUndefined(updateObject_Deleteable.dateOfDeletionChange);
-      const userIsSet = !OPA.isUndefined(updateObject_Deleteable.userIdOfDeletionChanger);
-
-      if (dateIsSet || userIsSet) {
-        return false;
-      }
-    } else if (OPA.isNullish(updateObject_Deleteable.isMarkedAsDeleted)) {
-      throw new Error("The \"isMarkedAsDeleted\" property must not be set to null.");
-    } else if (updateObject_Deleteable.isMarkedAsDeleted) {
-      const docIsDeleted = document.isMarkedAsDeleted;
-      const dateNotSet = OPA.isNullish(updateObject_Deleteable.dateOfDeletionChange);
-      const userNotSet = OPA.isNullish(updateObject_Deleteable.userIdOfDeletionChanger);
-      const userNotCreator = (updateObject_Deleteable.userIdOfDeletionChanger != document.userIdOfCreator);
-
-      if (docIsDeleted || dateNotSet || userNotSet || userNotCreator) {
-        return false;
-      }
-    } else {
-      const docIsDeleted = document.isMarkedAsDeleted;
-      const dateIsSet = !OPA.isNullish(updateObject_Deleteable.dateOfDeletionChange);
-      const userIsSet = !OPA.isNullish(updateObject_Deleteable.userIdOfDeletionChanger);
-      const userCanUnDelete = (userIdOfLatestUpdater == document.userIdOfCreator);
-
-      if ((docIsDeleted && !userCanUnDelete) || dateIsSet || userIsSet) {
-        return false;
-      }
-    }
   }
 
   // NOTE: Only the Creator can update the message
