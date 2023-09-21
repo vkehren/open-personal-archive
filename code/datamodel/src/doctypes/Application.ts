@@ -25,7 +25,7 @@ export interface IApplication extends OPA.IDocument_Upgradeable_ByUser_WithHisto
   notes: string;
   readonly dateOfInstallation: OPA.DateToUse;
 }
-const IApplication_ReadOnlyPropertyNames = [
+const IApplication_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
   OPA.getTypedPropertyKeyAsText<IApplication>("dateOfInstallation"),
 ];
 

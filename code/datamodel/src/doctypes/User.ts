@@ -55,7 +55,7 @@ export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable
   preferredName: string | null;
   recentQueries: Array<string>;
 }
-const IUser_ReadOnlyPropertyNames = [
+const IUser_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
   OPA.getTypedPropertyKeyAsText<IUser>("firebaseAuthUserId"),
   OPA.getTypedPropertyKeyAsText<IUser>("authProviderId"),
   OPA.getTypedPropertyKeyAsText<IUser>("authAccountName"),
@@ -354,7 +354,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
    * @param {string} [assertionFailureMessage=default] The message to include in the Error if the assertion fails.
    * @return {Promise<IUser>} The User corresponding to the UUID.
    */
-  async getByFirebaseAuthUserIdWithAssert(ds: OPA.IDataStorageState, firebaseAuthUserId: string, assertionFailureMessage = "The specified ID does not correspond to a valid authenticated user."): Promise<IUser> {
+  async getByFirebaseAuthUserIdWithAssert(ds: OPA.IDataStorageState, firebaseAuthUserId: string, assertionFailureMessage = "The specified ID does not correspond to a valid authenticated user."): Promise<IUser> { // eslint-disable-line max-len
     const user = await this.getByFirebaseAuthUserId(ds, firebaseAuthUserId);
     OPA.assertDocumentIsValid(user, assertionFailureMessage, assertionFailureMessage);
     const userNonNull = OPA.convertNonNullish(user);

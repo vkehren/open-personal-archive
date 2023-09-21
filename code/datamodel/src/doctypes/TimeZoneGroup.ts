@@ -30,7 +30,7 @@ export interface ITimeZoneGroup extends OPA.IDocument_Creatable {
   readonly displayOrder: number;
   readonly isDefault: boolean;
 }
-const ITimeZoneGroup_ReadOnlyPropertyNames = [
+const ITimeZoneGroup_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
   OPA.getTypedPropertyKeyAsText<ITimeZoneGroup>("name"),
   OPA.getTypedPropertyKeyAsText<ITimeZoneGroup>("abbreviation"),
   OPA.getTypedPropertyKeyAsText<ITimeZoneGroup>("utcOffset"),

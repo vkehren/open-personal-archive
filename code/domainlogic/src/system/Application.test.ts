@@ -285,7 +285,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     const newSchemaVersion = application.schemaVersion;
 
     // NOTE: We must downgrade initial version numbers to test upgrade works properly, but we cannot use updateApplication(...) to do downgrade, so we must update the server fields directly
-    await expect(OpaDb.Application.queries.upgrade(config.dataStorageState, {applicationVersion: oldVersion, schemaVersion: oldVersion, notes: "DOWNGRADE FOR TEST"}, OpaDm.User_OwnerId)).to.eventually.be.rejectedWith(Error);
+    await expect(OpaDb.Application.queries.upgrade(config.dataStorageState, {applicationVersion: oldVersion, schemaVersion: oldVersion, notes: "DOWNGRADE FOR TEST"}, OpaDm.User_OwnerId)).to.eventually.be.rejectedWith(Error); // eslint-disable-line max-len
     const applicationRef = OpaDb.Application.getTypedCollection(config.dataStorageState).doc(application.id);
     await applicationRef.update({applicationVersion: oldVersion, schemaVersion: oldVersion});
     application = await OpaDb.Application.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ApplicationId, "The Application does not exist.");

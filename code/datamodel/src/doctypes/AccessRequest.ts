@@ -27,7 +27,7 @@ export interface IAccessRequest extends OPA.IDocument_Creatable_ByUser, OPA.IDoc
   message: OPA.ILocalizable<string>;
   response: OPA.ILocalizable<string>;
 }
-const IAccessRequest_ReadOnlyPropertyNames = [
+const IAccessRequest_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
   OPA.getTypedPropertyKeyAsText<IAccessRequest>("archiveId"),
   OPA.getTypedPropertyKeyAsText<IAccessRequest>("isSpecificToCitation"),
   OPA.getTypedPropertyKeyAsText<IAccessRequest>("citationId"),
@@ -53,19 +53,19 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
   if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObjectAsUnknown as OPA.IUpdateable_ByUser)) {
     return false;
   }
-  if (!OPA.areUpdatesValid_ForTaggable_ByUser(document, updateObjectAsUnknown as OPA.ITaggable_ByUser, ((updateObjectAsUnknown as OPA.ITaggable_ByUser).userIdOfLatestTagger == document.userIdOfCreator))) {
+  if (!OPA.areUpdatesValid_ForTaggable_ByUser(document, updateObjectAsUnknown as OPA.ITaggable_ByUser, ((updateObjectAsUnknown as OPA.ITaggable_ByUser).userIdOfLatestTagger == document.userIdOfCreator))) { // eslint-disable-line max-len
     return false;
   }
-  if (!OPA.areUpdatesValid_ForArchivable_ByUser(document, updateObjectAsUnknown as OPA.IArchivable_ByUser, ((updateObjectAsUnknown as OPA.IArchivable_ByUser).userIdOfArchivalChanger == document.userIdOfCreator))) {
+  if (!OPA.areUpdatesValid_ForArchivable_ByUser(document, updateObjectAsUnknown as OPA.IArchivable_ByUser, ((updateObjectAsUnknown as OPA.IArchivable_ByUser).userIdOfArchivalChanger == document.userIdOfCreator))) { // eslint-disable-line max-len
     return false;
   }
-  if (!OPA.areUpdatesValid_ForViewable_ByUser(document, updateObjectAsUnknown as OPA.IViewable_ByUser, ((updateObjectAsUnknown as OPA.IViewable_ByUser).userIdOfLatestViewer == document.userIdOfCreator))) {
+  if (!OPA.areUpdatesValid_ForViewable_ByUser(document, updateObjectAsUnknown as OPA.IViewable_ByUser, ((updateObjectAsUnknown as OPA.IViewable_ByUser).userIdOfLatestViewer == document.userIdOfCreator))) { // eslint-disable-line max-len
     return false;
   }
   if (!OPA.areUpdatesValid_ForApprovable_ByUser(document, updateObjectAsUnknown as OPA.IApprovable_ByUser<OPA.ApprovalState>, ((updateObjectAsUnknown as OPA.IApprovable_ByUser<OPA.ApprovalState>).userIdOfDecider == document.userIdOfCreator))) { // eslint-disable-line max-len
     return false;
   }
-  if (!OPA.areUpdatesValid_ForDeleteable_ByUser(document, updateObjectAsUnknown as OPA.IDeleteable_ByUser, ((updateObjectAsUnknown as OPA.IDeleteable_ByUser).userIdOfDeletionChanger != document.userIdOfCreator))) {
+  if (!OPA.areUpdatesValid_ForDeleteable_ByUser(document, updateObjectAsUnknown as OPA.IDeleteable_ByUser, ((updateObjectAsUnknown as OPA.IDeleteable_ByUser).userIdOfDeletionChanger != document.userIdOfCreator))) { // eslint-disable-line max-len
     return false;
   }
 

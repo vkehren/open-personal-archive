@@ -21,7 +21,7 @@ export interface IRole extends OPA.IDocument_Creatable {
   readonly displayOrder: number;
   readonly isDefault: boolean;
 }
-const IRole_ReadOnlyPropertyNames = [
+const IRole_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
   OPA.getTypedPropertyKeyAsText<IRole>("name"),
   OPA.getTypedPropertyKeyAsText<IRole>("type"),
   OPA.getTypedPropertyKeyAsText<IRole>("displayOrder"),

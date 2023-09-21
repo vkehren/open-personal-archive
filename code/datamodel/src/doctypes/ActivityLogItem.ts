@@ -19,7 +19,7 @@ export interface IActivityLogItem extends OPA.IDocument_Creatable {
   readonly userId: string | null;
   readonly otherState: Record<string, unknown> | null;
 }
-const IActivityLogItem_ReadOnlyPropertyNames = [
+const IActivityLogItem_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
   OPA.getTypedPropertyKeyAsText<IActivityLogItem>("rootLogItemId"),
   OPA.getTypedPropertyKeyAsText<IActivityLogItem>("externalLogItemId"),
   OPA.getTypedPropertyKeyAsText<IActivityLogItem>("activityType"),

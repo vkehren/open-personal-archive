@@ -29,7 +29,7 @@ export interface ILocale extends OPA.IDocument_Creatable {
   readonly displayOrder: number;
   readonly isDefault: boolean;
 }
-const ILocale_ReadOnlyPropertyNames = [
+const ILocale_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
   OPA.getTypedPropertyKeyAsText<ILocale>("optionName"),
   OPA.getTypedPropertyKeyAsText<ILocale>("optionBaseName"),
   OPA.getTypedPropertyKeyAsText<ILocale>("displayName"),

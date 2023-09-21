@@ -195,7 +195,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
-    const invalidUpdateObject = (({updateHistory: "BLANK"} as unknown) as OpaDm.IAccessRequestPartial)
+    const invalidUpdateObject = (({updateHistory: "BLANK"} as unknown) as OpaDm.IAccessRequestPartial);
     await expect(OpaDb.AccessRequests.queries.update(config.dataStorageState, accessRequestId, invalidUpdateObject, ambientUserId())).to.eventually.be.rejectedWith(Error);
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 

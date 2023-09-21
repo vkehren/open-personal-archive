@@ -26,7 +26,7 @@ export interface ITimeZone extends OPA.IDocument_Creatable {
   readonly comments: string;
   readonly displayOrder: number;
 }
-const ITimeZone_ReadOnlyPropertyNames = [
+const ITimeZone_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
   OPA.getTypedPropertyKeyAsText<ITimeZone>("name"),
   OPA.getTypedPropertyKeyAsText<ITimeZone>("countryCode"),
   OPA.getTypedPropertyKeyAsText<ITimeZone>("geoCoordinates"),

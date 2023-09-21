@@ -33,7 +33,7 @@ export interface IArchive extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_
   defaultTimeZoneGroupId: string;
   defaultTimeZoneId: string;
 }
-const IArchive_ReadOnlyPropertyNames = [
+const IArchive_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
   OPA.getTypedPropertyKeyAsText<IArchive>("ownerId"),
   OPA.getTypedPropertyKeyAsText<IArchive>("pathToStorageFolder"),
 ];

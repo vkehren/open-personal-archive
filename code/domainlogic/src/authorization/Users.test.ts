@@ -155,7 +155,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
-    const invalidUpdateObject = (({updateHistory: "BLANK"} as unknown) as OpaDm.IUserPartial)
+    const invalidUpdateObject = (({updateHistory: "BLANK"} as unknown) as OpaDm.IUserPartial);
     await expect(OpaDb.Users.queries.update(config.dataStorageState, testUserId(), invalidUpdateObject, ambientUserId())).to.eventually.be.rejectedWith(Error);
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
@@ -875,7 +875,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
-    const invalidUpdateObject = (({updateHistory: "BLANK"} as unknown) as OpaDm.IUserPartial)
+    const invalidUpdateObject = (({updateHistory: "BLANK"} as unknown) as OpaDm.IUserPartial);
     await expect(OpaDb.Users.queries.update(config.dataStorageState, testUserId(), invalidUpdateObject, ambientUserId())).to.eventually.be.rejectedWith(Error);
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
