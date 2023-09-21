@@ -191,7 +191,7 @@ export const IUpgradeable_ByUser_UserIdOfLatestUpgrader_PropertyName = VC.getTyp
 export interface IUpgradeable_ByUser extends IUpgradeable {
   readonly userIdOfLatestUpgrader: BT.Id | null;
 }
-export const IUpgradeable_WithHistory_UpgradeHistory_PropertyName = VC.getTypedPropertyKeyAsText<IUpgradeable_ByUser_WithHistory<{}>>("upgradeHistory"); // eslint-disable-line camelcase
+export const IUpgradeable_WithHistory_UpgradeHistory_PropertyName = VC.getTypedPropertyKeyAsText<IUpgradeable_ByUser_WithHistory<unknown>>("upgradeHistory"); // eslint-disable-line camelcase
 export interface IUpgradeable_WithHistory<T> extends IUpgradeable {
   readonly upgradeHistory: Array<T>;
 }
@@ -274,7 +274,7 @@ export const IUpdateable_ByUser_UserIdOfLatestUpdater_PropertyName = VC.getTyped
 export interface IUpdateable_ByUser extends IUpdateable {
   readonly userIdOfLatestUpdater: BT.Id | null;
 }
-export const IUpdateable_WithHistory_UpdateHistory_PropertyName = VC.getTypedPropertyKeyAsText<IUpdateable_ByUser_WithHistory<{}>>("updateHistory"); // eslint-disable-line camelcase
+export const IUpdateable_WithHistory_UpdateHistory_PropertyName = VC.getTypedPropertyKeyAsText<IUpdateable_ByUser_WithHistory<unknown>>("updateHistory"); // eslint-disable-line camelcase
 export interface IUpdateable_WithHistory<T> extends IUpdateable {
   readonly updateHistory: Array<T>;
 }
