@@ -364,10 +364,10 @@ export interface IDocument_AssignableToRole_ByUser extends IDocument_AssignableT
  * Returns whether the updates to the object are valid from the perspective of the IAssignableToRole interface.
  * @param {IAssignableToRole} original The original object.
  * @param {IAssignableToRole} updated The updated object.
- * @param {boolean} isReadOnly Whether the properties of the IAssignableToRole interface are read-only or not.
+ * @param {boolean} [preventUpdates=false] Whether updates to properties of the IAssignableToRole interface should be prevented or not.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForAssignableToRole(original: IAssignableToRole, updated: IAssignableToRole, isReadOnly: boolean): boolean {
+export function areUpdatesValid_ForAssignableToRole(original: IAssignableToRole, updated: IAssignableToRole, preventUpdates = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
@@ -382,7 +382,7 @@ export function areUpdatesValid_ForAssignableToRole(original: IAssignableToRole,
     return false;
   }
   if (!TC.isNullish(updated.assignedRoleId)) {
-    if (isReadOnly && (updated.assignedRoleId != original.assignedRoleId)) {
+    if (preventUpdates && (updated.assignedRoleId != original.assignedRoleId)) {
       return false;
     }
   }
@@ -399,11 +399,11 @@ export function areUpdatesValid_ForAssignableToRole(original: IAssignableToRole,
  * Returns whether the updates to the object are valid from the perspective of the IAssignableToRole_ByUser interface.
  * @param {IAssignableToRole_ByUser} original The original object.
  * @param {IAssignableToRole_ByUser} updated The updated object.
- * @param {boolean} isReadOnly Whether the properties of the IAssignableToRole_ByUser interface are read-only or not.
+ * @param {boolean} [preventUpdates=false] Whether updates to properties of the IAssignableToRole_ByUser interface should be prevented or not.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForAssignableToRole_ByUser(original: IAssignableToRole_ByUser, updated: IAssignableToRole_ByUser, isReadOnly: boolean): boolean {
-  if (!areUpdatesValid_ForAssignableToRole(original, updated, isReadOnly)) {
+export function areUpdatesValid_ForAssignableToRole_ByUser(original: IAssignableToRole_ByUser, updated: IAssignableToRole_ByUser, preventUpdates = false): boolean {
+  if (!areUpdatesValid_ForAssignableToRole(original, updated, preventUpdates)) {
     return false;
   }
 
@@ -442,10 +442,10 @@ export interface IDocument_Taggable_ByUser extends IDocument_Taggable, ITaggable
  * Returns whether the updates to the object are valid from the perspective of the ITaggable interface.
  * @param {ITaggable} original The original object.
  * @param {ITaggable} updated The updated object.
- * @param {boolean} isReadOnly Whether the properties of the ITaggable interface are read-only or not.
+ * @param {boolean} [preventUpdates=false] Whether updates to properties of the ITaggable interface should be prevented or not.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForTaggable(original: ITaggable, updated: ITaggable, isReadOnly: boolean): boolean {
+export function areUpdatesValid_ForTaggable(original: ITaggable, updated: ITaggable, preventUpdates = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
@@ -460,7 +460,7 @@ export function areUpdatesValid_ForTaggable(original: ITaggable, updated: ITagga
     return false;
   }
   if (!TC.isNullish(updated.tags)) {
-    if (isReadOnly) {
+    if (preventUpdates) {
       return false;
     }
   }
@@ -477,11 +477,11 @@ export function areUpdatesValid_ForTaggable(original: ITaggable, updated: ITagga
  * Returns whether the updates to the object are valid from the perspective of the ITaggable_ByUser interface.
  * @param {ITaggable_ByUser} original The original object.
  * @param {ITaggable_ByUser} updated The updated object.
- * @param {boolean} isReadOnly Whether the properties of the ITaggable_ByUser interface are read-only or not.
+ * @param {boolean} [preventUpdates=false] Whether updates to properties of the ITaggable_ByUser interface should be prevented or not.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForTaggable_ByUser(original: ITaggable_ByUser, updated: ITaggable_ByUser, isReadOnly: boolean): boolean {
-  if (!areUpdatesValid_ForTaggable(original, updated, isReadOnly)) {
+export function areUpdatesValid_ForTaggable_ByUser(original: ITaggable_ByUser, updated: ITaggable_ByUser, preventUpdates = false): boolean {
+  if (!areUpdatesValid_ForTaggable(original, updated, preventUpdates)) {
     return false;
   }
 
@@ -520,10 +520,10 @@ export interface IDocument_Archivable_ByUser extends IDocument_Archivable, IArch
  * Returns whether the updates to the object are valid from the perspective of the IArchivable interface.
  * @param {IArchivable} original The original object.
  * @param {IArchivable} updated The updated object.
- * @param {boolean} isReadOnly Whether the properties of the IArchivable interface are read-only or not.
+ * @param {boolean} [preventUpdates=false] Whether updates to properties of the IArchivable interface should be prevented or not.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForArchivable(original: IArchivable, updated: IArchivable, isReadOnly: boolean): boolean {
+export function areUpdatesValid_ForArchivable(original: IArchivable, updated: IArchivable, preventUpdates = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
@@ -542,7 +542,7 @@ export function areUpdatesValid_ForArchivable(original: IArchivable, updated: IA
     if (!stateValid) {
       return false;
     }
-    if (isReadOnly) {
+    if (preventUpdates) {
       return false;
     }
   }
@@ -559,11 +559,11 @@ export function areUpdatesValid_ForArchivable(original: IArchivable, updated: IA
  * Returns whether the updates to the object are valid from the perspective of the IArchivable_ByUser interface.
  * @param {IArchivable_ByUser} original The original object.
  * @param {IArchivable_ByUser} updated The updated object.
- * @param {boolean} isReadOnly Whether the properties of the IArchivable_ByUser interface are read-only or not.
+ * @param {boolean} [preventUpdates=false] Whether updates to properties of the IArchivable_ByUser interface should be prevented or not.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForArchivable_ByUser(original: IArchivable_ByUser, updated: IArchivable_ByUser, isReadOnly: boolean): boolean {
-  if (!areUpdatesValid_ForArchivable(original, updated, isReadOnly)) {
+export function areUpdatesValid_ForArchivable_ByUser(original: IArchivable_ByUser, updated: IArchivable_ByUser, preventUpdates = false): boolean {
+  if (!areUpdatesValid_ForArchivable(original, updated, preventUpdates)) {
     return false;
   }
 
@@ -602,10 +602,10 @@ export interface IDocument_Viewable_ByUser extends IDocument_Viewable, IViewable
  * Returns whether the updates to the object are valid from the perspective of the IViewable interface.
  * @param {IViewable} original The original object.
  * @param {IViewable} updated The updated object.
- * @param {boolean} isReadOnly Whether the properties of the IViewable interface are read-only or not.
+ * @param {boolean} [preventUpdates=false] Whether updates to properties of the IViewable interface should be prevented or not.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForViewable(original: IViewable, updated: IViewable, isReadOnly: boolean): boolean {
+export function areUpdatesValid_ForViewable(original: IViewable, updated: IViewable, preventUpdates = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
@@ -624,7 +624,7 @@ export function areUpdatesValid_ForViewable(original: IViewable, updated: IViewa
     if (!stateValid) {
       return false;
     }
-    if (isReadOnly) {
+    if (preventUpdates) {
       return false;
     }
   }
@@ -641,11 +641,11 @@ export function areUpdatesValid_ForViewable(original: IViewable, updated: IViewa
  * Returns whether the updates to the object are valid from the perspective of the IViewable_ByUser interface.
  * @param {IViewable_ByUser} original The original object.
  * @param {IViewable_ByUser} updated The updated object.
- * @param {boolean} isReadOnly Whether the properties of the IViewable_ByUser interface are read-only or not.
+ * @param {boolean} [preventUpdates=false] Whether updates to properties of the IViewable_ByUser interface should be prevented or not.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForViewable_ByUser(original: IViewable_ByUser, updated: IViewable_ByUser, isReadOnly: boolean): boolean {
-  if (!areUpdatesValid_ForViewable(original, updated, isReadOnly)) {
+export function areUpdatesValid_ForViewable_ByUser(original: IViewable_ByUser, updated: IViewable_ByUser, preventUpdates = false): boolean {
+  if (!areUpdatesValid_ForViewable(original, updated, preventUpdates)) {
     return false;
   }
 
@@ -686,10 +686,10 @@ export interface IDocument_Approvable_ByUser<T> extends IDocument_Approvable<T>,
  * Returns whether the updates to the object are valid from the perspective of the IApprovable<BT.ApprovalState> interface.
  * @param {IApprovable<BT.ApprovalState>} original The original object.
  * @param {IApprovable<BT.ApprovalState>} updated The updated object.
- * @param {boolean} isReadOnly Whether the properties of the IApprovable<BT.ApprovalState> interface are read-only or not.
+ * @param {boolean} [preventUpdates=false] Whether updates to properties of the IApprovable<BT.ApprovalState> interface should be prevented or not.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForApprovable(original: IApprovable<BT.ApprovalState>, updated: IApprovable<BT.ApprovalState>, isReadOnly: boolean): boolean {
+export function areUpdatesValid_ForApprovable(original: IApprovable<BT.ApprovalState>, updated: IApprovable<BT.ApprovalState>, preventUpdates = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
@@ -712,7 +712,7 @@ export function areUpdatesValid_ForApprovable(original: IApprovable<BT.ApprovalS
     if (!approvalStateValid) {
       return false;
     }
-    if (isReadOnly) {
+    if (preventUpdates) {
       return false;
     }
   }
@@ -729,11 +729,11 @@ export function areUpdatesValid_ForApprovable(original: IApprovable<BT.ApprovalS
  * Returns whether the updates to the object are valid from the perspective of the IApprovable_ByUser<BT.ApprovalState> interface.
  * @param {IApprovable_ByUser<BT.ApprovalState>} original The original object.
  * @param {IApprovable_ByUser<BT.ApprovalState>} updated The updated object.
- * @param {boolean} isReadOnly Whether the properties of the IApprovable_ByUser<BT.ApprovalState> interface are read-only or not.
+ * @param {boolean} [preventUpdates=false] Whether updates to properties of the IApprovable_ByUser<BT.ApprovalState> interface should be prevented or not.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForApprovable_ByUser(original: IApprovable_ByUser<BT.ApprovalState>, updated: IApprovable_ByUser<BT.ApprovalState>, isReadOnly: boolean): boolean {
-  if (!areUpdatesValid_ForApprovable(original, updated, isReadOnly)) {
+export function areUpdatesValid_ForApprovable_ByUser(original: IApprovable_ByUser<BT.ApprovalState>, updated: IApprovable_ByUser<BT.ApprovalState>, preventUpdates = false): boolean {
+  if (!areUpdatesValid_ForApprovable(original, updated, preventUpdates)) {
     return false;
   }
 
@@ -794,10 +794,10 @@ export function isSuspended<T extends ISuspendable>(document: T): boolean {
  * Returns whether the updates to the object are valid from the perspective of the ISuspendable interface.
  * @param {ISuspendable} original The original object.
  * @param {ISuspendable} updated The updated object.
- * @param {boolean} isReadOnly Whether the properties of the ISuspendable interface are read-only or not.
+ * @param {boolean} [preventUpdates=false] Whether updates to properties of the ISuspendable interface should be prevented or not.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForSuspendable(original: ISuspendable, updated: ISuspendable, isReadOnly: boolean): boolean {
+export function areUpdatesValid_ForSuspendable(original: ISuspendable, updated: ISuspendable, preventUpdates = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
@@ -819,7 +819,7 @@ export function areUpdatesValid_ForSuspendable(original: ISuspendable, updated: 
     if (!(stateValidStart || stateValidEnd)) {
       return false;
     }
-    if (isReadOnly) {
+    if (preventUpdates) {
       return false;
     }
   }
@@ -837,11 +837,11 @@ export function areUpdatesValid_ForSuspendable(original: ISuspendable, updated: 
  * Returns whether the updates to the object are valid from the perspective of the ISuspendable_ByUser interface.
  * @param {ISuspendable_ByUser} original The original object.
  * @param {ISuspendable_ByUser} updated The updated object.
- * @param {boolean} isReadOnly Whether the properties of the ISuspendable_ByUser interface are read-only or not.
+ * @param {boolean} [preventUpdates=false] Whether updates to properties of the ISuspendable_ByUser interface should be prevented or not.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForSuspendable_ByUser(original: ISuspendable_ByUser, updated: ISuspendable_ByUser, isReadOnly: boolean): boolean {
-  if (!areUpdatesValid_ForSuspendable(original, updated, isReadOnly)) {
+export function areUpdatesValid_ForSuspendable_ByUser(original: ISuspendable_ByUser, updated: ISuspendable_ByUser, preventUpdates = false): boolean {
+  if (!areUpdatesValid_ForSuspendable(original, updated, preventUpdates)) {
     return false;
   }
 
@@ -893,10 +893,10 @@ export interface IDocument_Deleteable_ByUser extends IDocument_Deleteable, IDele
  * Returns whether the updates to the object are valid from the perspective of the IDeleteable interface.
  * @param {IDeleteable} original The original object.
  * @param {IDeleteable} updated The updated object.
- * @param {boolean} isReadOnly Whether the properties of the IDeleteable interface are read-only or not.
+ * @param {boolean} [preventUpdates=false] Whether updates to properties of the IDeleteable interface should be prevented or not.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForDeleteable(original: IDeleteable, updated: IDeleteable, isReadOnly: boolean): boolean {
+export function areUpdatesValid_ForDeleteable(original: IDeleteable, updated: IDeleteable, preventUpdates = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
@@ -915,7 +915,7 @@ export function areUpdatesValid_ForDeleteable(original: IDeleteable, updated: ID
     if (!stateValid) {
       return false;
     }
-    if (isReadOnly) {
+    if (preventUpdates) {
       return false;
     }
     // NOTE: Un-deletion must be performed as a solitary action
@@ -945,11 +945,11 @@ export function areUpdatesValid_ForDeleteable(original: IDeleteable, updated: ID
  * Returns whether the updates to the object are valid from the perspective of the IDeleteable_ByUser interface.
  * @param {IDeleteable_ByUser} original The original object.
  * @param {IDeleteable_ByUser} updated The updated object.
- * @param {boolean} isReadOnly Whether the properties of the IDeleteable_ByUser interface are read-only or not.
+ * @param {boolean} [preventUpdates=false] Whether updates to properties of the IDeleteable_ByUser interface should be prevented or not.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForDeleteable_ByUser(original: IDeleteable_ByUser, updated: IDeleteable_ByUser, isReadOnly: boolean): boolean {
-  if (!areUpdatesValid_ForDeleteable(original, updated, isReadOnly)) {
+export function areUpdatesValid_ForDeleteable_ByUser(original: IDeleteable_ByUser, updated: IDeleteable_ByUser, preventUpdates = false): boolean {
+  if (!areUpdatesValid_ForDeleteable(original, updated, preventUpdates)) {
     return false;
   }
 
