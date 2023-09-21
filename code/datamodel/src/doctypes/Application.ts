@@ -23,6 +23,9 @@ export interface IApplication extends OPA.IDocument_Upgradeable_ByUser_WithHisto
   schemaVersion: string;
   readonly dateOfInstallation: OPA.DateToUse;
 }
+const IApplication_ReadOnlyPropertyNames = [
+  OPA.getTypedPropertyKeyAsText<IApplication>("dateOfInstallation"),
+];
 
 /**
  * Checks whether the specified updates to the specified Application document are valid.
@@ -34,21 +37,13 @@ export function areUpdatesValid(document: IApplication, updateObject: IApplicati
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument, IApplication_ReadOnlyPropertyNames)) {
     return false;
   }
   if (!OPA.areUpdatesValid_ForUpgradeable_ByUser(document, updateObject as OPA.IUpgradeable_ByUser)) {
     return false;
   }
   // NOTE: If any properties are added that can be updated without upgrading, implement IUpdateable_ByUser on Application
-
-  // NOTE: updateObject MUST NOT change read-only data
-  const propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
-  const dateOfInstallation_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).dateOfInstallation);
-
-  if (dateOfInstallation_IsUpdated) {
-    return false;
-  }
 
   // NOTE: The "applicationVersion" cannot be downgraded or updated to same value as current value
   if (!OPA.isNullish(updateObject.applicationVersion)) {

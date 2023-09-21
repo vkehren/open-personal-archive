@@ -20,8 +20,6 @@ interface IAccessRequestPartial_WithHistory extends IAccessRequestPartial, OPA.I
   updateHistory: Array<UpdateHistoryItem> | firestore.FieldValue;
 }
 
-// NOTE: Use "IDocument_Creatable_ByUser" because we must record the User who created the AccessRequest (i.e. the owner of the AccessRequest)
-// NOTE: Use "IDocument_Updateable_ByUser" because the User creating the AccessRequest updates the "message", but the Decider updates the "response"
 export interface IAccessRequest extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser_WithHistory<UpdateHistoryItem>, OPA.IDocument_Taggable_ByUser, OPA.IDocument_Archivable_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<OPA.ApprovalState>, OPA.IDocument_Deleteable_ByUser { // eslint-disable-line max-len
   readonly archiveId: string; // NOTE: This field stores information necessary to extend the OPA system to manage multiple Archives
   readonly isSpecificToCitation: boolean;
@@ -29,6 +27,11 @@ export interface IAccessRequest extends OPA.IDocument_Creatable_ByUser, OPA.IDoc
   message: OPA.ILocalizable<string>;
   response: OPA.ILocalizable<string>;
 }
+const IAccessRequest_ReadOnlyPropertyNames = [
+  OPA.getTypedPropertyKeyAsText<IAccessRequest>("archiveId"),
+  OPA.getTypedPropertyKeyAsText<IAccessRequest>("isSpecificToCitation"),
+  OPA.getTypedPropertyKeyAsText<IAccessRequest>("citationId"),
+];
 
 /**
  * Checks whether the specified updates to the specified AccessRequest document are valid.
@@ -40,7 +43,7 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument, IAccessRequest_ReadOnlyPropertyNames)) {
     return false;
   }
   if (!OPA.areUpdatesValid_ForCreatable_ByUser(document, updateObject as OPA.ICreatable_ByUser)) {
@@ -64,17 +67,8 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
   if (!OPA.areUpdatesValid_ForDeleteable_ByUser(document, updateObject as OPA.IDeleteable_ByUser, ((updateObject as OPA.IDeleteable_ByUser).userIdOfDeletionChanger != document.userIdOfCreator))) {
     return false;
   }
+
   const userIdOfLatestUpdater = (updateObject as OPA.IUpdateable_ByUser).userIdOfLatestUpdater;
-
-  // NOTE: updateObject MUST NOT change read-only data
-  const propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
-  const archiveId_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).archiveId);
-  const isSpecificToCitation_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).isSpecificToCitation);
-  const citationId_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).citationId);
-
-  if (archiveId_IsUpdated || isSpecificToCitation_IsUpdated || citationId_IsUpdated) {
-    return false;
-  }
 
   // NOTE: Only the Creator can update the message
   if (!OPA.isUndefined(updateObject.message) && !OPA.areEqual(document.message, updateObject.message)) {

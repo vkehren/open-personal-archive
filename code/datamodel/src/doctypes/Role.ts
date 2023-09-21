@@ -21,6 +21,12 @@ export interface IRole extends OPA.IDocument_Creatable {
   readonly displayOrder: number;
   readonly isDefault: boolean;
 }
+const IRole_ReadOnlyPropertyNames = [
+  OPA.getTypedPropertyKeyAsText<IRole>("name"),
+  OPA.getTypedPropertyKeyAsText<IRole>("type"),
+  OPA.getTypedPropertyKeyAsText<IRole>("displayOrder"),
+  OPA.getTypedPropertyKeyAsText<IRole>("isDefault"),
+];
 
 type IRolePartial = unknown;
 /**
@@ -33,7 +39,7 @@ export function areUpdatesValid(document: IRole, updateObject: IRolePartial): bo
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument, IRole_ReadOnlyPropertyNames)) {
     return false;
   }
   if (!OPA.areUpdatesValid_ForCreatable(document, updateObject as OPA.ICreatable)) {

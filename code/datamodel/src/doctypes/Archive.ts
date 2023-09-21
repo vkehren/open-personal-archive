@@ -33,6 +33,10 @@ export interface IArchive extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_
   defaultTimeZoneGroupId: string;
   defaultTimeZoneId: string;
 }
+const IArchive_ReadOnlyPropertyNames = [
+  OPA.getTypedPropertyKeyAsText<IArchive>("ownerId"),
+  OPA.getTypedPropertyKeyAsText<IArchive>("pathToStorageFolder"),
+];
 
 /**
  * Checks whether the specified updates to the specified Archive document are valid.
@@ -44,7 +48,7 @@ export function areUpdatesValid(document: IArchive, updateObject: IArchivePartia
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument, IArchive_ReadOnlyPropertyNames)) {
     return false;
   }
   if (!OPA.areUpdatesValid_ForCreatable_ByUser(document, updateObject as OPA.ICreatable_ByUser)) {
@@ -54,14 +58,6 @@ export function areUpdatesValid(document: IArchive, updateObject: IArchivePartia
     return false;
   }
 
-  // NOTE: updateObject MUST NOT change read-only data
-  const propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
-  const ownerId_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).ownerId);
-  const pathToStorageFolder_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).pathToStorageFolder);
-
-  if (ownerId_IsUpdated || pathToStorageFolder_IsUpdated) {
-    return false;
-  }
   return true;
 }
 

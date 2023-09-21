@@ -30,6 +30,15 @@ export interface ITimeZoneGroup extends OPA.IDocument_Creatable {
   readonly displayOrder: number;
   readonly isDefault: boolean;
 }
+const ITimeZoneGroup_ReadOnlyPropertyNames = [
+  OPA.getTypedPropertyKeyAsText<ITimeZoneGroup>("name"),
+  OPA.getTypedPropertyKeyAsText<ITimeZoneGroup>("abbreviation"),
+  OPA.getTypedPropertyKeyAsText<ITimeZoneGroup>("utcOffset"),
+  OPA.getTypedPropertyKeyAsText<ITimeZoneGroup>("primaryTimeZoneId"),
+  OPA.getTypedPropertyKeyAsText<ITimeZoneGroup>("primaryTimeZoneName"),
+  OPA.getTypedPropertyKeyAsText<ITimeZoneGroup>("displayOrder"),
+  OPA.getTypedPropertyKeyAsText<ITimeZoneGroup>("isDefault"),
+];
 
 type ITimeZoneGroupPartial = unknown;
 /**
@@ -42,7 +51,7 @@ export function areUpdatesValid(document: ITimeZoneGroup, updateObject: ITimeZon
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument, ITimeZoneGroup_ReadOnlyPropertyNames)) {
     return false;
   }
   if (!OPA.areUpdatesValid_ForCreatable(document, updateObject as OPA.ICreatable)) {

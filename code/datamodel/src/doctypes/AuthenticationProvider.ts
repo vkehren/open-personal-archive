@@ -16,6 +16,12 @@ export interface IAuthenticationProvider extends OPA.IDocument_Creatable {
   readonly displayOrder: number;
   readonly isDefault: boolean;
 }
+const IAuthenticationProvider_ReadOnlyPropertyNames = [
+  OPA.getTypedPropertyKeyAsText<IAuthenticationProvider>("name"),
+  OPA.getTypedPropertyKeyAsText<IAuthenticationProvider>("externalId"),
+  OPA.getTypedPropertyKeyAsText<IAuthenticationProvider>("displayOrder"),
+  OPA.getTypedPropertyKeyAsText<IAuthenticationProvider>("isDefault"),
+];
 
 type IAuthenticationProviderPartial = unknown;
 /**
@@ -28,7 +34,7 @@ export function areUpdatesValid(document: IAuthenticationProvider, updateObject:
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument, IAuthenticationProvider_ReadOnlyPropertyNames)) {
     return false;
   }
   if (!OPA.areUpdatesValid_ForCreatable(document, updateObject as OPA.ICreatable)) {

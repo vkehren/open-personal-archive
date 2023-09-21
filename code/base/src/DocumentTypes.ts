@@ -46,9 +46,10 @@ export function assertDocumentIsValid<T extends IDocument>(document: T | null | 
  * Returns whether the updates to the object are valid from the perspective of the IDocument interface.
  * @param {IDocument} original The original object.
  * @param {IDocument} updated The updated object.
+ * @param {Array<string>} [readOnlyPropertyNames=[]] The list of property names that are invalid to update.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForDocument(original: IDocument, updated: IDocument): boolean {
+export function areUpdatesValid_ForDocument(original: IDocument, updated: IDocument, readOnlyPropertyNames = ([] as Array<string>)): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
@@ -60,6 +61,11 @@ export function areUpdatesValid_ForDocument(original: IDocument, updated: IDocum
     if (!idsMatch) {
       return false;
     }
+  }
+  const updatedPropertyNames = VC.getOwnPropertyKeys(updated);
+  const readOnlyPropertyUpdates = readOnlyPropertyNames.filter((value) => (updatedPropertyNames.includes(value)));
+  if (readOnlyPropertyUpdates.length > 0) {
+    return false;
   }
   return true;
 }

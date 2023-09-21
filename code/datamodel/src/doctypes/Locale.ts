@@ -29,6 +29,13 @@ export interface ILocale extends OPA.IDocument_Creatable {
   readonly displayOrder: number;
   readonly isDefault: boolean;
 }
+const ILocale_ReadOnlyPropertyNames = [
+  OPA.getTypedPropertyKeyAsText<ILocale>("optionName"),
+  OPA.getTypedPropertyKeyAsText<ILocale>("optionBaseName"),
+  OPA.getTypedPropertyKeyAsText<ILocale>("displayName"),
+  OPA.getTypedPropertyKeyAsText<ILocale>("displayOrder"),
+  OPA.getTypedPropertyKeyAsText<ILocale>("isDefault"),
+];
 
 type ILocalePartial = unknown;
 /**
@@ -41,7 +48,7 @@ export function areUpdatesValid(document: ILocale, updateObject: ILocalePartial)
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument, ILocale_ReadOnlyPropertyNames)) {
     return false;
   }
   if (!OPA.areUpdatesValid_ForCreatable(document, updateObject as OPA.ICreatable)) {

@@ -19,6 +19,19 @@ export interface IActivityLogItem extends OPA.IDocument_Creatable {
   readonly userId: string | null;
   readonly otherState: Record<string, unknown> | null;
 }
+const IActivityLogItem_ReadOnlyPropertyNames = [
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("rootLogItemId"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("externalLogItemId"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("activityType"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("requestor"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("resource"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("resourceCanonical"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("action"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("data"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("firebaseAuthUserId"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("userId"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("otherState"),
+];
 
 type IActivityLogItemPartial = unknown;
 /**
@@ -31,7 +44,7 @@ export function areUpdatesValid(document: IActivityLogItem, updateObject: IActiv
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument, IActivityLogItem_ReadOnlyPropertyNames)) {
     return false;
   }
   if (!OPA.areUpdatesValid_ForCreatable(document, updateObject as OPA.ICreatable)) {

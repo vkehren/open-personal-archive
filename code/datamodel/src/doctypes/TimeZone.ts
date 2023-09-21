@@ -26,6 +26,13 @@ export interface ITimeZone extends OPA.IDocument_Creatable {
   readonly comments: string;
   readonly displayOrder: number;
 }
+const ITimeZone_ReadOnlyPropertyNames = [
+  OPA.getTypedPropertyKeyAsText<ITimeZone>("name"),
+  OPA.getTypedPropertyKeyAsText<ITimeZone>("countryCode"),
+  OPA.getTypedPropertyKeyAsText<ITimeZone>("geoCoordinates"),
+  OPA.getTypedPropertyKeyAsText<ITimeZone>("comments"),
+  OPA.getTypedPropertyKeyAsText<ITimeZone>("displayOrder"),
+];
 
 type ITimeZonePartial = unknown;
 /**
@@ -38,7 +45,7 @@ export function areUpdatesValid(document: ITimeZone, updateObject: ITimeZonePart
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument, ITimeZone_ReadOnlyPropertyNames)) {
     return false;
   }
   if (!OPA.areUpdatesValid_ForCreatable(document, updateObject as OPA.ICreatable)) {

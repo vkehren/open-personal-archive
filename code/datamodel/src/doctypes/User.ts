@@ -55,6 +55,12 @@ export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable
   preferredName: string | null;
   recentQueries: Array<string>;
 }
+const IUser_ReadOnlyPropertyNames = [
+  OPA.getTypedPropertyKeyAsText<IUser>("firebaseAuthUserId"),
+  OPA.getTypedPropertyKeyAsText<IUser>("authProviderId"),
+  OPA.getTypedPropertyKeyAsText<IUser>("authAccountName"),
+  OPA.getTypedPropertyKeyAsText<IUser>("authAccountNameLowered"),
+];
 
 /**
  * Checks whether the specified updates to the specified User document are valid.
@@ -67,7 +73,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   OPA.assertNonNullish(updateObject);
 
   const docIsArchiveOwner = ((document.id == User_OwnerId) || (document.assignedRoleId == Role_OwnerId));
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument)) {
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject as OPA.IDocument, IUser_ReadOnlyPropertyNames)) {
     return false;
   }
   if (!OPA.areUpdatesValid_ForCreatable(document, updateObject as OPA.ICreatable)) {
@@ -92,46 +98,29 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
     return false;
   }
 
-  // NOTE: updateObject MUST NOT change read-only data
   const updateObject_CitationAccessor = (updateObject as ICitationAccessorPartial);
 
-  const propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
-  const firebaseAuthUserId_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).firebaseAuthUserId);
-  const authProviderId_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).authProviderId);
-  const authAccountName_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).authAccountName);
-  const authAccountNameLowered_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).authAccountNameLowered);
-  const requestedCitationIds_UpdateUsesInterface = (!OPA.isNullish(updateObject_CitationAccessor.dateOfLatestCitationChange));
-  const requestedCitationIds_IsUpdatedDirectly = (!requestedCitationIds_UpdateUsesInterface && propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).requestedCitationIds));
-  const viewableCitationIds_UpdateUsesInterface = requestedCitationIds_UpdateUsesInterface;
-  const viewableCitationIds_IsUpdatedDirectly = (!viewableCitationIds_UpdateUsesInterface && propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).viewableCitationIds));
+  // NOTE: Unlike most interfaces used in this fuction, ICitationAccessor only requires that one of the two array properties is updated
+  if (OPA.isUndefined(updateObject_CitationAccessor.requestedCitationIds) && OPA.isUndefined(updateObject_CitationAccessor.viewableCitationIds)) {
+    const dateIsSet = !OPA.isUndefined(updateObject_CitationAccessor.dateOfLatestCitationChange);
+    const userIsSet = !OPA.isUndefined(updateObject_CitationAccessor.userIdOfLatestCitationChanger);
 
-  if (firebaseAuthUserId_IsUpdated || authProviderId_IsUpdated || authAccountName_IsUpdated || authAccountNameLowered_IsUpdated || requestedCitationIds_IsUpdatedDirectly || viewableCitationIds_IsUpdatedDirectly) { // eslint-disable-line max-len
-    return false;
-  }
+    if (dateIsSet || userIsSet) {
+      return false;
+    }
+  } else if (OPA.isNull(updateObject_CitationAccessor.requestedCitationIds)) {
+    throw new Error("The \"requestedCitationIds\" property must not be set to null.");
+  } else if (OPA.isNull(updateObject_CitationAccessor.viewableCitationIds)) {
+    throw new Error("The \"viewableCitationIds\" property must not be set to null.");
+  } else {
+    const dateNotSet = OPA.isNullish(updateObject_CitationAccessor.dateOfLatestCitationChange);
+    const userNotSet = OPA.isNullish(updateObject_CitationAccessor.userIdOfLatestCitationChanger);
+    const dateNotCreation = (document.dateOfCreation != (updateObject as OPA.IAssignableToRole_ByUser).dateOfLatestRoleAssignment);
+    const isRequestedNotSelfAssigned = (!OPA.isNullish(updateObject_CitationAccessor.requestedCitationIds) && (updateObject_CitationAccessor.userIdOfLatestCitationChanger != document.id));
+    const isViewableSelfAssigned = (!OPA.isNullish(updateObject_CitationAccessor.viewableCitationIds) && (updateObject_CitationAccessor.userIdOfLatestCitationChanger == document.id));
 
-  if (true) { // eslint-disable-line no-constant-condition
-    // NOTE: Unlike most interfaces used in this fuction, ICitationAccessor only requires that one of the two array properties is updated
-    if (OPA.isUndefined(updateObject_CitationAccessor.requestedCitationIds) && OPA.isUndefined(updateObject_CitationAccessor.viewableCitationIds)) {
-      const dateIsSet = !OPA.isUndefined(updateObject_CitationAccessor.dateOfLatestCitationChange);
-      const userIsSet = !OPA.isUndefined(updateObject_CitationAccessor.userIdOfLatestCitationChanger);
-
-      if (dateIsSet || userIsSet) {
-        return false;
-      }
-    } else if (OPA.isNull(updateObject_CitationAccessor.requestedCitationIds)) {
-      throw new Error("The \"requestedCitationIds\" property must not be set to null.");
-    } else if (OPA.isNull(updateObject_CitationAccessor.viewableCitationIds)) {
-      throw new Error("The \"viewableCitationIds\" property must not be set to null.");
-    } else {
-      const dateNotSet = OPA.isNullish(updateObject_CitationAccessor.dateOfLatestCitationChange);
-      const userNotSet = OPA.isNullish(updateObject_CitationAccessor.userIdOfLatestCitationChanger);
-      const dateNotCreation = (document.dateOfCreation != (updateObject as OPA.IAssignableToRole_ByUser).dateOfLatestRoleAssignment);
-      const isRequestedNotSelfAssigned = (!OPA.isNullish(updateObject_CitationAccessor.requestedCitationIds) && (updateObject_CitationAccessor.userIdOfLatestCitationChanger != document.id));
-      const isViewableSelfAssigned = (!OPA.isNullish(updateObject_CitationAccessor.viewableCitationIds) && (updateObject_CitationAccessor.userIdOfLatestCitationChanger == document.id));
-
-      if ((dateNotSet && dateNotCreation) || (userNotSet && dateNotCreation) || isRequestedNotSelfAssigned || isViewableSelfAssigned) {
-        return false;
-      }
+    if ((dateNotSet && dateNotCreation) || (userNotSet && dateNotCreation) || isRequestedNotSelfAssigned || isViewableSelfAssigned) {
+      return false;
     }
   }
   return true;
