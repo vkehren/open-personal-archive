@@ -420,10 +420,9 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    const roleToAssign = await OpaDb.Roles.queries.getById(config.dataStorageState, OpaDm.Role_ViewerId);
-    const roleToAssignNonNull = OPA.convertNonNullish(roleToAssign);
-    if (functionType == "logic") {await expect(Users.assignUserToRole(callState, testUserId(), roleToAssignNonNull.id)).to.eventually.be.rejectedWith(Error);}
-    else {await expect(OpaDb.Users.queries.assignToRole(config.dataStorageState, testUserId(), roleToAssignNonNull, ambientUserId())).to.eventually.be.rejectedWith(Error);}
+    const roleToAssign = await OpaDb.Roles.queries.getByIdWithAssert(config.dataStorageState, OpaDm.Role_ViewerId);
+    if (functionType == "logic") {await expect(Users.assignUserToRole(callState, testUserId(), roleToAssign.id)).to.eventually.be.rejectedWith(Error);}
+    else {await expect(OpaDb.Users.queries.assignToRole(config.dataStorageState, testUserId(), roleToAssign, ambientUserId())).to.eventually.be.rejectedWith(Error);}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     expect(user.id).equals(TestAuthData.owner.opaUserId);
@@ -1261,11 +1260,10 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    const roleToAssign = await OpaDb.Roles.queries.getById(config.dataStorageState, OpaDm.Role_AdministratorId);
-    const roleToAssignNonNull = OPA.convertNonNullish(roleToAssign);
-    OPA.assertIsFalse(OpaDm.DefaultRoleId == roleToAssignNonNull.id);
-    if (functionType == "logic") {await expect(Users.assignUserToRole(callState, testUserId(), roleToAssignNonNull.id)).to.eventually.be.rejectedWith(Error);}
-    else {await expect(OpaDb.Users.queries.assignToRole(config.dataStorageState, testUserId(), roleToAssignNonNull, ambientUserId())).to.eventually.be.rejectedWith(Error);}
+    const roleToAssign = await OpaDb.Roles.queries.getByIdWithAssert(config.dataStorageState, OpaDm.Role_AdministratorId);
+    OPA.assertIsFalse(OpaDm.DefaultRoleId == roleToAssign.id);
+    if (functionType == "logic") {await expect(Users.assignUserToRole(callState, testUserId(), roleToAssign.id)).to.eventually.be.rejectedWith(Error);}
+    else {await expect(OpaDb.Users.queries.assignToRole(config.dataStorageState, testUserId(), roleToAssign, ambientUserId())).to.eventually.be.rejectedWith(Error);}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     expect(user.id).equals(TestAuthData.testUser.opaUserId);
@@ -1310,8 +1308,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    if (functionType == "logic") {await Users.assignUserToRole(callState, testUserId(), roleToAssignNonNull.id);}
-    else {await OpaDb.Users.queries.assignToRole(config.dataStorageState, testUserId(), roleToAssignNonNull, ambientUserId());}
+    if (functionType == "logic") {await Users.assignUserToRole(callState, testUserId(), roleToAssign.id);}
+    else {await OpaDb.Users.queries.assignToRole(config.dataStorageState, testUserId(), roleToAssign, ambientUserId());}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     expect(user.id).equals(TestAuthData.testUser.opaUserId);
@@ -1319,7 +1317,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.authProviderId).equals(authProviderNonNull.id);
     expect(user.authAccountName).equals(TestAuthData.testUser.email);
     expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
-    expect(user.assignedRoleId).equals(roleToAssignNonNull.id);
+    expect(user.assignedRoleId).equals(roleToAssign.id);
     expect(user.firstName).equals(firstName_Updated);
     expect(user.lastName).equals(lastName_Updated);
     expect(user.requestedCitationIds.length).equals(0);
@@ -1370,7 +1368,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.authProviderId).equals(authProviderNonNull.id);
     expect(user.authAccountName).equals(TestAuthData.testUser.email);
     expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
-    expect(user.assignedRoleId).equals(roleToAssignNonNull.id);
+    expect(user.assignedRoleId).equals(roleToAssign.id);
     expect(user.firstName).equals(firstName_Updated);
     expect(user.lastName).equals(lastName_Updated);
     expect(user.requestedCitationIds.length).equals(1);
@@ -1421,7 +1419,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.authProviderId).equals(authProviderNonNull.id);
     expect(user.authAccountName).equals(TestAuthData.testUser.email);
     expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
-    expect(user.assignedRoleId).equals(roleToAssignNonNull.id);
+    expect(user.assignedRoleId).equals(roleToAssign.id);
     expect(user.firstName).equals(firstName_Updated);
     expect(user.lastName).equals(lastName_Updated);
     expect(user.requestedCitationIds.length).equals(2);
@@ -1472,7 +1470,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.authProviderId).equals(authProviderNonNull.id);
     expect(user.authAccountName).equals(TestAuthData.testUser.email);
     expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
-    expect(user.assignedRoleId).equals(roleToAssignNonNull.id);
+    expect(user.assignedRoleId).equals(roleToAssign.id);
     expect(user.firstName).equals(firstName_Updated);
     expect(user.lastName).equals(lastName_Updated);
     expect(user.requestedCitationIds.length).equals(2);
@@ -1523,7 +1521,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.authProviderId).equals(authProviderNonNull.id);
     expect(user.authAccountName).equals(TestAuthData.testUser.email);
     expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
-    expect(user.assignedRoleId).equals(roleToAssignNonNull.id);
+    expect(user.assignedRoleId).equals(roleToAssign.id);
     expect(user.firstName).equals(firstName_Updated);
     expect(user.lastName).equals(lastName_Updated);
     expect(user.requestedCitationIds.length).equals(2);
@@ -1569,7 +1567,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.authProviderId).equals(authProviderNonNull.id);
     expect(user.authAccountName).equals(TestAuthData.testUser.email);
     expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
-    expect(user.assignedRoleId).equals(roleToAssignNonNull.id);
+    expect(user.assignedRoleId).equals(roleToAssign.id);
     expect(user.firstName).equals(firstName_Updated);
     expect(user.lastName).equals(lastName_Updated);
     expect(user.requestedCitationIds.length).equals(2);
@@ -1615,7 +1613,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.authProviderId).equals(authProviderNonNull.id);
     expect(user.authAccountName).equals(TestAuthData.testUser.email);
     expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
-    expect(user.assignedRoleId).equals(roleToAssignNonNull.id);
+    expect(user.assignedRoleId).equals(roleToAssign.id);
     expect(user.firstName).equals(firstName_Updated);
     expect(user.lastName).equals(lastName_Updated);
     expect(user.requestedCitationIds.length).equals(2);
@@ -1661,7 +1659,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.authProviderId).equals(authProviderNonNull.id);
     expect(user.authAccountName).equals(TestAuthData.testUser.email);
     expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
-    expect(user.assignedRoleId).equals(roleToAssignNonNull.id);
+    expect(user.assignedRoleId).equals(roleToAssign.id);
     expect(user.firstName).equals(firstName_Updated);
     expect(user.lastName).equals(lastName_Updated);
     expect(user.requestedCitationIds.length).equals(2);
@@ -1707,7 +1705,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.authProviderId).equals(authProviderNonNull.id);
     expect(user.authAccountName).equals(TestAuthData.testUser.email);
     expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
-    expect(user.assignedRoleId).equals(roleToAssignNonNull.id);
+    expect(user.assignedRoleId).equals(roleToAssign.id);
     expect(user.firstName).equals(firstName_Updated);
     expect(user.lastName).equals(lastName_Updated);
     expect(user.requestedCitationIds.length).equals(2);
@@ -1753,7 +1751,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.authProviderId).equals(authProviderNonNull.id);
     expect(user.authAccountName).equals(TestAuthData.testUser.email);
     expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
-    expect(user.assignedRoleId).equals(roleToAssignNonNull.id);
+    expect(user.assignedRoleId).equals(roleToAssign.id);
     expect(user.firstName).equals(firstName_Updated);
     expect(user.lastName).equals(lastName_Updated);
     expect(user.requestedCitationIds.length).equals(2);
@@ -1799,7 +1797,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.authProviderId).equals(authProviderNonNull.id);
     expect(user.authAccountName).equals(TestAuthData.testUser.email);
     expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
-    expect(user.assignedRoleId).equals(roleToAssignNonNull.id);
+    expect(user.assignedRoleId).equals(roleToAssign.id);
     expect(user.firstName).equals(firstName_Updated);
     expect(user.lastName).equals(lastName_Updated);
     expect(user.requestedCitationIds.length).equals(2);
@@ -1845,7 +1843,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.authProviderId).equals(authProviderNonNull.id);
     expect(user.authAccountName).equals(TestAuthData.testUser.email);
     expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
-    expect(user.assignedRoleId).equals(roleToAssignNonNull.id);
+    expect(user.assignedRoleId).equals(roleToAssign.id);
     expect(user.firstName).equals(firstName_Updated);
     expect(user.lastName).equals(lastName_Updated);
     expect(user.requestedCitationIds.length).equals(2);
@@ -1891,7 +1889,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.authProviderId).equals(authProviderNonNull.id);
     expect(user.authAccountName).equals(TestAuthData.testUser.email);
     expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
-    expect(user.assignedRoleId).equals(roleToAssignNonNull.id);
+    expect(user.assignedRoleId).equals(roleToAssign.id);
     expect(user.firstName).equals(firstName_Updated);
     expect(user.lastName).equals(lastName_Updated);
     expect(user.requestedCitationIds.length).equals(2);
@@ -1937,7 +1935,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.authProviderId).equals(authProviderNonNull.id);
     expect(user.authAccountName).equals(TestAuthData.testUser.email);
     expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
-    expect(user.assignedRoleId).equals(roleToAssignNonNull.id);
+    expect(user.assignedRoleId).equals(roleToAssign.id);
     expect(user.firstName).equals(firstName_Updated);
     expect(user.lastName).equals(lastName_Updated);
     expect(user.requestedCitationIds.length).equals(2);
@@ -1983,7 +1981,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.authProviderId).equals(authProviderNonNull.id);
     expect(user.authAccountName).equals(TestAuthData.testUser.email);
     expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
-    expect(user.assignedRoleId).equals(roleToAssignNonNull.id);
+    expect(user.assignedRoleId).equals(roleToAssign.id);
     expect(user.firstName).equals(firstName_Updated);
     expect(user.lastName).equals(lastName_Updated);
     expect(user.requestedCitationIds.length).equals(2);
@@ -2029,7 +2027,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.authProviderId).equals(authProviderNonNull.id);
     expect(user.authAccountName).equals(TestAuthData.testUser.email);
     expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
-    expect(user.assignedRoleId).equals(roleToAssignNonNull.id);
+    expect(user.assignedRoleId).equals(roleToAssign.id);
     expect(user.firstName).equals(firstName_Updated);
     expect(user.lastName).equals(lastName_Updated);
     expect(user.requestedCitationIds.length).equals(2);

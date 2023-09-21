@@ -199,57 +199,51 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     const currentLocale = OPA.convertNonNullish(callState.authorizationState).locale;
     await expect(Application.updateInstallationSettings(callState, undefined, undefined, undefined, undefined, undefined)).to.be.rejectedWith(Error);
 
-    let archive = await OpaDb.Archive.queries.getById(config.dataStorageState, OpaDm.ArchiveId);
-    OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
-    let archiveNonNull = OPA.convertNonNullish(archive);
+    let archive = await OpaDb.Archive.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ArchiveId, "The Archive does not exist.");
 
-    expect(archiveNonNull.name[currentLocale.optionName]).equals(archiveOriginal.name[currentLocale.optionName]);
-    expect(archiveNonNull.description[currentLocale.optionName]).equals(archiveOriginal.description[currentLocale.optionName]);
-    expect(archiveNonNull.defaultLocaleId).equals(archiveOriginal.defaultLocaleId);
-    expect(archiveNonNull.defaultTimeZoneGroupId).equals(archiveOriginal.defaultTimeZoneGroupId);
-    expect(archiveNonNull.defaultTimeZoneId).equals(archiveOriginal.defaultTimeZoneId);
-    expect(archiveNonNull.updateHistory.length).equals(1);
-    expect((archiveNonNull.updateHistory[0] as OpaDm.IArchive).updateHistory).equals(undefined);
-    expect(archiveNonNull.hasBeenUpdated).equals(false);
-    expect(archiveNonNull.dateOfLatestUpdate).equals(null);
-    expect(archiveNonNull.userIdOfLatestUpdater).equals(null);
+    expect(archive.name[currentLocale.optionName]).equals(archiveOriginal.name[currentLocale.optionName]);
+    expect(archive.description[currentLocale.optionName]).equals(archiveOriginal.description[currentLocale.optionName]);
+    expect(archive.defaultLocaleId).equals(archiveOriginal.defaultLocaleId);
+    expect(archive.defaultTimeZoneGroupId).equals(archiveOriginal.defaultTimeZoneGroupId);
+    expect(archive.defaultTimeZoneId).equals(archiveOriginal.defaultTimeZoneId);
+    expect(archive.updateHistory.length).equals(1);
+    expect((archive.updateHistory[0] as OpaDm.IArchive).updateHistory).equals(undefined);
+    expect(archive.hasBeenUpdated).equals(false);
+    expect(archive.dateOfLatestUpdate).equals(null);
+    expect(archive.userIdOfLatestUpdater).equals(null);
 
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     const nameUpdated = archiveOriginal.name[currentLocale.optionName] + " UPDATED";
     await Application.updateInstallationSettings(callState, nameUpdated, undefined, undefined, undefined, undefined);
 
-    archive = await OpaDb.Archive.queries.getById(config.dataStorageState, OpaDm.ArchiveId);
-    OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
-    archiveNonNull = OPA.convertNonNullish(archive);
+    archive = await OpaDb.Archive.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ArchiveId, "The Archive does not exist.");
 
-    expect(archiveNonNull.name[currentLocale.optionName]).equals(nameUpdated);
-    expect(archiveNonNull.description[currentLocale.optionName]).equals(archiveOriginal.description[currentLocale.optionName]);
-    expect(archiveNonNull.defaultLocaleId).equals(archiveOriginal.defaultLocaleId);
-    expect(archiveNonNull.defaultTimeZoneGroupId).equals(archiveOriginal.defaultTimeZoneGroupId);
-    expect(archiveNonNull.defaultTimeZoneId).equals(archiveOriginal.defaultTimeZoneId);
-    expect(archiveNonNull.updateHistory.length).equals(2);
-    expect(archiveNonNull.hasBeenUpdated).equals(true);
-    expect(archiveNonNull.dateOfLatestUpdate).not.equals(null);
-    expect(archiveNonNull.userIdOfLatestUpdater).equals(currentUser.id);
+    expect(archive.name[currentLocale.optionName]).equals(nameUpdated);
+    expect(archive.description[currentLocale.optionName]).equals(archiveOriginal.description[currentLocale.optionName]);
+    expect(archive.defaultLocaleId).equals(archiveOriginal.defaultLocaleId);
+    expect(archive.defaultTimeZoneGroupId).equals(archiveOriginal.defaultTimeZoneGroupId);
+    expect(archive.defaultTimeZoneId).equals(archiveOriginal.defaultTimeZoneId);
+    expect(archive.updateHistory.length).equals(2);
+    expect(archive.hasBeenUpdated).equals(true);
+    expect(archive.dateOfLatestUpdate).not.equals(null);
+    expect(archive.userIdOfLatestUpdater).equals(currentUser.id);
 
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     const descriptionUpdated = archiveOriginal.description[currentLocale.optionName] + " UPDATED";
     const defaultLocaleIdUpdated = (OpaDb.Locales.requiredDocuments.find((v) => !v.isDefault) as OpaDm.ILocale).id;
     await Application.updateInstallationSettings(callState, undefined, descriptionUpdated, defaultLocaleIdUpdated, undefined, undefined);
 
-    archive = await OpaDb.Archive.queries.getById(config.dataStorageState, OpaDm.ArchiveId);
-    OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
-    archiveNonNull = OPA.convertNonNullish(archive);
+    archive = await OpaDb.Archive.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ArchiveId, "The Archive does not exist.");
 
-    expect(archiveNonNull.name[currentLocale.optionName]).equals(nameUpdated);
-    expect(archiveNonNull.description[currentLocale.optionName]).equals(descriptionUpdated);
-    expect(archiveNonNull.defaultLocaleId).equals(defaultLocaleIdUpdated);
-    expect(archiveNonNull.defaultTimeZoneGroupId).equals(archiveOriginal.defaultTimeZoneGroupId);
-    expect(archiveNonNull.defaultTimeZoneId).equals(archiveOriginal.defaultTimeZoneId);
-    expect(archiveNonNull.updateHistory.length).equals(3);
-    expect(archiveNonNull.hasBeenUpdated).equals(true);
-    expect(archiveNonNull.dateOfLatestUpdate).not.equals(null);
-    expect(archiveNonNull.userIdOfLatestUpdater).equals(currentUser.id);
+    expect(archive.name[currentLocale.optionName]).equals(nameUpdated);
+    expect(archive.description[currentLocale.optionName]).equals(descriptionUpdated);
+    expect(archive.defaultLocaleId).equals(defaultLocaleIdUpdated);
+    expect(archive.defaultTimeZoneGroupId).equals(archiveOriginal.defaultTimeZoneGroupId);
+    expect(archive.defaultTimeZoneId).equals(archiveOriginal.defaultTimeZoneId);
+    expect(archive.updateHistory.length).equals(3);
+    expect(archive.hasBeenUpdated).equals(true);
+    expect(archive.dateOfLatestUpdate).not.equals(null);
+    expect(archive.userIdOfLatestUpdater).equals(currentUser.id);
 
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     const defaultTimeZoneGroupUpdated = (OpaDb.TimeZoneGroups.requiredDocuments.find((v) => !v.isDefault) as OpaDm.ITimeZoneGroup);
@@ -257,19 +251,17 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     const defaultTimeZoneIdUpdated = defaultTimeZoneGroupUpdated.primaryTimeZoneId;
     await Application.updateInstallationSettings(callState, undefined, undefined, undefined, defaultTimeZoneGroupIdUpdated, defaultTimeZoneIdUpdated);
 
-    archive = await OpaDb.Archive.queries.getById(config.dataStorageState, OpaDm.ArchiveId);
-    OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
-    archiveNonNull = OPA.convertNonNullish(archive);
+    archive = await OpaDb.Archive.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ArchiveId, "The Archive does not exist.");
 
-    expect(archiveNonNull.name[currentLocale.optionName]).equals(nameUpdated);
-    expect(archiveNonNull.description[currentLocale.optionName]).equals(descriptionUpdated);
-    expect(archiveNonNull.defaultLocaleId).equals(defaultLocaleIdUpdated);
-    expect(archiveNonNull.defaultTimeZoneGroupId).equals(defaultTimeZoneGroupIdUpdated);
-    expect(archiveNonNull.defaultTimeZoneId).equals(defaultTimeZoneIdUpdated);
-    expect(archiveNonNull.updateHistory.length).equals(4);
-    expect(archiveNonNull.hasBeenUpdated).equals(true);
-    expect(archiveNonNull.dateOfLatestUpdate).not.equals(null);
-    expect(archiveNonNull.userIdOfLatestUpdater).equals(currentUser.id);
+    expect(archive.name[currentLocale.optionName]).equals(nameUpdated);
+    expect(archive.description[currentLocale.optionName]).equals(descriptionUpdated);
+    expect(archive.defaultLocaleId).equals(defaultLocaleIdUpdated);
+    expect(archive.defaultTimeZoneGroupId).equals(defaultTimeZoneGroupIdUpdated);
+    expect(archive.defaultTimeZoneId).equals(defaultTimeZoneIdUpdated);
+    expect(archive.updateHistory.length).equals(4);
+    expect(archive.hasBeenUpdated).equals(true);
+    expect(archive.dateOfLatestUpdate).not.equals(null);
+    expect(archive.userIdOfLatestUpdater).equals(currentUser.id);
   });
 
   // IMPORTANT: You must build the domainlogic package before running this test so that the PackageInfo.ts files contain the correct VERSION values
@@ -285,49 +277,40 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     // NOTE: Since the System version has not changed, this call should fail
     let callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     expect(Application.performUpgrade(callState)).to.be.rejectedWith(Error);
-
-    let application = await OpaDb.Application.queries.getById(config.dataStorageState, OpaDm.ApplicationId);
-    OPA.assertDocumentIsValid(application, "The Application does not exist.");
-    let applicationNonNull = OPA.convertNonNullish(application);
+    let application = await OpaDb.Application.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ApplicationId, "The Application does not exist.");
 
     const oldVersion = "0.0.0.1";
-    const oldDateOfInstallation = applicationNonNull.dateOfInstallation;
-    const newApplicationVersion = applicationNonNull.applicationVersion;
-    const newSchemaVersion = applicationNonNull.schemaVersion;
+    const oldDateOfInstallation = application.dateOfInstallation;
+    const newApplicationVersion = application.applicationVersion;
+    const newSchemaVersion = application.schemaVersion;
 
     // NOTE: We must downgrade initial version numbers to test upgrade works properly, but we cannot use updateApplication(...) to do downgrade, so we must update the server fields directly
     await expect(OpaDb.Application.queries.upgrade(config.dataStorageState, {applicationVersion: oldVersion, schemaVersion: oldVersion}, OpaDm.User_OwnerId)).to.eventually.be.rejectedWith(Error);
-    const applicationRef = OpaDb.Application.getTypedCollection(config.dataStorageState).doc(applicationNonNull.id);
+    const applicationRef = OpaDb.Application.getTypedCollection(config.dataStorageState).doc(application.id);
     await applicationRef.update({applicationVersion: oldVersion, schemaVersion: oldVersion});
+    application = await OpaDb.Application.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ApplicationId, "The Application does not exist.");
 
-    application = await OpaDb.Application.queries.getById(config.dataStorageState, OpaDm.ApplicationId);
-    OPA.assertDocumentIsValid(application, "The Application does not exist.");
-    applicationNonNull = OPA.convertNonNullish(application);
-
-    expect(applicationNonNull.applicationVersion).equals(oldVersion);
-    expect(applicationNonNull.schemaVersion).equals(oldVersion);
-    expect(applicationNonNull.upgradeHistory.length).equals(1);
-    expect((applicationNonNull.upgradeHistory[0] as OpaDm.IApplication).upgradeHistory).equals(undefined);
-    expect(applicationNonNull.dateOfInstallation.valueOf()).equals(oldDateOfInstallation.valueOf());
-    expect(applicationNonNull.hasBeenUpgraded).equals(false);
-    expect(applicationNonNull.dateOfLatestUpgrade).equals(null);
-    expect(applicationNonNull.userIdOfLatestUpgrader).equals(null);
+    expect(application.applicationVersion).equals(oldVersion);
+    expect(application.schemaVersion).equals(oldVersion);
+    expect(application.upgradeHistory.length).equals(1);
+    expect((application.upgradeHistory[0] as OpaDm.IApplication).upgradeHistory).equals(undefined);
+    expect(application.dateOfInstallation.valueOf()).equals(oldDateOfInstallation.valueOf());
+    expect(application.hasBeenUpgraded).equals(false);
+    expect(application.dateOfLatestUpgrade).equals(null);
+    expect(application.userIdOfLatestUpgrader).equals(null);
 
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     await Application.performUpgrade(callState);
-
-    application = await OpaDb.Application.queries.getById(config.dataStorageState, OpaDm.ApplicationId);
-    OPA.assertDocumentIsValid(application, "The Application does not exist.");
-    applicationNonNull = OPA.convertNonNullish(application);
+    application = await OpaDb.Application.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ApplicationId, "The Application does not exist.");
 
     const authorizationState = OPA.convertNonNullish(callState.authorizationState);
-    expect(applicationNonNull.applicationVersion).equals(newApplicationVersion);
-    expect(applicationNonNull.schemaVersion).equals(newSchemaVersion);
-    expect(applicationNonNull.upgradeHistory.length).equals(2);
-    expect(applicationNonNull.dateOfInstallation.valueOf()).equals(oldDateOfInstallation.valueOf());
-    expect(applicationNonNull.hasBeenUpgraded).equals(true);
-    expect(applicationNonNull.dateOfLatestUpgrade).not.equals(null);
-    expect(applicationNonNull.userIdOfLatestUpgrader).equals(authorizationState.user.id);
+    expect(application.applicationVersion).equals(newApplicationVersion);
+    expect(application.schemaVersion).equals(newSchemaVersion);
+    expect(application.upgradeHistory.length).equals(2);
+    expect(application.dateOfInstallation.valueOf()).equals(oldDateOfInstallation.valueOf());
+    expect(application.hasBeenUpgraded).equals(true);
+    expect(application.dateOfLatestUpgrade).not.equals(null);
+    expect(application.userIdOfLatestUpgrader).equals(authorizationState.user.id);
   });
 
   afterEach(async () => {

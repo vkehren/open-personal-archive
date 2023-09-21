@@ -36,9 +36,6 @@ export async function requestUserAccess(callState: OpaDm.ICallState, message: st
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
-  const accessRequestReRead = await OpaDb.AccessRequests.queries.getById(callState.dataStorageState, accessRequestId);
-  OPA.assertDocumentIsValid(accessRequestReRead, "The requested AccessRequest does not exist.");
-  const accessRequestReReadNonNull = OPA.convertNonNullish(accessRequestReRead);
-
-  return accessRequestReReadNonNull;
+  const accessRequestReRead = await OpaDb.AccessRequests.queries.getByIdWithAssert(callState.dataStorageState, accessRequestId, "The requested AccessRequest does not exist.");
+  return accessRequestReRead;
 }

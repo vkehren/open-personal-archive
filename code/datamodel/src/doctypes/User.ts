@@ -358,6 +358,20 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   }
 
   /**
+   * Gets the User by that User's Firebase Authentication UUID, since that UUID is also a unique key, and asserts that the User is valid (i.e. is non-null and has non-null "id" property).
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
+   * @param {string} firebaseAuthUserId The ID for the User within the Firebase Authentication system.
+   * @param {string} [assertionFailureMessage=default] The message to include in the Error if the assertion fails.
+   * @return {Promise<IUser>} The User corresponding to the UUID.
+   */
+  async getByFirebaseAuthUserIdWithAssert(ds: OPA.IDataStorageState, firebaseAuthUserId: string, assertionFailureMessage = "The specified ID does not correspond to a valid authenticated user."): Promise<IUser> {
+    const user = await this.getByFirebaseAuthUserId(ds, firebaseAuthUserId);
+    OPA.assertDocumentIsValid(user, assertionFailureMessage, assertionFailureMessage);
+    const userNonNull = OPA.convertNonNullish(user);
+    return userNonNull;
+  }
+
+  /**
    * Creates the instance of the IUser document type that owns the Archive stored on the server.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} firebaseAuthUserId The ID for the User within the Firebase Authentication system.

@@ -83,6 +83,20 @@ export class AuthenticationProviderQuerySet extends OPA.QuerySet<IAuthentication
     const proxiedAuthProvider = this.documentProxyConstructor(authProvider);
     return proxiedAuthProvider;
   }
+
+  /**
+   * Gets the Authentication Provider by that Provider's externally provided ID, since that ID is also a unique key, and asserts that the Authentication Provider is valid (i.e. is non-null and has non-null "id" property).
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
+   * @param {string} externalId The ID for the Authentication Provider that is provided by the corresponding Provider.
+   * @param {string} [assertionFailureMessage=default] The message to include in the Error if the assertion fails.
+   * @return {Promise<IAuthenticationProvider>} The Authentication Provider corresponding to the ID.
+   */
+  async getByExternalAuthProviderIdWithAssert(ds: OPA.IDataStorageState, externalId: string, assertionFailureMessage = "The specified ID does not correspond to a valid authentication provider."): Promise<IAuthenticationProvider> {
+    const authProvider = await this.getByExternalAuthProviderId(ds, externalId);
+    OPA.assertDocumentIsValid(authProvider, assertionFailureMessage, assertionFailureMessage);
+    const authProviderNonNull = OPA.convertNonNullish(authProvider);
+    return authProviderNonNull;
+  }
 }
 
 export const CollectionDescriptor = new OPA.CollectionDescriptor<IAuthenticationProvider, AuthenticationProviderQuerySet, void>(SingularName, PluralName, IsSingleton, (cd) => new AuthenticationProviderQuerySet(cd), null, RequiredDocuments); // eslint-disable-line max-len
