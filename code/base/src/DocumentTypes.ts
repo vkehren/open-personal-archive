@@ -212,8 +212,8 @@ export function areUpdatesValid_ForUpgradeable(original: IUpgradeable, updated: 
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
   // NOTE: These values may both be false or both be true, but not one of each
-  const priorExistencesMatch = ((!original.hasBeenUpgraded) == TC.isNullish(original.dateOfLatestUpgrade));
-  if (!priorExistencesMatch) {
+  const priorExistencesValid = ((!original.hasBeenUpgraded) == TC.isNullish(original.dateOfLatestUpgrade));
+  if (!priorExistencesValid) {
     return false;
   }
   // NOTE: These values may optionally exist on any update
@@ -295,8 +295,8 @@ export function areUpdatesValid_ForUpdateable(original: IUpdateable, updated: IU
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
   // NOTE: These values may both be false or both be true, but not one of each
-  const priorExistencesMatch = ((!original.hasBeenUpdated) == TC.isNullish(original.dateOfLatestUpdate));
-  if (!priorExistencesMatch) {
+  const priorExistencesValid = ((!original.hasBeenUpdated) == TC.isNullish(original.dateOfLatestUpdate));
+  if (!priorExistencesValid) {
     return false;
   }
   // NOTE: These values must exist on any update
@@ -457,8 +457,8 @@ export function areUpdatesValid_ForTaggable(original: ITaggable, updated: ITagga
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
   // NOTE: These values may both be false or both be true, but not one of each
-  const priorExistencesMatch = (VC.isEmpty(original.tags) == TC.isNullish(original.dateOfLatestTagging));
-  if (!priorExistencesMatch) {
+  const priorExistencesValid = (VC.isEmpty(original.tags) == TC.isNullish(original.dateOfLatestTagging));
+  if (!priorExistencesValid) {
     return false;
   }
   // NOTE: These values may optionally exist on any update
@@ -535,8 +535,8 @@ export function areUpdatesValid_ForArchivable(original: IArchivable, updated: IA
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
   // NOTE: These values represent conditional IF operator, as in IF(isSet, hasDate)
-  const priorExistencesMatch = ((!original.isArchived) || (!TC.isNullish(original.dateOfArchivalChange)));
-  if (!priorExistencesMatch) {
+  const priorExistencesValid = ((!original.isArchived) || (!TC.isNullish(original.dateOfArchivalChange)));
+  if (!priorExistencesValid) {
     return false;
   }
   // NOTE: These values may optionally exist on any update
@@ -617,8 +617,8 @@ export function areUpdatesValid_ForViewable(original: IViewable, updated: IViewa
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
   // NOTE: These values may both be false or both be true, but not one of each
-  const priorExistencesMatch = ((!original.hasBeenViewed) == TC.isNullish(original.dateOfLatestViewing));
-  if (!priorExistencesMatch) {
+  const priorExistencesValid = ((!original.hasBeenViewed) == TC.isNullish(original.dateOfLatestViewing));
+  if (!priorExistencesValid) {
     return false;
   }
   // NOTE: These values may optionally exist on any update
@@ -701,8 +701,8 @@ export function areUpdatesValid_ForApprovable(original: IApprovable<BT.ApprovalS
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
   // NOTE: These values may both be false or both be true, but not one of each
-  const priorExistencesMatch = (((!original.hasBeenDecided) == (original.approvalState == BT.ApprovalStates.pending)) && ((!original.hasBeenDecided) == TC.isNullish(original.dateOfDecision)));
-  if (!priorExistencesMatch) {
+  const priorExistencesValid = (((!original.hasBeenDecided) == (original.approvalState == BT.ApprovalStates.pending)) && ((!original.hasBeenDecided) == TC.isNullish(original.dateOfDecision)));
+  if (!priorExistencesValid) {
     return false;
   }
   // NOTE: These values may optionally exist on any update
@@ -836,8 +836,8 @@ export function areUpdatesValid_ForDeleteable(original: IDeleteable, updated: ID
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
   // NOTE: These values represent conditional IF operator, as in IF(isSet, hasDate)
-  const priorExistencesMatch = ((!original.isMarkedAsDeleted) || (!TC.isNullish(original.dateOfDeletionChange)));
-  if (!priorExistencesMatch) {
+  const priorExistencesValid = ((!original.isMarkedAsDeleted) || (!TC.isNullish(original.dateOfDeletionChange)));
+  if (!priorExistencesValid) {
     return false;
   }
   // NOTE: These values may optionally exist on any update
