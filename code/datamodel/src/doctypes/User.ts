@@ -77,7 +77,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObject as OPA.IUpdateable_ByUser)) {
     return false;
   }
-  if (!OPA.areUpdatesValid_ForAssignableToRole_ByUser(document, updateObject as OPA.IAssignableToRole_ByUser, docIsArchiveOwner, {dateOfCreation: document.dateOfCreation, userIdOfCreator: document.id})) { // eslint-disable-line max-len
+  if (!OPA.areUpdatesValid_ForAssignableToRole_ByUser(document, updateObject as OPA.IAssignableToRole_ByUser, ((updateObject as OPA.IAssignableToRole_ByUser).userIdOfLatestRoleAssigner == document.id) || docIsArchiveOwner)) { // eslint-disable-line max-len
     return false;
   }
   if (!OPA.areUpdatesValid_ForViewable_ByUser(document, updateObject as OPA.IViewable_ByUser, ((updateObject as OPA.IViewable_ByUser).userIdOfLatestViewer == document.id))) {

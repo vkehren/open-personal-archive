@@ -400,16 +400,15 @@ export function areUpdatesValid_ForAssignableToRole(original: IAssignableToRole,
  * @param {IAssignableToRole_ByUser} original The original object.
  * @param {IAssignableToRole_ByUser} updated The updated object.
  * @param {boolean} isReadOnly Whether the properties of the IAssignableToRole_ByUser interface are read-only or not.
- * @param {ICreatable_ByUser} creationInfo The creation info for the original object.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForAssignableToRole_ByUser(original: IAssignableToRole_ByUser, updated: IAssignableToRole_ByUser, isReadOnly: boolean, creationInfo: ICreatable_ByUser): boolean {
+export function areUpdatesValid_ForAssignableToRole_ByUser(original: IAssignableToRole_ByUser, updated: IAssignableToRole_ByUser, isReadOnly: boolean): boolean {
   if (!areUpdatesValid_ForAssignableToRole(original, updated, isReadOnly)) {
     return false;
   }
 
-  // NOTE: When the System assigns the Role at creation, the "userId..." should be null
-  const priorExistencesValid = (!TC.isNullish(original.userIdOfLatestRoleAssigner) || (VC.areDatesEqual(original.dateOfLatestRoleAssignment, creationInfo.dateOfCreation)));
+  // NOTE: When the System assigns the Role at creation, the "userId..." should be null, so use conditional IF operator
+  const priorExistencesValid = ((!(!TC.isNullish(original.userIdOfLatestRoleAssigner))) || (!TC.isNullish(original.dateOfLatestRoleAssignment)));
   if (!priorExistencesValid) {
     return false;
   }
@@ -418,13 +417,7 @@ export function areUpdatesValid_ForAssignableToRole_ByUser(original: IAssignable
   if (!existencesMatch) {
     return false;
   }
-  // NOTE: The "userIdOf..." value may also be validated via AuthorizationState elsewhere
-  if (!TC.isNullish(updated.userIdOfLatestRoleAssigner)) {
-    const isSelfAssigned = (updated.userIdOfLatestRoleAssigner == creationInfo.userIdOfCreator);
-    if (isSelfAssigned) {
-      return false;
-    }
-  }
+  // NOTE: The "userIdOf..." value must be validated via AuthorizationState, not here
   return true;
 }
 
