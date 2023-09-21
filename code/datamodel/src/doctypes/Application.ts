@@ -158,9 +158,8 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
     const upgradeHistory = ds.constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, upgradeHistory} as IApplicationPartial_WithHistory);
 
-    const document = await this.getById(ds, documentId);
-    OPA.assertNonNullish(document);
-    const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
+    const document = await this.getByIdWithAssert(ds, documentId);
+    const areValid = areUpdatesValid(document, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());

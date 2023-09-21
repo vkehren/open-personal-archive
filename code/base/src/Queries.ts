@@ -11,6 +11,7 @@ export interface IQuerySet<T extends DT.IDocument> {
   readonly collectionDescriptor: ST.ITypedCollectionDescriptor<T>;
   documentProxyConstructor: BT.ProxyFunc<T>;
   getById(ds: FB.IDataStorageState, id: string): Promise<T | null>;
+  getByIdWithAssert(ds: FB.IDataStorageState, id: string, assertionFailureMessage: string): Promise<T>;
   getAll(ds: FB.IDataStorageState, pathFromRoot?: Array<ST.INestedCollectionStep> | undefined): Promise<Array<T>>;
 }
 
@@ -87,6 +88,20 @@ export class QuerySet<T extends DT.IDocument> implements IQuerySet<T> {
     const documentNonNull = TC.convertNonNullish(document);
     const proxiedDocument = this.documentProxyConstructor(documentNonNull);
     return proxiedDocument;
+  }
+
+  /**
+   * Gets a Document by that Document's ID and asserts that the Document is valid (i.e. is non-null and has non-null "id" property).
+   * @param {FB.IDataStorageState} ds The state container for data storage.
+   * @param {string} id The ID for the Document within the OPA system.
+   * @param {string} [assertionFailureMessage=default] The message to include in the Error if the assertion fails.
+   * @return {Promise<T>} The Document corresponding to the ID.
+   */
+  async getByIdWithAssert(ds: FB.IDataStorageState, id: string, assertionFailureMessage = "The specified ID does not correspond to a valid document."): Promise<T> {
+    const document = await this.getById(ds, id);
+    DT.assertDocumentIsValid(document, assertionFailureMessage, assertionFailureMessage);
+    const documentNonNull = TC.convertNonNullish(document);
+    return documentNonNull;
   }
 
   /**

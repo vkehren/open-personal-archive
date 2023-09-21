@@ -465,9 +465,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
-    const document = await this.getById(ds, documentId);
-    OPA.assertNonNullish(document);
-    const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
+    const document = await this.getByIdWithAssert(ds, documentId);
+    const areValid = areUpdatesValid(document, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
@@ -498,9 +497,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
-    const document = await this.getById(ds, documentId);
-    OPA.assertNonNullish(document);
-    const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
+    const document = await this.getByIdWithAssert(ds, documentId);
+    const areValid = areUpdatesValid(document, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
@@ -532,9 +530,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
-    const document = await this.getById(ds, documentId);
-    OPA.assertNonNullish(document);
-    const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
+    const document = await this.getByIdWithAssert(ds, documentId);
+    const areValid = areUpdatesValid(document, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
@@ -566,9 +563,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
-    const document = await this.getById(ds, documentId);
-    OPA.assertNonNullish(document);
-    const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
+    const document = await this.getByIdWithAssert(ds, documentId);
+    const areValid = areUpdatesValid(document, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
@@ -597,9 +593,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
-    const document = await this.getById(ds, documentId);
-    OPA.assertNonNullish(document);
-    const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
+    const document = await this.getByIdWithAssert(ds, documentId);
+    const areValid = areUpdatesValid(document, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
@@ -629,9 +624,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
-    const document = await this.getById(ds, documentId);
-    OPA.assertNonNullish(document);
-    const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
+    const document = await this.getByIdWithAssert(ds, documentId);
+    const areValid = areUpdatesValid(document, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
@@ -654,11 +648,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     OPA.assertFirestoreIsNotNullish(ds.db);
 
     // NOTE: We need the document earlier in this function to get the existing values for ISuspendable_ByUser
-    const document = await this.getById(ds, documentId);
-    OPA.assertNonNullish(document);
-    const documentNonNull = OPA.convertNonNullish(document);
-
-    OPA.assertIsFalse(OPA.isSuspended(documentNonNull), "The User must not be suspended before the User is suspended.");
+    const document = await this.getByIdWithAssert(ds, documentId);
+    OPA.assertIsFalse(OPA.isSuspended(document), "The User must not be suspended before the User is suspended.");
 
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
@@ -668,7 +659,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
-    const areValid = areUpdatesValid(documentNonNull, updateObject_WithHistory);
+    const areValid = areUpdatesValid(document, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
@@ -691,14 +682,12 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     OPA.assertFirestoreIsNotNullish(ds.db);
 
     // NOTE: We need the document earlier in this function to get the existing values for ISuspendable_ByUser
-    const document = await this.getById(ds, documentId);
-    OPA.assertNonNullish(document);
-    const documentNonNull = OPA.convertNonNullish(document);
-
-    OPA.assertIsTrue(OPA.isSuspended(documentNonNull), "The User must be suspended before the User is un-suspended.");
-    const reasonForSuspensionStart = documentNonNull.reasonForSuspensionStart;
-    const dateOfSuspensionStart = documentNonNull.dateOfSuspensionStart;
-    const userIdOfSuspensionStarter = documentNonNull.userIdOfSuspensionStarter;
+    const document = await this.getByIdWithAssert(ds, documentId);
+    OPA.assertIsTrue(OPA.isSuspended(document), "The User must be suspended before the User is un-suspended.");
+    // LATER: Rather than setting the following fields to their current value, explore deleting these fields from the update object
+    const reasonForSuspensionStart = document.reasonForSuspensionStart;
+    const dateOfSuspensionStart = document.dateOfSuspensionStart;
+    const userIdOfSuspensionStarter = document.userIdOfSuspensionStarter;
 
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
@@ -708,7 +697,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
-    const areValid = areUpdatesValid(documentNonNull, updateObject_WithHistory);
+    const areValid = areUpdatesValid(document, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
@@ -737,9 +726,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
-    const document = await this.getById(ds, documentId);
-    OPA.assertNonNullish(document);
-    const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
+    const document = await this.getByIdWithAssert(ds, documentId);
+    const areValid = areUpdatesValid(document, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
@@ -768,9 +756,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
-    const document = await this.getById(ds, documentId);
-    OPA.assertNonNullish(document);
-    const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
+    const document = await this.getByIdWithAssert(ds, documentId);
+    const areValid = areUpdatesValid(document, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
