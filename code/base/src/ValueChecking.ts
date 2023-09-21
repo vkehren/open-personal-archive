@@ -76,6 +76,17 @@ export function getOwnPropertyKeys(obj: unknown): Array<BT.KeyText> {
 }
 
 /**
+ * Gets the property value specified directly on an object.
+ * @param {unknown} obj The incoming object.
+ * @param {BT.KeyText} propName The property name to get.
+ * @return {T} The value for the property stored in the object.
+ */
+export function getOwnPropertyValue<T>(obj: unknown, propName: BT.KeyText): T {
+  const propertyValue = (obj as Record<BT.KeyText, T>)[propName];
+  return propertyValue;
+}
+
+/**
  * Gets the property key specified directly on type T as text.
  * @param {BT.TypedKeyText<T>} typedKey A property key that exists on type T.
  * @param {T | undefined} [obj=undefined] An object of type T.
