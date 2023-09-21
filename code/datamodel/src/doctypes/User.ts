@@ -54,7 +54,6 @@ export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable
   lastName: string;
   preferredName: string | null;
   recentQueries: Array<string>;
-  readonly updateHistory: Array<UpdateHistoryItem>;
 }
 
 /**
@@ -107,15 +106,6 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   const viewableCitationIds_IsUpdatedDirectly = (!viewableCitationIds_UpdateUsesInterface && propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).viewableCitationIds));
 
   if (firebaseAuthUserId_IsUpdated || authProviderId_IsUpdated || authAccountName_IsUpdated || authAccountNameLowered_IsUpdated || requestedCitationIds_IsUpdatedDirectly || viewableCitationIds_IsUpdatedDirectly) { // eslint-disable-line max-len
-    return false;
-  }
-
-  // NOTE: updateObject MUST NOT erase read-only history of changes
-  const updateHistory_KeyText = OPA.getTypedPropertyKeysAsText(document).updateHistory;
-  const updateHistory_IsUpdated = propertyNames_ForUpdate.includes(updateHistory_KeyText);
-  const updateHistory_Value = (updateObject as Record<string, unknown>)[updateHistory_KeyText];
-
-  if (updateHistory_IsUpdated && !OPA.isOfFieldValue_ArrayUnion<firestore.FieldValue>(updateHistory_Value)) {
     return false;
   }
 

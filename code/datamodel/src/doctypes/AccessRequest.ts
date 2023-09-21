@@ -28,7 +28,6 @@ export interface IAccessRequest extends OPA.IDocument_Creatable_ByUser, OPA.IDoc
   readonly citationId: string | null;
   message: OPA.ILocalizable<string>;
   response: OPA.ILocalizable<string>;
-  readonly updateHistory: Array<UpdateHistoryItem>;
 }
 
 /**
@@ -74,15 +73,6 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
   const citationId_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).citationId);
 
   if (archiveId_IsUpdated || isSpecificToCitation_IsUpdated || citationId_IsUpdated) {
-    return false;
-  }
-
-  // NOTE: updateObject MUST NOT erase read-only history of changes
-  const updateHistory_KeyText = OPA.getTypedPropertyKeysAsText(document).updateHistory;
-  const updateHistory_IsUpdated = propertyNames_ForUpdate.includes(updateHistory_KeyText);
-  const updateHistory_Value = (updateObject as Record<string, unknown>)[updateHistory_KeyText];
-
-  if (updateHistory_IsUpdated && !OPA.isOfFieldValue_ArrayUnion<firestore.FieldValue>(updateHistory_Value)) {
     return false;
   }
 

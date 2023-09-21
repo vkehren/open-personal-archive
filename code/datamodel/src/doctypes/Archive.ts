@@ -32,7 +32,6 @@ export interface IArchive extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_
   defaultLocaleId: string;
   defaultTimeZoneGroupId: string;
   defaultTimeZoneId: string;
-  readonly updateHistory: Array<UpdateHistoryItem>;
 }
 
 /**
@@ -61,15 +60,6 @@ export function areUpdatesValid(document: IArchive, updateObject: IArchivePartia
   const pathToStorageFolder_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).pathToStorageFolder);
 
   if (ownerId_IsUpdated || pathToStorageFolder_IsUpdated) {
-    return false;
-  }
-
-  // NOTE: updateObject MUST NOT erase read-only history of changes
-  const updateHistory_KeyText = OPA.getTypedPropertyKeysAsText(document).updateHistory;
-  const updateHistory_IsUpdated = propertyNames_ForUpdate.includes(updateHistory_KeyText);
-  const updateHistory_Value = (updateObject as Record<string, unknown>)[updateHistory_KeyText];
-
-  if (updateHistory_IsUpdated && !OPA.isOfFieldValue_ArrayUnion<firestore.FieldValue>(updateHistory_Value)) {
     return false;
   }
   return true;

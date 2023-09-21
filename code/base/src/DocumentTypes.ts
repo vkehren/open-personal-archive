@@ -1,4 +1,6 @@
+import * as firestore from "@google-cloud/firestore";
 import * as BT from "./BaseTypes";
+import * as FB from "./Firebase";
 import * as TC from "./TypeChecking";
 import * as VC from "./ValueChecking";
 
@@ -239,6 +241,15 @@ export function areUpdatesValid_ForUpgradeable(original: IUpgradeable, updated: 
       return false;
     }
   }
+  if (TC.isOf<IUpgradeHistoryProvider<unknown>>(original, (value) => (!TC.isNullish(value.upgradeHistory)))) {
+    if (VC.getOwnPropertyKeys(updated).includes(IUpgradeHistoryProvider_UpgradeHistory_PropertyName)) {
+      // NOTE: The "updated" object MUST NOT erase the read-only history of changes, so it MUST use ArrayUnion to perform updates on this property
+      const upgradeHistory = VC.getOwnPropertyValue(updated, IUpgradeHistoryProvider_UpgradeHistory_PropertyName);
+      if (!FB.isOfFieldValue_ArrayUnion<firestore.FieldValue>(upgradeHistory)) {
+        return false;
+      }
+    }
+  }
   return true;
 }
 
@@ -327,6 +338,15 @@ export function areUpdatesValid_ForUpdateable(original: IUpdateable, updated: IU
     const datesValid = (TC.isNullish(original.dateOfLatestUpdate) || (TC.convertNonNullish(updated.dateOfLatestUpdate) > TC.convertNonNullish(original.dateOfLatestUpdate)));
     if (!datesValid) {
       return false;
+    }
+  }
+  if (TC.isOf<IUpdateHistoryProvider<unknown>>(original, (value) => (!TC.isNullish(value.updateHistory)))) {
+    if (VC.getOwnPropertyKeys(updated).includes(IUpdateHistoryProvider_UpdateHistory_PropertyName)) {
+      // NOTE: The "updated" object MUST NOT erase the read-only history of changes, so it MUST use ArrayUnion to perform updates on this property
+      const updateHistory = VC.getOwnPropertyValue(updated, IUpdateHistoryProvider_UpdateHistory_PropertyName);
+      if (!FB.isOfFieldValue_ArrayUnion<firestore.FieldValue>(updateHistory)) {
+        return false;
+      }
     }
   }
   return true;

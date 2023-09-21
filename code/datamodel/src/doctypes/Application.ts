@@ -21,7 +21,6 @@ interface IApplicationPartial_WithHistory extends IApplicationPartial, OPA.IUpgr
 export interface IApplication extends OPA.IDocument_Upgradeable_ByUser_WithHistory<UpgradeHistoryItem> {
   applicationVersion: string;
   schemaVersion: string;
-  readonly upgradeHistory: Array<UpgradeHistoryItem>;
   readonly dateOfInstallation: OPA.DateToUse;
 }
 
@@ -48,15 +47,6 @@ export function areUpdatesValid(document: IApplication, updateObject: IApplicati
   const dateOfInstallation_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).dateOfInstallation);
 
   if (dateOfInstallation_IsUpdated) {
-    return false;
-  }
-
-  // NOTE: updateObject MUST NOT erase read-only history of upgrades
-  const upgradeHistory_KeyText = OPA.getTypedPropertyKeysAsText(document).upgradeHistory;
-  const upgradeHistory_IsUpdated = propertyNames_ForUpdate.includes(upgradeHistory_KeyText);
-  const upgradeHistory_Value = (updateObject as Record<string, unknown>)[upgradeHistory_KeyText];
-
-  if (upgradeHistory_IsUpdated && !OPA.isOfFieldValue_ArrayUnion<firestore.FieldValue>(upgradeHistory_Value)) {
     return false;
   }
 
