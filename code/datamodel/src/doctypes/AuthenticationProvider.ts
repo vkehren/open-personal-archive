@@ -61,7 +61,7 @@ export class AuthenticationProviderQuerySet extends OPA.QuerySet<IAuthentication
    * Gets the Authentication Provider by that Provider's externally provided ID, since that ID is also a unique key.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} externalId The ID for the Authentication Provider that is provided by the corresponding Provider.
-   * @return {Promise<IAuthenticationProvider | null>} The User corresponding to the UUID, or null if none exists.
+   * @return {Promise<IAuthenticationProvider | null>} The Authentication Provider corresponding to the ID, or null if none exists.
    */
   async getByExternalAuthProviderId(ds: OPA.IDataStorageState, externalId: string): Promise<IAuthenticationProvider | null> {
     OPA.assertDataStorageStateIsNotNullish(ds);
