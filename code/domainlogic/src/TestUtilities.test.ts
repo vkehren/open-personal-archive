@@ -17,7 +17,7 @@ export async function performInstallForTest(dataStorageState: OpaDm.IDataStorage
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
   // NOTE: Install the Application completely before performing any more writes
-  await Application.performInstall(dataStorageState, authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", OpaDm.DefaultLocaleId, OpaDm.DefaultTimeZoneGroupId, OPA.convertNonNullish(TestAuthData.owner.firstName), OPA.convertNonNullish(TestAuthData.owner.lastName)); // eslint-disable-line max-len
+  await Application.performInstall(dataStorageState, authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", OpaDm.DefaultLocaleId, OpaDm.DefaultTimeZoneGroupId, OPA.convertNonNullish(TestAuthData.owner.firstName), OPA.convertNonNullish(TestAuthData.owner.lastName), "INSTALL FOR TEST"); // eslint-disable-line max-len
 
   // NOTE: Create the writeBatch AFTER installation is complete bc data from installation is necessary for later queries in this function
   dataStorageState.currentWriteBatch = dataStorageState.constructorProvider.writeBatch();

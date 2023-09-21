@@ -148,7 +148,8 @@ export const performInstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, asyn
     // OPA.assertNonNullishOrWhitespace(defaultTimeZoneId, "The Archive default time zone must not be blank.");
     const ownerFirstName = (data.query.ownerFirstName) ? data.query.ownerFirstName : "";
     const ownerLastName = (data.query.ownerLastName) ? data.query.ownerLastName : "";
-    const installResult = await Application.performInstall(callState.dataStorageState, callState.authenticationState, archiveName, archiveDescription, pathToStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, ownerFirstName, ownerLastName); // eslint-disable-line max-len
+    const installationNotes = OPA.convertNonNullish(data.query.installationNotes, "");
+    const installResult = await Application.performInstall(callState.dataStorageState, callState.authenticationState, archiveName, archiveDescription, pathToStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, ownerFirstName, ownerLastName, installationNotes); // eslint-disable-line max-len
 
     return OPA.getSuccessResult("", installResult);
   } catch (error) {
@@ -206,8 +207,9 @@ export const performUpgrade = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, asyn
     await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, request, getLogMessage(UTL.ExecutionStates.ready));
 
     const data = request.data;
+    const upgradeNotes = OPA.convertNonNullish(data.query.upgradeNotes, "");
     const doBackupFirst = OPA.convertNonNullish(OPA.getBoolean(data.query.doBackupFirst, true));
-    const upgradeResult = await Application.performUpgrade(callState, doBackupFirst);
+    const upgradeResult = await Application.performUpgrade(callState, upgradeNotes, doBackupFirst);
     return OPA.getSuccessResult("", upgradeResult);
   } catch (error) {
     await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error as Error);

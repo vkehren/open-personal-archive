@@ -11,6 +11,7 @@ export const SingletonId = "OPA_Application";
 export interface IApplicationPartial {
   applicationVersion?: string;
   schemaVersion?: string;
+  notes: string;
 }
 
 type UpgradeHistoryItem = IApplicationPartial | OPA.IUpgradeable_ByUser;
@@ -21,6 +22,7 @@ interface IApplicationPartial_WithHistory extends IApplicationPartial, OPA.IUpgr
 export interface IApplication extends OPA.IDocument_Upgradeable_ByUser_WithHistory<UpgradeHistoryItem> {
   applicationVersion: string;
   schemaVersion: string;
+  notes: string;
   readonly dateOfInstallation: OPA.DateToUse;
 }
 const IApplication_ReadOnlyPropertyNames = [
@@ -67,14 +69,16 @@ export function areUpdatesValid(document: IApplication, updateObject: IApplicati
  * Creates an instance of the IApplication document type.
  * @param {string} applicationVersion The version of the OPA application code.
  * @param {string} schemaVersion The version of the OPA database schema.
+ * @param {string} notes Any notes of documentation about the installation.
  * @return {IApplication} The new document instance.
  */
-export function createSingleton(applicationVersion: string, schemaVersion: string): IApplication {
+export function createSingleton(applicationVersion: string, schemaVersion: string, notes: string): IApplication {
   const now = OPA.nowToUse();
   const document: IApplication = {
     id: SingletonId,
     applicationVersion: applicationVersion,
     schemaVersion: schemaVersion,
+    notes: notes,
     upgradeHistory: ([] as Array<UpgradeHistoryItem>),
     dateOfInstallation: now,
     hasBeenUpgraded: false,
@@ -111,13 +115,14 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} applicationVersion The version of the OPA application code.
    * @param {string} schemaVersion The version of the OPA database schema.
+   * @param {string} notes Any notes of documentation about the installation.
    * @return {Promise<string>} The new document ID.
    */
-  async create(ds: OPA.IDataStorageState, applicationVersion: string, schemaVersion: string): Promise<string> {
+  async create(ds: OPA.IDataStorageState, applicationVersion: string, schemaVersion: string, notes: string): Promise<string> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
-    const document = createSingleton(applicationVersion, schemaVersion);
+    const document = createSingleton(applicationVersion, schemaVersion, notes);
     const proxiedDocument = this.documentProxyConstructor(document);
     const documentId = proxiedDocument.id;
 
