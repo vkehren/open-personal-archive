@@ -191,10 +191,12 @@ export const IUpgradeable_ByUser_UserIdOfLatestUpgrader_PropertyName = VC.getTyp
 export interface IUpgradeable_ByUser extends IUpgradeable {
   readonly userIdOfLatestUpgrader: BT.Id | null;
 }
-export const IUpgradeable_WithHistory_UpgradeHistory_PropertyName = VC.getTypedPropertyKeyAsText<IUpgradeable_ByUser_WithHistory<unknown>>("upgradeHistory"); // eslint-disable-line camelcase
-export interface IUpgradeable_WithHistory<T> extends IUpgradeable {
+export const IUpgradeHistoryProvider_UpgradeHistory_PropertyName = VC.getTypedPropertyKeyAsText<IUpgradeHistoryProvider<unknown>>("upgradeHistory"); // eslint-disable-line camelcase
+export interface IUpgradeHistoryProvider<T> {
   readonly upgradeHistory: Array<T>;
 }
+export const IUpgradeable_WithHistory_UpgradeHistory_PropertyName = VC.getTypedPropertyKeyAsText<IUpgradeable_ByUser_WithHistory<unknown>>("upgradeHistory"); // eslint-disable-line camelcase
+export interface IUpgradeable_WithHistory<T> extends IUpgradeable, IUpgradeHistoryProvider<T> { }
 export interface IUpgradeable_ByUser_WithHistory<T> extends IUpgradeable_ByUser, IUpgradeable_WithHistory<T> { }
 export interface IDocument_Upgradeable extends IDocument, IUpgradeable { }
 export interface IDocument_Upgradeable_ByUser extends IDocument_Upgradeable, IUpgradeable_ByUser { }
@@ -279,10 +281,12 @@ export const IUpdateable_ByUser_UserIdOfLatestUpdater_PropertyName = VC.getTyped
 export interface IUpdateable_ByUser extends IUpdateable {
   readonly userIdOfLatestUpdater: BT.Id | null;
 }
-export const IUpdateable_WithHistory_UpdateHistory_PropertyName = VC.getTypedPropertyKeyAsText<IUpdateable_ByUser_WithHistory<unknown>>("updateHistory"); // eslint-disable-line camelcase
-export interface IUpdateable_WithHistory<T> extends IUpdateable {
+export const IUpdateHistoryProvider_UpdateHistory_PropertyName = VC.getTypedPropertyKeyAsText<IUpdateHistoryProvider<unknown>>("updateHistory"); // eslint-disable-line camelcase
+export interface IUpdateHistoryProvider<T> {
   readonly updateHistory: Array<T>;
 }
+export const IUpdateable_WithHistory_UpdateHistory_PropertyName = VC.getTypedPropertyKeyAsText<IUpdateable_ByUser_WithHistory<unknown>>("updateHistory"); // eslint-disable-line camelcase
+export interface IUpdateable_WithHistory<T> extends IUpdateable, IUpdateHistoryProvider<T> { }
 export interface IUpdateable_ByUser_WithHistory<T> extends IUpdateable_ByUser, IUpdateable_WithHistory<T> { }
 export interface IDocument_Updateable extends IDocument, IUpdateable { }
 export interface IDocument_Updateable_ByUser extends IDocument_Updateable, IUpdateable_ByUser { }
