@@ -22,7 +22,7 @@ interface IAccessRequestPartial_WithHistory extends IAccessRequestPartial, OPA.I
 
 // NOTE: Use "IDocument_Creatable_ByUser" because we must record the User who created the AccessRequest (i.e. the owner of the AccessRequest)
 // NOTE: Use "IDocument_Updateable_ByUser" because the User creating the AccessRequest updates the "message", but the Decider updates the "response"
-export interface IAccessRequest extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser, OPA.IDocument_Taggable_ByUser, OPA.IDocument_Archivable_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<OPA.ApprovalState>, OPA.IDocument_Deleteable_ByUser { // eslint-disable-line max-len
+export interface IAccessRequest extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser_WithHistory<UpdateHistoryItem>, OPA.IDocument_Taggable_ByUser, OPA.IDocument_Archivable_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<OPA.ApprovalState>, OPA.IDocument_Deleteable_ByUser { // eslint-disable-line max-len
   readonly archiveId: string; // NOTE: This field stores information necessary to extend the OPA system to manage multiple Archives
   readonly isSpecificToCitation: boolean;
   readonly citationId: string | null;

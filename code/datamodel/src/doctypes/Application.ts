@@ -18,7 +18,7 @@ interface IApplicationPartial_WithHistory extends IApplicationPartial, OPA.IUpgr
   upgradeHistory: Array<UpgradeHistoryItem> | firestore.FieldValue;
 }
 
-export interface IApplication extends OPA.IDocument_Upgradeable_ByUser {
+export interface IApplication extends OPA.IDocument_Upgradeable_ByUser_WithHistory<UpgradeHistoryItem> {
   applicationVersion: string;
   schemaVersion: string;
   readonly upgradeHistory: Array<UpgradeHistoryItem>;

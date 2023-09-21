@@ -24,7 +24,7 @@ interface IArchivePartial_WithHistory extends IArchivePartial, OPA.IUpdateable_B
   updateHistory: Array<UpdateHistoryItem> | firestore.FieldValue;
 }
 
-export interface IArchive extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser {
+export interface IArchive extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser_WithHistory<UpdateHistoryItem> {
   readonly ownerId: string;
   readonly pathToStorageFolder: string;
   name: OPA.ILocalizable<string>;

@@ -191,8 +191,15 @@ export const IUpgradeable_ByUser_UserIdOfLatestUpgrader_PropertyName = VC.getTyp
 export interface IUpgradeable_ByUser extends IUpgradeable {
   readonly userIdOfLatestUpgrader: BT.Id | null;
 }
+export const IUpgradeable_WithHistory_UpgradeHistory_PropertyName = VC.getTypedPropertyKeyAsText<IUpgradeable_ByUser_WithHistory<{}>>("upgradeHistory"); // eslint-disable-line camelcase
+export interface IUpgradeable_WithHistory<T> extends IUpgradeable {
+  readonly upgradeHistory: Array<T>;
+}
+export interface IUpgradeable_ByUser_WithHistory<T> extends IUpgradeable_ByUser, IUpgradeable_WithHistory<T> { }
 export interface IDocument_Upgradeable extends IDocument, IUpgradeable { }
 export interface IDocument_Upgradeable_ByUser extends IDocument_Upgradeable, IUpgradeable_ByUser { }
+export interface IDocument_Upgradeable_WithHistory<T> extends IDocument_Upgradeable, IUpgradeable_WithHistory<T> { }
+export interface IDocument_Upgradeable_ByUser_WithHistory<T> extends IDocument_Upgradeable_ByUser, IDocument_Upgradeable_WithHistory<T> { }
 
 /**
  * Returns whether the updates to the object are valid from the perspective of the IUpgradeable interface.
@@ -267,8 +274,15 @@ export const IUpdateable_ByUser_UserIdOfLatestUpdater_PropertyName = VC.getTyped
 export interface IUpdateable_ByUser extends IUpdateable {
   readonly userIdOfLatestUpdater: BT.Id | null;
 }
+export const IUpdateable_WithHistory_UpdateHistory_PropertyName = VC.getTypedPropertyKeyAsText<IUpdateable_ByUser_WithHistory<{}>>("updateHistory"); // eslint-disable-line camelcase
+export interface IUpdateable_WithHistory<T> extends IUpdateable {
+  readonly updateHistory: Array<T>;
+}
+export interface IUpdateable_ByUser_WithHistory<T> extends IUpdateable_ByUser, IUpdateable_WithHistory<T> { }
 export interface IDocument_Updateable extends IDocument, IUpdateable { }
 export interface IDocument_Updateable_ByUser extends IDocument_Updateable, IUpdateable_ByUser { }
+export interface IDocument_Updateable_WithHistory<T> extends IDocument_Updateable, IUpdateable_WithHistory<T> { }
+export interface IDocument_Updateable_ByUser_WithHistory<T> extends IDocument_Updateable_ByUser, IDocument_Updateable_WithHistory<T> { }
 
 /**
  * Returns whether the updates to the object are valid from the perspective of the IUpdateable interface.
