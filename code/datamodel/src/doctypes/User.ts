@@ -23,13 +23,6 @@ export interface IUserPartial {
   recentQueries?: Array<string> | firestore.FieldValue;
 }
 
-interface ICitationAccessor {
-  readonly requestedCitationIds: Array<string>;
-  readonly viewableCitationIds: Array<string>;
-  readonly dateOfLatestCitationChange: OPA.DateToUse | null;
-  readonly userIdOfLatestCitationChanger: string | null;
-}
-interface IDocument_CitationAccessor extends OPA.IDocument, ICitationAccessor { }
 interface ICitationAccessorPartial {
   requestedCitationIds?: Array<string> | firestore.FieldValue;
   viewableCitationIds?: Array<string> | firestore.FieldValue;
@@ -41,6 +34,14 @@ type UpdateHistoryItem = IUserPartial | ICitationAccessorPartial | OPA.IUpdateab
 interface IUserPartial_WithHistory extends IUserPartial, OPA.IUpdateable {
   updateHistory: Array<UpdateHistoryItem> | firestore.FieldValue;
 }
+
+interface ICitationAccessor {
+  readonly requestedCitationIds: Array<string>;
+  readonly viewableCitationIds: Array<string>;
+  readonly dateOfLatestCitationChange: OPA.DateToUse | null;
+  readonly userIdOfLatestCitationChanger: string | null;
+}
+interface IDocument_CitationAccessor extends OPA.IDocument, ICitationAccessor { }
 
 export interface IUser extends IDocument_CitationAccessor, OPA.IDocument_Creatable, OPA.IDocument_Updateable_ByUser_WithHistory<UpdateHistoryItem>, OPA.IDocument_AssignableToRole_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<OPA.ApprovalState>, OPA.IDocument_Suspendable_ByUser, OPA.IDocument_Deleteable_ByUser { // eslint-disable-line max-len
   readonly firebaseAuthUserId: string;
@@ -164,11 +165,11 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     firstName: firstName,
     lastName: lastName,
     preferredName: preferredName,
+    recentQueries: ([] as Array<string>),
     requestedCitationIds: ([] as Array<string>),
     viewableCitationIds: ([] as Array<string>),
     dateOfLatestCitationChange: null,
     userIdOfLatestCitationChanger: null,
-    recentQueries: ([] as Array<string>),
     updateHistory: ([] as Array<UpdateHistoryItem>),
     dateOfCreation: now,
     hasBeenUpdated: false,
@@ -230,11 +231,11 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     firstName: firstName,
     lastName: lastName,
     preferredName: preferredName,
+    recentQueries: ([] as Array<string>),
     requestedCitationIds: ([] as Array<string>),
     viewableCitationIds: ([] as Array<string>),
     dateOfLatestCitationChange: null,
     userIdOfLatestCitationChanger: null,
-    recentQueries: ([] as Array<string>),
     updateHistory: ([] as Array<UpdateHistoryItem>),
     dateOfCreation: now,
     hasBeenUpdated: false,
