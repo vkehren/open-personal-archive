@@ -86,7 +86,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
   });
   test("checks that initializeUserAccount(...) fails when System is not installed", testFunc1());
 
-  const testFunc2 = (functionType: TestUtils.TestFunctionType) => (async () => {
+  const testFunc2 = (functionType: TestConfig.TestFunctionType) => (async () => {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
     await TestUtils.assertUserDoesNotExist(config.dataStorageState, config.authenticationState);
@@ -800,7 +800,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
   test("checks that initializeUserAccount(...) fails but some User updates succeed when System is installed and User is Archive Owner", testFunc2("query"));
   test("checks that initializeUserAccount(...) fails but some User updates succeed when System is installed and User is Archive Owner", testFunc2("logic"));
 
-  const testFunc3 = (functionType: TestUtils.TestFunctionType) => (async () => {
+  const testFunc3 = (functionType: TestConfig.TestFunctionType) => (async () => {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
     await TestUtils.assertUserDoesNotExist(config.dataStorageState, config.authenticationState);

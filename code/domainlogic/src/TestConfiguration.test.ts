@@ -6,6 +6,7 @@ import {TestAuthData} from "./TestData.test";
 import * as TestConfigurationFile from "../test-config.json";
 
 export type TestEnvironment = "Cloud" | "Emulators";
+export type TestFunctionType = "query" | "logic";
 
 export interface IAuthenticationStateForTests extends OpaDm.IAuthenticationState {
   hasOpaUserId: OPA.DefaultFunc<boolean>;

@@ -4,8 +4,6 @@ import {OpaDbDescriptor as OpaDb} from "../../datamodel/src";
 import * as Application from "./system/Application";
 import {TestAuthData} from "./TestData.test";
 
-export type TestFunctionType = "query" | "logic";
-
 /**
  * Uses the test AuthenticationStates and the defaults of the system to install the Open Personal Archive™ (OPA) system and create a User for each Role.
  * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
