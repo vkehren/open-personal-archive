@@ -492,7 +492,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   }
 
   /**
-   * Updates the User stored on the server by constructing an IViewable_ByUser object.
+   * Sets the assigned Role of the User stored on the server by constructing an IAssignableToRole_ByUser object.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the User within the OPA system.
    * @param {IRole} role The Role to which to assign the User within the OPA system.
@@ -524,7 +524,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   }
 
   /**
-   * Adds a requested Citation to the User stored on the server by constructing an ICitationAccessor_Updateable object.
+   * Adds a requested Citation to the User stored on the server by constructing an ICitationAccessorPartial object.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the User within the OPA system.
    * @param {string} requestedCitationId The Citation to which the User has requested access.
@@ -557,7 +557,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   }
 
   /**
-   * Adds a viewable Citation to the User stored on the server by constructing an ICitationAccessor_Updateable object.
+   * Adds a viewable Citation to the User stored on the server by constructing an ICitationAccessorPartial object.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the User within the OPA system.
    * @param {string} viewableCitationId The Citation to which the User has been granted permission to view.
