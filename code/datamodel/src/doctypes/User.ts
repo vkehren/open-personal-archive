@@ -73,7 +73,8 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   OPA.assertNonNullish(updateObject);
 
   const updateObject_AsUnknown = (updateObject as unknown);
-  const updateObject_CitationAccessor = (updateObject_AsUnknown as ICitationAccessorPartial);
+  const updateObject_AsAssignableToRole_ByUser = (updateObject_AsUnknown as OPA.IAssignableToRole_ByUser);
+  const updateObject_AsCitationAccessor = (updateObject_AsUnknown as ICitationAccessorPartial);
   const docIsArchiveOwner = ((document.id == User_OwnerId) || (document.assignedRoleId == Role_OwnerId));
 
   if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IUser_ReadOnlyPropertyNames)) {
@@ -86,8 +87,8 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObject_AsUnknown as OPA.IUpdateable_ByUser, preventUpdates_ForUpdateable_ByUser)) {
     return false;
   }
-  const preventUpdates_ForAssignableToRole_ByUser = (((updateObject_AsUnknown as OPA.IAssignableToRole_ByUser).userIdOfLatestRoleAssigner == document.id) || docIsArchiveOwner);
-  if (!OPA.areUpdatesValid_ForAssignableToRole_ByUser(document, updateObject_AsUnknown as OPA.IAssignableToRole_ByUser, preventUpdates_ForAssignableToRole_ByUser)) {
+  const preventUpdates_ForAssignableToRole_ByUser = ((updateObject_AsAssignableToRole_ByUser.userIdOfLatestRoleAssigner == document.id) || docIsArchiveOwner);
+  if (!OPA.areUpdatesValid_ForAssignableToRole_ByUser(document, updateObject_AsAssignableToRole_ByUser, preventUpdates_ForAssignableToRole_ByUser)) {
     return false;
   }
   const preventUpdates_ForViewable_ByUser = ((updateObject_AsUnknown as OPA.IViewable_ByUser).userIdOfLatestViewer == document.id);
@@ -108,23 +109,23 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   }
 
   // NOTE: Unlike most interfaces used in this fuction, ICitationAccessor only requires that one of the two array properties is updated
-  if (OPA.isUndefined(updateObject_CitationAccessor.requestedCitationIds) && OPA.isUndefined(updateObject_CitationAccessor.viewableCitationIds)) {
-    const dateIsSet = !OPA.isUndefined(updateObject_CitationAccessor.dateOfLatestCitationChange);
-    const userIsSet = !OPA.isUndefined(updateObject_CitationAccessor.userIdOfLatestCitationChanger);
+  if (OPA.isUndefined(updateObject_AsCitationAccessor.requestedCitationIds) && OPA.isUndefined(updateObject_AsCitationAccessor.viewableCitationIds)) {
+    const dateIsSet = !OPA.isUndefined(updateObject_AsCitationAccessor.dateOfLatestCitationChange);
+    const userIsSet = !OPA.isUndefined(updateObject_AsCitationAccessor.userIdOfLatestCitationChanger);
 
     if (dateIsSet || userIsSet) {
       return false;
     }
-  } else if (OPA.isNull(updateObject_CitationAccessor.requestedCitationIds)) {
+  } else if (OPA.isNull(updateObject_AsCitationAccessor.requestedCitationIds)) {
     throw new Error("The \"requestedCitationIds\" property must not be set to null.");
-  } else if (OPA.isNull(updateObject_CitationAccessor.viewableCitationIds)) {
+  } else if (OPA.isNull(updateObject_AsCitationAccessor.viewableCitationIds)) {
     throw new Error("The \"viewableCitationIds\" property must not be set to null.");
   } else {
-    const dateNotSet = OPA.isNullish(updateObject_CitationAccessor.dateOfLatestCitationChange);
-    const userNotSet = OPA.isNullish(updateObject_CitationAccessor.userIdOfLatestCitationChanger);
-    const dateNotCreation = (document.dateOfCreation != (updateObject_AsUnknown as OPA.IAssignableToRole_ByUser).dateOfLatestRoleAssignment);
-    const isRequestedNotSelfAssigned = (!OPA.isNullish(updateObject_CitationAccessor.requestedCitationIds) && (updateObject_CitationAccessor.userIdOfLatestCitationChanger != document.id));
-    const isViewableSelfAssigned = (!OPA.isNullish(updateObject_CitationAccessor.viewableCitationIds) && (updateObject_CitationAccessor.userIdOfLatestCitationChanger == document.id));
+    const dateNotSet = OPA.isNullish(updateObject_AsCitationAccessor.dateOfLatestCitationChange);
+    const userNotSet = OPA.isNullish(updateObject_AsCitationAccessor.userIdOfLatestCitationChanger);
+    const dateNotCreation = (document.dateOfCreation != updateObject_AsAssignableToRole_ByUser.dateOfLatestRoleAssignment);
+    const isRequestedNotSelfAssigned = (!OPA.isNullish(updateObject_AsCitationAccessor.requestedCitationIds) && (updateObject_AsCitationAccessor.userIdOfLatestCitationChanger != document.id));
+    const isViewableSelfAssigned = (!OPA.isNullish(updateObject_AsCitationAccessor.viewableCitationIds) && (updateObject_AsCitationAccessor.userIdOfLatestCitationChanger == document.id));
 
     if ((dateNotSet && dateNotCreation) || (userNotSet && dateNotCreation) || isRequestedNotSelfAssigned || isViewableSelfAssigned) {
       return false;
