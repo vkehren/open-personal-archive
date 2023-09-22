@@ -1,6 +1,8 @@
 import * as OPA from "../../../base/src";
 import * as BT from "../BaseTypes";
 
+/* eslint-disable camelcase */
+
 const SingularName = "ActivityLogItem";
 const PluralName = "ActivityLogItems";
 const IsSingleton = false;
@@ -19,6 +21,19 @@ export interface IActivityLogItem extends OPA.IDocument_Creatable {
   readonly userId: string | null;
   readonly otherState: Record<string, unknown> | null;
 }
+const IActivityLogItem_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("rootLogItemId"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("externalLogItemId"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("activityType"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("requestor"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("resource"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("resourceCanonical"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("action"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("data"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("firebaseAuthUserId"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("userId"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("otherState"),
+];
 
 type IActivityLogItemPartial = unknown;
 /**
@@ -30,6 +45,15 @@ type IActivityLogItemPartial = unknown;
 export function areUpdatesValid(document: IActivityLogItem, updateObject: IActivityLogItemPartial): boolean {
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
+
+  const updateObject_AsUnknown = (updateObject as unknown);
+
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IActivityLogItem_ReadOnlyPropertyNames)) {
+    return false;
+  }
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject_AsUnknown as OPA.ICreatable)) {
+    return false;
+  }
 
   // NOTE: Currently, ActivityLogItems are not updateable
   return false;

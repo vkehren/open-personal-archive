@@ -3,7 +3,7 @@ import * as BT from "./BaseTypes";
 import * as TC from "./TypeChecking";
 import * as VC from "./ValueChecking";
 
-// export const name = "Firebase";
+export const DEFAULT_UNIQUENESS_INDEX_COLLECTION = "UniquenessIndices";
 export const BULK_WRITER_MAX_RETRY_ATTEMPTS = 4;
 export const FIREBASE_DEFAULT_REGION = "us-east1";
 
@@ -482,35 +482,6 @@ export function assertDataStorageStateIsNotNullish(dataStorageState: IDataStorag
  */
 export function assertFirestoreIsNotNullish(db: firestore.Firestore | null | undefined, message = "A valid Firebase Firestore database must be provided."): void {
   if (TC.isNullish(db)) {
-    throw new Error(message);
-  }
-}
-
-/**
- * Asserts that the Firebase Firestore document and its corresponding ID is NOT nullish.
- * @param {T | null | undefined} document The Firebase Firestore document.
- * @param {string} [invalidDocMessage=default] The message to display on failure of document assertion.
- * @param {string} [invalidIdMessage=default] The message to display on failure of ID property assertion.
- * @return {void}
- */
-export function assertDocumentIsValid<T extends BT.IDocument>(document: T | null | undefined, invalidDocMessage = "A valid document must be provided.", invalidIdMessage = "A valid document ID must be provided."): void { // eslint-disable-line max-len
-  if (TC.isNullish(document)) {
-    throw new Error(invalidDocMessage);
-  }
-
-  const documentNonNull = TC.convertNonNullish(document);
-  assertIdentifierIsValid(documentNonNull.id, invalidIdMessage);
-}
-
-/**
- * Asserts that the Firebase Firestore document ID is NOT nullish.
- * @param {string | null | undefined} id The Firebase Firestore document ID.
- * @param {string} [message=default] The message to display on failure of assertion.
- * @return {void}
- */
-export function assertIdentifierIsValid(id: string | null | undefined, message = "A valid document ID must be provided."): void {
-  // LATER: Rename "id" to "idSource" and allow caller to pass IDocument (or typed string or IDocument getter) as "idSource"
-  if (TC.isNullishOrWhitespace(id)) {
     throw new Error(message);
   }
 }

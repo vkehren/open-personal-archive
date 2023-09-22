@@ -3,6 +3,8 @@ import * as BT from "../BaseTypes";
 import * as CollectionData_Full from "./Locales.json"; // eslint-disable-line camelcase
 import * as CollectionData_Min from "./Locales.min.json"; // eslint-disable-line camelcase
 
+/* eslint-disable camelcase */
+
 /**
  * Dynamically gets the required documents.
  * @param {OPA.DateToUse | null} [dateOfCreation=null] The date to use as the value for the "dateOfCreation" property.
@@ -23,13 +25,19 @@ export const DefaultLocaleId = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNo
 export const DefaultLocale = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNonNullish(DefaultDocument).optionName : "en-US";
 
 export interface ILocale extends OPA.IDocument_Creatable {
-  readonly id: string;
   readonly optionName: string;
   readonly optionBaseName: string;
   readonly displayName: string;
   readonly displayOrder: number;
   readonly isDefault: boolean;
 }
+const ILocale_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
+  OPA.getTypedPropertyKeyAsText<ILocale>("optionName"),
+  OPA.getTypedPropertyKeyAsText<ILocale>("optionBaseName"),
+  OPA.getTypedPropertyKeyAsText<ILocale>("displayName"),
+  OPA.getTypedPropertyKeyAsText<ILocale>("displayOrder"),
+  OPA.getTypedPropertyKeyAsText<ILocale>("isDefault"),
+];
 
 type ILocalePartial = unknown;
 /**
@@ -41,6 +49,15 @@ type ILocalePartial = unknown;
 export function areUpdatesValid(document: ILocale, updateObject: ILocalePartial): boolean {
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
+
+  const updateObject_AsUnknown = (updateObject as unknown);
+
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, ILocale_ReadOnlyPropertyNames)) {
+    return false;
+  }
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject_AsUnknown as OPA.ICreatable)) {
+    return false;
+  }
 
   // NOTE: Currently, Locales are not updateable
   return false;

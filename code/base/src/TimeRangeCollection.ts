@@ -4,8 +4,6 @@ import * as VC from "./ValueChecking";
 import * as CL from "./Collections";
 import * as TR from "./TimeRange";
 
-// export const name = "TimeRangeCollection";
-
 /**
  * @constant
  * @type {boolean}

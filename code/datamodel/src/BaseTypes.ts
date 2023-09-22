@@ -1,31 +1,12 @@
-import * as OPA from "../../base/src";
-
-export const DefaultIndexCollection = "Indices";
-
-// LATER: Move the following to base package
-export const localizableStringConstructor = function(locale: string, desiredValue: string | null = null, defaultValue = ""): OPA.ILocalizable<string> {
-  OPA.assertNonNullishOrWhitespace(locale);
-  const localizableString = ({} as Record<string, unknown> & OPA.ILocalizable<string>);
-  localizableString[locale] = (!OPA.isNullishOrWhitespace(desiredValue) ? OPA.convertNonNullish(desiredValue) : defaultValue);
-  localizableString[OPA.Default_Locale] = localizableString[locale]; // NOTE: The base library default locale is actually "en"
-  return localizableString;
-};
-
+/** Controls whether the entire set of required Documents are loaded, or only the set needed for testing (i.e. the "min" or "minimal" set).
+ * @constant
+ * @type {{}}
+ */
 export const DataConfiguration = {
   Locale_UseMin: false,
   TimeZoneGroup_UseMin: false,
   TimeZone_UseMin: false,
 };
-
-// LATER: Move the following to base package
-export const PropertyNames_ForUnDelete_ByUser: Array<string | symbol> = [ // eslint-disable-line camelcase
-  OPA.IUpdateable_HasBeenUpdated_PropertyName,
-  OPA.IUpdateable_DateOfLatestUpdate_PropertyName,
-  OPA.IUpdateable_ByUser_UserIdOfLatestUpdater_PropertyName,
-  OPA.IDeleteable_IsMarkedAsDeleted_PropertyName,
-  OPA.IDeleteable_DateOfDeletion_PropertyName,
-  OPA.IDeleteable_ByUser_UserIdOfDeleter_PropertyName,
-];
 
 export type ActivityType = "browser_page_load" | "browser_page_view" | "browser_page_action" | "browser_page_error" | "server_function_call" | "server_function_error";
 export const ActivityTypes = {
@@ -53,13 +34,3 @@ export const RoleTypes = {
   authorizers: ([] as Array<RoleType>),
 };
 RoleTypes.authorizers = [RoleTypes.owner, RoleTypes.administrator];
-
-export type ApprovalState = "pending" | "approved" | "denied";
-export const ApprovalStates = {
-  default: ("pending" as ApprovalState),
-  pending: ("pending" as ApprovalState),
-  approved: ("approved" as ApprovalState),
-  denied: ("denied" as ApprovalState),
-  decided: ([] as Array<ApprovalState>),
-};
-ApprovalStates.decided = [ApprovalStates.approved, ApprovalStates.denied];

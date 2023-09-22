@@ -65,9 +65,6 @@ export async function recordLogItem(dataStorageState: OpaDm.IDataStorageState, a
   await dataStorageState.currentWriteBatch.commit();
   dataStorageState.currentWriteBatch = null;
 
-  const activityLogItemReRead = await OpaDb.ActivityLogItems.queries.getById(dataStorageState, activityLogItemId);
-  OPA.assertDocumentIsValid(activityLogItemReRead, "The requested ActivityLogItem does not exist.");
-  const activityLogItemReReadNonNull = OPA.convertNonNullish(activityLogItemReRead);
-
-  return activityLogItemReReadNonNull;
+  const activityLogItemReRead = await OpaDb.ActivityLogItems.queries.getByIdWithAssert(dataStorageState, activityLogItemId, "The requested ActivityLogItem does not exist.");
+  return activityLogItemReRead;
 }

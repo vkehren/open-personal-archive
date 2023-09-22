@@ -3,6 +3,8 @@ import * as BT from "../BaseTypes";
 import * as CollectionData_Full from "./TimeZoneGroups.json"; // eslint-disable-line camelcase
 import * as CollectionData_Min from "./TimeZoneGroups.min.json"; // eslint-disable-line camelcase
 
+/* eslint-disable camelcase */
+
 /**
  * Dynamically gets the required documents.
  * @param {OPA.DateToUse | null} [dateOfCreation=null] The date to use as the value for the "dateOfCreation" property.
@@ -22,7 +24,6 @@ const DefaultDocument = (RequiredDocuments.find((v) => v.isDefault) as ITimeZone
 export const DefaultTimeZoneGroupId = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNonNullish(DefaultDocument).id : "OPA_TimeZoneGroup_PST_-08:00";
 
 export interface ITimeZoneGroup extends OPA.IDocument_Creatable {
-  readonly id: string;
   readonly name: string;
   readonly abbreviation: string;
   readonly utcOffset: string;
@@ -31,6 +32,15 @@ export interface ITimeZoneGroup extends OPA.IDocument_Creatable {
   readonly displayOrder: number;
   readonly isDefault: boolean;
 }
+const ITimeZoneGroup_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
+  OPA.getTypedPropertyKeyAsText<ITimeZoneGroup>("name"),
+  OPA.getTypedPropertyKeyAsText<ITimeZoneGroup>("abbreviation"),
+  OPA.getTypedPropertyKeyAsText<ITimeZoneGroup>("utcOffset"),
+  OPA.getTypedPropertyKeyAsText<ITimeZoneGroup>("primaryTimeZoneId"),
+  OPA.getTypedPropertyKeyAsText<ITimeZoneGroup>("primaryTimeZoneName"),
+  OPA.getTypedPropertyKeyAsText<ITimeZoneGroup>("displayOrder"),
+  OPA.getTypedPropertyKeyAsText<ITimeZoneGroup>("isDefault"),
+];
 
 type ITimeZoneGroupPartial = unknown;
 /**
@@ -42,6 +52,15 @@ type ITimeZoneGroupPartial = unknown;
 export function areUpdatesValid(document: ITimeZoneGroup, updateObject: ITimeZoneGroupPartial): boolean {
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
+
+  const updateObject_AsUnknown = (updateObject as unknown);
+
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, ITimeZoneGroup_ReadOnlyPropertyNames)) {
+    return false;
+  }
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject_AsUnknown as OPA.ICreatable)) {
+    return false;
+  }
 
   // NOTE: Currently, TimeZoneGroups are not updateable
   return false;

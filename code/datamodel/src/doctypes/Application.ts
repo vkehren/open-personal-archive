@@ -11,6 +11,7 @@ export const SingletonId = "OPA_Application";
 export interface IApplicationPartial {
   applicationVersion?: string;
   schemaVersion?: string;
+  notes: string;
 }
 
 type UpgradeHistoryItem = IApplicationPartial | OPA.IUpgradeable_ByUser;
@@ -18,13 +19,15 @@ interface IApplicationPartial_WithHistory extends IApplicationPartial, OPA.IUpgr
   upgradeHistory: Array<UpgradeHistoryItem> | firestore.FieldValue;
 }
 
-export interface IApplication extends OPA.IDocument_Upgradeable_ByUser {
-  readonly id: string;
+export interface IApplication extends OPA.IDocument_Upgradeable_ByUser_WithHistory<UpgradeHistoryItem> {
   applicationVersion: string;
   schemaVersion: string;
-  readonly upgradeHistory: Array<UpgradeHistoryItem>;
+  notes: string;
   readonly dateOfInstallation: OPA.DateToUse;
 }
+const IApplication_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
+  OPA.getTypedPropertyKeyAsText<IApplication>("dateOfInstallation"),
+];
 
 /**
  * Checks whether the specified updates to the specified Application document are valid.
@@ -36,29 +39,16 @@ export function areUpdatesValid(document: IApplication, updateObject: IApplicati
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  // NOTE: updateObject MUST implement IUpgradeable_ByUser, so check immediately and do NOT use "if (true) {...}"
-  const updateObject_Updateable = (updateObject as OPA.IUpgradeable_ByUser);
+  const updateObject_AsUnknown = (updateObject as unknown);
 
-  if (!updateObject_Updateable.hasBeenUpgraded || OPA.isNullish(updateObject_Updateable.dateOfLatestUpgrade) || OPA.isNullish(updateObject_Updateable.userIdOfLatestUpgrader)) {
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IApplication_ReadOnlyPropertyNames)) {
     return false;
   }
-
-  const propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
-  const id_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).id);
-  const dateOfInstallation_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).dateOfInstallation);
-
-  if (id_IsUpdated || dateOfInstallation_IsUpdated) {
+  const preventUpdates_ForUpgradeable_ByUser = false;
+  if (!OPA.areUpdatesValid_ForUpgradeable_ByUser(document, updateObject_AsUnknown as OPA.IUpgradeable_ByUser, preventUpdates_ForUpgradeable_ByUser)) {
     return false;
   }
-
-  // NOTE: updateObject MUST NOT erase read-only history of upgrades
-  const upgradeHistory_KeyText = OPA.getTypedPropertyKeysAsText(document).upgradeHistory;
-  const upgradeHistory_IsUpdated = propertyNames_ForUpdate.includes(upgradeHistory_KeyText);
-  const upgradeHistory_Value = (updateObject as Record<string, unknown>)[upgradeHistory_KeyText];
-
-  if (upgradeHistory_IsUpdated && !OPA.isOfFieldValue_ArrayUnion<firestore.FieldValue>(upgradeHistory_Value)) {
-    return false;
-  }
+  // NOTE: If any properties are added that can be updated without upgrading, implement IUpdateable_ByUser on Application
 
   // NOTE: The "applicationVersion" cannot be downgraded or updated to same value as current value
   if (!OPA.isNullish(updateObject.applicationVersion)) {
@@ -81,14 +71,16 @@ export function areUpdatesValid(document: IApplication, updateObject: IApplicati
  * Creates an instance of the IApplication document type.
  * @param {string} applicationVersion The version of the OPA application code.
  * @param {string} schemaVersion The version of the OPA database schema.
+ * @param {string} notes Any notes of documentation about the installation.
  * @return {IApplication} The new document instance.
  */
-export function createSingleton(applicationVersion: string, schemaVersion: string): IApplication {
+export function createSingleton(applicationVersion: string, schemaVersion: string, notes: string): IApplication {
   const now = OPA.nowToUse();
   const document: IApplication = {
     id: SingletonId,
     applicationVersion: applicationVersion,
     schemaVersion: schemaVersion,
+    notes: notes,
     upgradeHistory: ([] as Array<UpgradeHistoryItem>),
     dateOfInstallation: now,
     hasBeenUpgraded: false,
@@ -125,13 +117,14 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} applicationVersion The version of the OPA application code.
    * @param {string} schemaVersion The version of the OPA database schema.
+   * @param {string} notes Any notes of documentation about the installation.
    * @return {Promise<string>} The new document ID.
    */
-  async create(ds: OPA.IDataStorageState, applicationVersion: string, schemaVersion: string): Promise<string> {
+  async create(ds: OPA.IDataStorageState, applicationVersion: string, schemaVersion: string, notes: string): Promise<string> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
-    const document = createSingleton(applicationVersion, schemaVersion);
+    const document = createSingleton(applicationVersion, schemaVersion, notes);
     const proxiedDocument = this.documentProxyConstructor(document);
     const documentId = proxiedDocument.id;
 
@@ -160,17 +153,20 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
+    // NOTE: Get the document earlier to check validity before and after setting "upgradeHistory" to also make sure it was not set on the "updateObject" passed in
     const documentId = SingletonId;
+    const document = await this.getByIdWithAssert(ds, documentId);
+
     const now = OPA.nowToUse();
     const updateObject_Upgradeable = ({hasBeenUpgraded: true, dateOfLatestUpgrade: now, userIdOfLatestUpgrader} as OPA.IUpgradeable_ByUser);
     updateObject = {...updateObject, ...updateObject_Upgradeable};
+    let areValid = areUpdatesValid(document, updateObject);
+    OPA.assertIsTrue(areValid, "The requested update is invalid.");
+
     const updateObject_ForHistory = OPA.replaceFieldValuesWithSummaries({...updateObject});
     const upgradeHistory = ds.constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, upgradeHistory} as IApplicationPartial_WithHistory);
-
-    const document = await this.getById(ds, documentId);
-    OPA.assertNonNullish(document);
-    const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
+    areValid = areUpdatesValid(document, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());

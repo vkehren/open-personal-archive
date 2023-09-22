@@ -3,6 +3,8 @@ import * as BT from "../BaseTypes";
 import * as CollectionData_Full from "./TimeZones.json"; // eslint-disable-line camelcase
 import * as CollectionData_Min from "./TimeZones.min.json"; // eslint-disable-line camelcase
 
+/* eslint-disable camelcase */
+
 /**
  * Dynamically gets the required documents.
  * @param {OPA.DateToUse | null} [dateOfCreation=null] The date to use as the value for the "dateOfCreation" property.
@@ -20,13 +22,19 @@ const IsSingleton = false;
 // const RequiredDocuments = getRequiredDocuments();
 
 export interface ITimeZone extends OPA.IDocument_Creatable {
-  readonly id: string;
   readonly name: string;
   readonly countryCode: string;
   readonly geoCoordinates: string;
   readonly comments: string;
   readonly displayOrder: number;
 }
+const ITimeZone_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
+  OPA.getTypedPropertyKeyAsText<ITimeZone>("name"),
+  OPA.getTypedPropertyKeyAsText<ITimeZone>("countryCode"),
+  OPA.getTypedPropertyKeyAsText<ITimeZone>("geoCoordinates"),
+  OPA.getTypedPropertyKeyAsText<ITimeZone>("comments"),
+  OPA.getTypedPropertyKeyAsText<ITimeZone>("displayOrder"),
+];
 
 type ITimeZonePartial = unknown;
 /**
@@ -38,6 +46,15 @@ type ITimeZonePartial = unknown;
 export function areUpdatesValid(document: ITimeZone, updateObject: ITimeZonePartial): boolean {
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
+
+  const updateObject_AsUnknown = (updateObject as unknown);
+
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, ITimeZone_ReadOnlyPropertyNames)) {
+    return false;
+  }
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject_AsUnknown as OPA.ICreatable)) {
+    return false;
+  }
 
   // NOTE: Currently, TimeZones are not updateable
   return false;

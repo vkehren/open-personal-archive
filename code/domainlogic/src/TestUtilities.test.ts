@@ -4,7 +4,12 @@ import {OpaDbDescriptor as OpaDb} from "../../datamodel/src";
 import * as Application from "./system/Application";
 import {TestAuthData} from "./TestData.test";
 
-export type TestFunctionType = "query" | "logic";
+export const InstallName = "Test Archive";
+export const InstallDescription = "Archive for Mocha + Chai unit tests.";
+export const InstallPath = "./Test_Archive/files";
+export const InstallLocaleId = OpaDm.DefaultLocaleId;
+export const InstallTimeZoneGroupId = OpaDm.DefaultTimeZoneGroupId;
+export const InstallNotes = "Install performed by Mocha test.";
 
 /**
  * Uses the test AuthenticationStates and the defaults of the system to install the Open Personal Archive™ (OPA) system and create a User for each Role.
@@ -17,21 +22,21 @@ export async function performInstallForTest(dataStorageState: OpaDm.IDataStorage
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
   // NOTE: Install the Application completely before performing any more writes
-  await Application.performInstall(dataStorageState, authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", OpaDm.DefaultLocaleId, OpaDm.DefaultTimeZoneGroupId, OPA.convertNonNullish(TestAuthData.owner.firstName), OPA.convertNonNullish(TestAuthData.owner.lastName)); // eslint-disable-line max-len
+  await Application.performInstall(dataStorageState, authenticationState, InstallName, InstallDescription, InstallPath, InstallLocaleId, InstallTimeZoneGroupId, InstallNotes); // eslint-disable-line max-len
 
   // NOTE: Create the writeBatch AFTER installation is complete bc data from installation is necessary for later queries in this function
   dataStorageState.currentWriteBatch = dataStorageState.constructorProvider.writeBatch();
 
-  const authProvider = OPA.convertNonNullish(await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(dataStorageState, authenticationState.providerId));
-  // const role_Owner = OPA.convertNonNullish(await OpaDb.Roles.queries.getById(dataStorageState.db, OpaDm.Role_OwnerId)); // eslint-disable-line camelcase
-  const role_Admin = OPA.convertNonNullish(await OpaDb.Roles.queries.getById(dataStorageState, OpaDm.Role_AdministratorId)); // eslint-disable-line camelcase
-  const role_Editor = OPA.convertNonNullish(await OpaDb.Roles.queries.getById(dataStorageState, OpaDm.Role_EditorId)); // eslint-disable-line camelcase
-  const role_Viewer = OPA.convertNonNullish(await OpaDb.Roles.queries.getById(dataStorageState, OpaDm.Role_ViewerId)); // eslint-disable-line camelcase
-  const role_Guest = OPA.convertNonNullish(await OpaDb.Roles.queries.getById(dataStorageState, OpaDm.Role_GuestId)); // eslint-disable-line camelcase
+  const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderIdWithAssert(dataStorageState, authenticationState.providerId);
+  // const role_Owner = await OpaDb.Roles.queries.getByIdWithAssert(dataStorageState.db, OpaDm.Role_OwnerId); // eslint-disable-line camelcase
+  const role_Admin = await OpaDb.Roles.queries.getByIdWithAssert(dataStorageState, OpaDm.Role_AdministratorId); // eslint-disable-line camelcase
+  const role_Editor = await OpaDb.Roles.queries.getByIdWithAssert(dataStorageState, OpaDm.Role_EditorId); // eslint-disable-line camelcase
+  const role_Viewer = await OpaDb.Roles.queries.getByIdWithAssert(dataStorageState, OpaDm.Role_ViewerId); // eslint-disable-line camelcase
+  const role_Guest = await OpaDb.Roles.queries.getByIdWithAssert(dataStorageState, OpaDm.Role_GuestId); // eslint-disable-line camelcase
 
-  const archive = OPA.convertNonNullish(await OpaDb.Archive.queries.getById(dataStorageState, OpaDm.ArchiveId));
-  const locale = OPA.convertNonNullish(await OpaDb.Locales.queries.getById(dataStorageState, archive.defaultLocaleId));
-  const timeZoneGroup = OPA.convertNonNullish(await OpaDb.TimeZoneGroups.queries.getById(dataStorageState, archive.defaultTimeZoneGroupId));
+  const archive = await OpaDb.Archive.queries.getByIdWithAssert(dataStorageState, OpaDm.ArchiveId);
+  const locale = await OpaDb.Locales.queries.getByIdWithAssert(dataStorageState, archive.defaultLocaleId);
+  const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getByIdWithAssert(dataStorageState, archive.defaultTimeZoneGroupId);
 
   let authState = TestAuthData.admin;
   authState.opaUserId = await OpaDb.Users.queries.createWithRole(dataStorageState, authState.firebaseAuthUserId, authProvider, authState.email, role_Admin, locale, timeZoneGroup, authState.firstName ?? "", authState.lastName ?? "", authState.displayName); // eslint-disable-line max-len
@@ -81,7 +86,6 @@ export async function assertUserDoesExist(dataStorageState: OpaDm.IDataStorageSt
  * @return {Promise<OpaDm.IAccessRequest>}
  */
 export async function assertAccessRequestDoesExist(dataStorageState: OpaDm.IDataStorageState, accessRequestId: string): Promise<OpaDm.IAccessRequest> {
-  const accessRequest = await OpaDb.AccessRequests.queries.getById(dataStorageState, accessRequestId);
-  OPA.assertNonNullish(accessRequest, "The AccessRequest was expected to exist.");
-  return OPA.convertNonNullish(accessRequest);
+  const accessRequest = await OpaDb.AccessRequests.queries.getByIdWithAssert(dataStorageState, accessRequestId, "The AccessRequest was expected to exist.");
+  return accessRequest;
 }

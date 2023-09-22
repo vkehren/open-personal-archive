@@ -1,5 +1,3 @@
-// export const name = "Messaging";
-
 export interface ICallResult<T> {
   readonly success: boolean,
   readonly message: string,

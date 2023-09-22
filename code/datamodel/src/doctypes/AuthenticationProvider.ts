@@ -1,6 +1,8 @@
 import * as OPA from "../../../base/src";
 import * as CollectionData from "./AuthenticationProviders.json";
 
+/* eslint-disable camelcase */
+
 const SingularName = "AuthenticationProvider";
 const PluralName = "AuthenticationProviders";
 const IsSingleton = false;
@@ -11,12 +13,17 @@ const DefaultDocument = (RequiredDocuments.find((v) => v.isDefault) as IAuthenti
 export const DefaultAuthenticationProviderId = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNonNullish(DefaultDocument).id : AuthenticationProvider_GoogleId; // eslint-disable-line camelcase
 
 export interface IAuthenticationProvider extends OPA.IDocument_Creatable {
-  readonly id: string;
   readonly name: string;
   readonly externalId: string;
   readonly displayOrder: number;
   readonly isDefault: boolean;
 }
+const IAuthenticationProvider_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
+  OPA.getTypedPropertyKeyAsText<IAuthenticationProvider>("name"),
+  OPA.getTypedPropertyKeyAsText<IAuthenticationProvider>("externalId"),
+  OPA.getTypedPropertyKeyAsText<IAuthenticationProvider>("displayOrder"),
+  OPA.getTypedPropertyKeyAsText<IAuthenticationProvider>("isDefault"),
+];
 
 type IAuthenticationProviderPartial = unknown;
 /**
@@ -28,6 +35,15 @@ type IAuthenticationProviderPartial = unknown;
 export function areUpdatesValid(document: IAuthenticationProvider, updateObject: IAuthenticationProviderPartial): boolean {
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
+
+  const updateObject_AsUnknown = (updateObject as unknown);
+
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IAuthenticationProvider_ReadOnlyPropertyNames)) {
+    return false;
+  }
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject_AsUnknown as OPA.ICreatable)) {
+    return false;
+  }
 
   // NOTE: Currently, AuthenticationProviders are not updateable
   return false;
@@ -55,7 +71,7 @@ export class AuthenticationProviderQuerySet extends OPA.QuerySet<IAuthentication
    * Gets the Authentication Provider by that Provider's externally provided ID, since that ID is also a unique key.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} externalId The ID for the Authentication Provider that is provided by the corresponding Provider.
-   * @return {Promise<IAuthenticationProvider | null>} The User corresponding to the UUID, or null if none exists.
+   * @return {Promise<IAuthenticationProvider | null>} The Authentication Provider corresponding to the ID, or null if none exists.
    */
   async getByExternalAuthProviderId(ds: OPA.IDataStorageState, externalId: string): Promise<IAuthenticationProvider | null> {
     OPA.assertDataStorageStateIsNotNullish(ds);
@@ -76,6 +92,20 @@ export class AuthenticationProviderQuerySet extends OPA.QuerySet<IAuthentication
     const authProvider = matchingAuthProvidersSnap.docs[0].data();
     const proxiedAuthProvider = this.documentProxyConstructor(authProvider);
     return proxiedAuthProvider;
+  }
+
+  /**
+   * Gets the Auth Provider by that its externally provided ID, since that ID is also a unique key, and asserts that the Auth Provider is valid (i.e. is non-null and has non-null "id" property).
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
+   * @param {string} externalId The ID for the Authentication Provider that is provided by the corresponding Provider.
+   * @param {string} [assertionFailureMessage=default] The message to include in the Error if the assertion fails.
+   * @return {Promise<IAuthenticationProvider>} The Authentication Provider corresponding to the ID.
+   */
+  async getByExternalAuthProviderIdWithAssert(ds: OPA.IDataStorageState, externalId: string, assertionFailureMessage = "The specified ID does not correspond to a valid authentication provider."): Promise<IAuthenticationProvider> { // eslint-disable-line max-len
+    const authProvider = await this.getByExternalAuthProviderId(ds, externalId);
+    OPA.assertDocumentIsValid(authProvider, assertionFailureMessage, assertionFailureMessage);
+    const authProviderNonNull = OPA.convertNonNullish(authProvider);
+    return authProviderNonNull;
   }
 }
 

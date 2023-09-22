@@ -24,8 +24,7 @@ interface IArchivePartial_WithHistory extends IArchivePartial, OPA.IUpdateable_B
   updateHistory: Array<UpdateHistoryItem> | firestore.FieldValue;
 }
 
-export interface IArchive extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser {
-  readonly id: string;
+export interface IArchive extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser_WithHistory<UpdateHistoryItem> {
   readonly ownerId: string;
   readonly pathToStorageFolder: string;
   name: OPA.ILocalizable<string>;
@@ -33,8 +32,11 @@ export interface IArchive extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_
   defaultLocaleId: string;
   defaultTimeZoneGroupId: string;
   defaultTimeZoneId: string;
-  readonly updateHistory: Array<UpdateHistoryItem>;
 }
+const IArchive_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
+  OPA.getTypedPropertyKeyAsText<IArchive>("ownerId"),
+  OPA.getTypedPropertyKeyAsText<IArchive>("pathToStorageFolder"),
+];
 
 /**
  * Checks whether the specified updates to the specified Archive document are valid.
@@ -46,31 +48,19 @@ export function areUpdatesValid(document: IArchive, updateObject: IArchivePartia
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  // NOTE: updateObject MUST implement IUpdateable_ByUser, so check immediately and do NOT use "if (true) {...}"
-  const updateObject_Updateable = (updateObject as OPA.IUpdateable_ByUser);
+  const updateObject_AsUnknown = (updateObject as unknown);
 
-  if (!updateObject_Updateable.hasBeenUpdated || OPA.isNullish(updateObject_Updateable.dateOfLatestUpdate) || OPA.isNullish(updateObject_Updateable.userIdOfLatestUpdater)) {
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IArchive_ReadOnlyPropertyNames)) {
+    return false;
+  }
+  if (!OPA.areUpdatesValid_ForCreatable_ByUser(document, updateObject_AsUnknown as OPA.ICreatable_ByUser)) {
+    return false;
+  }
+  const preventUpdates_ForUpdateable_ByUser = false;
+  if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObject_AsUnknown as OPA.IUpdateable_ByUser, preventUpdates_ForUpdateable_ByUser)) {
     return false;
   }
 
-  // NOTE: updateObject MUST NOT change read-only data
-  const propertyNames_ForUpdate = OPA.getOwnPropertyKeys(updateObject);
-  const id_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).id);
-  const ownerId_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).ownerId);
-  const pathToStorageFolder_IsUpdated = propertyNames_ForUpdate.includes(OPA.getTypedPropertyKeysAsText(document).pathToStorageFolder);
-
-  if (id_IsUpdated || ownerId_IsUpdated || pathToStorageFolder_IsUpdated) {
-    return false;
-  }
-
-  // NOTE: updateObject MUST NOT erase read-only history of changes
-  const updateHistory_KeyText = OPA.getTypedPropertyKeysAsText(document).updateHistory;
-  const updateHistory_IsUpdated = propertyNames_ForUpdate.includes(updateHistory_KeyText);
-  const updateHistory_Value = (updateObject as Record<string, unknown>)[updateHistory_KeyText];
-
-  if (updateHistory_IsUpdated && !OPA.isOfFieldValue_ArrayUnion<firestore.FieldValue>(updateHistory_Value)) {
-    return false;
-  }
   return true;
 }
 
@@ -176,17 +166,20 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
+    // NOTE: Get the document earlier to check validity before and after setting "updateHistory" to also make sure it was not set on the "updateObject" passed in
     const documentId = SingletonId;
+    const document = await this.getByIdWithAssert(ds, documentId);
+
     const now = OPA.nowToUse();
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
     updateObject = {...updateObject, ...updateObject_Updateable};
+    let areValid = areUpdatesValid(document, updateObject);
+    OPA.assertIsTrue(areValid, "The requested update is invalid.");
+
     const updateObject_ForHistory = OPA.replaceFieldValuesWithSummaries({...updateObject});
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IArchivePartial_WithHistory);
-
-    const document = await this.getById(ds, documentId);
-    OPA.assertNonNullish(document);
-    const areValid = areUpdatesValid(OPA.convertNonNullish(document), updateObject_WithHistory);
+    areValid = areUpdatesValid(document, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());

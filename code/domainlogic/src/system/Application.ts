@@ -114,11 +114,10 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
  * @param {string} pathToStorageFolder The path to the root folder for storing files in Firebase Storage.
  * @param {string} defaultLocaleId The ID of the default Locale for the Archive.
  * @param {string} defaultTimeZoneGroupId The ID of the default TimeZoneGroup for the Archive.
- * @param {string} ownerFirstName The first name of the owner of the Archive.
- * @param {string} ownerLastName The last name of the owner of the Archive.
+ * @param {string} installationNotes Any notes of documentation about the installation.
  * @return {Promise<void>}
  */
-export async function performInstall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState, archiveName: string, archiveDescription: string, pathToStorageFolder: string, defaultLocaleId: string, defaultTimeZoneGroupId: string, ownerFirstName: string, ownerLastName: string): Promise<void> { // eslint-disable-line max-len
+export async function performInstall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState, archiveName: string, archiveDescription: string, pathToStorageFolder: string, defaultLocaleId: string, defaultTimeZoneGroupId: string, installationNotes: string): Promise<void> { // eslint-disable-line max-len
   OPA.assertDataStorageStateIsNotNullish(dataStorageState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
@@ -134,9 +133,11 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   const ownerFirebaseAuthUserId = authenticationState.firebaseAuthUserId;
   const externalAuthProviderId = authenticationState.providerId;
   const ownerAccountName = authenticationState.email;
+  const ownerFirstName = OPA.convertNonNullish(authenticationState.firstName, "");
+  const ownerLastName = OPA.convertNonNullish(authenticationState.lastName, "");
 
   // 1) Create the Application document
-  await OpaDb.Application.queries.create(dataStorageState, ApplicationInfo.VERSION, SchemaInfo.VERSION);
+  await OpaDb.Application.queries.create(dataStorageState, ApplicationInfo.VERSION, SchemaInfo.VERSION, installationNotes);
 
   // 2) Load required data
   const requiredAuthProviderIds = OpaDm.AuthenticationProvider_RequiredIds;
@@ -165,22 +166,13 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   await OpaDb.TimeZoneGroups.loadRequiredDocuments(dataStorageState, eraseExistingData);
 
   // 3) Create the User document for the Owner of the Archive
-  const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(dataStorageState, externalAuthProviderId);
-  OPA.assertDocumentIsValid(authProvider, "The required AuthProvider does not exist.");
-  const roleOwner = await OpaDb.Roles.queries.getById(dataStorageState, OpaDm.Role_OwnerId);
-  OPA.assertDocumentIsValid(roleOwner, "The required Role does not exist.");
-  const localeDefault = await OpaDb.Locales.queries.getById(dataStorageState, defaultLocaleId);
-  OPA.assertDocumentIsValid(localeDefault, "The required Locale does not exist.");
-  const timeZoneGroupDefault = await OpaDb.TimeZoneGroups.queries.getById(dataStorageState, defaultTimeZoneGroupId);
-  OPA.assertDocumentIsValid(timeZoneGroupDefault, "The required TimeZoneGroup does not exist.");
-
-  const authProviderNonNull = OPA.convertNonNullish(authProvider);
-  const localeDefaultNonNull = OPA.convertNonNullish(localeDefault);
-  const timeZoneGroupDefaultNonNull = OPA.convertNonNullish(timeZoneGroupDefault);
-  const userOwner = await OpaDb.Users.queries.createArchiveOwner(dataStorageState, ownerFirebaseAuthUserId, authProviderNonNull, ownerAccountName, localeDefaultNonNull, timeZoneGroupDefaultNonNull, ownerFirstName, ownerLastName); // eslint-disable-line max-len
+  const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderIdWithAssert(dataStorageState, externalAuthProviderId, "The required AuthProvider does not exist.");
+  const localeDefault = await OpaDb.Locales.queries.getByIdWithAssert(dataStorageState, defaultLocaleId, "The required Locale does not exist.");
+  const timeZoneGroupDefault = await OpaDb.TimeZoneGroups.queries.getByIdWithAssert(dataStorageState, defaultTimeZoneGroupId, "The required TimeZoneGroup does not exist.");
+  const userOwner = await OpaDb.Users.queries.createArchiveOwner(dataStorageState, ownerFirebaseAuthUserId, authProvider, ownerAccountName, localeDefault, timeZoneGroupDefault, ownerFirstName, ownerLastName); // eslint-disable-line max-len
 
   // 4) Create the Archive document for the Archive
-  await OpaDb.Archive.queries.create(dataStorageState, archiveName, archiveDescription, pathToStorageFolder, userOwner, localeDefaultNonNull, timeZoneGroupDefaultNonNull);
+  await OpaDb.Archive.queries.create(dataStorageState, archiveName, archiveDescription, pathToStorageFolder, userOwner, localeDefault, timeZoneGroupDefault);
   await dataStorageState.currentWriteBatch.commit();
   dataStorageState.currentWriteBatch = null;
 }
@@ -218,35 +210,27 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
   const currentLocaleNonNull = authorizationState.locale;
   const localeToUse = currentLocaleNonNull.optionName;
 
-  const archive = await OpaDb.Archive.queries.getById(callState.dataStorageState, OpaDm.ArchiveId);
-  OPA.assertDocumentIsValid(archive, "The Archive does not exist.");
-  const archiveNonNull = OPA.convertNonNullish(archive);
+  const archive = await OpaDb.Archive.queries.getByIdWithAssert(callState.dataStorageState, OpaDm.ArchiveId, "The Archive does not exist.");
 
   const archivePartial: OpaDm.IArchivePartial = {};
-  if ((archiveName) && (archiveNonNull.name[localeToUse] != archiveName)) {
-    archivePartial.name = {...archiveNonNull.name};
+  if ((archiveName) && (archive.name[localeToUse] != archiveName)) {
+    archivePartial.name = {...archive.name};
     archivePartial.name[localeToUse] = archiveName;
   }
-  if ((archiveDescription) && (archiveNonNull.description[localeToUse] != archiveDescription)) {
-    archivePartial.description = {...archiveNonNull.description};
+  if ((archiveDescription) && (archive.description[localeToUse] != archiveDescription)) {
+    archivePartial.description = {...archive.description};
     archivePartial.description[localeToUse] = archiveDescription;
   }
-  if ((defaultLocaleId) && (archiveNonNull.defaultLocaleId != defaultLocaleId)) {
-    const locale = await OpaDb.Locales.queries.getById(callState.dataStorageState, defaultLocaleId);
-    OPA.assertDocumentIsValid(locale, "The Locale specified does not exist.");
-
+  if ((defaultLocaleId) && (archive.defaultLocaleId != defaultLocaleId)) {
+    await OpaDb.Locales.queries.getByIdWithAssert(callState.dataStorageState, defaultLocaleId, "The Locale specified does not exist.");
     archivePartial.defaultLocaleId = defaultLocaleId;
   }
-  if ((defaultTimeZoneGroupId) && (archiveNonNull.defaultTimeZoneGroupId != defaultTimeZoneGroupId)) {
-    const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getById(callState.dataStorageState, defaultTimeZoneGroupId);
-    OPA.assertDocumentIsValid(timeZoneGroup, "The TimeZoneGroup specified does not exist.");
-
+  if ((defaultTimeZoneGroupId) && (archive.defaultTimeZoneGroupId != defaultTimeZoneGroupId)) {
+    await OpaDb.TimeZoneGroups.queries.getByIdWithAssert(callState.dataStorageState, defaultTimeZoneGroupId, "The TimeZoneGroup specified does not exist.");
     archivePartial.defaultTimeZoneGroupId = defaultTimeZoneGroupId;
   }
-  if ((defaultTimeZoneId) && (archiveNonNull.defaultTimeZoneId != defaultTimeZoneId)) {
-    const timeZone = await OpaDb.TimeZones.queries.getById(callState.dataStorageState, defaultTimeZoneId);
-    OPA.assertDocumentIsValid(timeZone, "The TimeZone specified does not exist.");
-
+  if ((defaultTimeZoneId) && (archive.defaultTimeZoneId != defaultTimeZoneId)) {
+    await OpaDb.TimeZones.queries.getByIdWithAssert(callState.dataStorageState, defaultTimeZoneId, "The TimeZone specified does not exist.");
     archivePartial.defaultTimeZoneId = defaultTimeZoneId;
   }
   // LATER: Consider allowing change to root storage folder if no files have been added yet
@@ -263,10 +247,11 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
 /**
  * Upgrades the Open Personal Archive™ (OPA) system to the latest version.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} upgradeNotes Any notes of documentation about the installation.
  * @param {boolean} [doBackupFirst=false] Whether to backup the data before upgrading it (NOT IMPLEMENTED YET).
  * @return {Promise<void>}
  */
-export async function performUpgrade(callState: OpaDm.ICallState, doBackupFirst = false): Promise<void> { // eslint-disable-line max-len
+export async function performUpgrade(callState: OpaDm.ICallState, upgradeNotes: string, doBackupFirst = false): Promise<void> { // eslint-disable-line max-len
   OPA.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
@@ -291,12 +276,9 @@ export async function performUpgrade(callState: OpaDm.ICallState, doBackupFirst 
     throw new Error("Backup of existing Archive data has not been implemented yet.");
   }
 
-  const application = await OpaDb.Application.queries.getById(callState.dataStorageState, OpaDm.ApplicationId);
-  OPA.assertDocumentIsValid(application, "The Application does not exist.");
-  const applicationNonNull = OPA.convertNonNullish(application);
-
-  const applicationComparison = OPA.compareVersionNumberStrings(applicationNonNull.applicationVersion, ApplicationInfo.VERSION);
-  const schemaComparison = OPA.compareVersionNumberStrings(applicationNonNull.schemaVersion, SchemaInfo.VERSION);
+  const application = await OpaDb.Application.queries.getByIdWithAssert(callState.dataStorageState, OpaDm.ApplicationId, "The Application does not exist.");
+  const applicationComparison = OPA.compareVersionNumberStrings(application.applicationVersion, ApplicationInfo.VERSION);
+  const schemaComparison = OPA.compareVersionNumberStrings(application.schemaVersion, SchemaInfo.VERSION);
 
   OPA.assertNonNullish(applicationComparison, "The application version numbers provided are invalid.");
   OPA.assertNonNullish(schemaComparison, "The schema version numbers provided are invalid.");
@@ -304,19 +286,22 @@ export async function performUpgrade(callState: OpaDm.ICallState, doBackupFirst 
   OPA.assertIsFalse((schemaComparison < 0), "The schema version number currently cannot be downgraded.");
   OPA.assertIsFalse((applicationComparison == 0) && (schemaComparison == 0), "The application and schema version numbers match the latest build.");
 
-  // LATER: Do upgrade work here
-
-  const applicationPartial: OpaDm.IApplicationPartial = {};
+  let isVersionInfoValidForUpgrade = false;
+  const applicationPartial: OpaDm.IApplicationPartial = {notes: upgradeNotes};
   if (applicationComparison > 0) {
     applicationPartial.applicationVersion = ApplicationInfo.VERSION;
+    isVersionInfoValidForUpgrade = true;
   }
   if (schemaComparison > 0) {
     applicationPartial.schemaVersion = SchemaInfo.VERSION;
+    isVersionInfoValidForUpgrade = true;
   }
 
-  if (OPA.isEmpty(applicationPartial)) {
+  if (!isVersionInfoValidForUpgrade) {
     throw new Error("No upgraded version was provided.");
   }
+
+  // LATER: Do upgrade work here
 
   await OpaDb.Application.queries.upgrade(callState.dataStorageState, applicationPartial, currentUserNonNull.id);
   await callState.dataStorageState.currentWriteBatch.commit();

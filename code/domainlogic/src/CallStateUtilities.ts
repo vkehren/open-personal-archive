@@ -94,26 +94,12 @@ export async function readAuthorizationStateForFirebaseAuthUser(dataStorageState
   const isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
   OPA.assertSystemIsInstalled(isSystemInstalled);
 
-  const user = await OpaDb.Users.queries.getByFirebaseAuthUserId(dataStorageState, firebaseAuthUserId);
-  OPA.assertDocumentIsValid(user, "The current User must be properly authenticated.");
-  const userNonNull = OPA.convertNonNullish(user);
+  const user = await OpaDb.Users.queries.getByFirebaseAuthUserIdWithAssert(dataStorageState, firebaseAuthUserId, "The current User must be properly authenticated.");
+  const role = await OpaDb.Roles.queries.getByIdWithAssert(dataStorageState, user.assignedRoleId, "The current User's Role must be properly assigned.");
+  const locale = await OpaDb.Locales.queries.getByIdWithAssert(dataStorageState, user.localeId, "The current User must have a valid Locale.");
+  const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getByIdWithAssert(dataStorageState, user.timeZoneGroupId, "The current User must have a valid Time Zone Group.");
+  const timeZone = await OpaDb.TimeZones.queries.getByIdWithAssert(dataStorageState, user.timeZoneId, "The current User must have a valid Time Zone.");
 
-  const role = await OpaDb.Roles.queries.getById(dataStorageState, userNonNull.assignedRoleId);
-  OPA.assertDocumentIsValid(role, "The current User's Role must be properly assigned.");
-  const roleNonNull = OPA.convertNonNullish(role);
-
-  const locale = await OpaDb.Locales.queries.getById(dataStorageState, userNonNull.localeId);
-  OPA.assertDocumentIsValid(locale, "The current User must have a valid Locale.");
-  const localeNonNull = OPA.convertNonNullish(locale);
-
-  const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getById(dataStorageState, userNonNull.timeZoneGroupId);
-  OPA.assertDocumentIsValid(timeZoneGroup, "The current User must have a valid Time Zone Group.");
-  const timeZoneGroupNonNull = OPA.convertNonNullish(timeZoneGroup);
-
-  const timeZone = await OpaDb.TimeZones.queries.getById(dataStorageState, userNonNull.timeZoneId);
-  OPA.assertDocumentIsValid(timeZone, "The current User must have a valid Time Zone.");
-  const timeZoneNonNull = OPA.convertNonNullish(timeZone);
-
-  const result = new OpaDm.AuthorizationState(userNonNull, roleNonNull, localeNonNull, timeZoneGroupNonNull, timeZoneNonNull);
+  const result = new OpaDm.AuthorizationState(user, role, locale, timeZoneGroup, timeZone);
   return result;
 }

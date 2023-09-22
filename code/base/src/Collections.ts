@@ -2,8 +2,6 @@ import * as BT from "./BaseTypes";
 import * as TC from "./TypeChecking";
 import * as VC from "./ValueChecking";
 
-// export const name = "Collections";
-
 /**
  * Creates a Map from the specified Array of complex values.
  * @param {Array<T>} array The Array of values.

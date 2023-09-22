@@ -2,6 +2,8 @@ import * as OPA from "../../../base/src";
 import * as BT from "../BaseTypes";
 import * as CollectionData from "./Roles.json";
 
+/* eslint-disable camelcase */
+
 const SingularName = "Role";
 const PluralName = "Roles";
 const IsSingleton = false;
@@ -16,12 +18,17 @@ const DefaultDocument = (RequiredDocuments.find((v) => v.isDefault) as IRole | u
 export const DefaultRoleId = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNonNullish(DefaultDocument).id : Role_GuestId; // eslint-disable-line camelcase
 
 export interface IRole extends OPA.IDocument_Creatable {
-  readonly id: string;
   readonly name: string;
   readonly type: BT.RoleType;
   readonly displayOrder: number;
   readonly isDefault: boolean;
 }
+const IRole_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
+  OPA.getTypedPropertyKeyAsText<IRole>("name"),
+  OPA.getTypedPropertyKeyAsText<IRole>("type"),
+  OPA.getTypedPropertyKeyAsText<IRole>("displayOrder"),
+  OPA.getTypedPropertyKeyAsText<IRole>("isDefault"),
+];
 
 type IRolePartial = unknown;
 /**
@@ -33,6 +40,15 @@ type IRolePartial = unknown;
 export function areUpdatesValid(document: IRole, updateObject: IRolePartial): boolean {
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
+
+  const updateObject_AsUnknown = (updateObject as unknown);
+
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IRole_ReadOnlyPropertyNames)) {
+    return false;
+  }
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject_AsUnknown as OPA.ICreatable)) {
+    return false;
+  }
 
   // NOTE: Currently, Roles are not updateable
   return false;

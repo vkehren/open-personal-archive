@@ -99,24 +99,17 @@ export async function initializeUserAccount(callState: OpaDm.ICallState, authPro
   const firstName = (!OPA.isNullishOrWhitespace(callState.authenticationState.firstName)) ? OPA.convertNonNullish(callState.authenticationState.firstName) : "";
   const lastName = (!OPA.isNullishOrWhitespace(callState.authenticationState.lastName)) ? OPA.convertNonNullish(callState.authenticationState.lastName) : "";
 
-  const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(callState.dataStorageState, authProviderId);
-  OPA.assertDocumentIsValid(authProvider, "The required AuthProvider does not exist.");
-  const assignedRole = await OpaDb.Roles.queries.getById(callState.dataStorageState, OpaDm.DefaultRoleId);
-  OPA.assertDocumentIsValid(assignedRole, "The required Role does not exist.");
-  const locale = await OpaDb.Locales.queries.getById(callState.dataStorageState, systemState.archive.defaultLocaleId);
-  OPA.assertDocumentIsValid(locale, "The required Locale does not exist.");
-  const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getById(callState.dataStorageState, systemState.archive.defaultTimeZoneGroupId);
-  OPA.assertDocumentIsValid(timeZoneGroup, "The required TimeZoneGroup does not exist.");
+  const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderIdWithAssert(callState.dataStorageState, authProviderId, "The required AuthProvider does not exist.");
+  const assignedRole = await OpaDb.Roles.queries.getByIdWithAssert(callState.dataStorageState, OpaDm.DefaultRoleId, "The required Role does not exist.");
+  const locale = await OpaDb.Locales.queries.getByIdWithAssert(callState.dataStorageState, systemState.archive.defaultLocaleId, "The required Locale does not exist.");
+  const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getByIdWithAssert(callState.dataStorageState, systemState.archive.defaultTimeZoneGroupId, "The required TimeZoneGroup does not exist.");
 
-  const userId = await OpaDb.Users.queries.createWithRole(callState.dataStorageState, firebaseAuthUserId, OPA.convertNonNullish(authProvider), authAccountName, OPA.convertNonNullish(assignedRole), OPA.convertNonNullish(locale), OPA.convertNonNullish(timeZoneGroup), firstName, lastName);// eslint-disable-line max-len
+  const userId = await OpaDb.Users.queries.createWithRole(callState.dataStorageState, firebaseAuthUserId, authProvider, authAccountName, assignedRole, locale, timeZoneGroup, firstName, lastName);
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
-  const userReRead = await OpaDb.Users.queries.getById(callState.dataStorageState, userId);
-  OPA.assertDocumentIsValid(userReRead, "The requested User does not exist.");
-  const userReReadNonNull = OPA.convertNonNullish(userReRead);
-
-  return userReReadNonNull;
+  const userReRead = await OpaDb.Users.queries.getByIdWithAssert(callState.dataStorageState, userId, "The requested User does not exist.");
+  return userReRead;
 }
 
 /**
@@ -145,11 +138,8 @@ export async function updateUserProfile(callState: OpaDm.ICallState, updateObjec
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
-  const userReRead = await OpaDb.Users.queries.getById(callState.dataStorageState, authorizationState.user.id);
-  OPA.assertDocumentIsValid(userReRead, "The requested User does not exist.");
-  const userReReadNonNull = OPA.convertNonNullish(userReRead);
-
-  return userReReadNonNull;
+  const userReRead = await OpaDb.Users.queries.getByIdWithAssert(callState.dataStorageState, authorizationState.user.id, "The requested User does not exist.");
+  return userReRead;
 }
 
 /**
@@ -179,19 +169,14 @@ export async function assignUserToRole(callState: OpaDm.ICallState, userIdToAssi
   authorizationState.assertUserApproved();
   authorizationState.assertRoleAllowed(authorizerIds);
 
-  const roleToAssign = await OpaDb.Roles.queries.getById(callState.dataStorageState, roleIdToAssign);
-  OPA.assertNonNullish(roleToAssign);
-  const roleToAssignNonNull = OPA.convertNonNullish(roleToAssign);
+  const roleToAssign = await OpaDb.Roles.queries.getByIdWithAssert(callState.dataStorageState, roleIdToAssign);
 
-  await OpaDb.Users.queries.assignToRole(callState.dataStorageState, userIdToAssign, roleToAssignNonNull, authorizationState.user.id);
+  await OpaDb.Users.queries.assignToRole(callState.dataStorageState, userIdToAssign, roleToAssign, authorizationState.user.id);
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
-  const userReRead = await OpaDb.Users.queries.getById(callState.dataStorageState, userIdToAssign);
-  OPA.assertDocumentIsValid(userReRead, "The requested User does not exist.");
-  const userReReadNonNull = OPA.convertNonNullish(userReRead);
-
-  return userReReadNonNull;
+  const userReRead = await OpaDb.Users.queries.getByIdWithAssert(callState.dataStorageState, userIdToAssign, "The requested User does not exist.");
+  return userReRead;
 }
 
 /**
@@ -227,11 +212,8 @@ export async function addRequestedCitationToUser(callState: OpaDm.ICallState, us
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
-  const userReRead = await OpaDb.Users.queries.getById(callState.dataStorageState, userIdToUpdate);
-  OPA.assertDocumentIsValid(userReRead, "The requested User does not exist.");
-  const userReReadNonNull = OPA.convertNonNullish(userReRead);
-
-  return userReReadNonNull;
+  const userReRead = await OpaDb.Users.queries.getByIdWithAssert(callState.dataStorageState, userIdToUpdate, "The requested User does not exist.");
+  return userReRead;
 }
 
 /**
@@ -267,11 +249,8 @@ export async function addViewableCitationToUser(callState: OpaDm.ICallState, use
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
-  const userReRead = await OpaDb.Users.queries.getById(callState.dataStorageState, userIdToUpdate);
-  OPA.assertDocumentIsValid(userReRead, "The requested User does not exist.");
-  const userReReadNonNull = OPA.convertNonNullish(userReRead);
-
-  return userReReadNonNull;
+  const userReRead = await OpaDb.Users.queries.getByIdWithAssert(callState.dataStorageState, userIdToUpdate, "The requested User does not exist.");
+  return userReRead;
 }
 
 /**
@@ -304,11 +283,8 @@ export async function setUserToViewed(callState: OpaDm.ICallState, userIdToSet: 
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
-  const userReRead = await OpaDb.Users.queries.getById(callState.dataStorageState, userIdToSet);
-  OPA.assertDocumentIsValid(userReRead, "The requested User does not exist.");
-  const userReReadNonNull = OPA.convertNonNullish(userReRead);
-
-  return userReReadNonNull;
+  const userReRead = await OpaDb.Users.queries.getByIdWithAssert(callState.dataStorageState, userIdToSet, "The requested User does not exist.");
+  return userReRead;
 }
 
 /**
@@ -318,7 +294,7 @@ export async function setUserToViewed(callState: OpaDm.ICallState, userIdToSet: 
  * @param {OpaDm.ApprovalState} approvalState The ApprovalState to set to.
  * @return {Promise<OpaDm.IUser>}
  */
-export async function setUserToApprovalState(callState: OpaDm.ICallState, userIdToSet: string, approvalState: OpaDm.ApprovalState): Promise<OpaDm.IUser> {
+export async function setUserToApprovalState(callState: OpaDm.ICallState, userIdToSet: string, approvalState: OPA.ApprovalState): Promise<OpaDm.IUser> {
   OPA.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
@@ -342,11 +318,8 @@ export async function setUserToApprovalState(callState: OpaDm.ICallState, userId
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
-  const userReRead = await OpaDb.Users.queries.getById(callState.dataStorageState, userIdToSet);
-  OPA.assertDocumentIsValid(userReRead, "The requested User does not exist.");
-  const userReReadNonNull = OPA.convertNonNullish(userReRead);
-
-  return userReReadNonNull;
+  const userReRead = await OpaDb.Users.queries.getByIdWithAssert(callState.dataStorageState, userIdToSet, "The requested User does not exist.");
+  return userReRead;
 }
 
 /**
@@ -356,7 +329,7 @@ export async function setUserToApprovalState(callState: OpaDm.ICallState, userId
  * @return {Promise<OpaDm.IUser>}
  */
 export async function setUserToApproved(callState: OpaDm.ICallState, userIdToSet: string): Promise<OpaDm.IUser> {
-  return await setUserToApprovalState(callState, userIdToSet, OpaDm.ApprovalStates.approved);
+  return await setUserToApprovalState(callState, userIdToSet, OPA.ApprovalStates.approved);
 }
 
 /**
@@ -366,7 +339,7 @@ export async function setUserToApproved(callState: OpaDm.ICallState, userIdToSet
  * @return {Promise<OpaDm.IUser>}
  */
 export async function setUserToDenied(callState: OpaDm.ICallState, userIdToSet: string): Promise<OpaDm.IUser> {
-  return await setUserToApprovalState(callState, userIdToSet, OpaDm.ApprovalStates.denied);
+  return await setUserToApprovalState(callState, userIdToSet, OPA.ApprovalStates.denied);
 }
 
 /**
@@ -405,11 +378,8 @@ export async function setUserToSuspensionState(callState: OpaDm.ICallState, user
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
-  const userReRead = await OpaDb.Users.queries.getById(callState.dataStorageState, userIdToSet);
-  OPA.assertDocumentIsValid(userReRead, "The requested User does not exist.");
-  const userReReadNonNull = OPA.convertNonNullish(userReRead);
-
-  return userReReadNonNull;
+  const userReRead = await OpaDb.Users.queries.getByIdWithAssert(callState.dataStorageState, userIdToSet, "The requested User does not exist.");
+  return userReRead;
 }
 
 /**
@@ -435,7 +405,7 @@ export async function setUserToUnSuspended(callState: OpaDm.ICallState, userIdTo
 }
 
 /**
- * Updates the Deleted status of the specified User in the Open Personal Archive™ (OPA) system.
+ * Sets the Deletion status to "true" for the specified User in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
  * @param {string} userIdToSet The User to set the status of.
  * @return {Promise<OpaDm.IUser>}
@@ -464,9 +434,40 @@ export async function markUserAsDeleted(callState: OpaDm.ICallState, userIdToSet
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
-  const userReRead = await OpaDb.Users.queries.getById(callState.dataStorageState, userIdToSet);
-  OPA.assertDocumentIsValid(userReRead, "The requested User does not exist.");
-  const userReReadNonNull = OPA.convertNonNullish(userReRead);
+  const userReRead = await OpaDb.Users.queries.getByIdWithAssert(callState.dataStorageState, userIdToSet, "The requested User does not exist.");
+  return userReRead;
+}
 
-  return userReReadNonNull;
+/**
+ * Sets the Deletion status to "false" for the specified User in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} userIdToSet The User to set the status of.
+ * @return {Promise<OpaDm.IUser>}
+ */
+export async function markUserAsUnDeleted(callState: OpaDm.ICallState, userIdToSet: string): Promise<OpaDm.IUser> {
+  OPA.assertCallStateIsNotNullish(callState);
+  OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
+  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+
+  callState.dataStorageState.currentWriteBatch = callState.dataStorageState.constructorProvider.writeBatch();
+
+  const isSystemInstalled = await Application.isSystemInstalled(callState.dataStorageState);
+  OPA.assertSystemIsInstalled(isSystemInstalled);
+  OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
+  OpaDm.assertSystemStateIsNotNullish(callState.systemState);
+  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+
+  const authorizationState = OPA.convertNonNullish(callState.authorizationState);
+  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
+  const authorizerIds = [...authorizersById.keys()];
+
+  authorizationState.assertUserApproved();
+  authorizationState.assertRoleAllowed(authorizerIds);
+
+  await OpaDb.Users.queries.markAsUnDeleted(callState.dataStorageState, userIdToSet, authorizationState.user.id);
+  await callState.dataStorageState.currentWriteBatch.commit();
+  callState.dataStorageState.currentWriteBatch = null;
+
+  const userReRead = await OpaDb.Users.queries.getByIdWithAssert(callState.dataStorageState, userIdToSet, "The requested User does not exist.");
+  return userReRead;
 }
