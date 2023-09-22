@@ -547,7 +547,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    if (functionType == "logic") {await expect(Users.setUserToApprovalState(callState, testUserId(), OPA.ApprovalStates.denied)).to.eventually.be.rejectedWith(Error);}
+    if (functionType == "logic") {await expect(Users.setUserToDenied(callState, testUserId())).to.eventually.be.rejectedWith(Error);}
     else {await expect(OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, testUserId(), OPA.ApprovalStates.denied, ambientUserId())).to.eventually.be.rejectedWith(Error);}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
@@ -589,7 +589,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    if (functionType == "logic") {await expect(Users.setUserToApprovalState(callState, testUserId(), OPA.ApprovalStates.approved)).to.eventually.be.rejectedWith(Error);}
+    if (functionType == "logic") {await expect(Users.setUserToApproved(callState, testUserId())).to.eventually.be.rejectedWith(Error);}
     else {await expect(OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, testUserId(), OPA.ApprovalStates.approved, ambientUserId())).to.eventually.be.rejectedWith(Error);}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
@@ -968,7 +968,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    if (functionType == "logic") {await Users.setUserToApprovalState(callState, testUserId(), OPA.ApprovalStates.denied);}
+    if (functionType == "logic") {await Users.setUserToDenied(callState, testUserId());}
     else {await OpaDb.Users.queries.setToDecidedOption(config.dataStorageState, testUserId(), OPA.ApprovalStates.denied, ambientUserId());}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
