@@ -155,7 +155,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     // NOTE: Since we pass the Archive Owner's Authorization State, the following call should complete successfully
     wasSuccessful = await Application.performUninstall(config.dataStorageState, config.authenticationState, authorizationState, false);
     expect(wasSuccessful).equals(true);
-    await expect(OpaDb.Application.queries.getById(config.dataStorageState, OpaDm.ApplicationId)).equals(null);
+    expect(await OpaDb.Application.queries.getById(config.dataStorageState, OpaDm.ApplicationId)).equals(null);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
@@ -163,7 +163,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     // NOTE: Since the System is no longer installed, this call should succeed
     wasSuccessful = await Application.performUninstall(config.dataStorageState, config.authenticationState, null, false);
     expect(wasSuccessful).equals(true);
-    await expect(OpaDb.Application.queries.getById(config.dataStorageState, OpaDm.ApplicationId)).equals(null);
+    expect(await OpaDb.Application.queries.getById(config.dataStorageState, OpaDm.ApplicationId)).equals(null);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
@@ -171,7 +171,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     // NOTE: Since the System is no longer installed, this call should also succeed
     wasSuccessful = await Application.performUninstall(config.dataStorageState, config.authenticationState, authorizationState, false);
     expect(wasSuccessful).equals(true);
-    await expect(OpaDb.Application.queries.getById(config.dataStorageState, OpaDm.ApplicationId)).equals(null);
+    expect(await OpaDb.Application.queries.getById(config.dataStorageState, OpaDm.ApplicationId)).equals(null);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
