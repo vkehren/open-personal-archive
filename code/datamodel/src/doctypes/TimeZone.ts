@@ -3,6 +3,8 @@ import * as BT from "../BaseTypes";
 import * as CollectionData_Full from "./TimeZones.json"; // eslint-disable-line camelcase
 import * as CollectionData_Min from "./TimeZones.min.json"; // eslint-disable-line camelcase
 
+/* eslint-disable camelcase */
+
 /**
  * Dynamically gets the required documents.
  * @param {OPA.DateToUse | null} [dateOfCreation=null] The date to use as the value for the "dateOfCreation" property.
@@ -45,11 +47,12 @@ export function areUpdatesValid(document: ITimeZone, updateObject: ITimeZonePart
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  const updateObjectAsUnknown = (updateObject as unknown);
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObjectAsUnknown as OPA.IDocument, ITimeZone_ReadOnlyPropertyNames)) {
+  const updateObject_AsUnknown = (updateObject as unknown);
+
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, ITimeZone_ReadOnlyPropertyNames)) {
     return false;
   }
-  if (!OPA.areUpdatesValid_ForCreatable(document, updateObjectAsUnknown as OPA.ICreatable)) {
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject_AsUnknown as OPA.ICreatable)) {
     return false;
   }
 

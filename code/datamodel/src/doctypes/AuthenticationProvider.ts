@@ -1,6 +1,8 @@
 import * as OPA from "../../../base/src";
 import * as CollectionData from "./AuthenticationProviders.json";
 
+/* eslint-disable camelcase */
+
 const SingularName = "AuthenticationProvider";
 const PluralName = "AuthenticationProviders";
 const IsSingleton = false;
@@ -34,11 +36,12 @@ export function areUpdatesValid(document: IAuthenticationProvider, updateObject:
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  const updateObjectAsUnknown = (updateObject as unknown);
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObjectAsUnknown as OPA.IDocument, IAuthenticationProvider_ReadOnlyPropertyNames)) {
+  const updateObject_AsUnknown = (updateObject as unknown);
+
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IAuthenticationProvider_ReadOnlyPropertyNames)) {
     return false;
   }
-  if (!OPA.areUpdatesValid_ForCreatable(document, updateObjectAsUnknown as OPA.ICreatable)) {
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject_AsUnknown as OPA.ICreatable)) {
     return false;
   }
 

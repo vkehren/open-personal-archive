@@ -2,6 +2,8 @@ import * as OPA from "../../../base/src";
 import * as BT from "../BaseTypes";
 import * as CollectionData from "./Roles.json";
 
+/* eslint-disable camelcase */
+
 const SingularName = "Role";
 const PluralName = "Roles";
 const IsSingleton = false;
@@ -39,11 +41,12 @@ export function areUpdatesValid(document: IRole, updateObject: IRolePartial): bo
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  const updateObjectAsUnknown = (updateObject as unknown);
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObjectAsUnknown as OPA.IDocument, IRole_ReadOnlyPropertyNames)) {
+  const updateObject_AsUnknown = (updateObject as unknown);
+
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IRole_ReadOnlyPropertyNames)) {
     return false;
   }
-  if (!OPA.areUpdatesValid_ForCreatable(document, updateObjectAsUnknown as OPA.ICreatable)) {
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject_AsUnknown as OPA.ICreatable)) {
     return false;
   }
 

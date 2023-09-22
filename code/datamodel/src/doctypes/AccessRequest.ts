@@ -43,37 +43,43 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  const updateObjectAsUnknown = (updateObject as unknown);
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObjectAsUnknown as OPA.IDocument, IAccessRequest_ReadOnlyPropertyNames)) {
-    return false;
-  }
-  if (!OPA.areUpdatesValid_ForCreatable_ByUser(document, updateObjectAsUnknown as OPA.ICreatable_ByUser)) {
-    return false;
-  }
-  if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObjectAsUnknown as OPA.IUpdateable_ByUser)) {
-    return false;
-  }
-  if (!OPA.areUpdatesValid_ForTaggable_ByUser(document, updateObjectAsUnknown as OPA.ITaggable_ByUser, ((updateObjectAsUnknown as OPA.ITaggable_ByUser).userIdOfLatestTagger == document.userIdOfCreator))) { // eslint-disable-line max-len
-    return false;
-  }
-  if (!OPA.areUpdatesValid_ForArchivable_ByUser(document, updateObjectAsUnknown as OPA.IArchivable_ByUser, ((updateObjectAsUnknown as OPA.IArchivable_ByUser).userIdOfArchivalChanger == document.userIdOfCreator))) { // eslint-disable-line max-len
-    return false;
-  }
-  if (!OPA.areUpdatesValid_ForViewable_ByUser(document, updateObjectAsUnknown as OPA.IViewable_ByUser, ((updateObjectAsUnknown as OPA.IViewable_ByUser).userIdOfLatestViewer == document.userIdOfCreator))) { // eslint-disable-line max-len
-    return false;
-  }
-  if (!OPA.areUpdatesValid_ForApprovable_ByUser(document, updateObjectAsUnknown as OPA.IApprovable_ByUser<OPA.ApprovalState>, ((updateObjectAsUnknown as OPA.IApprovable_ByUser<OPA.ApprovalState>).userIdOfDecider == document.userIdOfCreator))) { // eslint-disable-line max-len
-    return false;
-  }
-  if (!OPA.areUpdatesValid_ForDeleteable_ByUser(document, updateObjectAsUnknown as OPA.IDeleteable_ByUser, ((updateObjectAsUnknown as OPA.IDeleteable_ByUser).userIdOfDeletionChanger != document.userIdOfCreator))) { // eslint-disable-line max-len
-    return false;
-  }
+  const updateObject_AsUnknown = (updateObject as unknown);
+  const updateObject_AsUpdateable_ByUser = (updateObject_AsUnknown as OPA.IUpdateable_ByUser);
 
-  const userIdOfLatestUpdater = (updateObjectAsUnknown as OPA.IUpdateable_ByUser).userIdOfLatestUpdater;
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IAccessRequest_ReadOnlyPropertyNames)) {
+    return false;
+  }
+  if (!OPA.areUpdatesValid_ForCreatable_ByUser(document, updateObject_AsUnknown as OPA.ICreatable_ByUser)) {
+    return false;
+  }
+  const preventUpdates_ForUpdateable_ByUser = false;
+  if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObject_AsUpdateable_ByUser, preventUpdates_ForUpdateable_ByUser)) {
+    return false;
+  }
+  const preventUpdates_ForTaggable_ByUser = ((updateObject_AsUnknown as OPA.ITaggable_ByUser).userIdOfLatestTagger == document.userIdOfCreator);
+  if (!OPA.areUpdatesValid_ForTaggable_ByUser(document, updateObject_AsUnknown as OPA.ITaggable_ByUser, preventUpdates_ForTaggable_ByUser)) {
+    return false;
+  }
+  const preventUpdates_ForArchivable_ByUser = ((updateObject_AsUnknown as OPA.IArchivable_ByUser).userIdOfArchivalChanger == document.userIdOfCreator);
+  if (!OPA.areUpdatesValid_ForArchivable_ByUser(document, updateObject_AsUnknown as OPA.IArchivable_ByUser, preventUpdates_ForArchivable_ByUser)) {
+    return false;
+  }
+  const preventUpdates_ForViewable_ByUser = ((updateObject_AsUnknown as OPA.IViewable_ByUser).userIdOfLatestViewer == document.userIdOfCreator);
+  if (!OPA.areUpdatesValid_ForViewable_ByUser(document, updateObject_AsUnknown as OPA.IViewable_ByUser, preventUpdates_ForViewable_ByUser)) {
+    return false;
+  }
+  const preventUpdates_ForApprovable_ByUser = ((updateObject_AsUnknown as OPA.IApprovable_ByUser<OPA.ApprovalState>).userIdOfDecider == document.userIdOfCreator);
+  if (!OPA.areUpdatesValid_ForApprovable_ByUser(document, updateObject_AsUnknown as OPA.IApprovable_ByUser<OPA.ApprovalState>, preventUpdates_ForApprovable_ByUser)) {
+    return false;
+  }
+  const preventUpdates_ForDeleteable_ByUser = ((updateObject_AsUnknown as OPA.IDeleteable_ByUser).userIdOfDeletionChanger != document.userIdOfCreator);
+  if (!OPA.areUpdatesValid_ForDeleteable_ByUser(document, updateObject_AsUnknown as OPA.IDeleteable_ByUser, preventUpdates_ForDeleteable_ByUser)) {
+    return false;
+  }
 
   // NOTE: Only the Creator can update the message
   if (!OPA.isUndefined(updateObject.message) && !OPA.areEqual(document.message, updateObject.message)) {
-    const userNotCreator = (userIdOfLatestUpdater != document.userIdOfCreator);
+    const userNotCreator = (updateObject_AsUpdateable_ByUser.userIdOfLatestUpdater != document.userIdOfCreator);
 
     if (userNotCreator) {
       return false;
@@ -84,11 +90,11 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
   if (!OPA.isUndefined(updateObject.response) && !OPA.areEqual(document.response, updateObject.response)) {
     let userIdsOfViewers = OPA.getIdentifiersFromObjects<OPA.IViewable_ByUser>(document.updateHistory, (doc) => doc.userIdOfLatestViewer);
     userIdsOfViewers = userIdsOfViewers.filter((userId) => (userId != document.userIdOfCreator));
-    const userNotViewer = (!userIdsOfViewers.includes(OPA.convertNonNullish(userIdOfLatestUpdater)));
+    const userNotViewer = (!userIdsOfViewers.includes(OPA.convertNonNullish(updateObject_AsUpdateable_ByUser.userIdOfLatestUpdater)));
 
     let userIdsOfDeciders = OPA.getIdentifiersFromObjects<OPA.IApprovable_ByUser<OPA.ApprovalState>>(document.updateHistory, (doc) => doc.userIdOfDecider);
     userIdsOfDeciders = userIdsOfDeciders.filter((userId) => (userId != document.userIdOfCreator));
-    const userNotDecider = (!userIdsOfDeciders.includes(OPA.convertNonNullish(userIdOfLatestUpdater)));
+    const userNotDecider = (!userIdsOfDeciders.includes(OPA.convertNonNullish(updateObject_AsUpdateable_ByUser.userIdOfLatestUpdater)));
 
     if (userNotViewer && userNotDecider) {
       return false;

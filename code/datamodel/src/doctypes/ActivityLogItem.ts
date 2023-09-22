@@ -1,6 +1,8 @@
 import * as OPA from "../../../base/src";
 import * as BT from "../BaseTypes";
 
+/* eslint-disable camelcase */
+
 const SingularName = "ActivityLogItem";
 const PluralName = "ActivityLogItems";
 const IsSingleton = false;
@@ -44,11 +46,12 @@ export function areUpdatesValid(document: IActivityLogItem, updateObject: IActiv
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  const updateObjectAsUnknown = (updateObject as unknown);
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObjectAsUnknown as OPA.IDocument, IActivityLogItem_ReadOnlyPropertyNames)) {
+  const updateObject_AsUnknown = (updateObject as unknown);
+
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IActivityLogItem_ReadOnlyPropertyNames)) {
     return false;
   }
-  if (!OPA.areUpdatesValid_ForCreatable(document, updateObjectAsUnknown as OPA.ICreatable)) {
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject_AsUnknown as OPA.ICreatable)) {
     return false;
   }
 

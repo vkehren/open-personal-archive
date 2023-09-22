@@ -72,34 +72,40 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
-  const updateObjectAsUnknown = (updateObject as unknown);
+  const updateObject_AsUnknown = (updateObject as unknown);
+  const updateObject_CitationAccessor = (updateObject_AsUnknown as ICitationAccessorPartial);
   const docIsArchiveOwner = ((document.id == User_OwnerId) || (document.assignedRoleId == Role_OwnerId));
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObjectAsUnknown as OPA.IDocument, IUser_ReadOnlyPropertyNames)) {
-    return false;
-  }
-  if (!OPA.areUpdatesValid_ForCreatable(document, updateObjectAsUnknown as OPA.ICreatable)) {
-    return false;
-  }
-  if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObjectAsUnknown as OPA.IUpdateable_ByUser)) {
-    return false;
-  }
-  if (!OPA.areUpdatesValid_ForAssignableToRole_ByUser(document, updateObjectAsUnknown as OPA.IAssignableToRole_ByUser, ((updateObjectAsUnknown as OPA.IAssignableToRole_ByUser).userIdOfLatestRoleAssigner == document.id) || docIsArchiveOwner)) { // eslint-disable-line max-len
-    return false;
-  }
-  if (!OPA.areUpdatesValid_ForViewable_ByUser(document, updateObjectAsUnknown as OPA.IViewable_ByUser, ((updateObjectAsUnknown as OPA.IViewable_ByUser).userIdOfLatestViewer == document.id))) {
-    return false;
-  }
-  if (!OPA.areUpdatesValid_ForApprovable_ByUser(document, updateObjectAsUnknown as OPA.IApprovable_ByUser<OPA.ApprovalState>, (((updateObjectAsUnknown as OPA.IApprovable_ByUser<OPA.ApprovalState>).userIdOfDecider == document.id) || docIsArchiveOwner))) { // eslint-disable-line max-len
-    return false;
-  }
-  if (!OPA.areUpdatesValid_ForSuspendable_ByUser(document, updateObjectAsUnknown as OPA.ISuspendable_ByUser, (((updateObjectAsUnknown as OPA.ISuspendable_ByUser).userIdOfSuspensionStarter == document.id) || ((updateObjectAsUnknown as OPA.ISuspendable_ByUser).userIdOfSuspensionEnder == document.id) || docIsArchiveOwner))) { // eslint-disable-line max-len
-    return false;
-  }
-  if (!OPA.areUpdatesValid_ForDeleteable_ByUser(document, updateObjectAsUnknown as OPA.IDeleteable_ByUser, (((updateObjectAsUnknown as OPA.IDeleteable_ByUser).userIdOfDeletionChanger != document.id) || docIsArchiveOwner))) { // eslint-disable-line max-len
-    return false;
-  }
 
-  const updateObject_CitationAccessor = (updateObjectAsUnknown as ICitationAccessorPartial);
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IUser_ReadOnlyPropertyNames)) {
+    return false;
+  }
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject_AsUnknown as OPA.ICreatable)) {
+    return false;
+  }
+  const preventUpdates_ForUpdateable_ByUser = false;
+  if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObject_AsUnknown as OPA.IUpdateable_ByUser, preventUpdates_ForUpdateable_ByUser)) {
+    return false;
+  }
+  const preventUpdates_ForAssignableToRole_ByUser = (((updateObject_AsUnknown as OPA.IAssignableToRole_ByUser).userIdOfLatestRoleAssigner == document.id) || docIsArchiveOwner);
+  if (!OPA.areUpdatesValid_ForAssignableToRole_ByUser(document, updateObject_AsUnknown as OPA.IAssignableToRole_ByUser, preventUpdates_ForAssignableToRole_ByUser)) {
+    return false;
+  }
+  const preventUpdates_ForViewable_ByUser = ((updateObject_AsUnknown as OPA.IViewable_ByUser).userIdOfLatestViewer == document.id);
+  if (!OPA.areUpdatesValid_ForViewable_ByUser(document, updateObject_AsUnknown as OPA.IViewable_ByUser, preventUpdates_ForViewable_ByUser)) {
+    return false;
+  }
+  const preventUpdates_ForApprovable_ByUser = (((updateObject_AsUnknown as OPA.IApprovable_ByUser<OPA.ApprovalState>).userIdOfDecider == document.id) || docIsArchiveOwner);
+  if (!OPA.areUpdatesValid_ForApprovable_ByUser(document, updateObject_AsUnknown as OPA.IApprovable_ByUser<OPA.ApprovalState>, preventUpdates_ForApprovable_ByUser)) {
+    return false;
+  }
+  const preventUpdates_ForSuspendable_ByUser = (((updateObject_AsUnknown as OPA.ISuspendable_ByUser).userIdOfSuspensionStarter == document.id) || ((updateObject_AsUnknown as OPA.ISuspendable_ByUser).userIdOfSuspensionEnder == document.id) || docIsArchiveOwner); // eslint-disable-line max-len
+  if (!OPA.areUpdatesValid_ForSuspendable_ByUser(document, updateObject_AsUnknown as OPA.ISuspendable_ByUser, preventUpdates_ForSuspendable_ByUser)) {
+    return false;
+  }
+  const preventUpdates_ForDeleteable_ByUser = (((updateObject_AsUnknown as OPA.IDeleteable_ByUser).userIdOfDeletionChanger != document.id) || docIsArchiveOwner);
+  if (!OPA.areUpdatesValid_ForDeleteable_ByUser(document, updateObject_AsUnknown as OPA.IDeleteable_ByUser, preventUpdates_ForDeleteable_ByUser)) {
+    return false;
+  }
 
   // NOTE: Unlike most interfaces used in this fuction, ICitationAccessor only requires that one of the two array properties is updated
   if (OPA.isUndefined(updateObject_CitationAccessor.requestedCitationIds) && OPA.isUndefined(updateObject_CitationAccessor.viewableCitationIds)) {
@@ -116,7 +122,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   } else {
     const dateNotSet = OPA.isNullish(updateObject_CitationAccessor.dateOfLatestCitationChange);
     const userNotSet = OPA.isNullish(updateObject_CitationAccessor.userIdOfLatestCitationChanger);
-    const dateNotCreation = (document.dateOfCreation != (updateObjectAsUnknown as OPA.IAssignableToRole_ByUser).dateOfLatestRoleAssignment);
+    const dateNotCreation = (document.dateOfCreation != (updateObject_AsUnknown as OPA.IAssignableToRole_ByUser).dateOfLatestRoleAssignment);
     const isRequestedNotSelfAssigned = (!OPA.isNullish(updateObject_CitationAccessor.requestedCitationIds) && (updateObject_CitationAccessor.userIdOfLatestCitationChanger != document.id));
     const isViewableSelfAssigned = (!OPA.isNullish(updateObject_CitationAccessor.viewableCitationIds) && (updateObject_CitationAccessor.userIdOfLatestCitationChanger == document.id));
 
