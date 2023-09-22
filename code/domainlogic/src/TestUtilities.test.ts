@@ -4,6 +4,13 @@ import {OpaDbDescriptor as OpaDb} from "../../datamodel/src";
 import * as Application from "./system/Application";
 import {TestAuthData} from "./TestData.test";
 
+export const InstallName = "Test Archive";
+export const InstallDescription = "Archive for Mocha + Chai unit tests.";
+export const InstallPath = "./Test_Archive/files";
+export const InstallLocaleId = OpaDm.DefaultLocaleId;
+export const InstallTimeZoneGroupId = OpaDm.DefaultTimeZoneGroupId;
+export const InstallNotes = "Install performed by Mocha test.";
+
 /**
  * Uses the test AuthenticationStates and the defaults of the system to install the Open Personal Archive™ (OPA) system and create a User for each Role.
  * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
@@ -15,7 +22,7 @@ export async function performInstallForTest(dataStorageState: OpaDm.IDataStorage
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
   // NOTE: Install the Application completely before performing any more writes
-  await Application.performInstall(dataStorageState, authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", OpaDm.DefaultLocaleId, OpaDm.DefaultTimeZoneGroupId, "INSTALL FOR TEST"); // eslint-disable-line max-len
+  await Application.performInstall(dataStorageState, authenticationState, InstallName, InstallDescription, InstallPath, InstallLocaleId, InstallTimeZoneGroupId, InstallNotes); // eslint-disable-line max-len
 
   // NOTE: Create the writeBatch AFTER installation is complete bc data from installation is necessary for later queries in this function
   dataStorageState.currentWriteBatch = dataStorageState.constructorProvider.writeBatch();

@@ -12,6 +12,7 @@ import * as SchemaInfo from "../../../datamodel/src/PackageInfo";
 import * as ApplicationInfo from "../PackageInfo";
 import {TestAuthData} from "../TestData.test";
 import * as TestConfig from "../TestConfiguration.test";
+import * as TestUtils from "../TestUtilities.test";
 
 const config = TestConfig.getTestConfiguration();
 
@@ -155,7 +156,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "INSTALL FOR TEST"); // eslint-disable-line max-len
+    await Application.performInstall(config.dataStorageState, config.authenticationState, TestUtils.InstallName, TestUtils.InstallDescription, TestUtils.InstallPath, TestUtils.InstallLocaleId, TestUtils.InstallTimeZoneGroupId, "INSTALL FOR TEST"); // eslint-disable-line max-len
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -179,14 +180,14 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(archives.length).equals(1);
 
     // NOTE: Since the System is already installed, this call should fail
-    expect(Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "INVALID INSTALL AGAIN FOR TEST")).to.be.rejectedWith(Error); // eslint-disable-line max-len
+    expect(Application.performInstall(config.dataStorageState, config.authenticationState, TestUtils.InstallName, TestUtils.InstallDescription, TestUtils.InstallPath, TestUtils.InstallLocaleId, TestUtils.InstallTimeZoneGroupId, "INVALID INSTALL AGAIN FOR TEST")).to.be.rejectedWith(Error); // eslint-disable-line max-len
   });
 
   test("checks that updateInstallationSettings(...) works properly", async () => {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "INSTALL FOR TEST"); // eslint-disable-line max-len
+    await Application.performInstall(config.dataStorageState, config.authenticationState, TestUtils.InstallName, TestUtils.InstallDescription, TestUtils.InstallPath, TestUtils.InstallLocaleId, TestUtils.InstallTimeZoneGroupId, "INSTALL FOR TEST"); // eslint-disable-line max-len
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -269,7 +270,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "INSTALL FOR TEST"); // eslint-disable-line max-len
+    await Application.performInstall(config.dataStorageState, config.authenticationState, TestUtils.InstallName, TestUtils.InstallDescription, TestUtils.InstallPath, TestUtils.InstallLocaleId, TestUtils.InstallTimeZoneGroupId, "INSTALL FOR TEST"); // eslint-disable-line max-len
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
