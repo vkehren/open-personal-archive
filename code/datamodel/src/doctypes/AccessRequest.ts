@@ -106,13 +106,13 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
 /**
  * Creates an instance of the IAccessRequest document type.
  * @param {string} id The ID for the AccessRequest within the OPA system.
- * @param {IUser} user The User creating the AccessRequest.
+ * @param {IUser} creator The User creating the AccessRequest.
  * @param {ILocale} locale The Locale for that User.
  * @param {string} message A message containing information about the Access Request.
  * @param {string | null} [citationId=null] The ID of the Citation that the Access Request pertains to, if one exists.
  * @return {IAccessRequest} The new document instance.
  */
-function createInstance(id: string, user: IUser, locale: ILocale, message: string, citationId: string | null = null): IAccessRequest { // eslint-disable-line max-len
+function createInstance(id: string, creator: IUser, locale: ILocale, message: string, citationId: string | null = null): IAccessRequest { // eslint-disable-line max-len
   const now = OPA.nowToUse();
   const document: IAccessRequest = {
     id: id,
@@ -123,7 +123,7 @@ function createInstance(id: string, user: IUser, locale: ILocale, message: strin
     response: OPA.localizableStringConstructor(DefaultLocale, ""), // NOTE: The Decider sets the response (and determines its Locale)
     updateHistory: ([] as Array<UpdateHistoryItem>),
     dateOfCreation: now,
-    userIdOfCreator: user.id,
+    userIdOfCreator: creator.id,
     hasBeenUpdated: false,
     dateOfLatestUpdate: null,
     userIdOfLatestUpdater: null,
@@ -192,20 +192,20 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
   /**
    * Creates an instance of the IAccessRequest document type stored on the server.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
-   * @param {IUser} user The User creating the AccessRequest.
+   * @param {IUser} creator The User creating the AccessRequest.
    * @param {ILocale} locale The Locale for that User.
    * @param {string} message A message containing information about the Access Request.
    * @param {string | null} [citationId=null] The ID of the Citation that the Access Request pertains to, if one exists.
    * @return {Promise<string>} The new document ID.
    */
-  async create(ds: OPA.IDataStorageState, user: IUser, locale: ILocale, message: string, citationId: string | null = null): Promise<string> { // eslint-disable-line max-len
+  async create(ds: OPA.IDataStorageState, creator: IUser, locale: ILocale, message: string, citationId: string | null = null): Promise<string> { // eslint-disable-line max-len
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc();
     const documentId = documentRef.id;
-    const document = createInstance(documentId, user, locale, message, citationId);
+    const document = createInstance(documentId, creator, locale, message, citationId);
     const proxiedDocument = this.documentProxyConstructor(document);
 
     OPA.assertNonNullish(proxiedDocument);
