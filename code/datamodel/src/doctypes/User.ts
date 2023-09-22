@@ -37,12 +37,12 @@ interface ICitationAccessorPartial {
   userIdOfLatestCitationChanger: string | null;
 }
 
-type UpdateHistoryItem = IUserPartial | OPA.IUpdateable_ByUser | OPA.IAssignableToRole_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<OPA.ApprovalState> | OPA.ISuspendable_ByUser | OPA.IDeleteable_ByUser; // eslint-disable-line max-len
+type UpdateHistoryItem = IUserPartial | ICitationAccessorPartial | OPA.IUpdateable_ByUser | OPA.IAssignableToRole_ByUser | OPA.IViewable_ByUser | OPA.IApprovable_ByUser<OPA.ApprovalState> | OPA.ISuspendable_ByUser | OPA.IDeleteable_ByUser; // eslint-disable-line max-len
 interface IUserPartial_WithHistory extends IUserPartial, OPA.IUpdateable {
   updateHistory: Array<UpdateHistoryItem> | firestore.FieldValue;
 }
 
-export interface IUser extends OPA.IDocument_Creatable, OPA.IDocument_Updateable_ByUser_WithHistory<UpdateHistoryItem>, OPA.IDocument_AssignableToRole_ByUser, IDocument_CitationAccessor, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<OPA.ApprovalState>, OPA.IDocument_Suspendable_ByUser, OPA.IDocument_Deleteable_ByUser { // eslint-disable-line max-len
+export interface IUser extends IDocument_CitationAccessor, OPA.IDocument_Creatable, OPA.IDocument_Updateable_ByUser_WithHistory<UpdateHistoryItem>, OPA.IDocument_AssignableToRole_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<OPA.ApprovalState>, OPA.IDocument_Suspendable_ByUser, OPA.IDocument_Deleteable_ByUser { // eslint-disable-line max-len
   readonly firebaseAuthUserId: string;
   readonly authProviderId: string;
   readonly authAccountName: string;
@@ -73,9 +73,9 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   OPA.assertNonNullish(updateObject);
 
   const updateObject_AsUnknown = (updateObject as unknown);
-  const updateObject_AsAssignableToRole_ByUser = (updateObject_AsUnknown as OPA.IAssignableToRole_ByUser);
   const updateObject_AsCitationAccessor = (updateObject_AsUnknown as ICitationAccessorPartial);
   const docIsArchiveOwner = ((document.id == User_OwnerId) || (document.assignedRoleId == Role_OwnerId));
+  const statusDate = OPA.convertNonNullish(OPA.getStatusDate(updateObject, OPA.getTypedPropertyKeyAsText<ICitationAccessor>("dateOfLatestCitationChange")), OPA.convertNonNullish(document.dateOfLatestUpdate, document.dateOfCreation)); // eslint-disable-line max-len
 
   if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IUser_ReadOnlyPropertyNames)) {
     return false;
@@ -87,8 +87,8 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObject_AsUnknown as OPA.IUpdateable_ByUser, preventUpdates_ForUpdateable_ByUser)) {
     return false;
   }
-  const preventUpdates_ForAssignableToRole_ByUser = ((updateObject_AsAssignableToRole_ByUser.userIdOfLatestRoleAssigner == document.id) || docIsArchiveOwner);
-  if (!OPA.areUpdatesValid_ForAssignableToRole_ByUser(document, updateObject_AsAssignableToRole_ByUser, preventUpdates_ForAssignableToRole_ByUser)) {
+  const preventUpdates_ForAssignableToRole_ByUser = (((updateObject_AsUnknown as OPA.IAssignableToRole_ByUser).userIdOfLatestRoleAssigner == document.id) || docIsArchiveOwner);
+  if (!OPA.areUpdatesValid_ForAssignableToRole_ByUser(document, updateObject_AsUnknown as OPA.IAssignableToRole_ByUser, preventUpdates_ForAssignableToRole_ByUser)) {
     return false;
   }
   const preventUpdates_ForViewable_ByUser = ((updateObject_AsUnknown as OPA.IViewable_ByUser).userIdOfLatestViewer == document.id);
@@ -123,7 +123,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   } else {
     const dateNotSet = OPA.isNullish(updateObject_AsCitationAccessor.dateOfLatestCitationChange);
     const userNotSet = OPA.isNullish(updateObject_AsCitationAccessor.userIdOfLatestCitationChanger);
-    const dateNotCreation = (document.dateOfCreation != updateObject_AsAssignableToRole_ByUser.dateOfLatestRoleAssignment);
+    const dateNotCreation = (document.dateOfCreation != statusDate);
     const isRequestedNotSelfAssigned = (!OPA.isNullish(updateObject_AsCitationAccessor.requestedCitationIds) && (updateObject_AsCitationAccessor.userIdOfLatestCitationChanger != document.id));
     const isViewableSelfAssigned = (!OPA.isNullish(updateObject_AsCitationAccessor.viewableCitationIds) && (updateObject_AsCitationAccessor.userIdOfLatestCitationChanger == document.id));
 

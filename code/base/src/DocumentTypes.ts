@@ -1006,3 +1006,69 @@ export function areUpdatesValid_ForDeleteable_ByUser(original: IDeleteable_ByUse
   // NOTE: The "userIdOf..." value must be validated via AuthorizationState, not here
   return true;
 }
+
+
+// General Functions
+/**
+ * Returns the first available status date from the contents of an object, or null if none exists.
+ * @param {unknown} obj The object.
+ * @param {Array<string> | string} [additionalPropertyNamesToCheck=[]] A list of property names for additional status dates to check.
+ * @return {BT.DateToUse | null}
+ */
+export function getStatusDate(obj: unknown, additionalPropertyNamesToCheck = ([] as (Array<string> | string))): BT.DateToUse | null {
+  if (TC.isNullish(obj)) {
+    return null;
+  }
+  if (!TC.isNullish(additionalPropertyNamesToCheck)) {
+    const objAsRecord = (obj as Record<string, unknown>);
+    if (TC.isArray(additionalPropertyNamesToCheck)) {
+      const propertyNames = (additionalPropertyNamesToCheck as Array<string>);
+      for (let i = 0; i < propertyNames.length; i++) {
+        const propertyName = propertyNames[i];
+        if (!TC.isNullish(objAsRecord[propertyName])) {
+          const date = objAsRecord[propertyName];
+          return (date as BT.DateToUse);
+        }
+      }
+    } else if (TC.isString(additionalPropertyNamesToCheck)) {
+      const propertyName = (additionalPropertyNamesToCheck as string);
+      if (!TC.isNullish(objAsRecord[propertyName])) {
+        const date = objAsRecord[propertyName];
+        return (date as BT.DateToUse);
+      }
+    } else {
+      throw new Error("An invalid list of property names was specified.");
+    }
+  }
+  if (!TC.isNullish((obj as IDeleteable).dateOfDeletionChange)) {
+    return (obj as IDeleteable).dateOfDeletionChange;
+  }
+  if (!TC.isNullish((obj as ISuspendable).dateOfSuspensionEnd)) {
+    return (obj as ISuspendable).dateOfSuspensionEnd;
+  }
+  if (!TC.isNullish((obj as IViewable).dateOfLatestViewing)) {
+    return (obj as IViewable).dateOfLatestViewing;
+  }
+  if (!TC.isNullish((obj as IApprovable<unknown>).dateOfDecision)) {
+    return (obj as IApprovable<unknown>).dateOfDecision;
+  }
+  if (!TC.isNullish((obj as IArchivable).dateOfArchivalChange)) {
+    return (obj as IArchivable).dateOfArchivalChange;
+  }
+  if (!TC.isNullish((obj as ITaggable).dateOfLatestTagging)) {
+    return (obj as ITaggable).dateOfLatestTagging;
+  }
+  if (!TC.isNullish((obj as IAssignableToRole).dateOfLatestRoleAssignment)) {
+    return (obj as IAssignableToRole).dateOfLatestRoleAssignment;
+  }
+  if (!TC.isNullish((obj as IUpdateable).dateOfLatestUpdate)) {
+    return (obj as IUpdateable).dateOfLatestUpdate;
+  }
+  if (!TC.isNullish((obj as IUpgradeable).dateOfLatestUpgrade)) {
+    return (obj as IUpgradeable).dateOfLatestUpgrade;
+  }
+  if (!TC.isNullish((obj as ICreatable).dateOfCreation)) {
+    return (obj as ICreatable).dateOfCreation;
+  }
+  return null;
+}
