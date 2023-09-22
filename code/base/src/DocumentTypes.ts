@@ -928,6 +928,9 @@ export interface IDeleteable_ByUser extends IDeleteable {
 }
 export interface IDocument_Deleteable extends IDocument, IDeleteable { }
 export interface IDocument_Deleteable_ByUser extends IDocument_Deleteable, IDeleteable_ByUser { }
+// Not to be stored
+export type DeletionState = "deleted" | "undeleted";
+export const DeletionStates = {deleted: ("deleted" as DeletionState), undeleted: ("undeleted" as DeletionState)};
 
 /**
  * Returns whether the updates to the object are valid from the perspective of the IDeleteable interface.

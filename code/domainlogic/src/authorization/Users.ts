@@ -430,7 +430,7 @@ export async function markUserAsDeleted(callState: OpaDm.ICallState, userIdToSet
   authorizationState.assertUserApproved();
   authorizationState.assertRoleAllowed(authorizerIds);
 
-  await OpaDb.Users.queries.markAsDeleted(callState.dataStorageState, userIdToSet, authorizationState.user.id);
+  await OpaDb.Users.queries.markWithDeletionState(callState.dataStorageState, userIdToSet, OPA.DeletionStates.deleted, authorizationState.user.id);
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
@@ -464,7 +464,7 @@ export async function markUserAsUnDeleted(callState: OpaDm.ICallState, userIdToS
   authorizationState.assertUserApproved();
   authorizationState.assertRoleAllowed(authorizerIds);
 
-  await OpaDb.Users.queries.markAsUnDeleted(callState.dataStorageState, userIdToSet, authorizationState.user.id);
+  await OpaDb.Users.queries.markWithDeletionState(callState.dataStorageState, userIdToSet, OPA.DeletionStates.undeleted, authorizationState.user.id);
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 

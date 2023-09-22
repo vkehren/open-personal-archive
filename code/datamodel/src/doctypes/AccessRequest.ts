@@ -384,50 +384,22 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
   }
 
   /**
-   * Marks the AccessRequest as deleted on the server by constructing an IDeleteable_ByUser object.
-   * @param {OPA.IDataStorageState} ds The state container for data storage.
-   * @param {string} documentId The ID for the AccessRequest within the OPA system.
-   * @param {string} userIdOfDeleter The ID for the Deleter within the OPA system.
-   * @return {Promise<void>}
-   */
-  async markAsDeleted(ds: OPA.IDataStorageState, documentId: string, userIdOfDeleter: string): Promise<void> {
-    OPA.assertDataStorageStateIsNotNullish(ds);
-    OPA.assertFirestoreIsNotNullish(ds.db);
-
-    const now = OPA.nowToUse();
-    const updateObject_Partial = ({} as IAccessRequestPartial);
-    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDeleter} as OPA.IUpdateable_ByUser);
-    const updateObject_Deleteable = ({isMarkedAsDeleted: true, dateOfDeletionChange: now, userIdOfDeletionChanger: userIdOfDeleter} as OPA.IDeleteable_ByUser);
-    const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Deleteable};
-    const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
-    const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
-
-    const document = await this.getByIdWithAssert(ds, documentId);
-    const areValid = areUpdatesValid(document, updateObject_WithHistory);
-    OPA.assertIsTrue(areValid, "The requested update is invalid.");
-
-    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
-    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
-    const documentRef = collectionRef.doc(documentId);
-    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
-  }
-
-  /**
    * Marks the AccessRequest as un-deleted on the server by constructing an IDeleteable_ByUser object.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the AccessRequest within the OPA system.
-   * @param {string} userIdOfUnDeleter The ID for the Deleter within the OPA system.
+   * @param {OPA.DeletionState} deletionState The deletion state with which to mark the AccessRequest.
+   * @param {string} userIdOfDeletionChanger The ID for the deletion state Changer within the OPA system.
    * @return {Promise<void>}
    */
-  async markAsUnDeleted(ds: OPA.IDataStorageState, documentId: string, userIdOfUnDeleter: string): Promise<void> {
+  async markWithDeletionState(ds: OPA.IDataStorageState, documentId: string, deletionState: OPA.DeletionState, userIdOfDeletionChanger: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
+    const isMarkedAsDeleted = (OPA.DeletionStates.deleted == deletionState);
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IAccessRequestPartial);
-    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfUnDeleter} as OPA.IUpdateable_ByUser);
-    const updateObject_Deleteable = ({isMarkedAsDeleted: false, dateOfDeletionChange: now, userIdOfDeletionChanger: userIdOfUnDeleter} as OPA.IDeleteable_ByUser);
+    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDeletionChanger} as OPA.IUpdateable_ByUser);
+    const updateObject_Deleteable = ({isMarkedAsDeleted, dateOfDeletionChange: now, userIdOfDeletionChanger} as OPA.IDeleteable_ByUser);
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Deleteable};
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
