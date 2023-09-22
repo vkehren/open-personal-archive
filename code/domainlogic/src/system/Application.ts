@@ -114,12 +114,10 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
  * @param {string} pathToStorageFolder The path to the root folder for storing files in Firebase Storage.
  * @param {string} defaultLocaleId The ID of the default Locale for the Archive.
  * @param {string} defaultTimeZoneGroupId The ID of the default TimeZoneGroup for the Archive.
- * @param {string} ownerFirstName The first name of the owner of the Archive.
- * @param {string} ownerLastName The last name of the owner of the Archive.
  * @param {string} installationNotes Any notes of documentation about the installation.
  * @return {Promise<void>}
  */
-export async function performInstall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState, archiveName: string, archiveDescription: string, pathToStorageFolder: string, defaultLocaleId: string, defaultTimeZoneGroupId: string, ownerFirstName: string, ownerLastName: string, installationNotes: string): Promise<void> { // eslint-disable-line max-len
+export async function performInstall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState, archiveName: string, archiveDescription: string, pathToStorageFolder: string, defaultLocaleId: string, defaultTimeZoneGroupId: string, installationNotes: string): Promise<void> { // eslint-disable-line max-len
   OPA.assertDataStorageStateIsNotNullish(dataStorageState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
@@ -135,6 +133,8 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   const ownerFirebaseAuthUserId = authenticationState.firebaseAuthUserId;
   const externalAuthProviderId = authenticationState.providerId;
   const ownerAccountName = authenticationState.email;
+  const ownerFirstName = OPA.convertNonNullish(authenticationState.firstName, "");
+  const ownerLastName = OPA.convertNonNullish(authenticationState.lastName, "");
 
   // 1) Create the Application document
   await OpaDb.Application.queries.create(dataStorageState, ApplicationInfo.VERSION, SchemaInfo.VERSION, installationNotes);

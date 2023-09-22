@@ -155,7 +155,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "Owner", "de Archive", "INSTALL FOR TEST"); // eslint-disable-line max-len
+    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "INSTALL FOR TEST"); // eslint-disable-line max-len
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -179,14 +179,14 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(archives.length).equals(1);
 
     // NOTE: Since the System is already installed, this call should fail
-    expect(Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "Owner", "de Archive", "INVALID INSTALL AGAIN FOR TEST")).to.be.rejectedWith(Error); // eslint-disable-line max-len
+    expect(Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "INVALID INSTALL AGAIN FOR TEST")).to.be.rejectedWith(Error); // eslint-disable-line max-len
   });
 
   test("checks that updateInstallationSettings(...) works properly", async () => {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "Owner", "de Archive", "INSTALL FOR TEST"); // eslint-disable-line max-len
+    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "INSTALL FOR TEST"); // eslint-disable-line max-len
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -269,7 +269,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "Owner", "de Archive", "INSTALL FOR TEST"); // eslint-disable-line max-len
+    await Application.performInstall(config.dataStorageState, config.authenticationState, "Test Archive", "Archive for Mocha + Chai unit tests.", "./Test_Archive/files", "OPA_Locale_en_US", "OPA_TimeZoneGroup_PST_-08:00", "INSTALL FOR TEST"); // eslint-disable-line max-len
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);

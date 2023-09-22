@@ -144,12 +144,8 @@ export const performInstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, asyn
     OPA.assertNonNullishOrWhitespace(defaultLocaleId, "The Archive default locale must not be blank.");
     const defaultTimeZoneGroupId = (data.query.defaultTimeZoneGroupId) ? data.query.defaultTimeZoneGroupId : undefined;
     OPA.assertNonNullishOrWhitespace(defaultTimeZoneGroupId, "The Archive default time zone group must not be blank.");
-    // const defaultTimeZoneId = (data.query.defaultTimeZoneId) ? data.query.defaultTimeZoneId : undefined;
-    // OPA.assertNonNullishOrWhitespace(defaultTimeZoneId, "The Archive default time zone must not be blank.");
-    const ownerFirstName = (data.query.ownerFirstName) ? data.query.ownerFirstName : "";
-    const ownerLastName = (data.query.ownerLastName) ? data.query.ownerLastName : "";
     const installationNotes = OPA.convertNonNullish(data.query.installationNotes, "");
-    const installResult = await Application.performInstall(callState.dataStorageState, callState.authenticationState, archiveName, archiveDescription, pathToStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, ownerFirstName, ownerLastName, installationNotes); // eslint-disable-line max-len
+    const installResult = await Application.performInstall(callState.dataStorageState, callState.authenticationState, archiveName, archiveDescription, pathToStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, installationNotes); // eslint-disable-line max-len
 
     return OPA.getSuccessResult("", installResult);
   } catch (error) {
