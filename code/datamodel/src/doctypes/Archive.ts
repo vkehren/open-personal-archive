@@ -45,8 +45,8 @@ const IArchive_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
  * @return {boolean} Whether the updates are valid or not.
  */
 export function areUpdatesValid(document: IArchive, updateObject: IArchivePartial): boolean {
-  OPA.assertNonNullish(document);
-  OPA.assertNonNullish(updateObject);
+  OPA.assertDocumentIsValid(document);
+  OPA.assertNonNullish(updateObject, "The processed Update Object must not be null.");
 
   const updateObject_AsUnknown = (updateObject as unknown);
 
@@ -75,6 +75,10 @@ export function areUpdatesValid(document: IArchive, updateObject: IArchivePartia
  * @return {IArchive} The new document instance.
  */
 export function createSingleton(name: string, description: string, pathToStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): IArchive {
+  OPA.assertDocumentIsValid(owner);
+  OPA.assertDocumentIsValid(defaultLocale);
+  OPA.assertDocumentIsValid(defaultTimeZoneGroup);
+
   const now = OPA.nowToUse();
   const names: OPA.ILocalizable<string> = {en: name};
   names[defaultLocale.optionName] = name;
@@ -136,6 +140,9 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
   async create(ds: OPA.IDataStorageState, name: string, description: string, pathToStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): Promise<string> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertDocumentIsValid(owner);
+    OPA.assertDocumentIsValid(defaultLocale);
+    OPA.assertDocumentIsValid(defaultTimeZoneGroup);
 
     const document = createSingleton(name, description, pathToStorageFolder, owner, defaultLocale, defaultTimeZoneGroup);
     const proxiedDocument = this.documentProxyConstructor(document);
@@ -165,6 +172,7 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
   async update(ds: OPA.IDataStorageState, updateObject: IArchivePartial, userIdOfLatestUpdater: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertNonNullish(updateObject, "The incoming Update Object must not be null.");
 
     // NOTE: Get the document earlier to check validity before and after setting "updateHistory" to also make sure it was not set on the "updateObject" passed in
     const documentId = SingletonId;

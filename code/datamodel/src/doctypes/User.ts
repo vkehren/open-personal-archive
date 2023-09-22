@@ -70,8 +70,8 @@ const IUser_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
  * @return {boolean} Whether the updates are valid or not.
  */
 export function areUpdatesValid(document: IUser, updateObject: IUserPartial): boolean {
-  OPA.assertNonNullish(document);
-  OPA.assertNonNullish(updateObject);
+  OPA.assertDocumentIsValid(document);
+  OPA.assertNonNullish(updateObject, "The processed Update Object must not be null.");
 
   const updateObject_AsUnknown = (updateObject as unknown);
   const updateObject_AsCitationAccessor = (updateObject_AsUnknown as ICitationAccessorPartial);
@@ -150,6 +150,10 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
  * @return {IUser} The new document instance.
  */
 function createInstance(id: string, firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, assignedRole: IRole, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): IUser { // eslint-disable-line max-len
+  OPA.assertDocumentIsValid(authProvider);
+  OPA.assertDocumentIsValid(assignedRole);
+  OPA.assertDocumentIsValid(locale);
+  OPA.assertDocumentIsValid(timeZoneGroup);
   OPA.assertIsTrue(assignedRole.id != Role_OwnerId, "The Archive Owner cannot be constructed as a normal User.");
 
   const now = OPA.nowToUse();
@@ -218,6 +222,10 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
  * @return {IUser} The new document instance.
  */
 export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): IUser { // eslint-disable-line max-len
+  OPA.assertDocumentIsValid(authProvider);
+  OPA.assertDocumentIsValid(locale);
+  OPA.assertDocumentIsValid(timeZoneGroup);
+
   const now = OPA.nowToUse();
   const document: IUser = {
     id: User_OwnerId,
@@ -385,6 +393,9 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   async createArchiveOwner(ds: OPA.IDataStorageState, firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): Promise<IUser> { // eslint-disable-line max-len
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertDocumentIsValid(authProvider);
+    OPA.assertDocumentIsValid(locale);
+    OPA.assertDocumentIsValid(timeZoneGroup);
 
     const owner = createArchiveOwner(firebaseAuthUserId, authProvider, authAccountName, locale, timeZoneGroup, firstName, lastName, preferredName);
     const proxiedOwner = this.documentProxyConstructor(owner);
@@ -431,6 +442,10 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   async createWithRole(ds: OPA.IDataStorageState, firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, assignedRole: IRole, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): Promise<string> { // eslint-disable-line max-len
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertDocumentIsValid(authProvider);
+    OPA.assertDocumentIsValid(assignedRole);
+    OPA.assertDocumentIsValid(locale);
+    OPA.assertDocumentIsValid(timeZoneGroup);
 
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc();
@@ -469,6 +484,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   async update(ds: OPA.IDataStorageState, documentId: string, updateObject: IUserPartial, userIdOfLatestUpdater: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertNonNullish(updateObject, "The incoming Update Object must not be null.");
 
     // NOTE: Get the document earlier to check validity before and after setting "updateHistory" to also make sure it was not set on the "updateObject" passed in
     const document = await this.getByIdWithAssert(ds, documentId);
@@ -503,7 +519,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   async assignToRole(ds: OPA.IDataStorageState, documentId: string, role: IRole, userIdOfLatestRoleAssigner: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
-    OPA.assertNonNullish(role);
+    OPA.assertDocumentIsValid(role);
 
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
@@ -535,7 +551,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   async addRequestedCitation(ds: OPA.IDataStorageState, documentId: string, requestedCitationId: string, userIdOfLatestUpdater: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
-    OPA.assertNonNullishOrWhitespace(requestedCitationId);
+    OPA.assertIdentifierIsValid(requestedCitationId); // LATER: Replace "requestedCitationId" with the actual Citation object here
 
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
@@ -568,7 +584,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   async addViewableCitation(ds: OPA.IDataStorageState, documentId: string, viewableCitationId: string, userIdOfLatestUpdater: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
-    OPA.assertNonNullishOrWhitespace(viewableCitationId);
+    OPA.assertIdentifierIsValid(viewableCitationId); // LATER: Replace "viewableCitationId" with the actual Citation object here
 
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);

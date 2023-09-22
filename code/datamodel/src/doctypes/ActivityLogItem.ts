@@ -43,8 +43,8 @@ type IActivityLogItemPartial = unknown;
  * @return {boolean} Whether the updates are valid or not.
  */
 export function areUpdatesValid(document: IActivityLogItem, updateObject: IActivityLogItemPartial): boolean {
-  OPA.assertNonNullish(document);
-  OPA.assertNonNullish(updateObject);
+  OPA.assertDocumentIsValid(document);
+  OPA.assertNonNullish(updateObject, "The processed Update Object must not be null.");
 
   const updateObject_AsUnknown = (updateObject as unknown);
 

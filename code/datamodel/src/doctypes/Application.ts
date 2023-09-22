@@ -36,8 +36,8 @@ const IApplication_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
  * @return {boolean} Whether the updates are valid or not.
  */
 export function areUpdatesValid(document: IApplication, updateObject: IApplicationPartial): boolean {
-  OPA.assertNonNullish(document);
-  OPA.assertNonNullish(updateObject);
+  OPA.assertDocumentIsValid(document);
+  OPA.assertNonNullish(updateObject, "The processed Update Object must not be null.");
 
   const updateObject_AsUnknown = (updateObject as unknown);
 
@@ -152,6 +152,7 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
   async upgrade(ds: OPA.IDataStorageState, updateObject: IApplicationPartial, userIdOfLatestUpgrader: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertNonNullish(updateObject, "The incoming Update Object must not be null.");
 
     // NOTE: Get the document earlier to check validity before and after setting "upgradeHistory" to also make sure it was not set on the "updateObject" passed in
     const documentId = SingletonId;

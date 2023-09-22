@@ -40,8 +40,8 @@ const IAccessRequest_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
  * @return {boolean} Whether the updates are valid or not.
  */
 export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessRequestPartial): boolean {
-  OPA.assertNonNullish(document);
-  OPA.assertNonNullish(updateObject);
+  OPA.assertDocumentIsValid(document);
+  OPA.assertNonNullish(updateObject, "The processed Update Object must not be null.");
 
   const updateObject_AsUnknown = (updateObject as unknown);
   const updateObject_AsUpdateable_ByUser = (updateObject_AsUnknown as OPA.IUpdateable_ByUser);
@@ -113,6 +113,9 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
  * @return {IAccessRequest} The new document instance.
  */
 function createInstance(id: string, creator: IUser, locale: ILocale, message: string, citationId: string | null = null): IAccessRequest { // eslint-disable-line max-len
+  OPA.assertDocumentIsValid(creator);
+  OPA.assertDocumentIsValid(locale);
+
   const now = OPA.nowToUse();
   const document: IAccessRequest = {
     id: id,
@@ -201,6 +204,8 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
   async create(ds: OPA.IDataStorageState, creator: IUser, locale: ILocale, message: string, citationId: string | null = null): Promise<string> { // eslint-disable-line max-len
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertDocumentIsValid(creator);
+    OPA.assertDocumentIsValid(locale);
 
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc();
@@ -230,6 +235,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
   async update(ds: OPA.IDataStorageState, documentId: string, updateObject: IAccessRequestPartial, userIdOfLatestUpdater: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertNonNullish(updateObject, "The incoming Update Object must not be null.");
 
     // NOTE: Get the document earlier to check validity before and after setting "updateHistory" to also make sure it was not set on the "updateObject" passed in
     const document = await this.getByIdWithAssert(ds, documentId);
@@ -264,6 +270,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
   async setTags(ds: OPA.IDataStorageState, documentId: string, tags: Array<string>, userIdOfLatestTagger: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertNonNullish(tags, "The array of Tags must not be null.");
 
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IAccessRequestPartial);
