@@ -223,7 +223,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(isSystemInstalled).equals(false);
 
     await Application.performInstall(config.dataStorageState, config.authenticationState, TestUtils.InstallName, TestUtils.InstallDescription, TestUtils.InstallPath, TestUtils.InstallLocaleId, TestUtils.InstallTimeZoneGroupId, installNotes); // eslint-disable-line max-len
-    let application = await OpaDb.Application.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ApplicationId);
+    const application = await OpaDb.Application.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ApplicationId);
     expect(application.id).equals(OpaDm.ApplicationId);
     expect(application.applicationVersion).equals(ApplicationInfo.VERSION);
     expect(application.schemaVersion).equals(SchemaInfo.VERSION);
