@@ -15,6 +15,13 @@ import * as TestConfig from "../TestConfiguration.test";
 import * as TestUtils from "../TestUtilities.test";
 
 const config = TestConfig.getTestConfiguration();
+const createNotes = "CREATE APPLICATION FOR TEST";
+const reCreateNotes = "CREATE APPLICATION AGAIN FOR TEST";
+const installNotes = "INSTALL FOR TEST";
+const invalidReInstallNotes = "INVALID INSTALL AGAIN FOR TEST";
+const upgradeNotes = "UPGRADE FOR TEST";
+const samegradeNotes = "SAME VERSION FOR TEST";
+const downgradeNotes = "DOWNGRADE FOR TEST";
 
 describe("Tests using Firebase " + config.testEnvironment, function() {
   if (!OPA.isNullish(config.timeout)) {
@@ -56,7 +63,12 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await OpaDb.Application.queries.create(config.dataStorageState, ApplicationInfo.VERSION, SchemaInfo.VERSION, "INSTALL FOR TEST");
+    await OpaDb.Application.queries.create(config.dataStorageState, ApplicationInfo.VERSION, SchemaInfo.VERSION, createNotes);
+    const application = await OpaDb.Application.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ApplicationId);
+    expect(application.id).equals(OpaDm.ApplicationId);
+    expect(application.applicationVersion).equals(ApplicationInfo.VERSION);
+    expect(application.schemaVersion).equals(SchemaInfo.VERSION);
+    expect(application.notes).equals(createNotes);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -66,7 +78,12 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await OpaDb.Application.queries.create(config.dataStorageState, ApplicationInfo.VERSION, SchemaInfo.VERSION, "INSTALL FOR TEST");
+    await OpaDb.Application.queries.create(config.dataStorageState, ApplicationInfo.VERSION, SchemaInfo.VERSION, createNotes);
+    let application = await OpaDb.Application.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ApplicationId);
+    expect(application.id).equals(OpaDm.ApplicationId);
+    expect(application.applicationVersion).equals(ApplicationInfo.VERSION);
+    expect(application.schemaVersion).equals(SchemaInfo.VERSION);
+    expect(application.notes).equals(createNotes);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -95,7 +112,12 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     const archives = await OpaDb.Archive.queries.getAll(config.dataStorageState);
     expect(archives.length).equals(0);
 
-    await OpaDb.Application.queries.create(config.dataStorageState, ApplicationInfo.VERSION, SchemaInfo.VERSION, "INSTALL AGAIN FOR TEST");
+    await OpaDb.Application.queries.create(config.dataStorageState, ApplicationInfo.VERSION, SchemaInfo.VERSION, reCreateNotes);
+    application = await OpaDb.Application.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ApplicationId);
+    expect(application.id).equals(OpaDm.ApplicationId);
+    expect(application.applicationVersion).equals(ApplicationInfo.VERSION);
+    expect(application.schemaVersion).equals(SchemaInfo.VERSION);
+    expect(application.notes).equals(reCreateNotes);
 
     const authProvider = OpaDb.AuthProviders.requiredDocuments.filter((value) => (value.isDefault))[0];
     const authProviderCollectionRef = OpaDb.AuthProviders.getTypedCollection(config.dataStorageState);
@@ -133,6 +155,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     // NOTE: Since we pass the Archive Owner's Authorization State, the following call should complete successfully
     wasSuccessful = await Application.performUninstall(config.dataStorageState, config.authenticationState, authorizationState, false);
     expect(wasSuccessful).equals(true);
+    await expect(OpaDb.Application.queries.getById(config.dataStorageState, OpaDm.ApplicationId)).equals(null);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
@@ -140,6 +163,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     // NOTE: Since the System is no longer installed, this call should succeed
     wasSuccessful = await Application.performUninstall(config.dataStorageState, config.authenticationState, null, false);
     expect(wasSuccessful).equals(true);
+    await expect(OpaDb.Application.queries.getById(config.dataStorageState, OpaDm.ApplicationId)).equals(null);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
@@ -147,6 +171,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     // NOTE: Since the System is no longer installed, this call should also succeed
     wasSuccessful = await Application.performUninstall(config.dataStorageState, config.authenticationState, authorizationState, false);
     expect(wasSuccessful).equals(true);
+    await expect(OpaDb.Application.queries.getById(config.dataStorageState, OpaDm.ApplicationId)).equals(null);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
@@ -156,7 +181,12 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await Application.performInstall(config.dataStorageState, config.authenticationState, TestUtils.InstallName, TestUtils.InstallDescription, TestUtils.InstallPath, TestUtils.InstallLocaleId, TestUtils.InstallTimeZoneGroupId, "INSTALL FOR TEST"); // eslint-disable-line max-len
+    await Application.performInstall(config.dataStorageState, config.authenticationState, TestUtils.InstallName, TestUtils.InstallDescription, TestUtils.InstallPath, TestUtils.InstallLocaleId, TestUtils.InstallTimeZoneGroupId, installNotes); // eslint-disable-line max-len
+    let application = await OpaDb.Application.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ApplicationId);
+    expect(application.id).equals(OpaDm.ApplicationId);
+    expect(application.applicationVersion).equals(ApplicationInfo.VERSION);
+    expect(application.schemaVersion).equals(SchemaInfo.VERSION);
+    expect(application.notes).equals(installNotes);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -180,14 +210,24 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(archives.length).equals(1);
 
     // NOTE: Since the System is already installed, this call should fail
-    expect(Application.performInstall(config.dataStorageState, config.authenticationState, TestUtils.InstallName, TestUtils.InstallDescription, TestUtils.InstallPath, TestUtils.InstallLocaleId, TestUtils.InstallTimeZoneGroupId, "INVALID INSTALL AGAIN FOR TEST")).to.be.rejectedWith(Error); // eslint-disable-line max-len
+    expect(Application.performInstall(config.dataStorageState, config.authenticationState, TestUtils.InstallName, TestUtils.InstallDescription, TestUtils.InstallPath, TestUtils.InstallLocaleId, TestUtils.InstallTimeZoneGroupId, invalidReInstallNotes)).to.be.rejectedWith(Error); // eslint-disable-line max-len
+    application = await OpaDb.Application.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ApplicationId);
+    expect(application.id).equals(OpaDm.ApplicationId);
+    expect(application.applicationVersion).equals(ApplicationInfo.VERSION);
+    expect(application.schemaVersion).equals(SchemaInfo.VERSION);
+    expect(application.notes).equals(installNotes);
   });
 
   test("checks that updateInstallationSettings(...) works properly", async () => {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await Application.performInstall(config.dataStorageState, config.authenticationState, TestUtils.InstallName, TestUtils.InstallDescription, TestUtils.InstallPath, TestUtils.InstallLocaleId, TestUtils.InstallTimeZoneGroupId, "INSTALL FOR TEST"); // eslint-disable-line max-len
+    await Application.performInstall(config.dataStorageState, config.authenticationState, TestUtils.InstallName, TestUtils.InstallDescription, TestUtils.InstallPath, TestUtils.InstallLocaleId, TestUtils.InstallTimeZoneGroupId, installNotes); // eslint-disable-line max-len
+    let application = await OpaDb.Application.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ApplicationId);
+    expect(application.id).equals(OpaDm.ApplicationId);
+    expect(application.applicationVersion).equals(ApplicationInfo.VERSION);
+    expect(application.schemaVersion).equals(SchemaInfo.VERSION);
+    expect(application.notes).equals(installNotes);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
@@ -270,15 +310,24 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
 
-    await Application.performInstall(config.dataStorageState, config.authenticationState, TestUtils.InstallName, TestUtils.InstallDescription, TestUtils.InstallPath, TestUtils.InstallLocaleId, TestUtils.InstallTimeZoneGroupId, "INSTALL FOR TEST"); // eslint-disable-line max-len
+    await Application.performInstall(config.dataStorageState, config.authenticationState, TestUtils.InstallName, TestUtils.InstallDescription, TestUtils.InstallPath, TestUtils.InstallLocaleId, TestUtils.InstallTimeZoneGroupId, installNotes); // eslint-disable-line max-len
+    let application = await OpaDb.Application.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ApplicationId);
+    expect(application.id).equals(OpaDm.ApplicationId);
+    expect(application.applicationVersion).equals(ApplicationInfo.VERSION);
+    expect(application.schemaVersion).equals(SchemaInfo.VERSION);
+    expect(application.notes).equals(installNotes);
 
     isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(true);
 
     // NOTE: Since the System version has not changed, this call should fail
     let callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    expect(Application.performUpgrade(callState, "NO CHANGE FOR TEST")).to.be.rejectedWith(Error);
-    let application = await OpaDb.Application.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ApplicationId, "The Application does not exist.");
+    expect(Application.performUpgrade(callState, samegradeNotes)).to.be.rejectedWith(Error);
+    application = await OpaDb.Application.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ApplicationId, "The Application does not exist.");
+    expect(application.id).equals(OpaDm.ApplicationId);
+    expect(application.applicationVersion).equals(ApplicationInfo.VERSION);
+    expect(application.schemaVersion).equals(SchemaInfo.VERSION);
+    expect(application.notes).equals(installNotes);
 
     const oldVersion = "0.0.0.1";
     const oldDateOfInstallation = application.dateOfInstallation;
@@ -286,7 +335,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     const newSchemaVersion = application.schemaVersion;
 
     // NOTE: We must downgrade initial version numbers to test upgrade works properly, but we cannot use updateApplication(...) to do downgrade, so we must update the server fields directly
-    await expect(OpaDb.Application.queries.upgrade(config.dataStorageState, {applicationVersion: oldVersion, schemaVersion: oldVersion, notes: "DOWNGRADE FOR TEST"}, OpaDm.User_OwnerId)).to.eventually.be.rejectedWith(Error); // eslint-disable-line max-len
+    await expect(OpaDb.Application.queries.upgrade(config.dataStorageState, {applicationVersion: oldVersion, schemaVersion: oldVersion, notes: downgradeNotes}, OpaDm.User_OwnerId)).to.eventually.be.rejectedWith(Error); // eslint-disable-line max-len
     const applicationRef = OpaDb.Application.getTypedCollection(config.dataStorageState).doc(application.id);
     await applicationRef.update({applicationVersion: oldVersion, schemaVersion: oldVersion});
     application = await OpaDb.Application.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ApplicationId, "The Application does not exist.");
@@ -301,8 +350,12 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(application.userIdOfLatestUpgrader).equals(null);
 
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    await Application.performUpgrade(callState, "UPGRADE FOR TEST");
+    await Application.performUpgrade(callState, upgradeNotes);
     application = await OpaDb.Application.queries.getByIdWithAssert(config.dataStorageState, OpaDm.ApplicationId, "The Application does not exist.");
+    expect(application.id).equals(OpaDm.ApplicationId);
+    expect(application.applicationVersion).equals(ApplicationInfo.VERSION);
+    expect(application.schemaVersion).equals(SchemaInfo.VERSION);
+    expect(application.notes).equals(upgradeNotes);
 
     const authorizationState = OPA.convertNonNullish(callState.authorizationState);
     expect(application.applicationVersion).equals(newApplicationVersion);
