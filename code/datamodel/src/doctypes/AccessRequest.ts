@@ -384,7 +384,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
   }
 
   /**
-   * Marks the AccessRequest as un-deleted on the server by constructing an IDeleteable_ByUser object.
+   * Marks the AccessRequest's deletion state stored on the server by constructing an IDeleteable_ByUser object.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the AccessRequest within the OPA system.
    * @param {OPA.DeletionState} deletionState The deletion state with which to mark the AccessRequest.
@@ -395,16 +395,19 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
-    const isMarkedAsDeleted = (OPA.DeletionStates.deleted == deletionState);
+    // NOTE: We need the document earlier in this function to get the existing values for IDeleteable_ByUser
+    const document = await this.getByIdWithAssert(ds, documentId);
+    const toBeMarkedAsDeleted = (deletionState == OPA.DeletionStates.deleted);
+    OPA.assertIsTrue((toBeMarkedAsDeleted != document.isMarkedAsDeleted), "The AccessRequest's deletion status is already of the desired value.");
+
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IAccessRequestPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDeletionChanger} as OPA.IUpdateable_ByUser);
-    const updateObject_Deleteable = ({isMarkedAsDeleted, dateOfDeletionChange: now, userIdOfDeletionChanger} as OPA.IDeleteable_ByUser);
+    const updateObject_Deleteable = ({isMarkedAsDeleted: toBeMarkedAsDeleted, dateOfDeletionChange: now, userIdOfDeletionChanger} as OPA.IDeleteable_ByUser);
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Deleteable};
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
-    const document = await this.getByIdWithAssert(ds, documentId);
     const areValid = areUpdatesValid(document, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
