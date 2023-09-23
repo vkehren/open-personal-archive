@@ -818,6 +818,9 @@ export interface ISuspendable_ByUser extends ISuspendable {
 }
 export interface IDocument_Suspendable extends IDocument, ISuspendable { }
 export interface IDocument_Suspendable_ByUser extends IDocument_Suspendable, ISuspendable_ByUser { }
+// Not to be stored
+export type SuspensionState = "suspended" | "unsuspended";
+export const SuspensionStates = {suspended: ("suspended" as SuspensionState), unsuspended: ("unsuspended" as SuspensionState)};
 
 /**
  * Gets whether the ISuspendable document is currently suspended.

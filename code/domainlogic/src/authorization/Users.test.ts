@@ -632,7 +632,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     config.authenticationState = TestAuthData.admin;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await expect(Users.setUserToSuspended(callState, testUserId(), testStartReason)).to.eventually.be.rejectedWith(Error);}
-    else {await expect(OpaDb.Users.queries.setToSuspended(config.dataStorageState, testUserId(), testStartReason, ambientUserId())).to.eventually.be.rejectedWith(Error);}
+    else {await expect(OpaDb.Users.queries.setToSuspensionState(config.dataStorageState, testUserId(), OPA.SuspensionStates.suspended, testStartReason, ambientUserId())).to.eventually.be.rejectedWith(Error);}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     expect(user.id).equals(TestAuthData.owner.opaUserId);
@@ -674,7 +674,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     config.authenticationState = TestAuthData.admin;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await expect(Users.setUserToUnSuspended(callState, testUserId(), testEndReason)).to.eventually.be.rejectedWith(Error);}
-    else {await expect(OpaDb.Users.queries.setToUnSuspended(config.dataStorageState, testUserId(), testEndReason, ambientUserId())).to.eventually.be.rejectedWith(Error);}
+    else {await expect(OpaDb.Users.queries.setToSuspensionState(config.dataStorageState, testUserId(), OPA.SuspensionStates.unsuspended, testEndReason, ambientUserId())).to.eventually.be.rejectedWith(Error);}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     expect(user.id).equals(TestAuthData.owner.opaUserId);
@@ -1647,7 +1647,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await expect(Users.setUserToSuspended(callState, testUserId(), testStartReason)).to.eventually.be.rejectedWith(Error);}
-    else {await expect(OpaDb.Users.queries.setToSuspended(config.dataStorageState, testUserId(), testStartReason, ambientUserId())).to.eventually.be.rejectedWith(Error);}
+    else {await expect(OpaDb.Users.queries.setToSuspensionState(config.dataStorageState, testUserId(), OPA.SuspensionStates.suspended, testStartReason, ambientUserId())).to.eventually.be.rejectedWith(Error);}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     expect(user.id).equals(TestAuthData.testUser.opaUserId);
@@ -1693,7 +1693,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await Users.setUserToSuspended(callState, testUserId(), testStartReason);}
-    else {await OpaDb.Users.queries.setToSuspended(config.dataStorageState, testUserId(), testStartReason, ambientUserId());}
+    else {await OpaDb.Users.queries.setToSuspensionState(config.dataStorageState, testUserId(), OPA.SuspensionStates.suspended, testStartReason, ambientUserId());}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     expect(user.id).equals(TestAuthData.testUser.opaUserId);
@@ -1739,7 +1739,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await expect(Users.setUserToSuspended(callState, testUserId(), testStartReason)).to.eventually.be.rejectedWith(Error);}
-    else {await expect(OpaDb.Users.queries.setToSuspended(config.dataStorageState, testUserId(), testStartReason, ambientUserId())).to.eventually.be.rejectedWith(Error);}
+    else {await expect(OpaDb.Users.queries.setToSuspensionState(config.dataStorageState, testUserId(), OPA.SuspensionStates.suspended, testStartReason, ambientUserId())).to.eventually.be.rejectedWith(Error);}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     expect(user.id).equals(TestAuthData.testUser.opaUserId);
@@ -1785,7 +1785,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await expect(Users.setUserToUnSuspended(callState, testUserId(), testEndReason)).to.eventually.be.rejectedWith(Error);}
-    else {await expect(OpaDb.Users.queries.setToUnSuspended(config.dataStorageState, testUserId(), testEndReason, ambientUserId())).to.eventually.be.rejectedWith(Error);}
+    else {await expect(OpaDb.Users.queries.setToSuspensionState(config.dataStorageState, testUserId(), OPA.SuspensionStates.unsuspended, testEndReason, ambientUserId())).to.eventually.be.rejectedWith(Error);}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     expect(user.id).equals(TestAuthData.testUser.opaUserId);
@@ -1831,7 +1831,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await Users.setUserToUnSuspended(callState, testUserId(), testEndReason);}
-    else {await OpaDb.Users.queries.setToUnSuspended(config.dataStorageState, testUserId(), testEndReason, ambientUserId());}
+    else {await OpaDb.Users.queries.setToSuspensionState(config.dataStorageState, testUserId(), OPA.SuspensionStates.unsuspended, testEndReason, ambientUserId());}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     expect(user.id).equals(TestAuthData.testUser.opaUserId);
@@ -1877,7 +1877,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     if (functionType == "logic") {await expect(Users.setUserToUnSuspended(callState, testUserId(), testEndReason)).to.eventually.be.rejectedWith(Error);}
-    else {await expect(OpaDb.Users.queries.setToUnSuspended(config.dataStorageState, testUserId(), testEndReason, ambientUserId())).to.eventually.be.rejectedWith(Error);}
+    else {await expect(OpaDb.Users.queries.setToSuspensionState(config.dataStorageState, testUserId(), OPA.SuspensionStates.unsuspended, testEndReason, ambientUserId())).to.eventually.be.rejectedWith(Error);}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     expect(user.id).equals(TestAuthData.testUser.opaUserId);

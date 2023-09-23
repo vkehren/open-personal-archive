@@ -668,63 +668,34 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   }
 
   /**
-   * Updates the User stored on the server by constructing an ISuspendable_ByUser object.
+   * Sets the User's suspension state stored on the server by constructing an ISuspendable_ByUser object.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the User within the OPA system.
-   * @param {string} reason The reason for the suspension.
-   * @param {string} userIdOfSuspensionStarter The ID for the Starter within the OPA system.
+   * @param {OPA.SuspensionState} suspensionState The suspension state with which to mark the User.
+   * @param {string} reason The reason for the suspension state change.
+   * @param {string} userIdOfSuspensionChanger The ID for the Changer within the OPA system.
    * @return {Promise<void>}
    */
-  async setToSuspended(ds: OPA.IDataStorageState, documentId: string, reason: string, userIdOfSuspensionStarter: string): Promise<void> {
+  async setToSuspensionState(ds: OPA.IDataStorageState, documentId: string, suspensionState: OPA.SuspensionState, reason: string, userIdOfSuspensionChanger: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
     // NOTE: We need the document earlier in this function to get the existing values for ISuspendable_ByUser
     const document = await this.getByIdWithAssert(ds, documentId);
-    OPA.assertIsFalse(OPA.isSuspended(document), "The User must not be suspended before the User is suspended.");
+    const toBeSuspended = (suspensionState == OPA.SuspensionStates.suspended);
+    OPA.assertIsTrue((toBeSuspended != OPA.isSuspended(document)), "The User's suspension status is already of the desired value.");
 
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
-    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfSuspensionStarter} as OPA.IUpdateable_ByUser);
-    const updateObject_Suspendable = ({isSuspended: true, hasSuspensionStarted: true, hasSuspensionEnded: false, reasonForSuspensionStart: reason, reasonForSuspensionEnd: null, dateOfSuspensionStart: now, dateOfSuspensionEnd: null, userIdOfSuspensionStarter, userIdOfSuspensionEnder: null} as OPA.ISuspendable_ByUser); // eslint-disable-line max-len
-    const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Suspendable};
-    const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
-    const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
-
-    const areValid = areUpdatesValid(document, updateObject_WithHistory);
-    OPA.assertIsTrue(areValid, "The requested update is invalid.");
-
-    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
-    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
-    const documentRef = collectionRef.doc(documentId);
-    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
-  }
-
-  /**
-   * Updates the User stored on the server by constructing an ISuspendable_ByUser object.
-   * @param {OPA.IDataStorageState} ds The state container for data storage.
-   * @param {string} documentId The ID for the User within the OPA system.
-   * @param {string} reason The reason to end the suspension.
-   * @param {string} userIdOfSuspensionEnder The ID for the Ender within the OPA system.
-   * @return {Promise<void>}
-   */
-  async setToUnSuspended(ds: OPA.IDataStorageState, documentId: string, reason: string, userIdOfSuspensionEnder: string): Promise<void> {
-    OPA.assertDataStorageStateIsNotNullish(ds);
-    OPA.assertFirestoreIsNotNullish(ds.db);
-
-    // NOTE: We need the document earlier in this function to get the existing values for ISuspendable_ByUser
-    const document = await this.getByIdWithAssert(ds, documentId);
-    OPA.assertIsTrue(OPA.isSuspended(document), "The User must be suspended before the User is un-suspended.");
-    // LATER: Rather than setting the following fields to their current value, explore deleting these fields from the update object
-    const reasonForSuspensionStart = document.reasonForSuspensionStart;
-    const dateOfSuspensionStart = document.dateOfSuspensionStart;
-    const userIdOfSuspensionStarter = document.userIdOfSuspensionStarter;
-
-    const now = OPA.nowToUse();
-    const updateObject_Partial = ({} as IUserPartial);
-    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfSuspensionEnder} as OPA.IUpdateable_ByUser);
-    const updateObject_Suspendable = ({isSuspended: false, hasSuspensionStarted: true, hasSuspensionEnded: true, reasonForSuspensionStart, reasonForSuspensionEnd: reason, dateOfSuspensionStart, dateOfSuspensionEnd: now, userIdOfSuspensionStarter, userIdOfSuspensionEnder} as OPA.ISuspendable_ByUser); // eslint-disable-line max-len
+    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfSuspensionChanger} as OPA.IUpdateable_ByUser);
+    let updateObject_Suspendable = ((null as unknown) as OPA.ISuspendable_ByUser);
+    if (suspensionState == OPA.SuspensionStates.suspended) {
+      updateObject_Suspendable = ({isSuspended: true, hasSuspensionStarted: true, hasSuspensionEnded: false, reasonForSuspensionStart: reason, reasonForSuspensionEnd: null, dateOfSuspensionStart: now, dateOfSuspensionEnd: null, userIdOfSuspensionStarter: userIdOfSuspensionChanger, userIdOfSuspensionEnder: null} as OPA.ISuspendable_ByUser); // eslint-disable-line max-len
+    } else if (suspensionState == OPA.SuspensionStates.unsuspended) {
+      updateObject_Suspendable = ({isSuspended: false, hasSuspensionEnded: true, reasonForSuspensionEnd: reason, dateOfSuspensionEnd: now, userIdOfSuspensionEnder: userIdOfSuspensionChanger} as OPA.ISuspendable_ByUser); // eslint-disable-line max-len
+    } else {
+      throw new Error("Invalid SuspensionState encountered.");
+    }
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Suspendable};
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);

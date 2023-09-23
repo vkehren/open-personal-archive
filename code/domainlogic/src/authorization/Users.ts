@@ -370,11 +370,8 @@ export async function setUserToSuspensionState(callState: OpaDm.ICallState, user
   authorizationState.assertUserApproved();
   authorizationState.assertRoleAllowed(authorizerIds);
 
-  if (suspend) {
-    await OpaDb.Users.queries.setToSuspended(callState.dataStorageState, userIdToSet, reason, authorizationState.user.id);
-  } else {
-    await OpaDb.Users.queries.setToUnSuspended(callState.dataStorageState, userIdToSet, reason, authorizationState.user.id);
-  }
+  const suspensionState = (suspend) ? OPA.SuspensionStates.suspended : OPA.SuspensionStates.unsuspended;
+  await OpaDb.Users.queries.setToSuspensionState(callState.dataStorageState, userIdToSet, suspensionState, reason, authorizationState.user.id);
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
