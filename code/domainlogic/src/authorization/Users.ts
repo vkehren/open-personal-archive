@@ -403,11 +403,11 @@ export async function setUserToUnSuspended(callState: OpaDm.ICallState, userIdTo
 /**
  * Updates the deletion status of the specified User in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
- * @param {string} userIdToSet The User to set the status of.
+ * @param {string} userIdToMark The User to mark the status of.
  * @param {OPA.DeletionState} deletionState The DeletionState to set to.
  * @return {Promise<OpaDm.IUser>}
  */
-export async function markUserWithDeletionState(callState: OpaDm.ICallState, userIdToSet: string, deletionState: OPA.DeletionState): Promise<OpaDm.IUser> {
+export async function markUserWithDeletionState(callState: OpaDm.ICallState, userIdToMark: string, deletionState: OPA.DeletionState): Promise<OpaDm.IUser> {
   OPA.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
@@ -427,30 +427,30 @@ export async function markUserWithDeletionState(callState: OpaDm.ICallState, use
   authorizationState.assertUserApproved();
   authorizationState.assertRoleAllowed(authorizerIds);
 
-  await OpaDb.Users.queries.markWithDeletionState(callState.dataStorageState, userIdToSet, deletionState, authorizationState.user.id);
+  await OpaDb.Users.queries.markWithDeletionState(callState.dataStorageState, userIdToMark, deletionState, authorizationState.user.id);
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
-  const userReRead = await OpaDb.Users.queries.getByIdWithAssert(callState.dataStorageState, userIdToSet, "The requested User does not exist.");
+  const userReRead = await OpaDb.Users.queries.getByIdWithAssert(callState.dataStorageState, userIdToMark, "The requested User does not exist.");
   return userReRead;
 }
 
 /**
  * Sets the Deletion status to "true" for the specified User in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
- * @param {string} userIdToSet The User to set the status of.
+ * @param {string} userIdToMark The User to mark the status of.
  * @return {Promise<OpaDm.IUser>}
  */
-export async function markUserAsDeleted(callState: OpaDm.ICallState, userIdToSet: string): Promise<OpaDm.IUser> {
-  return await markUserWithDeletionState(callState, userIdToSet, OPA.DeletionStates.deleted);
+export async function markUserAsDeleted(callState: OpaDm.ICallState, userIdToMark: string): Promise<OpaDm.IUser> {
+  return await markUserWithDeletionState(callState, userIdToMark, OPA.DeletionStates.deleted);
 }
 
 /**
  * Sets the Deletion status to "false" for the specified User in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
- * @param {string} userIdToSet The User to set the status of.
+ * @param {string} userIdToMark The User to mark the status of.
  * @return {Promise<OpaDm.IUser>}
  */
-export async function markUserAsUnDeleted(callState: OpaDm.ICallState, userIdToSet: string): Promise<OpaDm.IUser> {
-  return await markUserWithDeletionState(callState, userIdToSet, OPA.DeletionStates.undeleted);
+export async function markUserAsUnDeleted(callState: OpaDm.ICallState, userIdToMark: string): Promise<OpaDm.IUser> {
+  return await markUserWithDeletionState(callState, userIdToMark, OPA.DeletionStates.undeleted);
 }
