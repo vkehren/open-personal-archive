@@ -200,11 +200,8 @@ export async function addRequestedCitationToUser(callState: OpaDm.ICallState, us
   OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
-  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
-  const authorizerIds = [...authorizersById.keys()];
-
   authorizationState.assertUserApproved();
-  authorizationState.assertRoleAllowed(authorizerIds);
+  authorizationState.assertUserSameAs(userIdToUpdate);
 
   // LATER: Check the Citation acually exists
 
@@ -421,11 +418,8 @@ export async function markUserWithDeletionState(callState: OpaDm.ICallState, use
   OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
-  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
-  const authorizerIds = [...authorizersById.keys()];
-
   authorizationState.assertUserApproved();
-  authorizationState.assertRoleAllowed(authorizerIds);
+  authorizationState.assertUserSameAs(userIdToMark);
 
   await OpaDb.Users.queries.markWithDeletionState(callState.dataStorageState, userIdToMark, deletionState, authorizationState.user.id);
   await callState.dataStorageState.currentWriteBatch.commit();

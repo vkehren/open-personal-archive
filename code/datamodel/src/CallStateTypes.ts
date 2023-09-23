@@ -24,6 +24,9 @@ export interface IAuthorizationState {
   readonly timeZone: ITimeZone;
   isUserApproved(): boolean;
   assertUserApproved(): void;
+  isUserSameAs(userId: string): boolean;
+  assertUserSameAs(userId: string): void;
+  assertUserNotSameAs(userId: string): void;
   isRoleAllowed(allowedRoleIds: Array<string>): boolean;
   assertRoleAllowed(allowedRoleIds: Array<string>): void;
   isRoleDisallowed(disallowedRoleIds: Array<string>): boolean;
@@ -109,6 +112,37 @@ export class AuthorizationState implements IAuthorizationState {
   assertUserApproved(): void {
     if (!this.isUserApproved()) {
       throw new Error("The current User's account has NOT been approved.");
+    }
+  }
+
+  /**
+   * Returns true if the current User's account matches the User ID to check.
+   * @param {string} userId The User ID to check.
+   * @return {boolean} Whether the current User's account matches the User ID to check.
+   */
+  isUserSameAs(userId: string): boolean {
+    return (this._user.id == userId);
+  }
+
+  /**
+   * Asserts that the current User's account matches the User ID to check.
+   * @param {string} userId The User ID to check.
+   * @return {void}
+   */
+  assertUserSameAs(userId: string): void {
+    if (!this.isUserSameAs(userId)) {
+      throw new Error("The current User's account does not match the specified ID.");
+    }
+  }
+
+  /**
+   * Asserts that the current User's account does not match the User ID to check.
+   * @param {string} userId The User ID to check.
+   * @return {void}
+   */
+  assertUserNotSameAs(userId: string): void {
+    if (this.isUserSameAs(userId)) {
+      throw new Error("The current User's account does actually match the specified ID.");
     }
   }
 
