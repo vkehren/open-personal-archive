@@ -847,29 +847,42 @@ export function areUpdatesValid_ForSuspendable(original: ISuspendable, updated: 
   // NOTE: These values represent conditional IF operator, as in IF(isSet, hasDate)
   const priorExistencesValidStart = ((!original.hasSuspensionStarted) || (!TC.isNullish(original.dateOfSuspensionStart)));
   const priorExistencesValidEnd = ((!original.hasSuspensionEnded) || (!TC.isNullish(original.dateOfSuspensionEnd)));
-  if (!(priorExistencesValidStart && priorExistencesValidEnd)) {
+  if (!(!TC.isNullish(original.isSuspended) && priorExistencesValidStart && priorExistencesValidEnd)) {
     return false;
   }
-  // NOTE: These values may optionally exist on any update
-  const existencesValidStart = ((!updated.hasSuspensionStarted) || (!TC.isNullish(updated.dateOfSuspensionStart)));
-  const existencesValidEnd = ((!updated.hasSuspensionEnded) || (!TC.isNullish(updated.dateOfSuspensionEnd)));
-  if (!(existencesValidStart && existencesValidEnd)) {
-    return false;
-  }
-  if ((!TC.isNullish(updated.hasSuspensionStarted)) || (!TC.isNullish(updated.hasSuspensionEnded))) {
-    const stateValidStart = (updated.hasSuspensionStarted != original.hasSuspensionStarted); // NOTE: This value must change for updates
-    const stateValidEnd = (updated.hasSuspensionEnded != original.hasSuspensionEnded); // NOTE: This value must change for updates
-    if (!(stateValidStart || stateValidEnd)) {
-      return false;
+  // NOTE: Since the updated values are complicated to validate, this code tries to break validation into more steps
+  const existencesValidToCheck = (!TC.isNullish(updated.isSuspended) || !TC.isNullish(updated.hasSuspensionStarted) || !TC.isNullish(updated.hasSuspensionEnded) || !TC.isNullish(updated.dateOfSuspensionStart) || !TC.isNullish(updated.dateOfSuspensionEnd));
+  if (existencesValidToCheck) {
+    if (!original.isSuspended) {
+      const logicValidStart = (updated.isSuspended && updated.hasSuspensionStarted && !updated.hasSuspensionEnded);
+      if (!logicValidStart) {
+        return false;
+      }
+      const datesValidStart = (!TC.isNullish(updated.dateOfSuspensionStart) && TC.isNullish(updated.dateOfSuspensionEnd));
+      if (!datesValidStart) {
+        return false;
+      }
+      const dateValuesValidStart = (TC.isNullish(original.dateOfSuspensionEnd) || (TC.convertNonNullish(updated.dateOfSuspensionStart) > TC.convertNonNullish(original.dateOfSuspensionEnd)));
+      if (!dateValuesValidStart) {
+        return false;
+      }
+    } else {
+      // NOTE: If "hasSuspensionStarted" is provided, then it must not change the "original" value
+      const logicValidEnd = (!updated.isSuspended && updated.hasSuspensionEnded && (TC.isNullish(updated.hasSuspensionStarted) || updated.hasSuspensionStarted));
+      if (!logicValidEnd) {
+        return false;
+      }
+      // NOTE: If "dateOfSuspensionStart" is provided, then it must not change the "original" value
+      const datesValidEnd = (!TC.isNullish(updated.dateOfSuspensionEnd) && (TC.isNullish(updated.dateOfSuspensionStart) || (VC.areDatesEqual(updated.dateOfSuspensionStart, original.dateOfSuspensionStart))));
+      if (!datesValidEnd) {
+        return false;
+      }
+      const dateValuesValidStart = (!TC.isNullish(original.dateOfSuspensionStart) && (TC.convertNonNullish(updated.dateOfSuspensionEnd) > TC.convertNonNullish(original.dateOfSuspensionStart)));
+      if (!dateValuesValidStart) {
+        return false;
+      }
     }
     if (preventUpdates) {
-      return false;
-    }
-  }
-  if ((!TC.isNullish(updated.dateOfSuspensionStart)) || (!TC.isNullish(updated.dateOfSuspensionEnd))) {
-    const datesValidStart = (TC.isNullish(original.dateOfSuspensionStart) || ((TC.convertNonNullish(updated.hasSuspensionStarted, false)) && (TC.convertNonNullish(updated.dateOfSuspensionStart) > TC.convertNonNullish(original.dateOfSuspensionStart))));
-    const datesValidEnd = (TC.isNullish(original.dateOfSuspensionEnd) || ((TC.convertNonNullish(updated.hasSuspensionEnded, false)) && (TC.convertNonNullish(updated.dateOfSuspensionEnd) > TC.convertNonNullish(original.dateOfSuspensionEnd))));
-    if (!(datesValidStart || datesValidEnd)) {
       return false;
     }
   }
