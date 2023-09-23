@@ -346,7 +346,6 @@ export async function setUserToDenied(callState: OpaDm.ICallState, userIdToSet: 
  * Updates the IsSuspended status of the specified User in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
  * @param {string} userIdToSet The User to set the status of.
- * @param {boolean} suspend The status to set to.
  * @param {OPA.SuspensionState} suspensionState The SuspensionState to set to.
  * @param {string} reason The reason for the status.
  * @return {Promise<OpaDm.IUser>}
@@ -405,7 +404,6 @@ export async function setUserToUnSuspended(callState: OpaDm.ICallState, userIdTo
  * Updates the deletion status of the specified User in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
  * @param {string} userIdToSet The User to set the status of.
- * @param {boolean} markAsDeleted The status to set to.
  * @param {OPA.DeletionState} deletionState The DeletionState to set to.
  * @return {Promise<OpaDm.IUser>}
  */
