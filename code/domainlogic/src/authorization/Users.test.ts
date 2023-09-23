@@ -1348,7 +1348,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    const roleToAssign = await OpaDb.Roles.queries.getByIdWithAssert(config.dataStorageState, OpaDm.Role_AdministratorId);
+    const roleToAssign = await OpaDb.Roles.queries.getByIdWithAssert(config.dataStorageState, OpaDm.Role_ViewerId);
     OPA.assertIsFalse(OpaDm.DefaultRoleId == roleToAssign.id);
     if (functionType == "logic") {await expect(Users.assignUserToRole(callState, testUserId(), roleToAssign.id)).to.eventually.be.rejectedWith(Error);}
     else {await expect(OpaDb.Users.queries.assignToRole(config.dataStorageState, testUserId(), roleToAssign, ambientUserId())).to.eventually.be.rejectedWith(Error);}
