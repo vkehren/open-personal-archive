@@ -190,6 +190,7 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     dateOfDecision: null,
     userIdOfDecider: null,
     isSuspended: false, // NOTE: Here this is data property, but all QuerySet functions proxy this into a computed property
+    numberOfTimesSuspended: 0,
     hasSuspensionStarted: false,
     hasSuspensionEnded: false,
     reasonForSuspensionStart: null,
@@ -260,6 +261,7 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     dateOfDecision: now,
     userIdOfDecider: User_OwnerId,
     isSuspended: false, // NOTE: Here this is data property, but all QuerySet functions proxy this into a computed property
+    numberOfTimesSuspended: 0,
     hasSuspensionStarted: false,
     hasSuspensionEnded: false,
     reasonForSuspensionStart: null,
@@ -690,14 +692,17 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfSuspensionChanger} as OPA.IUpdateable_ByUser);
     let updateObject_Suspendable = ((null as unknown) as OPA.ISuspendable_ByUser);
     if (suspensionState == OPA.SuspensionStates.suspended) {
-      updateObject_Suspendable = ({isSuspended: true, hasSuspensionStarted: true, hasSuspensionEnded: false, reasonForSuspensionStart: reason, reasonForSuspensionEnd: null, dateOfSuspensionStart: now, dateOfSuspensionEnd: null, userIdOfSuspensionStarter: userIdOfSuspensionChanger, userIdOfSuspensionEnder: null} as OPA.ISuspendable_ByUser); // eslint-disable-line max-len
+      // NOTE: It is better to force the FieldValue into the interface's "number" value here than to change the interface to support FieldValues directly (as it would become more difficult to work with documents read from queries)
+      const incrementAsNumber = ((ds.constructorProvider.increment(1) as unknown) as number);
+      updateObject_Suspendable = ({isSuspended: true, numberOfTimesSuspended: incrementAsNumber, hasSuspensionStarted: true, hasSuspensionEnded: false, reasonForSuspensionStart: reason, reasonForSuspensionEnd: null, dateOfSuspensionStart: now, dateOfSuspensionEnd: null, userIdOfSuspensionStarter: userIdOfSuspensionChanger, userIdOfSuspensionEnder: null} as OPA.ISuspendable_ByUser); // eslint-disable-line max-len
     } else if (suspensionState == OPA.SuspensionStates.unsuspended) {
       updateObject_Suspendable = ({isSuspended: false, hasSuspensionEnded: true, reasonForSuspensionEnd: reason, dateOfSuspensionEnd: now, userIdOfSuspensionEnder: userIdOfSuspensionChanger} as OPA.ISuspendable_ByUser); // eslint-disable-line max-len
     } else {
       throw new Error("Invalid SuspensionState encountered.");
     }
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Suspendable};
-    const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
+    const updateObject_ForHistory = OPA.replaceFieldValuesWithSummaries({...updateObject});
+    const updateHistory = ds.constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
     const areValid = areUpdatesValid(document, updateObject_WithHistory);

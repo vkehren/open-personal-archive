@@ -803,6 +803,7 @@ export const ISuspendable_DateOfSuspensionStart_PropertyName = VC.getTypedProper
 export const ISuspendable_DateOfSuspensionEnd_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("dateOfSuspensionEnd"); // eslint-disable-line camelcase
 export interface ISuspendable {
   readonly isSuspended: boolean; // NOTE: This property should be computed by calling isSuspended<T>(...)
+  readonly numberOfTimesSuspended: number,
   readonly hasSuspensionStarted: boolean;
   readonly hasSuspensionEnded: boolean;
   readonly reasonForSuspensionStart: string | null;
@@ -851,7 +852,7 @@ export function areUpdatesValid_ForSuspendable(original: ISuspendable, updated: 
     return false;
   }
   // NOTE: Since the updated values are complicated to validate, this code tries to break validation into more steps
-  const existencesValidToCheck = (!TC.isNullish(updated.isSuspended) || !TC.isNullish(updated.hasSuspensionStarted) || !TC.isNullish(updated.hasSuspensionEnded) || !TC.isNullish(updated.dateOfSuspensionStart) || !TC.isNullish(updated.dateOfSuspensionEnd));
+  const existencesValidToCheck = (!TC.isNullish(updated.isSuspended) || !TC.isNullish(updated.numberOfTimesSuspended) || !TC.isNullish(updated.hasSuspensionStarted) || !TC.isNullish(updated.hasSuspensionEnded) || !TC.isNullish(updated.dateOfSuspensionStart) || !TC.isNullish(updated.dateOfSuspensionEnd));
   if (existencesValidToCheck) {
     if (!original.isSuspended) {
       const logicValidStart = (updated.isSuspended && updated.hasSuspensionStarted && !updated.hasSuspensionEnded);
