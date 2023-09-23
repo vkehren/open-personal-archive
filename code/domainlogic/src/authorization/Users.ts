@@ -347,10 +347,11 @@ export async function setUserToDenied(callState: OpaDm.ICallState, userIdToSet: 
  * @param {OpaDm.ICallState} callState The Call State for the current User.
  * @param {string} userIdToSet The User to set the status of.
  * @param {boolean} suspend The status to set to.
+ * @param {OPA.SuspensionState} suspensionState The SuspensionState to set to.
  * @param {string} reason The reason for the status.
  * @return {Promise<OpaDm.IUser>}
  */
-export async function setUserToSuspensionState(callState: OpaDm.ICallState, userIdToSet: string, suspend: boolean, reason: string): Promise<OpaDm.IUser> {
+export async function setUserToSuspensionState(callState: OpaDm.ICallState, userIdToSet: string, suspensionState: OPA.SuspensionState, reason: string): Promise<OpaDm.IUser> {
   OPA.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
@@ -370,7 +371,6 @@ export async function setUserToSuspensionState(callState: OpaDm.ICallState, user
   authorizationState.assertUserApproved();
   authorizationState.assertRoleAllowed(authorizerIds);
 
-  const suspensionState = (suspend) ? OPA.SuspensionStates.suspended : OPA.SuspensionStates.unsuspended;
   await OpaDb.Users.queries.setToSuspensionState(callState.dataStorageState, userIdToSet, suspensionState, reason, authorizationState.user.id);
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
@@ -387,7 +387,7 @@ export async function setUserToSuspensionState(callState: OpaDm.ICallState, user
  * @return {Promise<OpaDm.IUser>}
  */
 export async function setUserToSuspended(callState: OpaDm.ICallState, userIdToSet: string, reason: string): Promise<OpaDm.IUser> {
-  return await setUserToSuspensionState(callState, userIdToSet, true, reason);
+  return await setUserToSuspensionState(callState, userIdToSet, OPA.SuspensionStates.suspended, reason);
 }
 
 /**
@@ -398,7 +398,7 @@ export async function setUserToSuspended(callState: OpaDm.ICallState, userIdToSe
  * @return {Promise<OpaDm.IUser>}
  */
 export async function setUserToUnSuspended(callState: OpaDm.ICallState, userIdToSet: string, reason: string): Promise<OpaDm.IUser> {
-  return await setUserToSuspensionState(callState, userIdToSet, false, reason);
+  return await setUserToSuspensionState(callState, userIdToSet, OPA.SuspensionStates.unsuspended, reason);
 }
 
 /**
@@ -406,9 +406,10 @@ export async function setUserToUnSuspended(callState: OpaDm.ICallState, userIdTo
  * @param {OpaDm.ICallState} callState The Call State for the current User.
  * @param {string} userIdToSet The User to set the status of.
  * @param {boolean} markAsDeleted The status to set to.
+ * @param {OPA.DeletionState} deletionState The DeletionState to set to.
  * @return {Promise<OpaDm.IUser>}
  */
-export async function markUserWithDeletionState(callState: OpaDm.ICallState, userIdToSet: string, markAsDeleted: boolean): Promise<OpaDm.IUser> {
+export async function markUserWithDeletionState(callState: OpaDm.ICallState, userIdToSet: string, deletionState: OPA.DeletionState): Promise<OpaDm.IUser> {
   OPA.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
@@ -428,7 +429,6 @@ export async function markUserWithDeletionState(callState: OpaDm.ICallState, use
   authorizationState.assertUserApproved();
   authorizationState.assertRoleAllowed(authorizerIds);
 
-  const deletionState = (markAsDeleted) ? OPA.DeletionStates.deleted : OPA.DeletionStates.undeleted;
   await OpaDb.Users.queries.markWithDeletionState(callState.dataStorageState, userIdToSet, deletionState, authorizationState.user.id);
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
@@ -444,7 +444,7 @@ export async function markUserWithDeletionState(callState: OpaDm.ICallState, use
  * @return {Promise<OpaDm.IUser>}
  */
 export async function markUserAsDeleted(callState: OpaDm.ICallState, userIdToSet: string): Promise<OpaDm.IUser> {
-  return await markUserWithDeletionState(callState, userIdToSet, true);
+  return await markUserWithDeletionState(callState, userIdToSet, OPA.DeletionStates.deleted);
 }
 
 /**
@@ -454,5 +454,5 @@ export async function markUserAsDeleted(callState: OpaDm.ICallState, userIdToSet
  * @return {Promise<OpaDm.IUser>}
  */
 export async function markUserAsUnDeleted(callState: OpaDm.ICallState, userIdToSet: string): Promise<OpaDm.IUser> {
-  return await markUserWithDeletionState(callState, userIdToSet, false);
+  return await markUserWithDeletionState(callState, userIdToSet, OPA.DeletionStates.undeleted);
 }
