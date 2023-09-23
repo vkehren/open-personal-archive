@@ -867,8 +867,8 @@ export function areUpdatesValid_ForSuspendable(original: ISuspendable, updated: 
     }
   }
   if ((!TC.isNullish(updated.dateOfSuspensionStart)) || (!TC.isNullish(updated.dateOfSuspensionEnd))) {
-    const datesValidStart = (TC.isNullish(original.dateOfSuspensionStart) || (TC.convertNonNullish(updated.dateOfSuspensionStart) > TC.convertNonNullish(original.dateOfSuspensionStart)));
-    const datesValidEnd = (TC.isNullish(original.dateOfSuspensionEnd) || (TC.convertNonNullish(updated.dateOfSuspensionEnd) > TC.convertNonNullish(original.dateOfSuspensionEnd)));
+    const datesValidStart = (TC.isNullish(original.dateOfSuspensionStart) || ((TC.convertNonNullish(updated.hasSuspensionStarted, false)) && (TC.convertNonNullish(updated.dateOfSuspensionStart) > TC.convertNonNullish(original.dateOfSuspensionStart))));
+    const datesValidEnd = (TC.isNullish(original.dateOfSuspensionEnd) || ((TC.convertNonNullish(updated.hasSuspensionEnded, false)) && (TC.convertNonNullish(updated.dateOfSuspensionEnd) > TC.convertNonNullish(original.dateOfSuspensionEnd))));
     if (!(datesValidStart || datesValidEnd)) {
       return false;
     }
