@@ -1922,8 +1922,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    if (functionType == "logic") {await expect(Users.markUserAsDeleted(callState, testUserId())).to.eventually.be.rejectedWith(Error);}
-    else {await expect(OpaDb.Users.queries.markWithDeletionState(config.dataStorageState, testUserId(), OPA.DeletionStates.deleted, ambientUserId())).to.eventually.be.rejectedWith(Error);}
+    if (functionType == "logic") {await Users.setUserToSuspended(callState, testUserId(), testStartReason);}
+    else {await OpaDb.Users.queries.setToSuspensionState(config.dataStorageState, testUserId(), OPA.SuspensionStates.suspended, testStartReason, ambientUserId());}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     expect(user.id).equals(TestAuthData.testUser.opaUserId);
@@ -1939,7 +1939,53 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfLatestCitationChange).not.equals(null);
     expect(user.userIdOfLatestCitationChanger).equals(ownerId());
     expect(user.recentQueries.length).equals(0);
-    expect(user.updateHistory.length).equals(17);
+    expect(user.updateHistory.length).equals(18);
+    expect(user.hasBeenUpdated).equals(true);
+    expect(user.dateOfLatestUpdate).not.equals(null);
+    expect(user.userIdOfLatestUpdater).equals(ownerId());
+    expect(user.dateOfLatestRoleAssignment).not.equals(null);
+    expect(user.userIdOfLatestRoleAssigner).equals(ownerId());
+    expect(user.hasBeenViewed).equals(true);
+    expect(user.dateOfLatestViewing).not.equals(null);
+    expect(user.userIdOfLatestViewer).equals(ownerId());
+    expect(user.hasBeenDecided).equals(true);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
+    expect(user.dateOfDecision).not.equals(null);
+    expect(user.userIdOfDecider).equals(ownerId());
+    expect(OPA.isSuspended(user)).equals(true);
+    expect(user.isSuspended).equals(true);
+    expect(user.hasSuspensionStarted).equals(true);
+    expect(user.hasSuspensionEnded).equals(false);
+    expect(user.reasonForSuspensionStart).equals(testStartReason);
+    expect(user.reasonForSuspensionEnd).equals(null);
+    expect(user.dateOfSuspensionStart).not.equals(null);
+    expect(user.dateOfSuspensionEnd).equals(null);
+    expect(user.userIdOfSuspensionStarter).equals(ownerId());
+    expect(user.userIdOfSuspensionEnder).equals(null);
+    expect(user.isMarkedAsDeleted).equals(false);
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
+
+    config.authenticationState = TestAuthData.owner;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    if (functionType == "logic") {await Users.setUserToUnSuspended(callState, testUserId(), testEndReason);}
+    else {await OpaDb.Users.queries.setToSuspensionState(config.dataStorageState, testUserId(), OPA.SuspensionStates.unsuspended, testEndReason, ambientUserId());}
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
+
+    expect(user.id).equals(TestAuthData.testUser.opaUserId);
+    expect(user.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
+    expect(user.authProviderId).equals(authProviderNonNull.id);
+    expect(user.authAccountName).equals(TestAuthData.testUser.email);
+    expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
+    expect(user.assignedRoleId).equals(roleToAssign.id);
+    expect(user.firstName).equals(firstName_Updated);
+    expect(user.lastName).equals(lastName_Updated);
+    expect(user.requestedCitationIds.length).equals(2);
+    expect(user.viewableCitationIds.length).equals(2);
+    expect(user.dateOfLatestCitationChange).not.equals(null);
+    expect(user.userIdOfLatestCitationChanger).equals(ownerId());
+    expect(user.recentQueries.length).equals(0);
+    expect(user.updateHistory.length).equals(19);
     expect(user.hasBeenUpdated).equals(true);
     expect(user.dateOfLatestUpdate).not.equals(null);
     expect(user.userIdOfLatestUpdater).equals(ownerId());
@@ -1966,56 +2012,10 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.dateOfDeletionChange).equals(null);
     expect(user.userIdOfDeletionChanger).equals(null);
 
-    config.authenticationState = TestAuthData.testUser;
+    config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    if (functionType == "logic") {await Users.markUserAsDeleted(callState, testUserId());}
-    else {await OpaDb.Users.queries.markWithDeletionState(config.dataStorageState, testUserId(), OPA.DeletionStates.deleted, ambientUserId());}
-    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
-
-    expect(user.id).equals(TestAuthData.testUser.opaUserId);
-    expect(user.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
-    expect(user.authProviderId).equals(authProviderNonNull.id);
-    expect(user.authAccountName).equals(TestAuthData.testUser.email);
-    expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
-    expect(user.assignedRoleId).equals(roleToAssign.id);
-    expect(user.firstName).equals(firstName_Updated);
-    expect(user.lastName).equals(lastName_Updated);
-    expect(user.requestedCitationIds.length).equals(2);
-    expect(user.viewableCitationIds.length).equals(2);
-    expect(user.dateOfLatestCitationChange).not.equals(null);
-    expect(user.userIdOfLatestCitationChanger).equals(ownerId());
-    expect(user.recentQueries.length).equals(0);
-    expect(user.updateHistory.length).equals(18);
-    expect(user.hasBeenUpdated).equals(true);
-    expect(user.dateOfLatestUpdate).not.equals(null);
-    expect(user.userIdOfLatestUpdater).equals(testUserId());
-    expect(user.dateOfLatestRoleAssignment).not.equals(null);
-    expect(user.userIdOfLatestRoleAssigner).equals(ownerId());
-    expect(user.hasBeenViewed).equals(true);
-    expect(user.dateOfLatestViewing).not.equals(null);
-    expect(user.userIdOfLatestViewer).equals(ownerId());
-    expect(user.hasBeenDecided).equals(true);
-    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
-    expect(user.dateOfDecision).not.equals(null);
-    expect(user.userIdOfDecider).equals(ownerId());
-    expect(OPA.isSuspended(user)).equals(false);
-    expect(user.isSuspended).equals(false);
-    expect(user.hasSuspensionStarted).equals(true);
-    expect(user.hasSuspensionEnded).equals(true);
-    expect(user.reasonForSuspensionStart).equals(testStartReason);
-    expect(user.reasonForSuspensionEnd).equals(testEndReason);
-    expect(user.dateOfSuspensionStart).not.equals(null);
-    expect(user.dateOfSuspensionEnd).not.equals(null);
-    expect(user.userIdOfSuspensionStarter).equals(ownerId());
-    expect(user.userIdOfSuspensionEnder).equals(ownerId());
-    expect(user.isMarkedAsDeleted).equals(true);
-    expect(user.dateOfDeletionChange).not.equals(null);
-    expect(user.userIdOfDeletionChanger).equals(testUserId());
-
-    config.authenticationState = TestAuthData.testUser;
-    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    if (functionType == "logic") {await Users.markUserAsUnDeleted(callState, testUserId());}
-    else {await OpaDb.Users.queries.markWithDeletionState(config.dataStorageState, testUserId(), OPA.DeletionStates.undeleted, ambientUserId());}
+    if (functionType == "logic") {await expect(Users.markUserAsDeleted(callState, testUserId())).to.eventually.be.rejectedWith(Error);}
+    else {await expect(OpaDb.Users.queries.markWithDeletionState(config.dataStorageState, testUserId(), OPA.DeletionStates.deleted, ambientUserId())).to.eventually.be.rejectedWith(Error);}
     user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     expect(user.id).equals(TestAuthData.testUser.opaUserId);
@@ -2034,7 +2034,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.updateHistory.length).equals(19);
     expect(user.hasBeenUpdated).equals(true);
     expect(user.dateOfLatestUpdate).not.equals(null);
-    expect(user.userIdOfLatestUpdater).equals(testUserId());
+    expect(user.userIdOfLatestUpdater).equals(ownerId());
     expect(user.dateOfLatestRoleAssignment).not.equals(null);
     expect(user.userIdOfLatestRoleAssigner).equals(ownerId());
     expect(user.hasBeenViewed).equals(true);
@@ -2055,8 +2055,8 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfSuspensionStarter).equals(ownerId());
     expect(user.userIdOfSuspensionEnder).equals(ownerId());
     expect(user.isMarkedAsDeleted).equals(false);
-    expect(user.dateOfDeletionChange).not.equals(null);
-    expect(user.userIdOfDeletionChanger).equals(testUserId());
+    expect(user.dateOfDeletionChange).equals(null);
+    expect(user.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
@@ -2124,6 +2124,98 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(user.userIdOfLatestCitationChanger).equals(ownerId());
     expect(user.recentQueries.length).equals(0);
     expect(user.updateHistory.length).equals(21);
+    expect(user.hasBeenUpdated).equals(true);
+    expect(user.dateOfLatestUpdate).not.equals(null);
+    expect(user.userIdOfLatestUpdater).equals(testUserId());
+    expect(user.dateOfLatestRoleAssignment).not.equals(null);
+    expect(user.userIdOfLatestRoleAssigner).equals(ownerId());
+    expect(user.hasBeenViewed).equals(true);
+    expect(user.dateOfLatestViewing).not.equals(null);
+    expect(user.userIdOfLatestViewer).equals(ownerId());
+    expect(user.hasBeenDecided).equals(true);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
+    expect(user.dateOfDecision).not.equals(null);
+    expect(user.userIdOfDecider).equals(ownerId());
+    expect(OPA.isSuspended(user)).equals(false);
+    expect(user.isSuspended).equals(false);
+    expect(user.hasSuspensionStarted).equals(true);
+    expect(user.hasSuspensionEnded).equals(true);
+    expect(user.reasonForSuspensionStart).equals(testStartReason);
+    expect(user.reasonForSuspensionEnd).equals(testEndReason);
+    expect(user.dateOfSuspensionStart).not.equals(null);
+    expect(user.dateOfSuspensionEnd).not.equals(null);
+    expect(user.userIdOfSuspensionStarter).equals(ownerId());
+    expect(user.userIdOfSuspensionEnder).equals(ownerId());
+    expect(user.isMarkedAsDeleted).equals(false);
+    expect(user.dateOfDeletionChange).not.equals(null);
+    expect(user.userIdOfDeletionChanger).equals(testUserId());
+
+    config.authenticationState = TestAuthData.testUser;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    if (functionType == "logic") {await Users.markUserAsDeleted(callState, testUserId());}
+    else {await OpaDb.Users.queries.markWithDeletionState(config.dataStorageState, testUserId(), OPA.DeletionStates.deleted, ambientUserId());}
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
+
+    expect(user.id).equals(TestAuthData.testUser.opaUserId);
+    expect(user.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
+    expect(user.authProviderId).equals(authProviderNonNull.id);
+    expect(user.authAccountName).equals(TestAuthData.testUser.email);
+    expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
+    expect(user.assignedRoleId).equals(roleToAssign.id);
+    expect(user.firstName).equals(firstName_Updated);
+    expect(user.lastName).equals(lastName_Updated);
+    expect(user.requestedCitationIds.length).equals(2);
+    expect(user.viewableCitationIds.length).equals(2);
+    expect(user.dateOfLatestCitationChange).not.equals(null);
+    expect(user.userIdOfLatestCitationChanger).equals(ownerId());
+    expect(user.recentQueries.length).equals(0);
+    expect(user.updateHistory.length).equals(22);
+    expect(user.hasBeenUpdated).equals(true);
+    expect(user.dateOfLatestUpdate).not.equals(null);
+    expect(user.userIdOfLatestUpdater).equals(testUserId());
+    expect(user.dateOfLatestRoleAssignment).not.equals(null);
+    expect(user.userIdOfLatestRoleAssigner).equals(ownerId());
+    expect(user.hasBeenViewed).equals(true);
+    expect(user.dateOfLatestViewing).not.equals(null);
+    expect(user.userIdOfLatestViewer).equals(ownerId());
+    expect(user.hasBeenDecided).equals(true);
+    expect(user.approvalState).equals(OPA.ApprovalStates.approved);
+    expect(user.dateOfDecision).not.equals(null);
+    expect(user.userIdOfDecider).equals(ownerId());
+    expect(OPA.isSuspended(user)).equals(false);
+    expect(user.isSuspended).equals(false);
+    expect(user.hasSuspensionStarted).equals(true);
+    expect(user.hasSuspensionEnded).equals(true);
+    expect(user.reasonForSuspensionStart).equals(testStartReason);
+    expect(user.reasonForSuspensionEnd).equals(testEndReason);
+    expect(user.dateOfSuspensionStart).not.equals(null);
+    expect(user.dateOfSuspensionEnd).not.equals(null);
+    expect(user.userIdOfSuspensionStarter).equals(ownerId());
+    expect(user.userIdOfSuspensionEnder).equals(ownerId());
+    expect(user.isMarkedAsDeleted).equals(true);
+    expect(user.dateOfDeletionChange).not.equals(null);
+    expect(user.userIdOfDeletionChanger).equals(testUserId());
+
+    config.authenticationState = TestAuthData.testUser;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    if (functionType == "logic") {await Users.markUserAsUnDeleted(callState, testUserId());}
+    else {await OpaDb.Users.queries.markWithDeletionState(config.dataStorageState, testUserId(), OPA.DeletionStates.undeleted, ambientUserId());}
+    user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
+
+    expect(user.id).equals(TestAuthData.testUser.opaUserId);
+    expect(user.firebaseAuthUserId).equals(TestAuthData.testUser.firebaseAuthUserId);
+    expect(user.authProviderId).equals(authProviderNonNull.id);
+    expect(user.authAccountName).equals(TestAuthData.testUser.email);
+    expect(user.authAccountNameLowered).equals(TestAuthData.testUser.email.toLowerCase());
+    expect(user.assignedRoleId).equals(roleToAssign.id);
+    expect(user.firstName).equals(firstName_Updated);
+    expect(user.lastName).equals(lastName_Updated);
+    expect(user.requestedCitationIds.length).equals(2);
+    expect(user.viewableCitationIds.length).equals(2);
+    expect(user.dateOfLatestCitationChange).not.equals(null);
+    expect(user.userIdOfLatestCitationChanger).equals(ownerId());
+    expect(user.recentQueries.length).equals(0);
+    expect(user.updateHistory.length).equals(23);
     expect(user.hasBeenUpdated).equals(true);
     expect(user.dateOfLatestUpdate).not.equals(null);
     expect(user.userIdOfLatestUpdater).equals(testUserId());
