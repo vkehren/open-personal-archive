@@ -6,6 +6,7 @@ import * as VC from "./ValueChecking";
 export const DEFAULT_UNIQUENESS_INDEX_COLLECTION = "UniquenessIndices";
 export const BULK_WRITER_MAX_RETRY_ATTEMPTS = 4;
 export const FIREBASE_DEFAULT_REGION = "us-east1";
+export const DEFAULT_ANONYMOUS_DISPLAY_NAME = "(anonymous)";
 
 /** Provides workarounds for issues constructing Firebase objects across multiple packages (see https://github.com/googleapis/nodejs-firestore/issues/760) */
 export interface IFirebaseConstructorProvider {
