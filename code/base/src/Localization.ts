@@ -54,7 +54,7 @@ export function localizableStringConstructor(locale: string, desiredValue: strin
  * @param {boolean} [allowNullValue=Default_AllowNullValue] Whether to interpret "null" as a valid value for a given locale.
  * @return {[boolean, string]} Whether the Localizable object is valid and if not, a message describing the reason why not.
  */
-function isValidLocalizableInternal<T>(localizable: BT.ILocalizable<T>, allowUndefinedValue = DEFAULT_LOCALIZABLE_ALLOWS_UNDEFINED, allowNullValue = DEFAULT_LOCALIZABLE_ALLOWS_NULL): [boolean, string] {
+function isValidLocalizableInternal<T>(localizable: BT.ILocalizable<T>, allowUndefinedValue = DEFAULT_LOCALIZABLE_ALLOWS_UNDEFINED, allowNullValue = DEFAULT_LOCALIZABLE_ALLOWS_NULL): [boolean, string] { // eslint-disable-line max-len
   if (TC.isNullish(localizable)) {
     return [false, "The Localizable object must NOT be undefined or null."];
   }

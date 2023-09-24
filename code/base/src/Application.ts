@@ -61,7 +61,7 @@ export const DEFAULT_LITERAL_TYPE_PART_SEPARATOR = "_"; // eslint-disable-line c
  * @param {string} literalTypePartSeparator The string used to separate words in a string literal type (default is "_").
  * @return {T} The converted string literal type.
  */
-export function convertStringToLiteralType<T>(valueAsString: string, defaultValue: T, literalTypeUsesLowercase = DEFAULT_LITERAL_TYPE_USES_LOWERCASE, literalTypePartSeparator = DEFAULT_LITERAL_TYPE_PART_SEPARATOR): T {
+export function convertStringToLiteralType<T>(valueAsString: string, defaultValue: T, literalTypeUsesLowercase = DEFAULT_LITERAL_TYPE_USES_LOWERCASE, literalTypePartSeparator = DEFAULT_LITERAL_TYPE_PART_SEPARATOR): T { // eslint-disable-line max-len
   if (TC.isNullishOrWhitespace(valueAsString)) {
     return defaultValue;
   }

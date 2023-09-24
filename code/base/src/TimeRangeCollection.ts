@@ -21,7 +21,7 @@ export const Default_ReturnEarlierSideOfBoundary = true; // eslint-disable-line 
 /**
  * Takes an array of TimeRanges and checks whether the set are continuous or disjoint.
  * @param {Array<BT.ITimeRange>} timeRanges The array of TimeRanges.
- * @param {boolean} [allowEmptyTimeRanges=Default_AllowEmptyTimeRanges] Whether to allow empty TimeRanges or not. 
+ * @param {boolean} [allowEmptyTimeRanges=Default_AllowEmptyTimeRanges] Whether to allow empty TimeRanges or not.
  * @return {boolean} Whether the set of TimeRanges in the array is continuous or not.
  */
 export function isContinuous(timeRanges: Array<BT.ITimeRange>, allowEmptyTimeRanges: boolean = DEFAULT_CONTINUITY_ALLOWS_EMPTY_TIME_RANGES): boolean {
