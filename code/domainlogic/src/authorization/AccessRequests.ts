@@ -4,6 +4,51 @@ import {OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
 import * as Application from "../system/Application";
 import * as Users from "./Users";
 
+export interface IAccessRequestDisplayModel {
+  readonly id: string;
+  readonly message: string;
+  readonly response: string;
+  // LATER: Add other properties
+}
+
+/**
+ * Gets the list of AccessRequests for the current User in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @return {Promise<Array<IAccessRequestDisplayModel>>}
+ */
+export async function getListOfAccessRequests(callState: OpaDm.ICallState,): Promise<Array<IAccessRequestDisplayModel>> {
+  OPA.assertCallStateIsNotNullish(callState);
+  OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
+  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+
+  const isSystemInstalled = await Application.isSystemInstalled(callState.dataStorageState);
+  OPA.assertSystemIsInstalled(isSystemInstalled);
+  OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
+  OpaDm.assertSystemStateIsNotNullish(callState.systemState);
+  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+
+  const authorizationState = OPA.convertNonNullish(callState.authorizationState);
+  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
+  const authorizerIds = [...authorizersById.keys()];
+
+  authorizationState.assertUserApproved();
+
+  let accessRequests = ([] as Array<OpaDm.IAccessRequest>);
+  if (authorizationState.isRoleAllowed(authorizerIds)) {
+    accessRequests = await OpaDb.AccessRequests.queries.getAll(callState.dataStorageState);
+  } else {
+    accessRequests = await OpaDb.AccessRequests.queries.getAllForUserId(callState.dataStorageState, authorizationState.user.id);
+  }
+
+  const locale = authorizationState.locale.optionName;
+  const accessRequestDisplayModels = accessRequests.map((value) => ({
+    id: value.id,
+    message: OPA.getLocalizedText(value.message, locale),
+    response: OPA.getLocalizedText(value.response, locale),
+  } as IAccessRequestDisplayModel));
+  return accessRequestDisplayModels;
+}
+
 /**
  * Request access to the current installation of the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
