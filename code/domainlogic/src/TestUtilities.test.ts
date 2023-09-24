@@ -52,6 +52,17 @@ export async function performInstallForTest(dataStorageState: OpaDm.IDataStorage
 
   await dataStorageState.currentWriteBatch.commit();
   dataStorageState.currentWriteBatch = null;
+
+  // NOTE: Create the writeBatch AFTER Users have been created bc the Users must exist before they are approved
+  dataStorageState.currentWriteBatch = dataStorageState.constructorProvider.writeBatch();
+
+  await OpaDb.Users.queries.setToDecidedOption(dataStorageState, TestAuthData.admin.opaUserId, OPA.ApprovalStates.approved, OpaDm.User_OwnerId);
+  await OpaDb.Users.queries.setToDecidedOption(dataStorageState, TestAuthData.editor.opaUserId, OPA.ApprovalStates.approved, OpaDm.User_OwnerId);
+  await OpaDb.Users.queries.setToDecidedOption(dataStorageState, TestAuthData.viewer.opaUserId, OPA.ApprovalStates.approved, OpaDm.User_OwnerId);
+  await OpaDb.Users.queries.setToDecidedOption(dataStorageState, TestAuthData.guest.opaUserId, OPA.ApprovalStates.approved, OpaDm.User_OwnerId);
+
+  await dataStorageState.currentWriteBatch.commit();
+  dataStorageState.currentWriteBatch = null;
 }
 
 /**
