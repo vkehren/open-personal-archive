@@ -555,6 +555,9 @@ export interface IArchivable_ByUser extends IArchivable {
 }
 export interface IDocument_Archivable extends IDocument, IArchivable { }
 export interface IDocument_Archivable_ByUser extends IDocument_Archivable, IArchivable_ByUser { }
+// Not to be stored
+export type ArchivalState = "archived" | "not_archived";
+export const ArchivalStates = {archived: ("archived" as ArchivalState), not_archived: ("not_archived" as ArchivalState)};
 
 /**
  * Returns whether the updates to the object are valid from the perspective of the IArchivable interface.
