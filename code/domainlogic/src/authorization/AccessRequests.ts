@@ -2,6 +2,7 @@ import * as OPA from "../../../base/src";
 import * as OpaDm from "../../../datamodel/src";
 import {OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
 import * as Application from "../system/Application";
+import * as Users from "./Users";
 
 /**
  * Request access to the current installation of the Open Personal Archive™ (OPA) system.
@@ -38,6 +39,104 @@ export async function requestUserAccess(callState: OpaDm.ICallState, message: st
 
   const accessRequestReRead = await OpaDb.AccessRequests.queries.getByIdWithAssert(callState.dataStorageState, accessRequestId, "The requested AccessRequest does not exist.");
   return accessRequestReRead;
+}
+
+/**
+ * Updates the Viewed status of the specified AccessRequest in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} accessRequestIdToSet The AccessRequest to set the status of.
+ * @return {Promise<OpaDm.IAccessRequest>}
+ */
+export async function setAccessRequestToViewed(callState: OpaDm.ICallState, accessRequestIdToSet: string): Promise<OpaDm.IAccessRequest> {
+  OPA.assertCallStateIsNotNullish(callState);
+  OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
+  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+
+  callState.dataStorageState.currentWriteBatch = callState.dataStorageState.constructorProvider.writeBatch();
+
+  const isSystemInstalled = await Application.isSystemInstalled(callState.dataStorageState);
+  OPA.assertSystemIsInstalled(isSystemInstalled);
+  OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
+  OpaDm.assertSystemStateIsNotNullish(callState.systemState);
+  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+
+  const authorizationState = OPA.convertNonNullish(callState.authorizationState);
+  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
+  const authorizerIds = [...authorizersById.keys()];
+
+  authorizationState.assertUserApproved();
+  authorizationState.assertRoleAllowed(authorizerIds);
+
+  await OpaDb.AccessRequests.queries.setToViewed(callState.dataStorageState, accessRequestIdToSet, authorizationState.user.id);
+  await callState.dataStorageState.currentWriteBatch.commit();
+  callState.dataStorageState.currentWriteBatch = null;
+
+  const accessRequestReRead = await OpaDb.AccessRequests.queries.getByIdWithAssert(callState.dataStorageState, accessRequestIdToSet, "The requested AccessRequest does not exist.");
+  return accessRequestReRead;
+}
+
+/**
+ * Updates the Decided ApprovalState of the specified AccessRequest in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} accessRequestIdToSet The AccessRequest to set the ApprovalState of.
+ * @param {OpaDm.ApprovalState} approvalState The ApprovalState to set to.
+ * @return {Promise<OpaDm.IAccessRequest>}
+ */
+export async function setAccessRequestToApprovalState(callState: OpaDm.ICallState, accessRequestIdToSet: string, approvalState: OPA.ApprovalState): Promise<OpaDm.IAccessRequest> {
+  OPA.assertCallStateIsNotNullish(callState);
+  OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
+  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+
+  callState.dataStorageState.currentWriteBatch = callState.dataStorageState.constructorProvider.writeBatch();
+
+  const isSystemInstalled = await Application.isSystemInstalled(callState.dataStorageState);
+  OPA.assertSystemIsInstalled(isSystemInstalled);
+  OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
+  OpaDm.assertSystemStateIsNotNullish(callState.systemState);
+  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+
+  const authorizationState = OPA.convertNonNullish(callState.authorizationState);
+  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
+  const authorizerIds = [...authorizersById.keys()];
+
+  authorizationState.assertUserApproved();
+  authorizationState.assertRoleAllowed(authorizerIds);
+
+  // LATER: Decide whether "approved" should be rescindable, and if so, upon "denied", remove the Viewable Citation from the User
+  if (approvalState == OPA.ApprovalStates.approved) {
+    const accessRequestPreRead = await OpaDb.AccessRequests.queries.getByIdWithAssert(callState.dataStorageState, accessRequestIdToSet, "The requested AccessRequest does not exist.");
+    if (!OPA.isNullish(accessRequestPreRead.citationId)) {
+      const userId = accessRequestPreRead.userIdOfCreator;
+      await Users.addViewableCitationToUser(callState, userId, OPA.convertNonNullish(accessRequestPreRead.citationId));
+    }
+  }
+
+  await OpaDb.AccessRequests.queries.setToDecidedOption(callState.dataStorageState, accessRequestIdToSet, approvalState, authorizationState.user.id);
+  await callState.dataStorageState.currentWriteBatch.commit();
+  callState.dataStorageState.currentWriteBatch = null;
+
+  const accessRequestReRead = await OpaDb.AccessRequests.queries.getByIdWithAssert(callState.dataStorageState, accessRequestIdToSet, "The requested AccessRequest does not exist.");
+  return accessRequestReRead;
+}
+
+/**
+ * Set the ApprovalState to Approved for the specified AccessRequest in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} accessRequestIdToSet The AccessRequest to set the ApprovalState of.
+ * @return {Promise<OpaDm.IAccessRequest>}
+ */
+export async function setAccessRequestToApproved(callState: OpaDm.ICallState, accessRequestIdToSet: string): Promise<OpaDm.IAccessRequest> {
+  return await setAccessRequestToApprovalState(callState, accessRequestIdToSet, OPA.ApprovalStates.approved);
+}
+
+/**
+ * Set the ApprovalState to Denied for the specified AccessRequest in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} accessRequestIdToSet The AccessRequest to set the ApprovalState of.
+ * @return {Promise<OpaDm.IAccessRequest>}
+ */
+export async function setAccessRequestToDenied(callState: OpaDm.ICallState, accessRequestIdToSet: string): Promise<OpaDm.IAccessRequest> {
+  return await setAccessRequestToApprovalState(callState, accessRequestIdToSet, OPA.ApprovalStates.denied);
 }
 
 /**

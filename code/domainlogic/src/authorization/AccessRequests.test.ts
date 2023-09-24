@@ -295,9 +295,11 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     await expect(OpaDb.AccessRequests.queries.setToViewed(config.dataStorageState, accessRequestId, ambientUserId())).to.eventually.be.rejectedWith(Error);
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    config.authenticationState = TestAuthData.admin;
     // NOTE: Set to Viewed by User who created AccessRequest so that "userIdOfLatestViewer" changes to value other than "ownerId()" for next step
-    await OpaDb.AccessRequests.queries.setToViewed(config.dataStorageState, accessRequestId, ambientUserId());
+    config.authenticationState = TestAuthData.admin;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    if (functionType == "logic") {await AccessRequests.setAccessRequestToViewed(callState, accessRequestId);}
+    else {await OpaDb.AccessRequests.queries.setToViewed(config.dataStorageState, accessRequestId, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
@@ -547,7 +549,9 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
-    await OpaDb.AccessRequests.queries.setToDecidedOption(config.dataStorageState, accessRequestId, OPA.ApprovalStates.denied, ambientUserId());
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    if (functionType == "logic") {await AccessRequests.setAccessRequestToDenied(callState, accessRequestId);}
+    else {await OpaDb.AccessRequests.queries.setToDecidedOption(config.dataStorageState, accessRequestId, OPA.ApprovalStates.denied, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
@@ -577,7 +581,9 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
-    await OpaDb.AccessRequests.queries.setToDecidedOption(config.dataStorageState, accessRequestId, OPA.ApprovalStates.approved, ambientUserId());
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    if (functionType == "logic") {await AccessRequests.setAccessRequestToApproved(callState, accessRequestId);}
+    else {await OpaDb.AccessRequests.queries.setToDecidedOption(config.dataStorageState, accessRequestId, OPA.ApprovalStates.approved, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
