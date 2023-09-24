@@ -852,7 +852,7 @@ export function areUpdatesValid_ForSuspendable(original: ISuspendable, updated: 
     return false;
   }
   // NOTE: Since the updated values are complicated to validate, this code tries to break validation into more steps
-  const existencesValidToCheck = (!TC.isNullish(updated.isSuspended) || !TC.isNullish(updated.numberOfTimesSuspended) || !TC.isNullish(updated.hasSuspensionStarted) || !TC.isNullish(updated.hasSuspensionEnded) || !TC.isNullish(updated.dateOfSuspensionStart) || !TC.isNullish(updated.dateOfSuspensionEnd));
+  const existencesValidToCheck = (!TC.isNullish(updated.isSuspended) || !TC.isNullish(updated.numberOfTimesSuspended) || !TC.isNullish(updated.hasSuspensionStarted) || !TC.isNullish(updated.hasSuspensionEnded) || !TC.isNullish(updated.dateOfSuspensionStart) || !TC.isNullish(updated.dateOfSuspensionEnd)); // eslint-disable-line max-len
   if (existencesValidToCheck) {
     if (!original.isSuspended) {
       const logicValidStart = (updated.isSuspended && updated.hasSuspensionStarted && !updated.hasSuspensionEnded);
@@ -874,7 +874,7 @@ export function areUpdatesValid_ForSuspendable(original: ISuspendable, updated: 
         return false;
       }
       // NOTE: If "dateOfSuspensionStart" is provided, then it must not change the "original" value
-      const datesValidEnd = (!TC.isNullish(updated.dateOfSuspensionEnd) && (TC.isNullish(updated.dateOfSuspensionStart) || (VC.areDatesEqual(updated.dateOfSuspensionStart, original.dateOfSuspensionStart))));
+      const datesValidEnd = (!TC.isNullish(updated.dateOfSuspensionEnd) && (TC.isNullish(updated.dateOfSuspensionStart) || (VC.areDatesEqual(updated.dateOfSuspensionStart, original.dateOfSuspensionStart)))); // eslint-disable-line max-len
       if (!datesValidEnd) {
         return false;
       }

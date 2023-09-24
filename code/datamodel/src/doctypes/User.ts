@@ -692,6 +692,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfSuspensionChanger} as OPA.IUpdateable_ByUser);
     let updateObject_Suspendable = ((null as unknown) as OPA.ISuspendable_ByUser);
     if (suspensionState == OPA.SuspensionStates.suspended) {
+      // eslint-disable-next-line max-len
       // NOTE: It is better to force the FieldValue into the interface's "number" value here than to change the interface to support FieldValues directly (as it would become more difficult to work with documents read from queries)
       const incrementAsNumber = ((ds.constructorProvider.increment(1) as unknown) as number);
       updateObject_Suspendable = ({isSuspended: true, numberOfTimesSuspended: incrementAsNumber, hasSuspensionStarted: true, hasSuspensionEnded: false, reasonForSuspensionStart: reason, reasonForSuspensionEnd: null, dateOfSuspensionStart: now, dateOfSuspensionEnd: null, userIdOfSuspensionStarter: userIdOfSuspensionChanger, userIdOfSuspensionEnder: null} as OPA.ISuspendable_ByUser); // eslint-disable-line max-len
