@@ -72,7 +72,7 @@ export function isNullishOrEmpty(value: unknown): boolean {
  * @param {boolean} [includeEmptyAsWhitespace=VC.Default_IncludeEmptyAsWhitespace] Whether to include the empty string as whitespace.
  * @return {boolean} The result of checking.
  */
-export function isNullishOrWhitespace(value: unknown, includeEmptyAsWhitespace: boolean = VC.Default_IncludeEmptyAsWhitespace): boolean {
+export function isNullishOrWhitespace(value: unknown, includeEmptyAsWhitespace: boolean = VC.DEFAULT_WHITESPACE_INCLUDES_EMPTY_STRING): boolean {
   if (isNullish(value)) {
     return true;
   }

@@ -48,45 +48,45 @@ test("checks that passing 'falseString' returns 'falseString'", () => {
 });
 
 
-// TESTS for convertStringToEnumValue(...)
+// TESTS for convertStringToLiteralType(...)
 test("checks that passing 'undefined' returns 'null'", () => {
-  expect(AP.convertStringToEnumValue<EnumUnderscore>(undefinedString, "b_c")).toBe("b_c");
+  expect(AP.convertStringToLiteralType<EnumUnderscore>(undefinedString, "b_c")).toBe("b_c");
 });
 
 test("checks that passing 'undefined' returns 'null'", () => {
-  expect(AP.convertStringToEnumValue<EnumDash>(undefinedString, "b-c")).toBe("b-c");
+  expect(AP.convertStringToLiteralType<EnumDash>(undefinedString, "b-c")).toBe("b-c");
 });
 
 test("checks that passing 'null' returns 'null'", () => {
-  expect(AP.convertStringToEnumValue<EnumUnderscore>(nullString, "b_c")).toBe("b_c");
+  expect(AP.convertStringToLiteralType<EnumUnderscore>(nullString, "b_c")).toBe("b_c");
 });
 
 test("checks that passing 'null' returns 'null'", () => {
-  expect(AP.convertStringToEnumValue<EnumDash>(nullString, "b-c")).toBe("b-c");
+  expect(AP.convertStringToLiteralType<EnumDash>(nullString, "b-c")).toBe("b-c");
 });
 
 test("checks that passing 'a_b' returns 'a_b'", () => {
-  expect(AP.convertStringToEnumValue<EnumUnderscore>("a_b", "b_c")).toBe("a_b");
+  expect(AP.convertStringToLiteralType<EnumUnderscore>("a_b", "b_c")).toBe("a_b");
 });
 
 test("checks that passing 'a-b' returns 'a-b'", () => {
-  expect(AP.convertStringToEnumValue<EnumDash>("a-b", "b-c")).toBe("a-b");
+  expect(AP.convertStringToLiteralType<EnumDash>("a-b", "b-c")).toBe("a-b");
 });
 
 test("checks that passing 'b_c' returns 'b_c'", () => {
-  expect(AP.convertStringToEnumValue<EnumUnderscore>("b_c", "c_d")).toBe("b_c");
+  expect(AP.convertStringToLiteralType<EnumUnderscore>("b_c", "c_d")).toBe("b_c");
 });
 
 test("checks that passing 'b-c' returns 'b-c'", () => {
-  expect(AP.convertStringToEnumValue<EnumDash>("b-c", "c-d")).toBe("b-c");
+  expect(AP.convertStringToLiteralType<EnumDash>("b-c", "c-d")).toBe("b-c");
 });
 
 test("checks that passing 'c_d' returns 'c_d'", () => {
-  expect(AP.convertStringToEnumValue<EnumUnderscore>("c_d", "a_b")).toBe("c_d");
+  expect(AP.convertStringToLiteralType<EnumUnderscore>("c_d", "a_b")).toBe("c_d");
 });
 
 test("checks that passing 'c-d' returns 'c-d'", () => {
-  expect(AP.convertStringToEnumValue<EnumDash>("c-d", "a-b")).toBe("c-d");
+  expect(AP.convertStringToLiteralType<EnumDash>("c-d", "a-b")).toBe("c-d");
 });
 
 

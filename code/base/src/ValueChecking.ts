@@ -6,7 +6,7 @@ import * as TC from "./TypeChecking";
  * @type {string}
  * @default
  */
-export const Default_IncludeEmptyAsWhitespace = true; // eslint-disable-line camelcase
+export const DEFAULT_WHITESPACE_INCLUDES_EMPTY_STRING = true; // eslint-disable-line camelcase
 
 /**
  * Gets the size of (i.e. number of elements in) the value.
@@ -53,7 +53,7 @@ export function isEmpty(value: string | Object | Array<any> | Map<any, any> | Se
  * @param {boolean} [includeEmptyAsWhitespace=Default_IncludeEmptyAsWhitespace] Whether to include the empty string as whitespace.
  * @return {boolean} The result of checking.
  */
-export function isWhitespace(value: string, includeEmptyAsWhitespace: boolean = Default_IncludeEmptyAsWhitespace): boolean {
+export function isWhitespace(value: string, includeEmptyAsWhitespace: boolean = DEFAULT_WHITESPACE_INCLUDES_EMPTY_STRING): boolean {
   if (TC.isNullish(value)) {
     return false;
   }

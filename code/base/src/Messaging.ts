@@ -9,7 +9,7 @@ export interface ICallResult<T> {
  * @type {boolean}
  * @default
  */
-export const Default_IncludeErrorInResult = false; // eslint-disable-line camelcase
+export const DEFAULT_RESULT_INCLUDES_ERROR = false; // eslint-disable-line camelcase
 
 /**
  * Creates a result object representing a successful call.
@@ -32,7 +32,7 @@ export function getSuccessResult<T>(message: string, data: T | undefined = undef
  * @param {boolean} [includeErrorInResult=Default_IncludeErrorInResult] Whether to return the actual error object as data or not.
  * @return {ICallResult<Error>} The result of the call.
  */
-export function getFailureResult(error: Error, includeErrorInResult: boolean = Default_IncludeErrorInResult): ICallResult<Error> {
+export function getFailureResult(error: Error, includeErrorInResult: boolean = DEFAULT_RESULT_INCLUDES_ERROR): ICallResult<Error> {
   const result: ICallResult<Error> = {
     success: false,
     message: error.message,
