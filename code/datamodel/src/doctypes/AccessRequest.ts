@@ -184,7 +184,8 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     OPA.assertIdentifierIsValid(userId, "A valid OPA User ID must be provided.");
 
     const accessRequestsCollectionRef = this.collectionDescriptor.getTypedCollection(ds);
-    const getAccessRequestsForUserIdQuery = accessRequestsCollectionRef.where("userIdOfRequestor", "==", userId);
+    const userIdFieldName = OPA.getTypedPropertyKeyAsText<IAccessRequest>("userIdOfCreator");
+    const getAccessRequestsForUserIdQuery = accessRequestsCollectionRef.where(userIdFieldName, "==", userId);
     const matchingAccessRequestsSnap = await getAccessRequestsForUserIdQuery.get();
 
     const matchingAccessRequests = matchingAccessRequestsSnap.docs.map((doc) => doc.data());

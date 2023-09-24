@@ -83,7 +83,8 @@ export class RoleQuerySet extends OPA.QuerySet<IRole> {
     OPA.assertFirestoreIsNotNullish(ds.db);
 
     const rolesCollectionRef = this.collectionDescriptor.getTypedCollection(ds);
-    const getRolesForTypesQuery = rolesCollectionRef.where("type", "in", roleTypes);
+    const typeFieldName = OPA.getTypedPropertyKeyAsText<IRole>("type");
+    const getRolesForTypesQuery = rolesCollectionRef.where(typeFieldName, "in", roleTypes);
     const matchingRolesSnap = await getRolesForTypesQuery.get();
 
     const roles = matchingRolesSnap.docs.map((doc) => this.documentProxyConstructor(doc.data()));

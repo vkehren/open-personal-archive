@@ -350,7 +350,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     OPA.assertIdentifierIsValid(firebaseAuthUserId, "A valid Firebase Auth User ID must be provided.");
 
     const usersCollectionRef = this.collectionDescriptor.getTypedCollection(ds);
-    const getUserForUuidQuery = usersCollectionRef.where("firebaseAuthUserId", "==", firebaseAuthUserId);
+    const firebaseAuthUserIdFieldName = OPA.getTypedPropertyKeyAsText<IUser>("firebaseAuthUserId");
+    const getUserForUuidQuery = usersCollectionRef.where(firebaseAuthUserIdFieldName, "==", firebaseAuthUserId);
     const matchingUsersSnap = await getUserForUuidQuery.get();
 
     if (matchingUsersSnap.docs.length > 1) {
