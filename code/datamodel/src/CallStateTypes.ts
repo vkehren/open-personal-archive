@@ -7,7 +7,7 @@ import {ITimeZone} from "./doctypes/TimeZone";
 import {ITimeZoneGroup} from "./doctypes/TimeZoneGroup";
 import {IUser} from "./doctypes/User";
 
-export type ICallState = OPA.ICallStateBase<ISystemState, IAuthorizationState>;
+export type ICallState = OPA.ICallStateBase<IDataStorageState, IAuthenticationState, ISystemState, IAuthorizationState>;
 export type IDataStorageState = OPA.IDataStorageState;
 export type IAuthenticationState = OPA.IAuthenticationState;
 
