@@ -3,8 +3,14 @@ import * as OpaDm from "../../../datamodel/src";
 import {OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
 import * as Application from "../system/Application";
 
-export interface IAnonymousDisplayModel {
+export interface IUserAccountDisplayModel {
+  readonly isAnonymous: boolean;
+  readonly isUserAccountInitialized: boolean;
+  readonly isUserAccountApproved: boolean;
   readonly displayName: string;
+  readonly firebaseAuthUserId: string | null;
+  readonly opaUserId: string | null;
+  readonly userAccount: IUserDisplayModel | null;
 }
 
 export interface IUserDisplayModel {
@@ -12,15 +18,14 @@ export interface IUserDisplayModel {
   readonly firebaseAuthUserId: string;
   readonly accountName: string;
   readonly displayName: string;
-  readonly assignedRoleId: string;
+  readonly assignedRole: IRoleDisplayModel;
   readonly dateOfCreation: OPA.DateToUse;
 }
 
-export interface IUserAccountDisplayModel {
-  readonly isAnonymous: boolean;
-  readonly firebaseAuthState: OpaDm.IAuthenticationState | null;
-  readonly isUserAccountInitialized: boolean;
-  readonly userAccount: OpaDm.IUser | null;
+export interface IRoleDisplayModel {
+  readonly id: string;
+  readonly name: string;
+  readonly type: string;
 }
 
 /**
@@ -32,8 +37,11 @@ export async function getUserAccountDisplayModel(callState: OpaDm.ICallState | n
   if (OPA.isNullish(callState)) {
     const anonymousAccountDisplayModel: IUserAccountDisplayModel = {
       isAnonymous: true,
-      firebaseAuthState: null,
       isUserAccountInitialized: false,
+      isUserAccountApproved: false,
+      displayName: OPA.DEFAULT_ANONYMOUS_DISPLAY_NAME,
+      firebaseAuthUserId: null,
+      opaUserId: null,
       userAccount: null,
     };
     return anonymousAccountDisplayModel;
@@ -49,23 +57,45 @@ export async function getUserAccountDisplayModel(callState: OpaDm.ICallState | n
   OpaDm.assertSystemStateIsNotNullish(callStateNonNull.systemState);
 
   if (!callStateNonNull.hasAuthorizationState) {
+    const authenticationState = OPA.convertNonNullish(callStateNonNull.authenticationState);
+    const defaultDisplayName = OPA.convertNonNullish(authenticationState.firstName, authenticationState.email);
+    const actualDisplayName = OPA.convertNonNullish(authenticationState.displayName, defaultDisplayName);
     const uninitializedAccountDisplayModel: IUserAccountDisplayModel = {
       isAnonymous: false,
-      firebaseAuthState: callStateNonNull.authenticationState,
       isUserAccountInitialized: false,
+      isUserAccountApproved: false,
+      displayName: actualDisplayName,
+      firebaseAuthUserId: authenticationState.firebaseAuthUserId,
+      opaUserId: null,
       userAccount: null,
     };
     return uninitializedAccountDisplayModel;
   }
 
   OpaDm.assertAuthorizationStateIsNotNullish(callStateNonNull.authorizationState);
-  const authorizationState = OPA.convertNonNullish(callStateNonNull.authorizationState);
 
+  const authorizationState = OPA.convertNonNullish(callStateNonNull.authorizationState);
+  const defaultDisplayName = OPA.convertNonNullish(authorizationState.user.firstName, authorizationState.user.authAccountName);
+  const actualDisplayName = OPA.convertNonNullish(callStateNonNull.authenticationState.displayName, defaultDisplayName);
   const userAccountDisplayModel: IUserAccountDisplayModel = {
     isAnonymous: false,
-    firebaseAuthState: callStateNonNull.authenticationState,
     isUserAccountInitialized: true,
-    userAccount: authorizationState.user,
+    isUserAccountApproved: authorizationState.isUserApproved(),
+    displayName: actualDisplayName,
+    firebaseAuthUserId: authorizationState.user.firebaseAuthUserId,
+    opaUserId: authorizationState.user.id,
+    userAccount: {
+      id: authorizationState.user.id,
+      firebaseAuthUserId: authorizationState.user.firebaseAuthUserId,
+      accountName: authorizationState.user.authAccountName,
+      displayName: actualDisplayName,
+      assignedRole: {
+        id: authorizationState.role.id,
+        name: authorizationState.role.name,
+        type: authorizationState.role.type,
+      },
+      dateOfCreation: authorizationState.user.dateOfCreation,
+    },
   };
   return userAccountDisplayModel;
 }
