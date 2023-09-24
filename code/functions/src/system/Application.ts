@@ -88,8 +88,8 @@ export const isInstalled = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (
 
     return OPA.getSuccessResult(message, data);
   } catch (error) {
-    await UTL.logFunctionError(dataStorageState, authenticationState, request, error as Error);
-    return OPA.getFailureResult(error as Error);
+    await UTL.logFunctionError(dataStorageState, authenticationState, request, error);
+    return OPA.getFailureResult(error);
   } finally {
     await UTL.cleanUpStateAfterCall(dataStorageState, authenticationState, adminApp, request);
   }
@@ -112,8 +112,8 @@ export const getInstallationScreenDisplayModel = onCall({region: OPA.FIREBASE_DE
     const displayModel = await Application.getInstallationScreenDisplayModel(callState);
     return OPA.getSuccessResult("", displayModel);
   } catch (error) {
-    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error as Error);
-    return OPA.getFailureResult(error as Error);
+    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error);
+    return OPA.getFailureResult(error);
   } finally {
     await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, request);
   }
@@ -149,8 +149,8 @@ export const performInstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, asyn
 
     return OPA.getSuccessResult("", installResult);
   } catch (error) {
-    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error as Error);
-    return OPA.getFailureResult(error as Error);
+    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error);
+    return OPA.getFailureResult(error);
   } finally {
     await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, request);
   }
@@ -181,8 +181,8 @@ export const updateInstallationSettings = onCall({region: OPA.FIREBASE_DEFAULT_R
     const displayModel = await Application.getInstallationScreenDisplayModel(callState);
     return OPA.getSuccessResult("", displayModel);
   } catch (error) {
-    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error as Error);
-    return OPA.getFailureResult(error as Error);
+    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error);
+    return OPA.getFailureResult(error);
   } finally {
     await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, request);
   }
@@ -208,8 +208,8 @@ export const performUpgrade = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, asyn
     const upgradeResult = await Application.performUpgrade(callState, upgradeNotes, doBackupFirst);
     return OPA.getSuccessResult("", upgradeResult);
   } catch (error) {
-    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error as Error);
-    return OPA.getFailureResult(error as Error);
+    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error);
+    return OPA.getFailureResult(error);
   } finally {
     await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, request);
   }
@@ -234,8 +234,8 @@ export const performUninstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, as
     const uninstallResult = await Application.performUninstall(callState.dataStorageState, callState.authenticationState, callState.authorizationState, doBackupFirst);
     return OPA.getSuccessResult("", uninstallResult);
   } catch (error) {
-    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error as Error);
-    return OPA.getFailureResult(error as Error);
+    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error);
+    return OPA.getFailureResult(error);
   } finally {
     await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, request);
   }
