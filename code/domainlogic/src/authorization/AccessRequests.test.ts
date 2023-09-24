@@ -117,7 +117,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
   test("checks that requestUserAccess(...) fails when System is installed and User is Archive Owner", testFunc2(testCitationId_Null));
   test("checks that requestUserAccess(...) fails when System is installed and User is Archive Owner", testFunc2(testCitationId_NonNull));
 
-  const testFunc3 = (testCitationId: string | null) => (async () => {
+  const testFunc3 = (testCitationId: string | null, functionType: TestConfig.TestFunctionType) => (async () => {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
     expect(isSystemInstalled).equals(false);
     await TestUtils.assertUserDoesNotExist(config.dataStorageState, config.authenticationState);
@@ -147,10 +147,15 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     let user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     // NOTE: Since the TestUser is newly created, record the userId
-    TestAuthData.testUser.opaUserId = OPA.convertNonNullish(user).id;
+    TestAuthData.testUser.opaUserId = user.id;
 
+    // LATER: Check that relevant AccessRequests functions fail prior to approving Test User
+    config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    user = await Users.setUserToApproved(callState, testUserId());
 
+    config.authenticationState = TestAuthData.testUser;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     const accessRequestNullable = await AccessRequests.requestUserAccess(callState, testMessage, testCitationId);
     expect(accessRequestNullable).not.equals(null);
     const accessRequestId = OPA.convertNonNullish(accessRequestNullable).id;
@@ -602,7 +607,9 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.owner;
-    await expect(OpaDb.AccessRequests.queries.markWithDeletionState(config.dataStorageState, accessRequestId, OPA.DeletionStates.deleted, ambientUserId())).to.eventually.be.rejectedWith(Error);
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    if (functionType == "logic") {await expect(AccessRequests.markAccessRequestAsDeleted(callState, accessRequestId)).to.eventually.be.rejectedWith(Error);}
+    else {await expect(OpaDb.AccessRequests.queries.markWithDeletionState(config.dataStorageState, accessRequestId, OPA.DeletionStates.deleted, ambientUserId())).to.eventually.be.rejectedWith(Error);}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
@@ -632,7 +639,9 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.userIdOfDeletionChanger).equals(null);
 
     config.authenticationState = TestAuthData.testUser;
-    await OpaDb.AccessRequests.queries.markWithDeletionState(config.dataStorageState, accessRequestId, OPA.DeletionStates.deleted, ambientUserId());
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    if (functionType == "logic") {await AccessRequests.markAccessRequestAsDeleted(callState, accessRequestId);}
+    else {await OpaDb.AccessRequests.queries.markWithDeletionState(config.dataStorageState, accessRequestId, OPA.DeletionStates.deleted, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
@@ -662,7 +671,9 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.userIdOfDeletionChanger).equals(testUserId());
 
     config.authenticationState = TestAuthData.testUser;
-    await OpaDb.AccessRequests.queries.markWithDeletionState(config.dataStorageState, accessRequestId, OPA.DeletionStates.undeleted, ambientUserId());
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    if (functionType == "logic") {await AccessRequests.markAccessRequestAsUnDeleted(callState, accessRequestId);}
+    else {await OpaDb.AccessRequests.queries.markWithDeletionState(config.dataStorageState, accessRequestId, OPA.DeletionStates.undeleted, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
@@ -692,7 +703,9 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.userIdOfDeletionChanger).equals(testUserId());
 
     config.authenticationState = TestAuthData.testUser;
-    await OpaDb.AccessRequests.queries.markWithDeletionState(config.dataStorageState, accessRequestId, OPA.DeletionStates.deleted, ambientUserId());
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    if (functionType == "logic") {await AccessRequests.markAccessRequestAsDeleted(callState, accessRequestId);}
+    else {await OpaDb.AccessRequests.queries.markWithDeletionState(config.dataStorageState, accessRequestId, OPA.DeletionStates.deleted, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
@@ -722,7 +735,9 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.userIdOfDeletionChanger).equals(testUserId());
 
     config.authenticationState = TestAuthData.testUser;
-    await OpaDb.AccessRequests.queries.markWithDeletionState(config.dataStorageState, accessRequestId, OPA.DeletionStates.undeleted, ambientUserId());
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    if (functionType == "logic") {await AccessRequests.markAccessRequestAsUnDeleted(callState, accessRequestId);}
+    else {await OpaDb.AccessRequests.queries.markWithDeletionState(config.dataStorageState, accessRequestId, OPA.DeletionStates.undeleted, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
@@ -751,8 +766,10 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.dateOfDeletionChange).not.equals(null);
     expect(accessRequest.userIdOfDeletionChanger).equals(testUserId());
   });
-  test("checks that requestUserAccess(...) succeeds and AccessRequest updates succeed when System is installed and User is not Archive Owner", testFunc3(testCitationId_Null));
-  test("checks that requestUserAccess(...) succeeds and AccessRequest updates succeed when System is installed and User is not Archive Owner", testFunc3(testCitationId_NonNull));
+  test("checks that requestUserAccess(...) succeeds and AccessRequest updates succeed when System is installed and User is not Archive Owner", testFunc3(testCitationId_Null, "query"));
+  test("checks that requestUserAccess(...) succeeds and AccessRequest updates succeed when System is installed and User is not Archive Owner", testFunc3(testCitationId_Null, "logic"));
+  test("checks that requestUserAccess(...) succeeds and AccessRequest updates succeed when System is installed and User is not Archive Owner", testFunc3(testCitationId_NonNull, "query"));
+  test("checks that requestUserAccess(...) succeeds and AccessRequest updates succeed when System is installed and User is not Archive Owner", testFunc3(testCitationId_NonNull, "logic"));
 
   afterEach(async () => {
     await config.dataStorageState.db.terminate();
