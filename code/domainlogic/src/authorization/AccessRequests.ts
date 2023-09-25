@@ -13,9 +13,10 @@ export interface IAccessRequestDisplayModel {
 /**
  * Gets the list of AccessRequests for the current User in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {OPA.ApprovalState | null} [approvalState=null] The ApprovalState desired for retrieval.
  * @return {Promise<Array<IAccessRequestDisplayModel>>}
  */
-export async function getListOfAccessRequests(callState: OpaDm.ICallState,): Promise<Array<IAccessRequestDisplayModel>> {
+export async function getListOfAccessRequests(callState: OpaDm.ICallState, approvalState: OPA.ApprovalState | null = null): Promise<Array<IAccessRequestDisplayModel>> {
   OPA.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
@@ -34,16 +35,16 @@ export async function getListOfAccessRequests(callState: OpaDm.ICallState,): Pro
 
   let accessRequests = ([] as Array<OpaDm.IAccessRequest>);
   if (authorizationState.isRoleAllowed(authorizerIds)) {
-    accessRequests = await OpaDb.AccessRequests.queries.getAll(callState.dataStorageState);
+    accessRequests = await OpaDb.AccessRequests.queries.getAllForApprovalState(callState.dataStorageState, approvalState);
   } else {
-    accessRequests = await OpaDb.AccessRequests.queries.getAllForUserId(callState.dataStorageState, authorizationState.user.id);
+    accessRequests = await OpaDb.AccessRequests.queries.getAllForUserId(callState.dataStorageState, authorizationState.user.id, approvalState);
   }
 
   const locale = authorizationState.locale.optionName;
-  const accessRequestDisplayModels = accessRequests.map((value) => ({
-    id: value.id,
-    message: OPA.getLocalizedText(value.message, locale),
-    response: OPA.getLocalizedText(value.response, locale),
+  const accessRequestDisplayModels = accessRequests.map((accessRequest) => ({
+    id: accessRequest.id,
+    message: OPA.getLocalizedText(accessRequest.message, locale),
+    response: OPA.getLocalizedText(accessRequest.response, locale),
   } as IAccessRequestDisplayModel));
   return accessRequestDisplayModels;
 }

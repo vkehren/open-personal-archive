@@ -173,19 +173,48 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
   }
 
   /**
+   * Gets all AccessRequests stored in the database, filtering on ApprovalState if specified.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
+   * @param {OPA.ApprovalState | null} [approvalState=null] The ApprovalState desired for retrieval.
+   * @return {Promise<Array<IAccessRequest>>} The list of AccessRequests in the Collection.
+   */
+  async getAllForApprovalState(ds: OPA.IDataStorageState, approvalState: OPA.ApprovalState | null = null): Promise<Array<IAccessRequest>> {
+    if (OPA.isNullish(approvalState)) {
+      return await this.getAll(ds);
+    }
+
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
+
+    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
+    const approvalStateFieldName = OPA.getTypedPropertyKeyAsText<IAccessRequest>("approvalState");
+    const getQuery = collectionRef.where(approvalStateFieldName, "==", approvalState);
+    const querySnap = await getQuery.get();
+    const documents = querySnap.docs.map((value) => value.data());
+
+    const proxiedDocuments = documents.map((document) => this.documentProxyConstructor(document));
+    return proxiedDocuments;
+  }
+
+  /**
    * Gets all of the AccessRequests for the relevant User's OPA User ID.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} userId The ID for the relevant User within the OPA system.
+   * @param {OPA.ApprovalState | null} [approvalState=null] The ApprovalState desired for retrieval.
    * @return {Promise<Array<IAccessRequest>>} The list of Access Requests that correspond to the relevant User.
    */
-  async getAllForUserId(ds: OPA.IDataStorageState, userId: string): Promise<Array<IAccessRequest>> {
+  async getAllForUserId(ds: OPA.IDataStorageState, userId: string, approvalState: OPA.ApprovalState | null = null): Promise<Array<IAccessRequest>> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
     OPA.assertIdentifierIsValid(userId, "A valid OPA User ID must be provided.");
 
     const accessRequestsCollectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const userIdFieldName = OPA.getTypedPropertyKeyAsText<IAccessRequest>("userIdOfCreator");
-    const getAccessRequestsForUserIdQuery = accessRequestsCollectionRef.where(userIdFieldName, "==", userId);
+    let getAccessRequestsForUserIdQuery = accessRequestsCollectionRef.where(userIdFieldName, "==", userId);
+    if (!OPA.isNullish(approvalState)) {
+      const approvalStateFieldName = OPA.getTypedPropertyKeyAsText<IAccessRequest>("approvalState");
+      getAccessRequestsForUserIdQuery = getAccessRequestsForUserIdQuery.where(approvalStateFieldName, "==", approvalState);
+    }
     const matchingAccessRequestsSnap = await getAccessRequestsForUserIdQuery.get();
 
     const matchingAccessRequests = matchingAccessRequestsSnap.docs.map((doc) => doc.data());

@@ -866,6 +866,110 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
   test("checks that requestUserAccess(...) succeeds and AccessRequest updates succeed when System is installed and User is not Archive Owner", testFunc3(testCitationId_NonNull, "query"));
   test("checks that requestUserAccess(...) succeeds and AccessRequest updates succeed when System is installed and User is not Archive Owner", testFunc3(testCitationId_NonNull, "logic"));
 
+  const testFunc4 = () => (async () => {
+    let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
+    expect(isSystemInstalled).equals(false);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, TestAuthData.owner);
+
+    await TestUtils.performInstallForTest(config.dataStorageState, config.authenticationState);
+
+    isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
+    expect(isSystemInstalled).equals(true);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.owner);
+
+    const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(config.dataStorageState, config.authenticationState.providerId);
+    expect(authProvider).not.equals(null);
+
+    // NOTE: Set the ambient AuthenticationState to a User other than the Archive Owner
+    config.authenticationState = TestAuthData.testUser;
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, TestAuthData.testUser);
+
+    let callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, TestAuthData.testUser);
+
+    await Users.initializeUserAccount(callState, config.authenticationState.providerId, config.authenticationState.email);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
+    let user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
+
+    // NOTE: Since the TestUser is newly created, record the userId
+    TestAuthData.testUser.opaUserId = user.id;
+
+    // LATER: Check that relevant AccessRequests functions fail prior to approving Test User
+    config.authenticationState = TestAuthData.owner;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    user = await Users.setUserToApproved(callState, testUserId());
+
+    config.authenticationState = TestAuthData.testUser;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    const accessRequestT1 = await AccessRequests.requestUserAccess(callState, testMessage + "T1");
+    const accessRequestT2 = await AccessRequests.requestUserAccess(callState, testMessage + "T2");
+    const accessRequestT3 = await AccessRequests.requestUserAccess(callState, testMessage + "T3");
+
+    config.authenticationState = TestAuthData.guest;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    const accessRequestG1 = await AccessRequests.requestUserAccess(callState, testMessage + "G1");
+    const accessRequestG2 = await AccessRequests.requestUserAccess(callState, testMessage + "G2");
+    const accessRequestG3 = await AccessRequests.requestUserAccess(callState, testMessage + "G3");
+
+    config.authenticationState = TestAuthData.owner;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    let accessRequestsOwnerAll = await AccessRequests.getListOfAccessRequests(callState);
+    let accessRequestsOwnerPending = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.pending);
+    let accessRequestsOwnerDenied = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.denied);
+    let accessRequestsOwnerApproved = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.approved);
+
+    let accessRequestsOwnerAllIds = accessRequestsOwnerAll.map((value) => (value.id));
+    let accessRequestsOwnerPendingIds = accessRequestsOwnerPending.map((value) => (value.id));
+    let accessRequestsOwnerDeniedIds = accessRequestsOwnerDenied.map((value) => (value.id));
+    let accessRequestsOwnerApprovedIds = accessRequestsOwnerApproved.map((value) => (value.id));
+
+    expect(accessRequestsOwnerAll.length).equals(6);
+    expect(accessRequestsOwnerAllIds.includes(accessRequestT1.id)).equals(true);
+    expect(accessRequestsOwnerAllIds.includes(accessRequestT2.id)).equals(true);
+    expect(accessRequestsOwnerAllIds.includes(accessRequestT3.id)).equals(true);
+    expect(accessRequestsOwnerAllIds.includes(accessRequestG1.id)).equals(true);
+    expect(accessRequestsOwnerAllIds.includes(accessRequestG2.id)).equals(true);
+    expect(accessRequestsOwnerAllIds.includes(accessRequestG3.id)).equals(true);
+    expect(accessRequestsOwnerPending.length).equals(6);
+    expect(accessRequestsOwnerPendingIds.includes(accessRequestT1.id)).equals(true);
+    expect(accessRequestsOwnerPendingIds.includes(accessRequestT2.id)).equals(true);
+    expect(accessRequestsOwnerPendingIds.includes(accessRequestT3.id)).equals(true);
+    expect(accessRequestsOwnerPendingIds.includes(accessRequestG1.id)).equals(true);
+    expect(accessRequestsOwnerPendingIds.includes(accessRequestG2.id)).equals(true);
+    expect(accessRequestsOwnerPendingIds.includes(accessRequestG3.id)).equals(true);
+    expect(accessRequestsOwnerDenied.length).equals(0);
+    expect(accessRequestsOwnerDeniedIds.includes(accessRequestT1.id)).equals(false);
+    expect(accessRequestsOwnerDeniedIds.includes(accessRequestT2.id)).equals(false);
+    expect(accessRequestsOwnerDeniedIds.includes(accessRequestT3.id)).equals(false);
+    expect(accessRequestsOwnerDeniedIds.includes(accessRequestG1.id)).equals(false);
+    expect(accessRequestsOwnerDeniedIds.includes(accessRequestG2.id)).equals(false);
+    expect(accessRequestsOwnerDeniedIds.includes(accessRequestG3.id)).equals(false);
+    expect(accessRequestsOwnerApproved.length).equals(0);
+    expect(accessRequestsOwnerApprovedIds.includes(accessRequestT1.id)).equals(false);
+    expect(accessRequestsOwnerApprovedIds.includes(accessRequestT2.id)).equals(false);
+    expect(accessRequestsOwnerApprovedIds.includes(accessRequestT3.id)).equals(false);
+    expect(accessRequestsOwnerApprovedIds.includes(accessRequestG1.id)).equals(false);
+    expect(accessRequestsOwnerApprovedIds.includes(accessRequestG2.id)).equals(false);
+    expect(accessRequestsOwnerApprovedIds.includes(accessRequestG3.id)).equals(false);
+
+    // LATER: Check Guest
+    // LATER: Check TestUser
+    // LATER: Deny 2 AccessRequests
+    // LATER: Check Owner
+    // LATER: Check Guest
+    // LATER: Check TestUser
+    // LATER: Approve 2 AccessRequests
+    // LATER: Check Owner
+    // LATER: Check Guest
+    // LATER: Check TestUser
+    // EXTENSION: Check Admin, Editor, and Viewer
+  });
+  test("checks that getListOfAccessRequests(...) succeeds and filters properly when System is installed", testFunc4());
+
   afterEach(async () => {
     await config.dataStorageState.db.terminate();
     await admin.app().delete();
