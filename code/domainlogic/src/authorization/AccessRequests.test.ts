@@ -917,6 +917,21 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    const accessRequestT1DM = await AccessRequests.convertAccessRequestToDisplayModel(callState, accessRequestT1);
+    expect(accessRequestT1DM.id).equals(accessRequestT1.id);
+    const accessRequestT2DM = await AccessRequests.convertAccessRequestToDisplayModel(callState, accessRequestT2);
+    expect(accessRequestT2DM.id).equals(accessRequestT2.id);
+    const accessRequestT3DM = await AccessRequests.convertAccessRequestToDisplayModel(callState, accessRequestT3);
+    expect(accessRequestT3DM.id).equals(accessRequestT3.id);
+    const accessRequestG1DM = await AccessRequests.convertAccessRequestToDisplayModel(callState, accessRequestG1);
+    expect(accessRequestG1DM.id).equals(accessRequestG1.id);
+    const accessRequestG2DM = await AccessRequests.convertAccessRequestToDisplayModel(callState, accessRequestG2);
+    expect(accessRequestG2DM.id).equals(accessRequestG2.id);
+    const accessRequestG3DM = await AccessRequests.convertAccessRequestToDisplayModel(callState, accessRequestG3);
+    expect(accessRequestG3DM.id).equals(accessRequestG3.id);
+
+    config.authenticationState = TestAuthData.owner;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     let accessRequestsOwnerAll = await AccessRequests.getListOfAccessRequests(callState);
     let accessRequestsOwnerAllIds = accessRequestsOwnerAll.map((value) => (value.id));
     let accessRequestsOwnerPending = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.pending);
@@ -1644,6 +1659,27 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequestsTestUserApprovedIds.includes(accessRequestG1.id)).equals(false);
     expect(accessRequestsTestUserApprovedIds.includes(accessRequestG2.id)).equals(false);
     expect(accessRequestsTestUserApprovedIds.includes(accessRequestG3.id)).equals(false);
+
+    config.authenticationState = TestAuthData.owner;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    const accessRequestDMsOwnerAll = await AccessRequests.convertAccessRequestsToDisplayModels(callState, accessRequestsOwnerAll);
+    expect(accessRequestDMsOwnerAll.length).equals(accessRequestsOwnerAll.length);
+    accessRequestDMsOwnerAll.forEach((value, index) => expect(value.id).equals(accessRequestsOwnerAll[index].id));
+    const accessRequestDMsAdminAll = await AccessRequests.convertAccessRequestsToDisplayModels(callState, accessRequestsAdminAll);
+    expect(accessRequestDMsAdminAll.length).equals(accessRequestsAdminAll.length);
+    accessRequestDMsAdminAll.forEach((value, index) => expect(value.id).equals(accessRequestsAdminAll[index].id));
+    const accessRequestDMsEditorAll = await AccessRequests.convertAccessRequestsToDisplayModels(callState, accessRequestsEditorAll);
+    expect(accessRequestDMsEditorAll.length).equals(accessRequestsEditorAll.length);
+    accessRequestDMsEditorAll.forEach((value, index) => expect(value.id).equals(accessRequestsEditorAll[index].id));
+    const accessRequestDMsViewerAll = await AccessRequests.convertAccessRequestsToDisplayModels(callState, accessRequestsViewerAll);
+    expect(accessRequestDMsViewerAll.length).equals(accessRequestsViewerAll.length);
+    accessRequestDMsViewerAll.forEach((value, index) => expect(value.id).equals(accessRequestsViewerAll[index].id));
+    const accessRequestDMsGuestAll = await AccessRequests.convertAccessRequestsToDisplayModels(callState, accessRequestsGuestAll);
+    expect(accessRequestDMsGuestAll.length).equals(accessRequestsGuestAll.length);
+    accessRequestDMsGuestAll.forEach((value, index) => expect(value.id).equals(accessRequestsGuestAll[index].id));
+    const accessRequestDMsTestUserAll = await AccessRequests.convertAccessRequestsToDisplayModels(callState, accessRequestsTestUserAll);
+    expect(accessRequestDMsTestUserAll.length).equals(accessRequestsTestUserAll.length);
+    accessRequestDMsTestUserAll.forEach((value, index) => expect(value.id).equals(accessRequestsTestUserAll[index].id));
   });
   test("checks that getListOfAccessRequests(...) succeeds and filters properly when System is installed", testFunc4());
 
