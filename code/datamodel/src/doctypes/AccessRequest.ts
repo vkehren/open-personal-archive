@@ -265,20 +265,30 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the AccessRequest within the OPA system.
    * @param {Array<string>} tags The tags that apply to the AccessRequest.
+   * @param {OPA.ArrayContentType} contentType The type of updates that the array represents.
    * @param {string} userIdOfLatestTagger The ID for the latest Tagger within the OPA system.
    * @return {Promise<void>}
    */
-  async setTags(ds: OPA.IDataStorageState, documentId: string, tags: Array<string>, userIdOfLatestTagger: string): Promise<void> {
+  async setTags(ds: OPA.IDataStorageState, documentId: string, tags: Array<string>, contentType: OPA.ArrayContentType, userIdOfLatestTagger: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
     OPA.assertNonNullish(tags, "The array of Tags must not be null.");
 
+    let tagsValue: Array<string> | firestore.FieldValue = tags;
+    if (contentType == OPA.ArrayContentTypes.only_added) {
+      tagsValue = ds.constructorProvider.arrayUnion(...tags);
+    } else if (contentType == OPA.ArrayContentTypes.only_removed) {
+      tagsValue = ds.constructorProvider.arrayRemove(...tags);
+    }
+    const tagsValueAsArray = ((tagsValue as unknown) as Array<string>);
+
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IAccessRequestPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfLatestTagger} as OPA.IUpdateable_ByUser);
-    const updateObject_Taggable = ({tags, dateOfLatestTagging: now, userIdOfLatestTagger} as OPA.ITaggable_ByUser);
+    const updateObject_Taggable = ({tags: tagsValueAsArray, dateOfLatestTagging: now, userIdOfLatestTagger} as OPA.ITaggable_ByUser);
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Taggable};
-    const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
+    const updateObject_ForHistory = OPA.replaceFieldValuesWithSummaries({...updateObject});
+    const updateHistory = ds.constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
     const document = await this.getByIdWithAssert(ds, documentId);

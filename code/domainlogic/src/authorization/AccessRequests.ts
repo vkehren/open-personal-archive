@@ -165,9 +165,10 @@ export async function updateResponseToAccessRequest(callState: OpaDm.ICallState,
  * @param {OpaDm.ICallState} callState The Call State for the current User.
  * @param {string} accessRequestIdToSet The AccessRequest to set.
  * @param {Array<string>} tags The tags that apply to the AccessRequest.
+ * @param {OPA.ArrayContentType} [contentType="exact"] The content type of the array.
  * @return {Promise<OpaDm.IAccessRequest>}
  */
-export async function setAccessRequestTags(callState: OpaDm.ICallState, accessRequestIdToSet: string, tags: Array<string>): Promise<OpaDm.IAccessRequest> {
+export async function setAccessRequestTags(callState: OpaDm.ICallState, accessRequestIdToSet: string, tags: Array<string>, contentType = OPA.ArrayContentTypes.exact): Promise<OpaDm.IAccessRequest> {
   OPA.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
@@ -187,7 +188,7 @@ export async function setAccessRequestTags(callState: OpaDm.ICallState, accessRe
   authorizationState.assertUserApproved();
   authorizationState.assertRoleAllowed(authorizerIds);
 
-  await OpaDb.AccessRequests.queries.setTags(callState.dataStorageState, accessRequestIdToSet, tags, authorizationState.user.id);
+  await OpaDb.AccessRequests.queries.setTags(callState.dataStorageState, accessRequestIdToSet, tags, contentType, authorizationState.user.id);
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
@@ -196,9 +197,31 @@ export async function setAccessRequestTags(callState: OpaDm.ICallState, accessRe
 }
 
 /**
+ * Adds the Tags to the specified AccessRequest in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} accessRequestIdToSet The AccessRequest to set.
+ * @param {Array<string>} tags The tags to add to the AccessRequest.
+ * @return {Promise<OpaDm.IAccessRequest>}
+ */
+export async function addAccessRequestTags(callState: OpaDm.ICallState, accessRequestIdToAddTo: string, tagsToAdd: Array<string>): Promise<OpaDm.IAccessRequest> {
+  return await setAccessRequestTags(callState, accessRequestIdToAddTo, tagsToAdd, OPA.ArrayContentTypes.only_added);
+}
+
+/**
+ * Removes the Tags from the specified AccessRequest in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} accessRequestIdToRemoveFrom The AccessRequest to set.
+ * @param {Array<string>} tags The tags to remove from the AccessRequest.
+ * @return {Promise<OpaDm.IAccessRequest>}
+ */
+export async function removeAccessRequestTags(callState: OpaDm.ICallState, accessRequestIdToRemoveFrom: string, tagsToAdd: Array<string>): Promise<OpaDm.IAccessRequest> {
+  return await setAccessRequestTags(callState, accessRequestIdToRemoveFrom, tagsToAdd, OPA.ArrayContentTypes.only_removed);
+}
+
+/**
  * Set the ArchivalState of the specified AccessRequest in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
- * @param {string} accessRequestIdToSet The AccessRequest to set the ArchivalState of.
+ * @param {string} accessRequestIdToSet The AccessRequest to set the ArchivalState   of.
  * @param {OpaDm.ArchivalState} archivalState The ArchivalState to set to.
  * @return {Promise<OpaDm.IAccessRequest>}
  */

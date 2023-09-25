@@ -235,7 +235,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     const tags = ["a", "b", "c"];
     if (functionType == "logic") {await AccessRequests.setAccessRequestTags(callState, accessRequestId, tags);}
-    else {await OpaDb.AccessRequests.queries.setTags(config.dataStorageState, accessRequestId, tags, ambientUserId());}
+    else {await OpaDb.AccessRequests.queries.setTags(config.dataStorageState, accessRequestId, tags, OPA.ArrayContentTypes.exact, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
@@ -266,8 +266,9 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    if (functionType == "logic") {await AccessRequests.setAccessRequestToViewed(callState, accessRequestId);}
-    else {await OpaDb.AccessRequests.queries.setToViewed(config.dataStorageState, accessRequestId, ambientUserId());}
+    const tagsToAdd = ["d", "e", "f", "g"];
+    if (functionType == "logic") {await AccessRequests.addAccessRequestTags(callState, accessRequestId, tagsToAdd);}
+    else {await OpaDb.AccessRequests.queries.setTags(config.dataStorageState, accessRequestId, tagsToAdd, OPA.ArrayContentTypes.only_added, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
     expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
@@ -279,7 +280,72 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.hasBeenUpdated).equals(true);
     expect(accessRequest.dateOfLatestUpdate).not.equals(null);
     expect(accessRequest.userIdOfLatestUpdater).equals(ownerId());
-    expect(accessRequest.tags.length).equals(3);
+    expect(accessRequest.tags.length).equals(7);
+    expect(accessRequest.dateOfLatestTagging).not.equals(null);
+    expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
+    expect(accessRequest.isArchived).equals(false);
+    expect(accessRequest.dateOfArchivalChange).equals(null);
+    expect(accessRequest.userIdOfArchivalChanger).equals(null);
+    expect(accessRequest.hasBeenViewed).equals(false);
+    expect(accessRequest.dateOfLatestViewing).equals(null);
+    expect(accessRequest.userIdOfLatestViewer).equals(null);
+    expect(accessRequest.hasBeenDecided).equals(false);
+    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.pending);
+    expect(accessRequest.dateOfDecision).equals(null);
+    expect(accessRequest.userIdOfDecider).equals(null);
+    expect(accessRequest.isMarkedAsDeleted).equals(false);
+    expect(accessRequest.dateOfDeletionChange).equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(null);
+
+    config.authenticationState = TestAuthData.owner;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    const tagsToRemove = ["b", "d", "f"];
+    if (functionType == "logic") {await AccessRequests.removeAccessRequestTags(callState, accessRequestId, tagsToRemove);}
+    else {await OpaDb.AccessRequests.queries.setTags(config.dataStorageState, accessRequestId, tagsToRemove, OPA.ArrayContentTypes.only_removed, ambientUserId());}
+    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
+
+    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
+    expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
+    expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage);
+    expect(accessRequest.response[OpaDm.DefaultLocale]).equals("");
+    expect(accessRequest.updateHistory.length).equals(4);
+    expect(accessRequest.hasBeenUpdated).equals(true);
+    expect(accessRequest.dateOfLatestUpdate).not.equals(null);
+    expect(accessRequest.userIdOfLatestUpdater).equals(ownerId());
+    expect(accessRequest.tags.length).equals(4);
+    expect(accessRequest.dateOfLatestTagging).not.equals(null);
+    expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
+    expect(accessRequest.isArchived).equals(false);
+    expect(accessRequest.dateOfArchivalChange).equals(null);
+    expect(accessRequest.userIdOfArchivalChanger).equals(null);
+    expect(accessRequest.hasBeenViewed).equals(false);
+    expect(accessRequest.dateOfLatestViewing).equals(null);
+    expect(accessRequest.userIdOfLatestViewer).equals(null);
+    expect(accessRequest.hasBeenDecided).equals(false);
+    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.pending);
+    expect(accessRequest.dateOfDecision).equals(null);
+    expect(accessRequest.userIdOfDecider).equals(null);
+    expect(accessRequest.isMarkedAsDeleted).equals(false);
+    expect(accessRequest.dateOfDeletionChange).equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(null);
+
+    config.authenticationState = TestAuthData.owner;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    if (functionType == "logic") {await AccessRequests.setAccessRequestToViewed(callState, accessRequestId);}
+    else {await OpaDb.AccessRequests.queries.setToViewed(config.dataStorageState, accessRequestId, ambientUserId());}
+    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
+
+    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
+    expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
+    expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage);
+    expect(accessRequest.response[OpaDm.DefaultLocale]).equals("");
+    expect(accessRequest.updateHistory.length).equals(5);
+    expect(accessRequest.hasBeenUpdated).equals(true);
+    expect(accessRequest.dateOfLatestUpdate).not.equals(null);
+    expect(accessRequest.userIdOfLatestUpdater).equals(ownerId());
+    expect(accessRequest.tags.length).equals(4);
     expect(accessRequest.dateOfLatestTagging).not.equals(null);
     expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
     expect(accessRequest.isArchived).equals(false);
@@ -314,11 +380,11 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage);
     expect(accessRequest.response[OpaDm.DefaultLocale]).equals("");
-    expect(accessRequest.updateHistory.length).equals(4);
+    expect(accessRequest.updateHistory.length).equals(6);
     expect(accessRequest.hasBeenUpdated).equals(true);
     expect(accessRequest.dateOfLatestUpdate).not.equals(null);
     expect(accessRequest.userIdOfLatestUpdater).equals(adminId());
-    expect(accessRequest.tags.length).equals(3);
+    expect(accessRequest.tags.length).equals(4);
     expect(accessRequest.dateOfLatestTagging).not.equals(null);
     expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
     expect(accessRequest.isArchived).equals(false);
@@ -347,11 +413,11 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage);
     expect(accessRequest.response[OpaDm.DefaultLocale]).equals(testResponse);
-    expect(accessRequest.updateHistory.length).equals(5);
+    expect(accessRequest.updateHistory.length).equals(7);
     expect(accessRequest.hasBeenUpdated).equals(true);
     expect(accessRequest.dateOfLatestUpdate).not.equals(null);
     expect(accessRequest.userIdOfLatestUpdater).equals(ownerId());
-    expect(accessRequest.tags.length).equals(3);
+    expect(accessRequest.tags.length).equals(4);
     expect(accessRequest.dateOfLatestTagging).not.equals(null);
     expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
     expect(accessRequest.isArchived).equals(false);
@@ -381,11 +447,11 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage);
     expect(accessRequest.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
-    expect(accessRequest.updateHistory.length).equals(6);
+    expect(accessRequest.updateHistory.length).equals(8);
     expect(accessRequest.hasBeenUpdated).equals(true);
     expect(accessRequest.dateOfLatestUpdate).not.equals(null);
     expect(accessRequest.userIdOfLatestUpdater).equals(ownerId());
-    expect(accessRequest.tags.length).equals(3);
+    expect(accessRequest.tags.length).equals(4);
     expect(accessRequest.dateOfLatestTagging).not.equals(null);
     expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
     expect(accessRequest.isArchived).equals(false);
@@ -415,11 +481,11 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
     expect(accessRequest.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
-    expect(accessRequest.updateHistory.length).equals(7);
+    expect(accessRequest.updateHistory.length).equals(9);
     expect(accessRequest.hasBeenUpdated).equals(true);
     expect(accessRequest.dateOfLatestUpdate).not.equals(null);
     expect(accessRequest.userIdOfLatestUpdater).equals(testUserId());
-    expect(accessRequest.tags.length).equals(3);
+    expect(accessRequest.tags.length).equals(4);
     expect(accessRequest.dateOfLatestTagging).not.equals(null);
     expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
     expect(accessRequest.isArchived).equals(false);
@@ -453,11 +519,11 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
     expect(accessRequest.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
-    expect(accessRequest.updateHistory.length).equals(8);
+    expect(accessRequest.updateHistory.length).equals(10);
     expect(accessRequest.hasBeenUpdated).equals(true);
     expect(accessRequest.dateOfLatestUpdate).not.equals(null);
     expect(accessRequest.userIdOfLatestUpdater).equals(adminId());
-    expect(accessRequest.tags.length).equals(3);
+    expect(accessRequest.tags.length).equals(4);
     expect(accessRequest.dateOfLatestTagging).not.equals(null);
     expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
     expect(accessRequest.isArchived).equals(true);
@@ -485,11 +551,11 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
     expect(accessRequest.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
-    expect(accessRequest.updateHistory.length).equals(9);
+    expect(accessRequest.updateHistory.length).equals(11);
     expect(accessRequest.hasBeenUpdated).equals(true);
     expect(accessRequest.dateOfLatestUpdate).not.equals(null);
     expect(accessRequest.userIdOfLatestUpdater).equals(ownerId());
-    expect(accessRequest.tags.length).equals(3);
+    expect(accessRequest.tags.length).equals(4);
     expect(accessRequest.dateOfLatestTagging).not.equals(null);
     expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
     expect(accessRequest.isArchived).equals(false);
@@ -518,11 +584,11 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
     expect(accessRequest.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
-    expect(accessRequest.updateHistory.length).equals(10);
+    expect(accessRequest.updateHistory.length).equals(12);
     expect(accessRequest.hasBeenUpdated).equals(true);
     expect(accessRequest.dateOfLatestUpdate).not.equals(null);
     expect(accessRequest.userIdOfLatestUpdater).equals(ownerId());
-    expect(accessRequest.tags.length).equals(3);
+    expect(accessRequest.tags.length).equals(4);
     expect(accessRequest.dateOfLatestTagging).not.equals(null);
     expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
     expect(accessRequest.isArchived).equals(true);
@@ -550,11 +616,11 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
     expect(accessRequest.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
-    expect(accessRequest.updateHistory.length).equals(11);
+    expect(accessRequest.updateHistory.length).equals(13);
     expect(accessRequest.hasBeenUpdated).equals(true);
     expect(accessRequest.dateOfLatestUpdate).not.equals(null);
     expect(accessRequest.userIdOfLatestUpdater).equals(ownerId());
-    expect(accessRequest.tags.length).equals(3);
+    expect(accessRequest.tags.length).equals(4);
     expect(accessRequest.dateOfLatestTagging).not.equals(null);
     expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
     expect(accessRequest.isArchived).equals(false);
@@ -582,11 +648,11 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
     expect(accessRequest.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
-    expect(accessRequest.updateHistory.length).equals(12);
+    expect(accessRequest.updateHistory.length).equals(14);
     expect(accessRequest.hasBeenUpdated).equals(true);
     expect(accessRequest.dateOfLatestUpdate).not.equals(null);
     expect(accessRequest.userIdOfLatestUpdater).equals(ownerId());
-    expect(accessRequest.tags.length).equals(3);
+    expect(accessRequest.tags.length).equals(4);
     expect(accessRequest.dateOfLatestTagging).not.equals(null);
     expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
     expect(accessRequest.isArchived).equals(false);
@@ -614,11 +680,11 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
     expect(accessRequest.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
-    expect(accessRequest.updateHistory.length).equals(13);
+    expect(accessRequest.updateHistory.length).equals(15);
     expect(accessRequest.hasBeenUpdated).equals(true);
     expect(accessRequest.dateOfLatestUpdate).not.equals(null);
     expect(accessRequest.userIdOfLatestUpdater).equals(ownerId());
-    expect(accessRequest.tags.length).equals(3);
+    expect(accessRequest.tags.length).equals(4);
     expect(accessRequest.dateOfLatestTagging).not.equals(null);
     expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
     expect(accessRequest.isArchived).equals(false);
@@ -646,11 +712,11 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
     expect(accessRequest.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
-    expect(accessRequest.updateHistory.length).equals(13);
+    expect(accessRequest.updateHistory.length).equals(15);
     expect(accessRequest.hasBeenUpdated).equals(true);
     expect(accessRequest.dateOfLatestUpdate).not.equals(null);
     expect(accessRequest.userIdOfLatestUpdater).equals(ownerId());
-    expect(accessRequest.tags.length).equals(3);
+    expect(accessRequest.tags.length).equals(4);
     expect(accessRequest.dateOfLatestTagging).not.equals(null);
     expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
     expect(accessRequest.isArchived).equals(false);
@@ -678,75 +744,11 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
     expect(accessRequest.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
-    expect(accessRequest.updateHistory.length).equals(14);
-    expect(accessRequest.hasBeenUpdated).equals(true);
-    expect(accessRequest.dateOfLatestUpdate).not.equals(null);
-    expect(accessRequest.userIdOfLatestUpdater).equals(testUserId());
-    expect(accessRequest.tags.length).equals(3);
-    expect(accessRequest.dateOfLatestTagging).not.equals(null);
-    expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
-    expect(accessRequest.isArchived).equals(false);
-    expect(accessRequest.dateOfArchivalChange).not.equals(null);
-    expect(accessRequest.userIdOfArchivalChanger).equals(ownerId());
-    expect(accessRequest.hasBeenViewed).equals(true);
-    expect(accessRequest.dateOfLatestViewing).not.equals(null);
-    expect(accessRequest.userIdOfLatestViewer).equals(adminId());
-    expect(accessRequest.hasBeenDecided).equals(true);
-    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.approved);
-    expect(accessRequest.dateOfDecision).not.equals(null);
-    expect(accessRequest.userIdOfDecider).equals(ownerId());
-    expect(accessRequest.isMarkedAsDeleted).equals(true);
-    expect(accessRequest.dateOfDeletionChange).not.equals(null);
-    expect(accessRequest.userIdOfDeletionChanger).equals(testUserId());
-
-    config.authenticationState = TestAuthData.testUser;
-    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    if (functionType == "logic") {await AccessRequests.markAccessRequestAsUnDeleted(callState, accessRequestId);}
-    else {await OpaDb.AccessRequests.queries.markWithDeletionState(config.dataStorageState, accessRequestId, OPA.DeletionStates.undeleted, ambientUserId());}
-    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
-
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
-    expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
-    expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
-    expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
-    expect(accessRequest.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
-    expect(accessRequest.updateHistory.length).equals(15);
-    expect(accessRequest.hasBeenUpdated).equals(true);
-    expect(accessRequest.dateOfLatestUpdate).not.equals(null);
-    expect(accessRequest.userIdOfLatestUpdater).equals(testUserId());
-    expect(accessRequest.tags.length).equals(3);
-    expect(accessRequest.dateOfLatestTagging).not.equals(null);
-    expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
-    expect(accessRequest.isArchived).equals(false);
-    expect(accessRequest.dateOfArchivalChange).not.equals(null);
-    expect(accessRequest.userIdOfArchivalChanger).equals(ownerId());
-    expect(accessRequest.hasBeenViewed).equals(true);
-    expect(accessRequest.dateOfLatestViewing).not.equals(null);
-    expect(accessRequest.userIdOfLatestViewer).equals(adminId());
-    expect(accessRequest.hasBeenDecided).equals(true);
-    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.approved);
-    expect(accessRequest.dateOfDecision).not.equals(null);
-    expect(accessRequest.userIdOfDecider).equals(ownerId());
-    expect(accessRequest.isMarkedAsDeleted).equals(false);
-    expect(accessRequest.dateOfDeletionChange).not.equals(null);
-    expect(accessRequest.userIdOfDeletionChanger).equals(testUserId());
-
-    config.authenticationState = TestAuthData.testUser;
-    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    if (functionType == "logic") {await AccessRequests.markAccessRequestAsDeleted(callState, accessRequestId);}
-    else {await OpaDb.AccessRequests.queries.markWithDeletionState(config.dataStorageState, accessRequestId, OPA.DeletionStates.deleted, ambientUserId());}
-    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
-
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
-    expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
-    expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
-    expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
-    expect(accessRequest.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
     expect(accessRequest.updateHistory.length).equals(16);
     expect(accessRequest.hasBeenUpdated).equals(true);
     expect(accessRequest.dateOfLatestUpdate).not.equals(null);
     expect(accessRequest.userIdOfLatestUpdater).equals(testUserId());
-    expect(accessRequest.tags.length).equals(3);
+    expect(accessRequest.tags.length).equals(4);
     expect(accessRequest.dateOfLatestTagging).not.equals(null);
     expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
     expect(accessRequest.isArchived).equals(false);
@@ -778,7 +780,71 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequest.hasBeenUpdated).equals(true);
     expect(accessRequest.dateOfLatestUpdate).not.equals(null);
     expect(accessRequest.userIdOfLatestUpdater).equals(testUserId());
-    expect(accessRequest.tags.length).equals(3);
+    expect(accessRequest.tags.length).equals(4);
+    expect(accessRequest.dateOfLatestTagging).not.equals(null);
+    expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
+    expect(accessRequest.isArchived).equals(false);
+    expect(accessRequest.dateOfArchivalChange).not.equals(null);
+    expect(accessRequest.userIdOfArchivalChanger).equals(ownerId());
+    expect(accessRequest.hasBeenViewed).equals(true);
+    expect(accessRequest.dateOfLatestViewing).not.equals(null);
+    expect(accessRequest.userIdOfLatestViewer).equals(adminId());
+    expect(accessRequest.hasBeenDecided).equals(true);
+    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.approved);
+    expect(accessRequest.dateOfDecision).not.equals(null);
+    expect(accessRequest.userIdOfDecider).equals(ownerId());
+    expect(accessRequest.isMarkedAsDeleted).equals(false);
+    expect(accessRequest.dateOfDeletionChange).not.equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(testUserId());
+
+    config.authenticationState = TestAuthData.testUser;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    if (functionType == "logic") {await AccessRequests.markAccessRequestAsDeleted(callState, accessRequestId);}
+    else {await OpaDb.AccessRequests.queries.markWithDeletionState(config.dataStorageState, accessRequestId, OPA.DeletionStates.deleted, ambientUserId());}
+    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
+
+    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
+    expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
+    expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
+    expect(accessRequest.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
+    expect(accessRequest.updateHistory.length).equals(18);
+    expect(accessRequest.hasBeenUpdated).equals(true);
+    expect(accessRequest.dateOfLatestUpdate).not.equals(null);
+    expect(accessRequest.userIdOfLatestUpdater).equals(testUserId());
+    expect(accessRequest.tags.length).equals(4);
+    expect(accessRequest.dateOfLatestTagging).not.equals(null);
+    expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
+    expect(accessRequest.isArchived).equals(false);
+    expect(accessRequest.dateOfArchivalChange).not.equals(null);
+    expect(accessRequest.userIdOfArchivalChanger).equals(ownerId());
+    expect(accessRequest.hasBeenViewed).equals(true);
+    expect(accessRequest.dateOfLatestViewing).not.equals(null);
+    expect(accessRequest.userIdOfLatestViewer).equals(adminId());
+    expect(accessRequest.hasBeenDecided).equals(true);
+    expect(accessRequest.approvalState).equals(OPA.ApprovalStates.approved);
+    expect(accessRequest.dateOfDecision).not.equals(null);
+    expect(accessRequest.userIdOfDecider).equals(ownerId());
+    expect(accessRequest.isMarkedAsDeleted).equals(true);
+    expect(accessRequest.dateOfDeletionChange).not.equals(null);
+    expect(accessRequest.userIdOfDeletionChanger).equals(testUserId());
+
+    config.authenticationState = TestAuthData.testUser;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    if (functionType == "logic") {await AccessRequests.markAccessRequestAsUnDeleted(callState, accessRequestId);}
+    else {await OpaDb.AccessRequests.queries.markWithDeletionState(config.dataStorageState, accessRequestId, OPA.DeletionStates.undeleted, ambientUserId());}
+    accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
+
+    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
+    expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
+    expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
+    expect(accessRequest.response[OpaDm.DefaultLocale]).equals(testResponse_Updated);
+    expect(accessRequest.updateHistory.length).equals(19);
+    expect(accessRequest.hasBeenUpdated).equals(true);
+    expect(accessRequest.dateOfLatestUpdate).not.equals(null);
+    expect(accessRequest.userIdOfLatestUpdater).equals(testUserId());
+    expect(accessRequest.tags.length).equals(4);
     expect(accessRequest.dateOfLatestTagging).not.equals(null);
     expect(accessRequest.userIdOfLatestTagger).equals(ownerId());
     expect(accessRequest.isArchived).equals(false);
