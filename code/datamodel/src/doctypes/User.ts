@@ -322,6 +322,30 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   }
 
   /**
+   * Gets all Users stored in the database, filtering on ApprovalState if specified.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
+   * @param {OPA.ApprovalState | null} [approvalState=null] The ApprovalState desired for retrieval.
+   * @return {Promise<Array<IUser>>} The list of Users in the Collection.
+   */
+  async getAllForApprovalState(ds: OPA.IDataStorageState, approvalState: OPA.ApprovalState | null = null): Promise<Array<IUser>> {
+    if (OPA.isNullish(approvalState)) {
+      return await this.getAll(ds);
+    }
+
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
+
+    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
+    const approvalStateFieldName = OPA.getTypedPropertyKeyAsText<IUser>("approvalState");
+    const getQuery = collectionRef.where(approvalStateFieldName, "==", approvalState);
+    const querySnap = await getQuery.get();
+    const documents = querySnap.docs.map((value) => value.data());
+
+    const proxiedDocuments = documents.map((document) => this.documentProxyConstructor(document));
+    return proxiedDocuments;
+  }
+
+  /**
    * Gets the User that is the Owner of the Archive managed by the OPA installation.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @return {Promise<IUser>} The User corresponding to the UUID, or null if none exists.

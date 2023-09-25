@@ -29,6 +29,81 @@ export interface IRoleDisplayModel {
 }
 
 /**
+ * Gets the list of Users in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {OPA.ApprovalState | null} [approvalState=null] The ApprovalState desired for retrieval.
+ * @return {Promise<Array<IUserDisplayModel>>}
+ */
+export async function getListOfUsers(callState: OpaDm.ICallState, approvalState: OPA.ApprovalState | null = null): Promise<Array<IUserDisplayModel>> {
+  OPA.assertCallStateIsNotNullish(callState);
+  OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
+  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+
+  const isSystemInstalled = await Application.isSystemInstalled(callState.dataStorageState);
+  OPA.assertSystemIsInstalled(isSystemInstalled);
+  OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
+  OpaDm.assertSystemStateIsNotNullish(callState.systemState);
+  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+
+  const authorizationState = OPA.convertNonNullish(callState.authorizationState);
+  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
+  const authorizerIds = [...authorizersById.keys()];
+
+  authorizationState.assertUserApproved();
+
+  if (!authorizationState.isRoleAllowed(authorizerIds)) {
+    const isUserOwnResult = (OPA.isNullish(approvalState) || (approvalState == OPA.ApprovalStates.approved));
+    if (!isUserOwnResult) {
+      return [];
+    }
+
+    const user = authorizationState.user;
+    const role = authorizationState.role;
+
+    const defaultDisplayName = OPA.convertNonNullish(user.firstName, user.authAccountName);
+    const actualDisplayName = OPA.convertNonNullish(user.preferredName, defaultDisplayName);
+    const userDisplayModel = {
+      id: user.id,
+      firebaseAuthUserId: user.firebaseAuthUserId,
+      accountName: user.authAccountName,
+      displayName: actualDisplayName,
+      assignedRole: {
+        id: role.id,
+        name: role.name,
+        type: role.type,
+      },
+      dateOfCreation: user.dateOfCreation,
+    };
+    return [userDisplayModel];
+  }
+
+  const users = await OpaDb.Users.queries.getAllForApprovalState(callState.dataStorageState, approvalState);
+  const roles = await OpaDb.Roles.queries.getAll(callState.dataStorageState);
+  const rolesMap = OPA.createMapFromArray(roles, (role) => (role.id));
+
+  const userDisplayModels = users.map((user) => {
+    const role = OPA.convertNonNullish(rolesMap.get(user.assignedRoleId));
+    OPA.assertDocumentIsValid(role);
+
+    const defaultDisplayName = OPA.convertNonNullish(user.firstName, user.authAccountName);
+    const actualDisplayName = OPA.convertNonNullish(user.preferredName, defaultDisplayName);
+    return {
+      id: user.id,
+      firebaseAuthUserId: user.firebaseAuthUserId,
+      accountName: user.authAccountName,
+      displayName: actualDisplayName,
+      assignedRole: {
+        id: role.id,
+        name: role.name,
+        type: role.type,
+      },
+      dateOfCreation: user.dateOfCreation,
+    };
+  });
+  return userDisplayModels;
+}
+
+/**
  * Gets the account display model for the current User using the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.ICallState | null} callState The Call State for the current User, or null if no User has been authenticated or authorized.
  * @return {Promise<IUserAccountDisplayModel>}
