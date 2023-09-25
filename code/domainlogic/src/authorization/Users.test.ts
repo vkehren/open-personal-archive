@@ -2322,7 +2322,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
 
     await Users.initializeUserAccount(callState, config.authenticationState.providerId, config.authenticationState.email);
     await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
-    let user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
+    const user = await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.testUser);
 
     // NOTE: Since the TestUser is newly created, record the userId
     TestAuthData.testUser.opaUserId = user.id;
@@ -2957,14 +2957,14 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.testUser;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    let usersTestUserAll = await Users.getListOfUsers(callState);
-    let usersTestUserAllIds = usersTestUserAll.map((value) => (value.id));
-    let usersTestUserPending = await Users.getListOfUsers(callState, OPA.ApprovalStates.pending);
-    let usersTestUserPendingIds = usersTestUserPending.map((value) => (value.id));
-    let usersTestUserDenied = await Users.getListOfUsers(callState, OPA.ApprovalStates.denied);
-    let usersTestUserDeniedIds = usersTestUserDenied.map((value) => (value.id));
-    let usersTestUserApproved = await Users.getListOfUsers(callState, OPA.ApprovalStates.approved);
-    let usersTestUserApprovedIds = usersTestUserApproved.map((value) => (value.id));
+    const usersTestUserAll = await Users.getListOfUsers(callState);
+    const usersTestUserAllIds = usersTestUserAll.map((value) => (value.id));
+    const usersTestUserPending = await Users.getListOfUsers(callState, OPA.ApprovalStates.pending);
+    const usersTestUserPendingIds = usersTestUserPending.map((value) => (value.id));
+    const usersTestUserDenied = await Users.getListOfUsers(callState, OPA.ApprovalStates.denied);
+    const usersTestUserDeniedIds = usersTestUserDenied.map((value) => (value.id));
+    const usersTestUserApproved = await Users.getListOfUsers(callState, OPA.ApprovalStates.approved);
+    const usersTestUserApprovedIds = usersTestUserApproved.map((value) => (value.id));
 
     expect(usersTestUserAll.length).equals(1);
     expect(usersTestUserAllIds.includes(ownerId())).equals(false);

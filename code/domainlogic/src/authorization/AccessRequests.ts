@@ -200,8 +200,8 @@ export async function setAccessRequestTags(callState: OpaDm.ICallState, accessRe
 /**
  * Adds the Tags to the specified AccessRequest in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
- * @param {string} accessRequestIdToSet The AccessRequest to set.
- * @param {Array<string>} tags The tags to add to the AccessRequest.
+ * @param {string} accessRequestIdToAddTo The AccessRequest to which to add Tags.
+ * @param {Array<string>} tagsToAdd The tags to add to the AccessRequest.
  * @return {Promise<OpaDm.IAccessRequest>}
  */
 export async function addAccessRequestTags(callState: OpaDm.ICallState, accessRequestIdToAddTo: string, tagsToAdd: Array<string>): Promise<OpaDm.IAccessRequest> {
@@ -211,12 +211,12 @@ export async function addAccessRequestTags(callState: OpaDm.ICallState, accessRe
 /**
  * Removes the Tags from the specified AccessRequest in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
- * @param {string} accessRequestIdToRemoveFrom The AccessRequest to set.
- * @param {Array<string>} tags The tags to remove from the AccessRequest.
+ * @param {string} accessRequestIdToRemoveFrom The AccessRequest from which to remove Tags.
+ * @param {Array<string>} tagsToRemove The tags to remove from the AccessRequest.
  * @return {Promise<OpaDm.IAccessRequest>}
  */
-export async function removeAccessRequestTags(callState: OpaDm.ICallState, accessRequestIdToRemoveFrom: string, tagsToAdd: Array<string>): Promise<OpaDm.IAccessRequest> {
-  return await setAccessRequestTags(callState, accessRequestIdToRemoveFrom, tagsToAdd, OPA.ArrayContentTypes.only_removed);
+export async function removeAccessRequestTags(callState: OpaDm.ICallState, accessRequestIdToRemoveFrom: string, tagsToRemove: Array<string>): Promise<OpaDm.IAccessRequest> {
+  return await setAccessRequestTags(callState, accessRequestIdToRemoveFrom, tagsToRemove, OPA.ArrayContentTypes.only_removed);
 }
 
 /**
