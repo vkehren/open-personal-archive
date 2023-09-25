@@ -284,3 +284,36 @@ export async function cleanUpStateAfterCall(dataStorageState: OpaDm.IDataStorage
     logFunctionError(dataStorageState, authenticationState, request, error);
   }
 }
+
+export type ActionFunc<T> = (request: CallableRequest, callState: OpaDm.ICallState) => Promise<T>;
+export type ActionResult<T> = OPA.ICallResult<T | Error | string | unknown>;
+/**
+ * Cleans up resources upon completion of a server function call in the Open Personal Archive™ (OPA) system.
+ * @param {CallableRequest} request The Firebase request object.
+ * @param {OPA.DefaultFunc<string>} getModuleName The function that gets the module name for logging.
+ * @param {OPA.DefaultFunc<string>} getFunctionName The function that gets the module name for logging.
+ * @param {ActionFunc<T>} doAction The function that performs the action.
+ * @return {Promise<ActionResult<T>>}
+ */
+export async function performAuthenticatedActionWithResult<T>(request: CallableRequest, getModuleName: OPA.DefaultFunc<string>, getFunctionName: OPA.DefaultFunc<string>, doAction: ActionFunc<T>): Promise<ActionResult<T>> { // eslint-disable-line max-len
+  let adminApp = ((null as unknown) as admin.app.App);
+  let callState = ((null as unknown) as OpaDm.ICallState);
+  const getLogMessage = (state: ExecutionState) => getFunctionCallLogMessage(getModuleName(), getFunctionName(), state);
+
+  try {
+    logger.info(getLogMessage(ExecutionStates.entry), {structuredData: true});
+    adminApp = admin.app();
+    callState = await getCallStateForFirebaseContextAndApp(request, adminApp);
+
+    await setExternalLogState(callState.dataStorageState, request);
+    await logFunctionCall(callState.dataStorageState, callState.authenticationState, request, getLogMessage(ExecutionStates.ready));
+
+    const result = await doAction(request, callState);
+    return OPA.getSuccessResult(result);
+  } catch (error) {
+    await logFunctionError(callState.dataStorageState, callState.authenticationState, request, error);
+    return OPA.getFailureResult(error);
+  } finally {
+    await cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, request);
+  }
+}
