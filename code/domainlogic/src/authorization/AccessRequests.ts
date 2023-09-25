@@ -2,7 +2,6 @@ import * as OPA from "../../../base/src";
 import * as OpaDm from "../../../datamodel/src";
 import {OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
 import * as Application from "../system/Application";
-import * as Users from "./Users";
 
 export interface IAccessRequestDisplayModel {
   readonly id: string;
@@ -318,7 +317,8 @@ export async function setAccessRequestToApprovalState(callState: OpaDm.ICallStat
     const accessRequestPreRead = await OpaDb.AccessRequests.queries.getByIdWithAssert(callState.dataStorageState, accessRequestIdToSet, "The requested AccessRequest does not exist.");
     if (!OPA.isNullish(accessRequestPreRead.citationId)) {
       const userId = accessRequestPreRead.userIdOfCreator;
-      await Users.addViewableCitationToUser(callState, userId, OPA.convertNonNullish(accessRequestPreRead.citationId));
+      const citationId = OPA.convertNonNullish(accessRequestPreRead.citationId);
+      await OpaDb.Users.queries.addViewableCitation(callState.dataStorageState, userId, citationId, authorizationState.user.id);
     }
   }
 
