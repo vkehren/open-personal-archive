@@ -11,12 +11,50 @@ export interface IAccessRequestDisplayModel {
 }
 
 /**
+ * Converts an array of IAccessRequests to an array of IAccessRequestDisplayModels.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {Array<OpaDm.IAccessRequest>} accessRequests The array of IAccessRequests.
+ * @return {Promise<Array<IAccessRequestDisplayModel>>}
+ */
+export async function convertAccessRequestsToDisplayModels(callState: OpaDm.ICallState, accessRequests: Array<OpaDm.IAccessRequest>): Promise<Array<IAccessRequestDisplayModel>> {
+  OPA.assertCallStateIsNotNullish(callState);
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
+  OPA.assertNonNullish(accessRequests);
+
+  const authorizationState = OPA.convertNonNullish(callState.authorizationState);
+  const locale = authorizationState.locale.optionName;
+
+  const accessRequestDisplayModels = accessRequests.map((accessRequest) => ({
+    id: accessRequest.id,
+    message: OPA.getLocalizedText(accessRequest.message, locale),
+    response: OPA.getLocalizedText(accessRequest.response, locale),
+  } as IAccessRequestDisplayModel));
+  return accessRequestDisplayModels;
+}
+
+/**
+ * Converts an IAccessRequest to an IAccessRequestDisplayModel.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {OpaDm.IAccessRequest} accessRequest The IAccessRequest.
+ * @return {Promise<Array<IAccessRequestDisplayModel>>}
+ */
+export async function convertAccessRequestToDisplayModel(callState: OpaDm.ICallState, accessRequest: OpaDm.IAccessRequest): Promise<IAccessRequestDisplayModel> {
+  const accessRequestDisplayModels = await convertAccessRequestsToDisplayModels(callState, [accessRequest]);
+
+  OPA.assertNonNullish(accessRequestDisplayModels);
+  OPA.assertIsTrue(accessRequestDisplayModels.length == 1);
+
+  const accessRequestDisplayModel = accessRequestDisplayModels[0];
+  return accessRequestDisplayModel;
+}
+
+/**
  * Gets the list of AccessRequests for the current User in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
  * @param {OPA.ApprovalState | null} [approvalState=null] The ApprovalState desired for retrieval.
- * @return {Promise<Array<IAccessRequestDisplayModel>>}
+ * @return {Promise<Array<OpaDm.IAccessRequest>>}
  */
-export async function getListOfAccessRequests(callState: OpaDm.ICallState, approvalState: OPA.ApprovalState | null = null): Promise<Array<IAccessRequestDisplayModel>> {
+export async function getListOfAccessRequests(callState: OpaDm.ICallState, approvalState: OPA.ApprovalState | null = null): Promise<Array<OpaDm.IAccessRequest>> {
   OPA.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
@@ -33,20 +71,13 @@ export async function getListOfAccessRequests(callState: OpaDm.ICallState, appro
 
   authorizationState.assertUserApproved();
 
-  let accessRequests = ([] as Array<OpaDm.IAccessRequest>);
-  if (authorizationState.isRoleAllowed(authorizerIds)) {
-    accessRequests = await OpaDb.AccessRequests.queries.getAllForApprovalState(callState.dataStorageState, approvalState);
+  if (!authorizationState.isRoleAllowed(authorizerIds)) {
+    const accessRequests = await OpaDb.AccessRequests.queries.getAllForUserId(callState.dataStorageState, authorizationState.user.id, approvalState);
+    return accessRequests;
   } else {
-    accessRequests = await OpaDb.AccessRequests.queries.getAllForUserId(callState.dataStorageState, authorizationState.user.id, approvalState);
+    const accessRequests = await OpaDb.AccessRequests.queries.getAllForApprovalState(callState.dataStorageState, approvalState);
+    return accessRequests;
   }
-
-  const locale = authorizationState.locale.optionName;
-  const accessRequestDisplayModels = accessRequests.map((accessRequest) => ({
-    id: accessRequest.id,
-    message: OPA.getLocalizedText(accessRequest.message, locale),
-    response: OPA.getLocalizedText(accessRequest.response, locale),
-  } as IAccessRequestDisplayModel));
-  return accessRequestDisplayModels;
 }
 
 /**

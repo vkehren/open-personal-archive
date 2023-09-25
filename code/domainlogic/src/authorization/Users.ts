@@ -29,12 +29,86 @@ export interface IRoleDisplayModel {
 }
 
 /**
+ * Converts an array of IUsers to an array of IUserDisplayModels.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {Array<OpaDm.IUser>} users The array of IUsers.
+ * @param {Array<OpaDm.IRole> | null} [roles=null] The array of IRoles necessary, if they have already been read.
+ * @return {Promise<Array<IUserDisplayModel>>}
+ */
+export async function convertUsersToDisplayModels(callState: OpaDm.ICallState, users: Array<OpaDm.IUser>, roles: Array<OpaDm.IRole> | null = null): Promise<Array<IUserDisplayModel>> {
+  OPA.assertCallStateIsNotNullish(callState);
+  OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
+  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+  OPA.assertNonNullish(users);
+
+  if (OPA.isNullish(roles) || OPA.isEmpty(OPA.convertNonNullish(roles))) {
+    roles = await OpaDb.Roles.queries.getAll(callState.dataStorageState);
+  }
+
+  OPA.assertNonNullish(roles);
+  const rolesMap = OPA.createMapFromArray(OPA.convertNonNullish(roles), (role) => (role.id));
+
+  const userDisplayModels = users.map((user) => {
+    const roleId = user.assignedRoleId;
+    const role = OPA.convertNonNullish(rolesMap.get(roleId));
+    OPA.assertDocumentIsValid(role);
+
+    const defaultDisplayName = OPA.convertNonNullish(user.firstName, user.authAccountName);
+    const actualDisplayName = OPA.convertNonNullish(user.preferredName, defaultDisplayName);
+    return {
+      id: user.id,
+      firebaseAuthUserId: user.firebaseAuthUserId,
+      accountName: user.authAccountName,
+      displayName: actualDisplayName,
+      assignedRole: {
+        id: role.id,
+        name: role.name,
+        type: role.type,
+      },
+      dateOfCreation: user.dateOfCreation,
+    };
+  });
+  return userDisplayModels;
+}
+
+/**
+ * Converts an IUser to an IUserDisplayModel.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {OpaDm.IUser} user The IUser.
+ * @param {OpaDm.IRole | null} [role=null] The IRole for the IUser, if it has already been read.
+ * @return {Promise<Array<IAccessRequestDisplayModel>>}
+ */
+export async function convertUserToDisplayModel(callState: OpaDm.ICallState, user: OpaDm.IUser, role: OpaDm.IRole | null = null): Promise<IUserDisplayModel> {
+  OPA.assertCallStateIsNotNullish(callState);
+  OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
+  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
+
+  const authorizationState = OPA.convertNonNullish(callState.authorizationState);
+  const roleId = user.assignedRoleId;
+  if (roleId == authorizationState.role.id) {
+    role = authorizationState.role;
+  } else {
+    role = await OpaDb.Roles.queries.getById(callState.dataStorageState, roleId);
+  }
+
+  OPA.assertNonNullish(role);
+  const userDisplayModels = await convertUsersToDisplayModels(callState, [user], [OPA.convertNonNullish(role)]);
+
+  OPA.assertNonNullish(userDisplayModels);
+  OPA.assertIsTrue(userDisplayModels.length == 1);
+
+  const userDisplayModel = userDisplayModels[0];
+  return userDisplayModel;
+}
+
+/**
  * Gets the list of Users in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
  * @param {OPA.ApprovalState | null} [approvalState=null] The ApprovalState desired for retrieval.
- * @return {Promise<Array<IUserDisplayModel>>}
+ * @return {Promise<Array<OpaDm.IUser>>}
  */
-export async function getListOfUsers(callState: OpaDm.ICallState, approvalState: OPA.ApprovalState | null = null): Promise<Array<IUserDisplayModel>> {
+export async function getListOfUsers(callState: OpaDm.ICallState, approvalState: OPA.ApprovalState | null = null): Promise<Array<OpaDm.IUser>> {
   OPA.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
@@ -58,49 +132,11 @@ export async function getListOfUsers(callState: OpaDm.ICallState, approvalState:
     }
 
     const user = authorizationState.user;
-    const role = authorizationState.role;
-
-    const defaultDisplayName = OPA.convertNonNullish(user.firstName, user.authAccountName);
-    const actualDisplayName = OPA.convertNonNullish(user.preferredName, defaultDisplayName);
-    const userDisplayModel = {
-      id: user.id,
-      firebaseAuthUserId: user.firebaseAuthUserId,
-      accountName: user.authAccountName,
-      displayName: actualDisplayName,
-      assignedRole: {
-        id: role.id,
-        name: role.name,
-        type: role.type,
-      },
-      dateOfCreation: user.dateOfCreation,
-    };
-    return [userDisplayModel];
+    return [user];
+  } else {
+    const users = await OpaDb.Users.queries.getAllForApprovalState(callState.dataStorageState, approvalState);
+    return users;
   }
-
-  const users = await OpaDb.Users.queries.getAllForApprovalState(callState.dataStorageState, approvalState);
-  const roles = await OpaDb.Roles.queries.getAll(callState.dataStorageState);
-  const rolesMap = OPA.createMapFromArray(roles, (role) => (role.id));
-
-  const userDisplayModels = users.map((user) => {
-    const role = OPA.convertNonNullish(rolesMap.get(user.assignedRoleId));
-    OPA.assertDocumentIsValid(role);
-
-    const defaultDisplayName = OPA.convertNonNullish(user.firstName, user.authAccountName);
-    const actualDisplayName = OPA.convertNonNullish(user.preferredName, defaultDisplayName);
-    return {
-      id: user.id,
-      firebaseAuthUserId: user.firebaseAuthUserId,
-      accountName: user.authAccountName,
-      displayName: actualDisplayName,
-      assignedRole: {
-        id: role.id,
-        name: role.name,
-        type: role.type,
-      },
-      dateOfCreation: user.dateOfCreation,
-    };
-  });
-  return userDisplayModels;
 }
 
 /**
