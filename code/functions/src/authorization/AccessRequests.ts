@@ -24,8 +24,9 @@ export const requestUserAccess = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, a
 
     const data = request.data;
     const message = (data.query.message) ? data.query.message : undefined;
-    OPA.assertNonNullishOrWhitespace(message, "The Access Request message must not be blank.");
     const citationId = (data.query.citationId) ? data.query.citationId : null;
+
+    OPA.assertNonNullishOrWhitespace(message, "The Access Request message must not be blank.");
 
     const displayModel = await AccessRequests.requestUserAccess(callState, message, citationId);
     // LATER: Return an actual display model
