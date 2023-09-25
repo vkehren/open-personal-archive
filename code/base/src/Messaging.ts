@@ -22,16 +22,26 @@ export const DEFAULT_RESULT_INCLUDES_ERROR = false; // eslint-disable-line camel
 
 /**
  * Creates a result object representing a successful call.
- * @param {string} message A descriptive message about the state of the call.
  * @param {T | undefined} [data=undefined] The data to return for the call.
+ * @param {string} [message=""] A descriptive message about the state of the call.
  * @return {ICallResult<T>} The result of the call.
  */
-export function getSuccessResult<T>(message: string, data: T | undefined = undefined): ICallResult<T> {
+export function getSuccessResult<T>(data: T | undefined = undefined, message = ""): ICallResult<T> {
   const result: ICallResult<T> = {
     success: true,
     message: message,
     data: data,
   };
+  return result;
+}
+
+/**
+ * Creates a result object representing a successful call.
+ * @param {string} [message=""] A descriptive message about the state of the call.
+ * @return {ICallResult<unknown>} The result of the call.
+ */
+export function getSuccessResultForMessage(message = ""): ICallResult<unknown> {
+  const result = getSuccessResult<unknown>(undefined, message);
   return result;
 }
 

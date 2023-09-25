@@ -30,7 +30,7 @@ export const requestUserAccess = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, a
 
     const displayModel = await AccessRequests.requestUserAccess(callState, message, citationId);
     // LATER: Return an actual display model
-    return OPA.getSuccessResult("", displayModel);
+    return OPA.getSuccessResult(displayModel);
   } catch (error) {
     await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error);
     return OPA.getFailureResult(error);

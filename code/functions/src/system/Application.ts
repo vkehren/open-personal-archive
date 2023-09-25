@@ -86,7 +86,7 @@ export const isInstalled = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (
       }
     }
 
-    return OPA.getSuccessResult(message, data);
+    return OPA.getSuccessResult(data, message);
   } catch (error) {
     await UTL.logFunctionError(dataStorageState, authenticationState, request, error);
     return OPA.getFailureResult(error);
@@ -110,7 +110,7 @@ export const getInstallationScreenDisplayModel = onCall({region: OPA.FIREBASE_DE
     await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, request, getLogMessage(UTL.ExecutionStates.ready));
 
     const displayModel = await Application.getInstallationScreenDisplayModel(callState);
-    return OPA.getSuccessResult("", displayModel);
+    return OPA.getSuccessResult(displayModel);
   } catch (error) {
     await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error);
     return OPA.getFailureResult(error);
@@ -147,7 +147,7 @@ export const performInstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, asyn
     const installationNotes = OPA.convertNonNullish(data.query.installationNotes, "");
     const installResult = await Application.performInstall(callState.dataStorageState, callState.authenticationState, archiveName, archiveDescription, pathToStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, installationNotes); // eslint-disable-line max-len
 
-    return OPA.getSuccessResult("", installResult);
+    return OPA.getSuccessResult(installResult);
   } catch (error) {
     await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error);
     return OPA.getFailureResult(error);
@@ -179,7 +179,7 @@ export const updateInstallationSettings = onCall({region: OPA.FIREBASE_DEFAULT_R
     await Application.updateInstallationSettings(callState, archiveName, archiveDescription, defaultLocaleId, defaultTimeZoneGroupId, defaultTimeZoneId);
 
     const displayModel = await Application.getInstallationScreenDisplayModel(callState);
-    return OPA.getSuccessResult("", displayModel);
+    return OPA.getSuccessResult(displayModel);
   } catch (error) {
     await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error);
     return OPA.getFailureResult(error);
@@ -206,7 +206,7 @@ export const performUpgrade = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, asyn
     const upgradeNotes = OPA.convertNonNullish(data.query.upgradeNotes, "");
     const doBackupFirst = OPA.convertNonNullish(OPA.getBoolean(data.query.doBackupFirst, true));
     const upgradeResult = await Application.performUpgrade(callState, upgradeNotes, doBackupFirst);
-    return OPA.getSuccessResult("", upgradeResult);
+    return OPA.getSuccessResult(upgradeResult);
   } catch (error) {
     await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error);
     return OPA.getFailureResult(error);
@@ -232,7 +232,7 @@ export const performUninstall = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, as
     const data = request.data;
     const doBackupFirst = OPA.convertNonNullish(OPA.getBoolean(data.query.doBackupFirst, true));
     const uninstallResult = await Application.performUninstall(callState.dataStorageState, callState.authenticationState, callState.authorizationState, doBackupFirst);
-    return OPA.getSuccessResult("", uninstallResult);
+    return OPA.getSuccessResult(uninstallResult);
   } catch (error) {
     await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, request, error);
     return OPA.getFailureResult(error);

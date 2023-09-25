@@ -16,7 +16,12 @@ const Failure_Object = {name: (Object_Prefix + Failure_String), wasSuccessful: f
 
 // TESTS for getSuccessResult<T>(...)
 test("checks that passing string to getSuccessResult<T>(...) works", () => {
-  const resultNoObj = MSG.getSuccessResult<string>(Success_String);
+  const resultForMsg = MSG.getSuccessResultForMessage(Success_String);
+  expect(resultForMsg.success).toBe(true);
+  expect(resultForMsg.message).toBe(Success_String);
+  expect(resultForMsg.data).toBe(undefined);
+
+  const resultNoObj = MSG.getSuccessResult<unknown>(undefined, Success_String);
   expect(resultNoObj.success).toBe(true);
   expect(resultNoObj.message).toBe(Success_String);
   expect(resultNoObj.data).toBe(undefined);
@@ -28,12 +33,17 @@ test("checks that passing string to getSuccessResult<T>(...) works", () => {
 });
 
 test("checks that passing object to getSuccessResult<T>(...) works", () => {
-  const resultNoObj = MSG.getSuccessResult<typeof Success_Object>(Success_Object.name);
+  const resultForMsg = MSG.getSuccessResultForMessage(Success_Object.name);
+  expect(resultForMsg.success).toBe(true);
+  expect(resultForMsg.message).toBe(Object_Prefix + Success_String);
+  expect(resultForMsg.data).toBe(undefined);
+
+  const resultNoObj = MSG.getSuccessResult<unknown>(undefined, Success_Object.name);
   expect(resultNoObj.success).toBe(true);
   expect(resultNoObj.message).toBe(Object_Prefix + Success_String);
   expect(resultNoObj.data).toBe(undefined);
 
-  const resultWithObj = MSG.getSuccessResult<typeof Success_Object>(Success_Object.name, Success_Object);
+  const resultWithObj = MSG.getSuccessResult<typeof Success_Object>(Success_Object, Success_Object.name,);
   expect(resultWithObj.success).toBe(true);
   expect(resultWithObj.message).toBe(Object_Prefix + Success_String);
   expect(resultWithObj.data).toBe(Success_Object);
