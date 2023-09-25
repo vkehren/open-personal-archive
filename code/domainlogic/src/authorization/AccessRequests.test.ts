@@ -918,13 +918,12 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
     let accessRequestsOwnerAll = await AccessRequests.getListOfAccessRequests(callState);
-    let accessRequestsOwnerPending = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.pending);
-    let accessRequestsOwnerDenied = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.denied);
-    let accessRequestsOwnerApproved = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.approved);
-
     let accessRequestsOwnerAllIds = accessRequestsOwnerAll.map((value) => (value.id));
+    let accessRequestsOwnerPending = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.pending);
     let accessRequestsOwnerPendingIds = accessRequestsOwnerPending.map((value) => (value.id));
+    let accessRequestsOwnerDenied = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.denied);
     let accessRequestsOwnerDeniedIds = accessRequestsOwnerDenied.map((value) => (value.id));
+    let accessRequestsOwnerApproved = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.approved);
     let accessRequestsOwnerApprovedIds = accessRequestsOwnerApproved.map((value) => (value.id));
 
     expect(accessRequestsOwnerAll.length).equals(6);
@@ -956,17 +955,210 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     expect(accessRequestsOwnerApprovedIds.includes(accessRequestG2.id)).equals(false);
     expect(accessRequestsOwnerApprovedIds.includes(accessRequestG3.id)).equals(false);
 
-    // LATER: Check Guest
-    // LATER: Check TestUser
+    config.authenticationState = TestAuthData.admin;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    let accessRequestsAdminAll = await AccessRequests.getListOfAccessRequests(callState);
+    let accessRequestsAdminAllIds = accessRequestsAdminAll.map((value) => (value.id));
+    let accessRequestsAdminPending = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.pending);
+    let accessRequestsAdminPendingIds = accessRequestsAdminPending.map((value) => (value.id));
+    let accessRequestsAdminDenied = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.denied);
+    let accessRequestsAdminDeniedIds = accessRequestsAdminDenied.map((value) => (value.id));
+    let accessRequestsAdminApproved = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.approved);
+    let accessRequestsAdminApprovedIds = accessRequestsAdminApproved.map((value) => (value.id));
+
+    expect(accessRequestsAdminAll.length).equals(6);
+    expect(accessRequestsAdminAllIds.includes(accessRequestT1.id)).equals(true);
+    expect(accessRequestsAdminAllIds.includes(accessRequestT2.id)).equals(true);
+    expect(accessRequestsAdminAllIds.includes(accessRequestT3.id)).equals(true);
+    expect(accessRequestsAdminAllIds.includes(accessRequestG1.id)).equals(true);
+    expect(accessRequestsAdminAllIds.includes(accessRequestG2.id)).equals(true);
+    expect(accessRequestsAdminAllIds.includes(accessRequestG3.id)).equals(true);
+    expect(accessRequestsAdminPending.length).equals(6);
+    expect(accessRequestsAdminPendingIds.includes(accessRequestT1.id)).equals(true);
+    expect(accessRequestsAdminPendingIds.includes(accessRequestT2.id)).equals(true);
+    expect(accessRequestsAdminPendingIds.includes(accessRequestT3.id)).equals(true);
+    expect(accessRequestsAdminPendingIds.includes(accessRequestG1.id)).equals(true);
+    expect(accessRequestsAdminPendingIds.includes(accessRequestG2.id)).equals(true);
+    expect(accessRequestsAdminPendingIds.includes(accessRequestG3.id)).equals(true);
+    expect(accessRequestsAdminDenied.length).equals(0);
+    expect(accessRequestsAdminDeniedIds.includes(accessRequestT1.id)).equals(false);
+    expect(accessRequestsAdminDeniedIds.includes(accessRequestT2.id)).equals(false);
+    expect(accessRequestsAdminDeniedIds.includes(accessRequestT3.id)).equals(false);
+    expect(accessRequestsAdminDeniedIds.includes(accessRequestG1.id)).equals(false);
+    expect(accessRequestsAdminDeniedIds.includes(accessRequestG2.id)).equals(false);
+    expect(accessRequestsAdminDeniedIds.includes(accessRequestG3.id)).equals(false);
+    expect(accessRequestsAdminApproved.length).equals(0);
+    expect(accessRequestsAdminApprovedIds.includes(accessRequestT1.id)).equals(false);
+    expect(accessRequestsAdminApprovedIds.includes(accessRequestT2.id)).equals(false);
+    expect(accessRequestsAdminApprovedIds.includes(accessRequestT3.id)).equals(false);
+    expect(accessRequestsAdminApprovedIds.includes(accessRequestG1.id)).equals(false);
+    expect(accessRequestsAdminApprovedIds.includes(accessRequestG2.id)).equals(false);
+    expect(accessRequestsAdminApprovedIds.includes(accessRequestG3.id)).equals(false);
+
+    config.authenticationState = TestAuthData.editor;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    let accessRequestsEditorAll = await AccessRequests.getListOfAccessRequests(callState);
+    let accessRequestsEditorAllIds = accessRequestsEditorAll.map((value) => (value.id));
+    let accessRequestsEditorPending = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.pending);
+    let accessRequestsEditorPendingIds = accessRequestsEditorPending.map((value) => (value.id));
+    let accessRequestsEditorDenied = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.denied);
+    let accessRequestsEditorDeniedIds = accessRequestsEditorDenied.map((value) => (value.id));
+    let accessRequestsEditorApproved = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.approved);
+    let accessRequestsEditorApprovedIds = accessRequestsEditorApproved.map((value) => (value.id));
+
+    expect(accessRequestsEditorAll.length).equals(0);
+    expect(accessRequestsEditorAllIds.includes(accessRequestT1.id)).equals(false);
+    expect(accessRequestsEditorAllIds.includes(accessRequestT2.id)).equals(false);
+    expect(accessRequestsEditorAllIds.includes(accessRequestT3.id)).equals(false);
+    expect(accessRequestsEditorAllIds.includes(accessRequestG1.id)).equals(false);
+    expect(accessRequestsEditorAllIds.includes(accessRequestG2.id)).equals(false);
+    expect(accessRequestsEditorAllIds.includes(accessRequestG3.id)).equals(false);
+    expect(accessRequestsEditorPending.length).equals(0);
+    expect(accessRequestsEditorPendingIds.includes(accessRequestT1.id)).equals(false);
+    expect(accessRequestsEditorPendingIds.includes(accessRequestT2.id)).equals(false);
+    expect(accessRequestsEditorPendingIds.includes(accessRequestT3.id)).equals(false);
+    expect(accessRequestsEditorPendingIds.includes(accessRequestG1.id)).equals(false);
+    expect(accessRequestsEditorPendingIds.includes(accessRequestG2.id)).equals(false);
+    expect(accessRequestsEditorPendingIds.includes(accessRequestG3.id)).equals(false);
+    expect(accessRequestsEditorDenied.length).equals(0);
+    expect(accessRequestsEditorDeniedIds.includes(accessRequestT1.id)).equals(false);
+    expect(accessRequestsEditorDeniedIds.includes(accessRequestT2.id)).equals(false);
+    expect(accessRequestsEditorDeniedIds.includes(accessRequestT3.id)).equals(false);
+    expect(accessRequestsEditorDeniedIds.includes(accessRequestG1.id)).equals(false);
+    expect(accessRequestsEditorDeniedIds.includes(accessRequestG2.id)).equals(false);
+    expect(accessRequestsEditorDeniedIds.includes(accessRequestG3.id)).equals(false);
+    expect(accessRequestsEditorApproved.length).equals(0);
+    expect(accessRequestsEditorApprovedIds.includes(accessRequestT1.id)).equals(false);
+    expect(accessRequestsEditorApprovedIds.includes(accessRequestT2.id)).equals(false);
+    expect(accessRequestsEditorApprovedIds.includes(accessRequestT3.id)).equals(false);
+    expect(accessRequestsEditorApprovedIds.includes(accessRequestG1.id)).equals(false);
+    expect(accessRequestsEditorApprovedIds.includes(accessRequestG2.id)).equals(false);
+    expect(accessRequestsEditorApprovedIds.includes(accessRequestG3.id)).equals(false);
+
+    config.authenticationState = TestAuthData.viewer;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    let accessRequestsViewerAll = await AccessRequests.getListOfAccessRequests(callState);
+    let accessRequestsViewerAllIds = accessRequestsViewerAll.map((value) => (value.id));
+    let accessRequestsViewerPending = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.pending);
+    let accessRequestsViewerPendingIds = accessRequestsViewerPending.map((value) => (value.id));
+    let accessRequestsViewerDenied = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.denied);
+    let accessRequestsViewerDeniedIds = accessRequestsViewerDenied.map((value) => (value.id));
+    let accessRequestsViewerApproved = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.approved);
+    let accessRequestsViewerApprovedIds = accessRequestsViewerApproved.map((value) => (value.id));
+
+    expect(accessRequestsViewerAll.length).equals(0);
+    expect(accessRequestsViewerAllIds.includes(accessRequestT1.id)).equals(false);
+    expect(accessRequestsViewerAllIds.includes(accessRequestT2.id)).equals(false);
+    expect(accessRequestsViewerAllIds.includes(accessRequestT3.id)).equals(false);
+    expect(accessRequestsViewerAllIds.includes(accessRequestG1.id)).equals(false);
+    expect(accessRequestsViewerAllIds.includes(accessRequestG2.id)).equals(false);
+    expect(accessRequestsViewerAllIds.includes(accessRequestG3.id)).equals(false);
+    expect(accessRequestsViewerPending.length).equals(0);
+    expect(accessRequestsViewerPendingIds.includes(accessRequestT1.id)).equals(false);
+    expect(accessRequestsViewerPendingIds.includes(accessRequestT2.id)).equals(false);
+    expect(accessRequestsViewerPendingIds.includes(accessRequestT3.id)).equals(false);
+    expect(accessRequestsViewerPendingIds.includes(accessRequestG1.id)).equals(false);
+    expect(accessRequestsViewerPendingIds.includes(accessRequestG2.id)).equals(false);
+    expect(accessRequestsViewerPendingIds.includes(accessRequestG3.id)).equals(false);
+    expect(accessRequestsViewerDenied.length).equals(0);
+    expect(accessRequestsViewerDeniedIds.includes(accessRequestT1.id)).equals(false);
+    expect(accessRequestsViewerDeniedIds.includes(accessRequestT2.id)).equals(false);
+    expect(accessRequestsViewerDeniedIds.includes(accessRequestT3.id)).equals(false);
+    expect(accessRequestsViewerDeniedIds.includes(accessRequestG1.id)).equals(false);
+    expect(accessRequestsViewerDeniedIds.includes(accessRequestG2.id)).equals(false);
+    expect(accessRequestsViewerDeniedIds.includes(accessRequestG3.id)).equals(false);
+    expect(accessRequestsViewerApproved.length).equals(0);
+    expect(accessRequestsViewerApprovedIds.includes(accessRequestT1.id)).equals(false);
+    expect(accessRequestsViewerApprovedIds.includes(accessRequestT2.id)).equals(false);
+    expect(accessRequestsViewerApprovedIds.includes(accessRequestT3.id)).equals(false);
+    expect(accessRequestsViewerApprovedIds.includes(accessRequestG1.id)).equals(false);
+    expect(accessRequestsViewerApprovedIds.includes(accessRequestG2.id)).equals(false);
+    expect(accessRequestsViewerApprovedIds.includes(accessRequestG3.id)).equals(false);
+
+    config.authenticationState = TestAuthData.guest;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    let accessRequestsGuestAll = await AccessRequests.getListOfAccessRequests(callState);
+    let accessRequestsGuestAllIds = accessRequestsGuestAll.map((value) => (value.id));
+    let accessRequestsGuestPending = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.pending);
+    let accessRequestsGuestPendingIds = accessRequestsGuestPending.map((value) => (value.id));
+    let accessRequestsGuestDenied = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.denied);
+    let accessRequestsGuestDeniedIds = accessRequestsGuestDenied.map((value) => (value.id));
+    let accessRequestsGuestApproved = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.approved);
+    let accessRequestsGuestApprovedIds = accessRequestsGuestApproved.map((value) => (value.id));
+
+    expect(accessRequestsGuestAll.length).equals(3);
+    expect(accessRequestsGuestAllIds.includes(accessRequestT1.id)).equals(false);
+    expect(accessRequestsGuestAllIds.includes(accessRequestT2.id)).equals(false);
+    expect(accessRequestsGuestAllIds.includes(accessRequestT3.id)).equals(false);
+    expect(accessRequestsGuestAllIds.includes(accessRequestG1.id)).equals(true);
+    expect(accessRequestsGuestAllIds.includes(accessRequestG2.id)).equals(true);
+    expect(accessRequestsGuestAllIds.includes(accessRequestG3.id)).equals(true);
+    expect(accessRequestsGuestPending.length).equals(3);
+    expect(accessRequestsGuestPendingIds.includes(accessRequestT1.id)).equals(false);
+    expect(accessRequestsGuestPendingIds.includes(accessRequestT2.id)).equals(false);
+    expect(accessRequestsGuestPendingIds.includes(accessRequestT3.id)).equals(false);
+    expect(accessRequestsGuestPendingIds.includes(accessRequestG1.id)).equals(true);
+    expect(accessRequestsGuestPendingIds.includes(accessRequestG2.id)).equals(true);
+    expect(accessRequestsGuestPendingIds.includes(accessRequestG3.id)).equals(true);
+    expect(accessRequestsGuestDenied.length).equals(0);
+    expect(accessRequestsGuestDeniedIds.includes(accessRequestT1.id)).equals(false);
+    expect(accessRequestsGuestDeniedIds.includes(accessRequestT2.id)).equals(false);
+    expect(accessRequestsGuestDeniedIds.includes(accessRequestT3.id)).equals(false);
+    expect(accessRequestsGuestDeniedIds.includes(accessRequestG1.id)).equals(false);
+    expect(accessRequestsGuestDeniedIds.includes(accessRequestG2.id)).equals(false);
+    expect(accessRequestsGuestDeniedIds.includes(accessRequestG3.id)).equals(false);
+    expect(accessRequestsGuestApproved.length).equals(0);
+    expect(accessRequestsGuestApprovedIds.includes(accessRequestT1.id)).equals(false);
+    expect(accessRequestsGuestApprovedIds.includes(accessRequestT2.id)).equals(false);
+    expect(accessRequestsGuestApprovedIds.includes(accessRequestT3.id)).equals(false);
+    expect(accessRequestsGuestApprovedIds.includes(accessRequestG1.id)).equals(false);
+    expect(accessRequestsGuestApprovedIds.includes(accessRequestG2.id)).equals(false);
+    expect(accessRequestsGuestApprovedIds.includes(accessRequestG3.id)).equals(false);
+
+    config.authenticationState = TestAuthData.testUser;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    let accessRequestsTestUserAll = await AccessRequests.getListOfAccessRequests(callState);
+    let accessRequestsTestUserAllIds = accessRequestsTestUserAll.map((value) => (value.id));
+    let accessRequestsTestUserPending = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.pending);
+    let accessRequestsTestUserPendingIds = accessRequestsTestUserPending.map((value) => (value.id));
+    let accessRequestsTestUserDenied = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.denied);
+    let accessRequestsTestUserDeniedIds = accessRequestsTestUserDenied.map((value) => (value.id));
+    let accessRequestsTestUserApproved = await AccessRequests.getListOfAccessRequests(callState, OPA.ApprovalStates.approved);
+    let accessRequestsTestUserApprovedIds = accessRequestsTestUserApproved.map((value) => (value.id));
+
+    expect(accessRequestsTestUserAll.length).equals(3);
+    expect(accessRequestsTestUserAllIds.includes(accessRequestT1.id)).equals(true);
+    expect(accessRequestsTestUserAllIds.includes(accessRequestT2.id)).equals(true);
+    expect(accessRequestsTestUserAllIds.includes(accessRequestT3.id)).equals(true);
+    expect(accessRequestsTestUserAllIds.includes(accessRequestG1.id)).equals(false);
+    expect(accessRequestsTestUserAllIds.includes(accessRequestG2.id)).equals(false);
+    expect(accessRequestsTestUserAllIds.includes(accessRequestG3.id)).equals(false);
+    expect(accessRequestsTestUserPending.length).equals(3);
+    expect(accessRequestsTestUserPendingIds.includes(accessRequestT1.id)).equals(true);
+    expect(accessRequestsTestUserPendingIds.includes(accessRequestT2.id)).equals(true);
+    expect(accessRequestsTestUserPendingIds.includes(accessRequestT3.id)).equals(true);
+    expect(accessRequestsTestUserPendingIds.includes(accessRequestG1.id)).equals(false);
+    expect(accessRequestsTestUserPendingIds.includes(accessRequestG2.id)).equals(false);
+    expect(accessRequestsTestUserPendingIds.includes(accessRequestG3.id)).equals(false);
+    expect(accessRequestsTestUserDenied.length).equals(0);
+    expect(accessRequestsTestUserDeniedIds.includes(accessRequestT1.id)).equals(false);
+    expect(accessRequestsTestUserDeniedIds.includes(accessRequestT2.id)).equals(false);
+    expect(accessRequestsTestUserDeniedIds.includes(accessRequestT3.id)).equals(false);
+    expect(accessRequestsTestUserDeniedIds.includes(accessRequestG1.id)).equals(false);
+    expect(accessRequestsTestUserDeniedIds.includes(accessRequestG2.id)).equals(false);
+    expect(accessRequestsTestUserDeniedIds.includes(accessRequestG3.id)).equals(false);
+    expect(accessRequestsTestUserApproved.length).equals(0);
+    expect(accessRequestsTestUserApprovedIds.includes(accessRequestT1.id)).equals(false);
+    expect(accessRequestsTestUserApprovedIds.includes(accessRequestT2.id)).equals(false);
+    expect(accessRequestsTestUserApprovedIds.includes(accessRequestT3.id)).equals(false);
+    expect(accessRequestsTestUserApprovedIds.includes(accessRequestG1.id)).equals(false);
+    expect(accessRequestsTestUserApprovedIds.includes(accessRequestG2.id)).equals(false);
+    expect(accessRequestsTestUserApprovedIds.includes(accessRequestG3.id)).equals(false);
+
     // LATER: Deny 2 AccessRequests
-    // LATER: Check Owner
-    // LATER: Check Guest
-    // LATER: Check TestUser
+    // LATER: Check All Again
     // LATER: Approve 2 AccessRequests
-    // LATER: Check Owner
-    // LATER: Check Guest
-    // LATER: Check TestUser
-    // EXTENSION: Check Admin, Editor, and Viewer
+    // LATER: Check All Again
   });
   test("checks that getListOfAccessRequests(...) succeeds and filters properly when System is installed", testFunc4());
 
