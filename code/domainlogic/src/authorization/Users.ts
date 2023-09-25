@@ -43,7 +43,7 @@ export async function getListOfUsers(callState: OpaDm.ICallState, approvalState:
   OPA.assertSystemIsInstalled(isSystemInstalled);
   OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
-  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
@@ -234,7 +234,7 @@ export async function updateUserProfile(callState: OpaDm.ICallState, updateObjec
   OPA.assertSystemIsInstalled(isSystemInstalled);
   OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
-  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   authorizationState.assertUserApproved();
@@ -265,7 +265,7 @@ export async function assignUserToRole(callState: OpaDm.ICallState, userIdToAssi
   OPA.assertSystemIsInstalled(isSystemInstalled);
   OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
-  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
@@ -302,7 +302,7 @@ export async function addRequestedCitationToUser(callState: OpaDm.ICallState, us
   OPA.assertSystemIsInstalled(isSystemInstalled);
   OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
-  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   authorizationState.assertUserApproved();
@@ -336,7 +336,7 @@ export async function addViewableCitationToUser(callState: OpaDm.ICallState, use
   OPA.assertSystemIsInstalled(isSystemInstalled);
   OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
-  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
@@ -372,7 +372,7 @@ export async function setUserToViewed(callState: OpaDm.ICallState, userIdToSet: 
   OPA.assertSystemIsInstalled(isSystemInstalled);
   OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
-  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
@@ -407,7 +407,7 @@ export async function setUserToApprovalState(callState: OpaDm.ICallState, userId
   OPA.assertSystemIsInstalled(isSystemInstalled);
   OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
-  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
@@ -463,7 +463,7 @@ export async function setUserToSuspensionState(callState: OpaDm.ICallState, user
   OPA.assertSystemIsInstalled(isSystemInstalled);
   OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
-  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
@@ -520,7 +520,7 @@ export async function markUserWithDeletionState(callState: OpaDm.ICallState, use
   OPA.assertSystemIsInstalled(isSystemInstalled);
   OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
-  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   authorizationState.assertUserApproved();

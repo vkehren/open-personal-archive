@@ -207,7 +207,7 @@ export function assertSystemStateIsNotNullish(systemState: ISystemState | null |
  * @param {string} [message=default] The message to display on failure of assertion.
  * @return {void}
  */
-export function assertAuthorizationStateIsNotNullish(authorizationState: IAuthorizationState | null | undefined, message = "The Authorization State must not be null."): void {
+export function assertAuthorizationStateIsNotNullish(authorizationState: IAuthorizationState | null | undefined, message = "The Authorization State must not be null, and the current User account must be properly initialized."): void { // eslint-disable-line max-len
   if (OPA.isNullish(authorizationState)) {
     throw new Error(message);
   }

@@ -25,7 +25,7 @@ export async function getListOfAccessRequests(callState: OpaDm.ICallState, appro
   OPA.assertSystemIsInstalled(isSystemInstalled);
   OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
-  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
@@ -104,7 +104,7 @@ export async function updateMessageForAccessRequest(callState: OpaDm.ICallState,
   OPA.assertSystemIsInstalled(isSystemInstalled);
   OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
-  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const accessRequestPreRead = await OpaDb.AccessRequests.queries.getByIdWithAssert(callState.dataStorageState, accessRequestIdToUpdate, "The requested AccessRequest does not exist.");
@@ -140,7 +140,7 @@ export async function updateResponseToAccessRequest(callState: OpaDm.ICallState,
   OPA.assertSystemIsInstalled(isSystemInstalled);
   OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
-  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
@@ -180,7 +180,7 @@ export async function setAccessRequestTags(callState: OpaDm.ICallState, accessRe
   OPA.assertSystemIsInstalled(isSystemInstalled);
   OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
-  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
@@ -237,7 +237,7 @@ export async function setAccessRequestToArchivalState(callState: OpaDm.ICallStat
   OPA.assertSystemIsInstalled(isSystemInstalled);
   OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
-  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
@@ -292,7 +292,7 @@ export async function setAccessRequestToViewed(callState: OpaDm.ICallState, acce
   OPA.assertSystemIsInstalled(isSystemInstalled);
   OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
-  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
@@ -327,7 +327,7 @@ export async function setAccessRequestToApprovalState(callState: OpaDm.ICallStat
   OPA.assertSystemIsInstalled(isSystemInstalled);
   OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
-  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
@@ -392,7 +392,7 @@ export async function markAccessRequestWithDeletionState(callState: OpaDm.ICallS
   OPA.assertSystemIsInstalled(isSystemInstalled);
   OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
   OpaDm.assertSystemStateIsNotNullish(callState.systemState);
-  OPA.assertIsTrue(callState.hasAuthorizationState, "The User account has not yet been initialized.");
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const accessRequestPreRead = await OpaDb.AccessRequests.queries.getByIdWithAssert(callState.dataStorageState, accessRequestIdToMark, "The requested AccessRequest does not exist.");
