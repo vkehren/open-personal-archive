@@ -310,3 +310,44 @@ test("checks that passing '1' as text to getBoolean(...) with default to 'false'
 test("checks that passing '1' as text to getBoolean(...) with default to 'true' returns 'true'", () => {
   expect(VC.getBoolean("1", true)).toBe(true);
 });
+
+// TESTS for isOfValue(...)
+test("checks that passing 'undefined' to isOfValue(...) returns 'false'", () => {
+  expect(VC.isOfValue(undefined, -33)).toBe(false);
+  expect(VC.isOfValue(undefined, -32)).toBe(false);
+  expect(VC.isOfValue(undefined, -1)).toBe(false);
+  expect(VC.isOfValue(undefined, 0)).toBe(false);
+  expect(VC.isOfValue(undefined, 1)).toBe(false);
+  expect(VC.isOfValue(undefined, 32)).toBe(false);
+  expect(VC.isOfValue(undefined, 33)).toBe(false);
+});
+
+test("checks that passing 'null' to isOfValue(...) returns 'false'", () => {
+  expect(VC.isOfValue(null, -33)).toBe(false);
+  expect(VC.isOfValue(null, -32)).toBe(false);
+  expect(VC.isOfValue(null, -1)).toBe(false);
+  expect(VC.isOfValue(null, 0)).toBe(false);
+  expect(VC.isOfValue(null, 1)).toBe(false);
+  expect(VC.isOfValue(null, 32)).toBe(false);
+  expect(VC.isOfValue(null, 33)).toBe(false);
+});
+
+test("checks that passing '1' bitwise to isOfValue(...) returns correct value", () => {
+  expect(VC.isOfValue(1, -33)).toBe(true);
+  expect(VC.isOfValue(1, -32)).toBe(false);
+  expect(VC.isOfValue(1, -1)).toBe(true);
+  expect(VC.isOfValue(1, 0)).toBe(false);
+  expect(VC.isOfValue(1, 1)).toBe(true);
+  expect(VC.isOfValue(1, 32)).toBe(false);
+  expect(VC.isOfValue(1, 33)).toBe(true);
+});
+
+test("checks that passing '1' logically to isOfValue(...) returns correct value", () => {
+  expect(VC.isOfValue(1, -33, false)).toBe(false);
+  expect(VC.isOfValue(1, -32, false)).toBe(false);
+  expect(VC.isOfValue(1, -1, false)).toBe(false);
+  expect(VC.isOfValue(1, 0, false)).toBe(false);
+  expect(VC.isOfValue(1, 1, false)).toBe(true);
+  expect(VC.isOfValue(1, 32, false)).toBe(false);
+  expect(VC.isOfValue(1, 33, false)).toBe(false);
+});

@@ -211,3 +211,37 @@ export function assertDatesAreEqual(date1: Date | null | undefined, date2: Date 
     throw new Error(message);
   }
 }
+
+/**
+ * Returns whether a number is of another value.
+ * @param {number | null | undefined} actual The actual value.
+ * @param {number} desired The desired value.
+ * @param {boolean} [checkBitWise=true] Whether to check bit-wise or logically.
+ * @return {boolean}
+ */
+export function isOfValue(actual: number | null | undefined, desired: number, checkBitWise = true): boolean {
+  if (TC.isNullish(actual)) {
+    return false;
+  }
+  if (!checkBitWise) {
+    return (actual == desired);
+  }
+
+  const actualNonNull = TC.convertNonNullish(actual);
+  const containsValue = (actualNonNull & desired);
+  return (actualNonNull == containsValue);
+}
+
+/**
+ * Asserts that a number is of another value.
+ * @param {number | null | undefined} actual The actual value.
+ * @param {number} desired The desired value.
+ * @param {boolean} [checkBitWise=true] Whether to check bit-wise or logically.
+ * @param {string} [message="The actual value is not of the desired value."] The message to display on failure of assertion.
+ * @return {void}
+ */
+export function assertIsOfValue(actual: number | null | undefined, desired: number, checkBitWise = true, message = "The actual value is not of the desired value."): void {
+  if (!isOfValue(actual, desired, checkBitWise)) {
+    throw new Error(message);
+  }
+}
