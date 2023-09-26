@@ -20,7 +20,7 @@ import * as AccessRequest from "./doctypes/AccessRequest";
 export interface IOpaDbDescriptor extends OPA.ICollection {
   readonly ActivityLogItems: OPA.ITypedQueryableFactoryCollectionDescriptor<ActivityLogItem.IActivityLogItem, ActivityLogItem.ActivityLogItemQuerySet, ActivityLogItem.FactoryFunc>;
   readonly AuthProviders: OPA.ITypedQueryableCollectionDescriptor<AuthProvider.IAuthenticationProvider, AuthProvider.AuthenticationProviderQuerySet>;
-  readonly Locales: OPA.ITypedQueryableCollectionDescriptor<Locale.ILocale, Locale.QuerySet>;
+  readonly Locales: OPA.ITypedQueryableCollectionDescriptor<Locale.ILocale, Locale.LocaleQuerySet>;
   readonly Roles: OPA.ITypedQueryableCollectionDescriptor<Role.IRole, Role.RoleQuerySet>;
   readonly TimeZones: OPA.ITypedQueryableCollectionDescriptor<TimeZone.ITimeZone, TimeZone.QuerySet>;
   readonly TimeZoneGroups: OPA.ITypedQueryableCollectionDescriptor<TimeZoneGroup.ITimeZoneGroup, TimeZoneGroup.QuerySet>;
@@ -50,7 +50,7 @@ export const OpaDbDescriptor = OPA.convertTo<IOpaDbDescriptor>(DbDescriptor);
 export {DataConfiguration, ActivityType, ActivityTypes, RoleType, RoleTypes} from "./BaseTypes";
 export {ICallState, IDataStorageState, IAuthenticationState, ISystemState, IAuthorizationState, AuthorizationState, assertSystemStateIsNotNullish, assertAuthorizationStateIsNotNullish} from "./CallStateTypes"; // eslint-disable-line max-len
 export {IActivityLogItem} from "./doctypes/ActivityLogItem";
-export {IAuthenticationProvider, DefaultAuthenticationProviderId, AuthenticationProvider_GoogleId, AuthenticationProvider_RequiredIds} from "./doctypes/AuthenticationProvider"; // eslint-disable-line camelcase, max-len
+export {IAuthenticationProvider, DefaultAuthenticationProviderId, AuthenticationProvider_GoogleId, AuthenticationProvider_FirebaseId, AuthenticationProvider_RequiredIds} from "./doctypes/AuthenticationProvider"; // eslint-disable-line camelcase, max-len
 export {ILocale, DefaultLocaleId, DefaultLocale} from "./doctypes/Locale";
 export {IRole, DefaultRoleId, Role_OwnerId, Role_AdministratorId, Role_EditorId, Role_ViewerId, Role_GuestId, Role_RequiredIds} from "./doctypes/Role"; // eslint-disable-line camelcase
 export {ITimeZone} from "./doctypes/TimeZone";

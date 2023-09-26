@@ -8,6 +8,48 @@ export const BULK_WRITER_MAX_RETRY_ATTEMPTS = 4;
 export const FIREBASE_DEFAULT_REGION = "us-east1";
 export const DEFAULT_ANONYMOUS_DISPLAY_NAME = "(anonymous)";
 
+export type FirebaseAuthType = "ADMIN" | "USER" | "UNAUTHENTICATED";
+export const FirebaseAuthTypes = {
+  admin: ("ADMIN" as FirebaseAuthType),
+  user: ("USER" as FirebaseAuthType),
+  unauthenticated: ("UNAUTHENTICATED" as FirebaseAuthType),
+};
+
+export type FirebaseProviderType = "firebase" | "google.com";
+export const FirebaseProviderTypes = {
+  firebase: ("firebase" as FirebaseProviderType), // email and password
+  google: ("google.com" as FirebaseProviderType), // Google popup
+};
+
+export interface IFirebaseAuthUserData {
+  authType: FirebaseAuthType;
+  uid: string;
+  providerId: FirebaseProviderType;
+  email: string;
+  emailVerified: boolean;
+  isAnonymous: boolean;
+  displayName?: string;
+  username?: string;
+  phoneNumber?: string;
+  disabled: boolean;
+  isNewUser?: boolean;
+  locale?: string;
+  ipAddress: string;
+  timestamp: string;
+}
+
+export enum AuthActionRequirement {
+  Automatic,
+  EmailVerified = 1 << 1,
+  NotDisabled = 1 << 2,
+  EmailVerifiedAndNotDisabled = EmailVerified | NotDisabled,
+  Manual = 1 << 8,
+}
+export const DEFAULT_AUTH_AUTO_INITIALIZATION_TYPE = AuthActionRequirement.NotDisabled;
+export const DEFAULT_AUTH_AUTO_APPROVAL_TYPE = AuthActionRequirement.EmailVerifiedAndNotDisabled;
+export const REQUIRED_AUTH_AUTO_SUSPEND_REASON = "AUTOMATIC SUSPENSION FROM AUTH: Account was disabled";
+export const REQUIRED_AUTH_AUTO_UNSUSPEND_REASON = "AUTOMATIC UNSUSPENSION FROM AUTH: Account was no longer disabled";
+
 /** Provides workarounds for issues constructing Firebase objects across multiple packages (see https://github.com/googleapis/nodejs-firestore/issues/760) */
 export interface IFirebaseConstructorProvider {
   arrayRemove: (...elements: any[]) => firestore.FieldValue; // eslint-disable-line @typescript-eslint/no-explicit-any

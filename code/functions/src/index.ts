@@ -1,6 +1,11 @@
+import {AuthBlockingEvent, beforeUserSignedIn} from "firebase-functions/v2/identity"; // NOTE: Also has "beforeUserCreated"
+import * as logger from "firebase-functions/logger";
 import * as admin from "firebase-admin";
 import * as OPA from "../../base/src";
+import * as OpaDm from "../../datamodel/src";
+import {authenticationEventHandlerForFirebaseAuth} from "../../domainlogic/src";
 import * as adminCredentialFile from "../open-personal-archive-firebase-adminsdk-credential.json";
+import * as UTL from "./Utilities";
 import express = require("express");
 import cors = require("cors");
 
@@ -37,6 +42,50 @@ if (useCorsHandler) {
   const corsHandler = cors(corsOptions);
   expressApp.use(corsHandler);
 }
+
+const moduleName = module.filename.split(".")[0];
+
+export const firebaseAuthSignInHandler = beforeUserSignedIn(async (event: AuthBlockingEvent): Promise<void> => {
+  let adminApp = ((null as unknown) as admin.app.App);
+  let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
+  const getLogMessage = (state: UTL.ExecutionState) => UTL.getFunctionCallLogMessage(moduleName, "Authentication Trigger to initialize User", state);
+  const shimmedRequest: OPA.ICallRequest = {
+    clientIpAddress: event.ipAddress,
+    url: event.eventType,
+    data: {eventType: event.eventType, eventId: event.eventId, eventData: event.data},
+  };
+
+  try {
+    logger.info(getLogMessage(UTL.ExecutionStates.entry), {structuredData: true});
+    adminApp = admin.app();
+    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp);
+
+    const userData: OPA.IFirebaseAuthUserData = {
+      authType: (event.authType as OPA.FirebaseAuthType),
+      uid: event.data.uid,
+      providerId: (event.data.providerData[0].providerId as OPA.FirebaseProviderType),
+      email: OPA.convertNonNullish(event.data.email),
+      emailVerified: event.data.emailVerified,
+      isAnonymous: false,
+      displayName: event.data.displayName,
+      username: (!OPA.isNullish(event.additionalUserInfo)) ? event.additionalUserInfo?.username : undefined,
+      phoneNumber: event.data.phoneNumber,
+      disabled: event.data.disabled,
+      isNewUser: (!OPA.isNullish(event.additionalUserInfo)) ? event.additionalUserInfo?.isNewUser : undefined,
+      locale: event.locale,
+      ipAddress: event.ipAddress,
+      timestamp: event.timestamp,
+    };
+    const opaUser = await authenticationEventHandlerForFirebaseAuth(dataStorageState, userData);
+
+    const messageSuffix = (!OPA.isNullish(opaUser)) ? (" for " + OPA.convertNonNullish(opaUser).authAccountName) : " without User";
+    logger.info(getLogMessage(UTL.ExecutionStates.complete) + messageSuffix, {structuredData: true});
+  } catch (error) {
+    await UTL.logFunctionError(dataStorageState, null, shimmedRequest, error as Error);
+  } finally {
+    await UTL.cleanUpStateAfterCall(dataStorageState, null, adminApp, shimmedRequest);
+  }
+});
 
 // NOTE: Export API functions
 export * from "./system/Application";
