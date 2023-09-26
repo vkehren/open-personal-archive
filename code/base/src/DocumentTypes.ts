@@ -555,6 +555,9 @@ export interface IArchivable_ByUser extends IArchivable {
 }
 export interface IDocument_Archivable extends IDocument, IArchivable { }
 export interface IDocument_Archivable_ByUser extends IDocument_Archivable, IArchivable_ByUser { }
+// Not to be stored
+export type ArchivalState = "archived" | "not_archived";
+export const ArchivalStates = {archived: ("archived" as ArchivalState), not_archived: ("not_archived" as ArchivalState)};
 
 /**
  * Returns whether the updates to the object are valid from the perspective of the IArchivable interface.
@@ -803,6 +806,7 @@ export const ISuspendable_DateOfSuspensionStart_PropertyName = VC.getTypedProper
 export const ISuspendable_DateOfSuspensionEnd_PropertyName = VC.getTypedPropertyKeyAsText<ISuspendable>("dateOfSuspensionEnd"); // eslint-disable-line camelcase
 export interface ISuspendable {
   readonly isSuspended: boolean; // NOTE: This property should be computed by calling isSuspended<T>(...)
+  readonly numberOfTimesSuspended: number,
   readonly hasSuspensionStarted: boolean;
   readonly hasSuspensionEnded: boolean;
   readonly reasonForSuspensionStart: string | null;
@@ -818,6 +822,9 @@ export interface ISuspendable_ByUser extends ISuspendable {
 }
 export interface IDocument_Suspendable extends IDocument, ISuspendable { }
 export interface IDocument_Suspendable_ByUser extends IDocument_Suspendable, ISuspendable_ByUser { }
+// Not to be stored
+export type SuspensionState = "suspended" | "unsuspended";
+export const SuspensionStates = {suspended: ("suspended" as SuspensionState), unsuspended: ("unsuspended" as SuspensionState)};
 
 /**
  * Gets whether the ISuspendable document is currently suspended.
@@ -844,29 +851,42 @@ export function areUpdatesValid_ForSuspendable(original: ISuspendable, updated: 
   // NOTE: These values represent conditional IF operator, as in IF(isSet, hasDate)
   const priorExistencesValidStart = ((!original.hasSuspensionStarted) || (!TC.isNullish(original.dateOfSuspensionStart)));
   const priorExistencesValidEnd = ((!original.hasSuspensionEnded) || (!TC.isNullish(original.dateOfSuspensionEnd)));
-  if (!(priorExistencesValidStart && priorExistencesValidEnd)) {
+  if (!(!TC.isNullish(original.isSuspended) && priorExistencesValidStart && priorExistencesValidEnd)) {
     return false;
   }
-  // NOTE: These values may optionally exist on any update
-  const existencesValidStart = ((!updated.hasSuspensionStarted) || (!TC.isNullish(updated.dateOfSuspensionStart)));
-  const existencesValidEnd = ((!updated.hasSuspensionEnded) || (!TC.isNullish(updated.dateOfSuspensionEnd)));
-  if (!(existencesValidStart && existencesValidEnd)) {
-    return false;
-  }
-  if ((!TC.isNullish(updated.hasSuspensionStarted)) || (!TC.isNullish(updated.hasSuspensionEnded))) {
-    const stateValidStart = (updated.hasSuspensionStarted != original.hasSuspensionStarted); // NOTE: This value must change for updates
-    const stateValidEnd = (updated.hasSuspensionEnded != original.hasSuspensionEnded); // NOTE: This value must change for updates
-    if (!(stateValidStart || stateValidEnd)) {
-      return false;
+  // NOTE: Since the updated values are complicated to validate, this code tries to break validation into more steps
+  const existencesValidToCheck = (!TC.isNullish(updated.isSuspended) || !TC.isNullish(updated.numberOfTimesSuspended) || !TC.isNullish(updated.hasSuspensionStarted) || !TC.isNullish(updated.hasSuspensionEnded) || !TC.isNullish(updated.dateOfSuspensionStart) || !TC.isNullish(updated.dateOfSuspensionEnd)); // eslint-disable-line max-len
+  if (existencesValidToCheck) {
+    if (!original.isSuspended) {
+      const logicValidStart = (updated.isSuspended && updated.hasSuspensionStarted && !updated.hasSuspensionEnded);
+      if (!logicValidStart) {
+        return false;
+      }
+      const datesValidStart = (!TC.isNullish(updated.dateOfSuspensionStart) && TC.isNullish(updated.dateOfSuspensionEnd));
+      if (!datesValidStart) {
+        return false;
+      }
+      const dateValuesValidStart = (TC.isNullish(original.dateOfSuspensionEnd) || (TC.convertNonNullish(updated.dateOfSuspensionStart) > TC.convertNonNullish(original.dateOfSuspensionEnd)));
+      if (!dateValuesValidStart) {
+        return false;
+      }
+    } else {
+      // NOTE: If "hasSuspensionStarted" is provided, then it must not change the "original" value
+      const logicValidEnd = (!updated.isSuspended && updated.hasSuspensionEnded && (TC.isNullish(updated.hasSuspensionStarted) || updated.hasSuspensionStarted));
+      if (!logicValidEnd) {
+        return false;
+      }
+      // NOTE: If "dateOfSuspensionStart" is provided, then it must not change the "original" value
+      const datesValidEnd = (!TC.isNullish(updated.dateOfSuspensionEnd) && (TC.isNullish(updated.dateOfSuspensionStart) || (VC.areDatesEqual(updated.dateOfSuspensionStart, original.dateOfSuspensionStart)))); // eslint-disable-line max-len
+      if (!datesValidEnd) {
+        return false;
+      }
+      const dateValuesValidStart = (!TC.isNullish(original.dateOfSuspensionStart) && (TC.convertNonNullish(updated.dateOfSuspensionEnd) > TC.convertNonNullish(original.dateOfSuspensionStart)));
+      if (!dateValuesValidStart) {
+        return false;
+      }
     }
     if (preventUpdates) {
-      return false;
-    }
-  }
-  if ((!TC.isNullish(updated.dateOfSuspensionStart)) || (!TC.isNullish(updated.dateOfSuspensionEnd))) {
-    const datesValidStart = (TC.isNullish(original.dateOfSuspensionStart) || (TC.convertNonNullish(updated.dateOfSuspensionStart) > TC.convertNonNullish(original.dateOfSuspensionStart)));
-    const datesValidEnd = (TC.isNullish(original.dateOfSuspensionEnd) || (TC.convertNonNullish(updated.dateOfSuspensionEnd) > TC.convertNonNullish(original.dateOfSuspensionEnd)));
-    if (!(datesValidStart || datesValidEnd)) {
       return false;
     }
   }
@@ -928,6 +948,9 @@ export interface IDeleteable_ByUser extends IDeleteable {
 }
 export interface IDocument_Deleteable extends IDocument, IDeleteable { }
 export interface IDocument_Deleteable_ByUser extends IDocument_Deleteable, IDeleteable_ByUser { }
+// Not to be stored
+export type DeletionState = "deleted" | "undeleted";
+export const DeletionStates = {deleted: ("deleted" as DeletionState), undeleted: ("undeleted" as DeletionState)};
 
 /**
  * Returns whether the updates to the object are valid from the perspective of the IDeleteable interface.

@@ -40,8 +40,8 @@ const IAccessRequest_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
  * @return {boolean} Whether the updates are valid or not.
  */
 export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessRequestPartial): boolean {
-  OPA.assertNonNullish(document);
-  OPA.assertNonNullish(updateObject);
+  OPA.assertDocumentIsValid(document);
+  OPA.assertNonNullish(updateObject, "The processed Update Object must not be null.");
 
   const updateObject_AsUnknown = (updateObject as unknown);
   const updateObject_AsUpdateable_ByUser = (updateObject_AsUnknown as OPA.IUpdateable_ByUser);
@@ -106,13 +106,16 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
 /**
  * Creates an instance of the IAccessRequest document type.
  * @param {string} id The ID for the AccessRequest within the OPA system.
- * @param {IUser} user The User creating the AccessRequest.
+ * @param {IUser} creator The User creating the AccessRequest.
  * @param {ILocale} locale The Locale for that User.
  * @param {string} message A message containing information about the Access Request.
  * @param {string | null} [citationId=null] The ID of the Citation that the Access Request pertains to, if one exists.
  * @return {IAccessRequest} The new document instance.
  */
-function createInstance(id: string, user: IUser, locale: ILocale, message: string, citationId: string | null = null): IAccessRequest { // eslint-disable-line max-len
+function createInstance(id: string, creator: IUser, locale: ILocale, message: string, citationId: string | null = null): IAccessRequest { // eslint-disable-line max-len
+  OPA.assertDocumentIsValid(creator);
+  OPA.assertDocumentIsValid(locale);
+
   const now = OPA.nowToUse();
   const document: IAccessRequest = {
     id: id,
@@ -123,7 +126,7 @@ function createInstance(id: string, user: IUser, locale: ILocale, message: strin
     response: OPA.localizableStringConstructor(DefaultLocale, ""), // NOTE: The Decider sets the response (and determines its Locale)
     updateHistory: ([] as Array<UpdateHistoryItem>),
     dateOfCreation: now,
-    userIdOfCreator: user.id,
+    userIdOfCreator: creator.id,
     hasBeenUpdated: false,
     dateOfLatestUpdate: null,
     userIdOfLatestUpdater: null,
@@ -170,18 +173,48 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
   }
 
   /**
+   * Gets all AccessRequests stored in the database, filtering on ApprovalState if specified.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
+   * @param {OPA.ApprovalState | null} [approvalState=null] The ApprovalState desired for retrieval.
+   * @return {Promise<Array<IAccessRequest>>} The list of AccessRequests in the Collection.
+   */
+  async getAllForApprovalState(ds: OPA.IDataStorageState, approvalState: OPA.ApprovalState | null = null): Promise<Array<IAccessRequest>> {
+    if (OPA.isNullish(approvalState)) {
+      return await this.getAll(ds);
+    }
+
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
+
+    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
+    const approvalStateFieldName = OPA.getTypedPropertyKeyAsText<IAccessRequest>("approvalState");
+    const getQuery = collectionRef.where(approvalStateFieldName, "==", approvalState);
+    const querySnap = await getQuery.get();
+    const documents = querySnap.docs.map((value) => value.data());
+
+    const proxiedDocuments = documents.map((document) => this.documentProxyConstructor(document));
+    return proxiedDocuments;
+  }
+
+  /**
    * Gets all of the AccessRequests for the relevant User's OPA User ID.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} userId The ID for the relevant User within the OPA system.
+   * @param {OPA.ApprovalState | null} [approvalState=null] The ApprovalState desired for retrieval.
    * @return {Promise<Array<IAccessRequest>>} The list of Access Requests that correspond to the relevant User.
    */
-  async getAllForUserId(ds: OPA.IDataStorageState, userId: string): Promise<Array<IAccessRequest>> {
+  async getAllForUserId(ds: OPA.IDataStorageState, userId: string, approvalState: OPA.ApprovalState | null = null): Promise<Array<IAccessRequest>> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
     OPA.assertIdentifierIsValid(userId, "A valid OPA User ID must be provided.");
 
     const accessRequestsCollectionRef = this.collectionDescriptor.getTypedCollection(ds);
-    const getAccessRequestsForUserIdQuery = accessRequestsCollectionRef.where("userIdOfRequestor", "==", userId);
+    const userIdFieldName = OPA.getTypedPropertyKeyAsText<IAccessRequest>("userIdOfCreator");
+    let getAccessRequestsForUserIdQuery = accessRequestsCollectionRef.where(userIdFieldName, "==", userId);
+    if (!OPA.isNullish(approvalState)) {
+      const approvalStateFieldName = OPA.getTypedPropertyKeyAsText<IAccessRequest>("approvalState");
+      getAccessRequestsForUserIdQuery = getAccessRequestsForUserIdQuery.where(approvalStateFieldName, "==", approvalState);
+    }
     const matchingAccessRequestsSnap = await getAccessRequestsForUserIdQuery.get();
 
     const matchingAccessRequests = matchingAccessRequestsSnap.docs.map((doc) => doc.data());
@@ -192,20 +225,22 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
   /**
    * Creates an instance of the IAccessRequest document type stored on the server.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
-   * @param {IUser} user The User creating the AccessRequest.
+   * @param {IUser} creator The User creating the AccessRequest.
    * @param {ILocale} locale The Locale for that User.
    * @param {string} message A message containing information about the Access Request.
    * @param {string | null} [citationId=null] The ID of the Citation that the Access Request pertains to, if one exists.
    * @return {Promise<string>} The new document ID.
    */
-  async create(ds: OPA.IDataStorageState, user: IUser, locale: ILocale, message: string, citationId: string | null = null): Promise<string> { // eslint-disable-line max-len
+  async create(ds: OPA.IDataStorageState, creator: IUser, locale: ILocale, message: string, citationId: string | null = null): Promise<string> { // eslint-disable-line max-len
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertDocumentIsValid(creator);
+    OPA.assertDocumentIsValid(locale);
 
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc();
     const documentId = documentRef.id;
-    const document = createInstance(documentId, user, locale, message, citationId);
+    const document = createInstance(documentId, creator, locale, message, citationId);
     const proxiedDocument = this.documentProxyConstructor(document);
 
     OPA.assertNonNullish(proxiedDocument);
@@ -230,6 +265,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
   async update(ds: OPA.IDataStorageState, documentId: string, updateObject: IAccessRequestPartial, userIdOfLatestUpdater: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertNonNullish(updateObject, "The incoming Update Object must not be null.");
 
     // NOTE: Get the document earlier to check validity before and after setting "updateHistory" to also make sure it was not set on the "updateObject" passed in
     const document = await this.getByIdWithAssert(ds, documentId);
@@ -258,19 +294,30 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the AccessRequest within the OPA system.
    * @param {Array<string>} tags The tags that apply to the AccessRequest.
+   * @param {OPA.ArrayContentType} contentType The type of updates that the array represents.
    * @param {string} userIdOfLatestTagger The ID for the latest Tagger within the OPA system.
    * @return {Promise<void>}
    */
-  async setTags(ds: OPA.IDataStorageState, documentId: string, tags: Array<string>, userIdOfLatestTagger: string): Promise<void> {
+  async setTags(ds: OPA.IDataStorageState, documentId: string, tags: Array<string>, contentType: OPA.ArrayContentType, userIdOfLatestTagger: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertNonNullish(tags, "The array of Tags must not be null.");
+
+    let tagsValue: Array<string> | firestore.FieldValue = tags;
+    if (contentType == OPA.ArrayContentTypes.only_added) {
+      tagsValue = ds.constructorProvider.arrayUnion(...tags);
+    } else if (contentType == OPA.ArrayContentTypes.only_removed) {
+      tagsValue = ds.constructorProvider.arrayRemove(...tags);
+    }
+    const tagsValueAsArray = ((tagsValue as unknown) as Array<string>);
 
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IAccessRequestPartial);
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfLatestTagger} as OPA.IUpdateable_ByUser);
-    const updateObject_Taggable = ({tags, dateOfLatestTagging: now, userIdOfLatestTagger} as OPA.ITaggable_ByUser);
+    const updateObject_Taggable = ({tags: tagsValueAsArray, dateOfLatestTagging: now, userIdOfLatestTagger} as OPA.ITaggable_ByUser);
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Taggable};
-    const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
+    const updateObject_ForHistory = OPA.replaceFieldValuesWithSummaries({...updateObject});
+    const updateHistory = ds.constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
     const document = await this.getByIdWithAssert(ds, documentId);
@@ -377,55 +424,30 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
   }
 
   /**
-   * Marks the AccessRequest as deleted on the server by constructing an IDeleteable_ByUser object.
+   * Marks the AccessRequest's deletion state stored on the server by constructing an IDeleteable_ByUser object.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the AccessRequest within the OPA system.
-   * @param {string} userIdOfDeleter The ID for the Deleter within the OPA system.
+   * @param {OPA.DeletionState} deletionState The deletion state with which to mark the AccessRequest.
+   * @param {string} userIdOfDeletionChanger The ID for the deletion state Changer within the OPA system.
    * @return {Promise<void>}
    */
-  async markAsDeleted(ds: OPA.IDataStorageState, documentId: string, userIdOfDeleter: string): Promise<void> {
+  async markWithDeletionState(ds: OPA.IDataStorageState, documentId: string, deletionState: OPA.DeletionState, userIdOfDeletionChanger: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
+    // NOTE: We need the document earlier in this function to get the existing values for IDeleteable_ByUser
+    const document = await this.getByIdWithAssert(ds, documentId);
+    const toBeMarkedAsDeleted = (deletionState == OPA.DeletionStates.deleted);
+    OPA.assertIsTrue((toBeMarkedAsDeleted != document.isMarkedAsDeleted), "The AccessRequest's deletion status is already of the desired value.");
+
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IAccessRequestPartial);
-    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDeleter} as OPA.IUpdateable_ByUser);
-    const updateObject_Deleteable = ({isMarkedAsDeleted: true, dateOfDeletionChange: now, userIdOfDeletionChanger: userIdOfDeleter} as OPA.IDeleteable_ByUser);
+    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDeletionChanger} as OPA.IUpdateable_ByUser);
+    const updateObject_Deleteable = ({isMarkedAsDeleted: toBeMarkedAsDeleted, dateOfDeletionChange: now, userIdOfDeletionChanger} as OPA.IDeleteable_ByUser);
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Deleteable};
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
 
-    const document = await this.getByIdWithAssert(ds, documentId);
-    const areValid = areUpdatesValid(document, updateObject_WithHistory);
-    OPA.assertIsTrue(areValid, "The requested update is invalid.");
-
-    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
-    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
-    const documentRef = collectionRef.doc(documentId);
-    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
-  }
-
-  /**
-   * Marks the AccessRequest as un-deleted on the server by constructing an IDeleteable_ByUser object.
-   * @param {OPA.IDataStorageState} ds The state container for data storage.
-   * @param {string} documentId The ID for the AccessRequest within the OPA system.
-   * @param {string} userIdOfUnDeleter The ID for the Deleter within the OPA system.
-   * @return {Promise<void>}
-   */
-  async markAsUnDeleted(ds: OPA.IDataStorageState, documentId: string, userIdOfUnDeleter: string): Promise<void> {
-    OPA.assertDataStorageStateIsNotNullish(ds);
-    OPA.assertFirestoreIsNotNullish(ds.db);
-
-    const now = OPA.nowToUse();
-    const updateObject_Partial = ({} as IAccessRequestPartial);
-    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfUnDeleter} as OPA.IUpdateable_ByUser);
-    const updateObject_Deleteable = ({isMarkedAsDeleted: false, dateOfDeletionChange: now, userIdOfDeletionChanger: userIdOfUnDeleter} as OPA.IDeleteable_ByUser);
-    const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Deleteable};
-    const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
-    const updateObject_WithHistory = ({...updateObject, updateHistory} as IAccessRequestPartial_WithHistory);
-
-    const document = await this.getByIdWithAssert(ds, documentId);
     const areValid = areUpdatesValid(document, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 

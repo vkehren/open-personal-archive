@@ -107,6 +107,13 @@ export const ApprovalStates = {
 };
 ApprovalStates.decided = [ApprovalStates.approved, ApprovalStates.denied];
 
+export type ArrayContentType = "exact" | "only_added" | "only_removed";
+export const ArrayContentTypes = {
+  exact: ("exact" as ArrayContentType),
+  only_added: ("only_added" as ArrayContentType),
+  only_removed: ("only_removed" as ArrayContentType),
+};
+
 /**
  * Returns whether the ID is valid.
  * @param {DefaultFunc<IdNullable> | IdNullable} id The ID to check.

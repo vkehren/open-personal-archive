@@ -1,11 +1,12 @@
 import * as TC from "./TypeChecking";
 
 /**
+ * The maximum character value to use for ordering query results.
  * @constant
  * @type {string}
  * @default
  */
-export const Query_OrderBy_CharHighest = "\uf8ff"; // eslint-disable-line camelcase
+export const MAX_QUERY_CHAR_VALUE = "\uf8ff"; // eslint-disable-line camelcase
 
 /**
  * Deep-checks if two objects of type T as value-wise equivalent.
@@ -43,32 +44,32 @@ export function copyObject<T>(obj: T): T {
  * @type {boolean}
  * @default
  */
-export const Default_Enum_NamesAreLowercase = true; // eslint-disable-line camelcase
+export const DEFAULT_LITERAL_TYPE_USES_LOWERCASE = true; // eslint-disable-line camelcase
 
 /**
  * @constant
  * @type {string}
  * @default
  */
-export const Default_Enum_PartSeparator = "_"; // eslint-disable-line camelcase
+export const DEFAULT_LITERAL_TYPE_PART_SEPARATOR = "_"; // eslint-disable-line camelcase
 
 /**
- * Converts an enum value string to an enum value of type T.
- * @param {string} valueAsString The enum value as a string.
- * @param {T} defaultValue The default enum value to use.
- * @param {boolean} namesAreLowercase Whether enum named values are all lower-cased (default is "true").
- * @param {string} partSeparator The string used to separate words in an enum named value (default is "_").
- * @return {T} The converted enum value.
+ * Converts a string value into a string literal type of type T.
+ * @param {string} valueAsString The string literal type as a string.
+ * @param {T} defaultValue The default string literal type to use.
+ * @param {boolean} literalTypeUsesLowercase Whether the string literal type is lower-cased (default is "true").
+ * @param {string} literalTypePartSeparator The string used to separate words in a string literal type (default is "_").
+ * @return {T} The converted string literal type.
  */
-export function convertStringToEnumValue<T>(valueAsString: string, defaultValue: T, namesAreLowercase = Default_Enum_NamesAreLowercase, partSeparator = Default_Enum_PartSeparator): T {
+export function convertStringToLiteralType<T>(valueAsString: string, defaultValue: T, literalTypeUsesLowercase = DEFAULT_LITERAL_TYPE_USES_LOWERCASE, literalTypePartSeparator = DEFAULT_LITERAL_TYPE_PART_SEPARATOR): T { // eslint-disable-line max-len
   if (TC.isNullishOrWhitespace(valueAsString)) {
     return defaultValue;
   }
 
-  let valueAsStringToConvert = valueAsString.replace(" ", partSeparator);
-  valueAsStringToConvert = valueAsStringToConvert.replace("  ", partSeparator);
+  let valueAsStringToConvert = valueAsString.replace(" ", literalTypePartSeparator); // NOTE: 1 space
+  valueAsStringToConvert = valueAsStringToConvert.replace("  ", literalTypePartSeparator); // NOTE: 2 space
 
-  if (namesAreLowercase) {
+  if (literalTypeUsesLowercase) {
     valueAsStringToConvert = valueAsStringToConvert.toLowerCase();
   }
 
@@ -81,15 +82,15 @@ export function convertStringToEnumValue<T>(valueAsString: string, defaultValue:
  * @type {string}
  * @default
  */
-export const Default_Version_PartSeparator = "."; // eslint-disable-line camelcase
+export const DEFAULT_VERSION_PART_SEPARATOR = "."; // eslint-disable-line camelcase
 
 /**
  * Converts a version number string to an array of version number parts.
  * @param {string} versionNumberAsString The version number as a string.
- * @param {string} partSeparator The string used to separate words in an enum named value (default is "_").
+ * @param {string} partSeparator The string used to separate parts of a version number.
  * @return {Array<number>} The parts of the version number as an array of numbers.
  */
-export function convertVersionNumberStringToNumberParts(versionNumberAsString: string, partSeparator = Default_Version_PartSeparator): Array<number> {
+export function convertVersionNumberStringToNumberParts(versionNumberAsString: string, partSeparator = DEFAULT_VERSION_PART_SEPARATOR): Array<number> {
   if (TC.isNullishOrWhitespace(versionNumberAsString)) {
     throw new Error("The version number string provided does not contain any text.");
   }
@@ -114,7 +115,7 @@ export function convertVersionNumberStringToNumberParts(versionNumberAsString: s
  * @type {number}
  * @default
  */
-export const Default_Version_MissingNumberValue = 0; // eslint-disable-line camelcase
+export const DEFAULT_VERSION_MISSING_NUMBER_VALUE = 0; // eslint-disable-line camelcase
 
 /**
  * Compares two version numbers encoded as arrays of numbers.
@@ -123,7 +124,7 @@ export const Default_Version_MissingNumberValue = 0; // eslint-disable-line came
  * @param {number} missingNumberValue The number to use when a number part is missing a value relative to the other version number (default is "0").
  * @return {number} The result of comparison (i.e. -1, 0, or 1).
  */
-export function compareVersionNumbers(firstVersionNumber: Array<number>, secondVersionNumber: Array<number>, missingNumberValue = Default_Version_MissingNumberValue): number {
+export function compareVersionNumbers(firstVersionNumber: Array<number>, secondVersionNumber: Array<number>, missingNumberValue = DEFAULT_VERSION_MISSING_NUMBER_VALUE): number {
   if (TC.isNullish(firstVersionNumber)) {
     throw new Error("The first version number array provided has not been initialized.");
   }
@@ -156,11 +157,11 @@ export function compareVersionNumbers(firstVersionNumber: Array<number>, secondV
  * Compares two version numbers encoded as strings containing number parts.
  * @param {string} firstVersionNumber The first version number.
  * @param {string} secondVersionNumber The second version number.
- * @param {string} partSeparator The string used to separate words in an enum named value (default is "_").
- * @param {number} missingNumberValue The number to use when a number part is missing a value relative to the other version number (default is "0").
+ * @param {string} partSeparator The string used to separate parts of a version number.
+ * @param {number} missingNumberValue The number to use when a version number part is missing a value relative to the other version number (default is "0").
  * @return {number} The result of comparison (i.e. -1, 0, or 1).
  */
-export function compareVersionNumberStrings(firstVersionNumber: string, secondVersionNumber: string, partSeparator = Default_Version_PartSeparator, missingNumberValue = Default_Version_MissingNumberValue): number { // eslint-disable-line max-len
+export function compareVersionNumberStrings(firstVersionNumber: string, secondVersionNumber: string, partSeparator = DEFAULT_VERSION_PART_SEPARATOR, missingNumberValue = DEFAULT_VERSION_MISSING_NUMBER_VALUE): number { // eslint-disable-line max-len
   const firstVersionNumberParts = convertVersionNumberStringToNumberParts(firstVersionNumber, partSeparator);
   const secondVersionNumberParts = convertVersionNumberStringToNumberParts(secondVersionNumber, partSeparator);
   const compareResult = compareVersionNumbers(firstVersionNumberParts, secondVersionNumberParts, missingNumberValue);

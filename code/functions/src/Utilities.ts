@@ -219,7 +219,7 @@ export async function logFunctionCall(dataStorageState: OpaDm.IDataStorageState,
       dataStorageState.logWriteState.rootLogItemId = logItem.id;
     }
   } catch (error) {
-    await logFunctionError(dataStorageState, authenticationState, request, error as Error);
+    await logFunctionError(dataStorageState, authenticationState, request, error);
   }
 }
 
@@ -228,18 +228,23 @@ export async function logFunctionCall(dataStorageState: OpaDm.IDataStorageState,
  * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
  * @param {OpaDm.IAuthenticationState | null} authenticationState The Firebase Authentication state for the User.
  * @param {CallableRequest} request The Firebase request object.
- * @param {Error} error The Error that occurred.
+ * @param {unknown} caught The caught object encountered.
  * @return {Promise<OpaDm.void>}
  */
-export async function logFunctionError(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, request: CallableRequest, error: Error): Promise<void> { // eslint-disable-line max-len
+export async function logFunctionError(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, request: CallableRequest, caught: unknown): Promise<void> { // eslint-disable-line max-len
   try {
     const activityType = OpaDm.ActivityTypes.server_function_error;
     const requestor = request.rawRequest.ip;
     const resource = request.rawRequest.originalUrl;
-    const errorState = {hasError: true, name: error.name, message: error.message, stacktrace: error.stack};
-    const otherState = {message: error.message, logWriteState: dataStorageState.logWriteState, errorState: errorState};
+    const otherState = {message: OPA.UNRECOGNIZED_ERROR_MESSAGE, logWriteState: dataStorageState.logWriteState, errorState: caught};
 
-    logger.error(error.message, {structuredData: true, activityType, requestor, resource, otherState});
+    if (OPA.isOf<Error>(caught, (value) => (!OPA.isNullishOrWhitespace(value.message)))) {
+      const error = (caught as Error);
+      otherState.message = error.message;
+      otherState.errorState = {hasError: true, name: error.name, message: error.message, stack: error.stack};
+    }
+
+    logger.error(otherState.message, {structuredData: true, activityType, requestor, resource, otherState});
     await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, requestor, resource, null, request.data, otherState);
   } catch {
     // NOTE: Do nothing, as we are here because an error has already pccurred
@@ -276,6 +281,39 @@ export async function cleanUpStateAfterCall(dataStorageState: OpaDm.IDataStorage
     }
     await dataStorageState.db.terminate();
   } catch (error) {
-    logFunctionError(dataStorageState, authenticationState, request, error as Error);
+    logFunctionError(dataStorageState, authenticationState, request, error);
+  }
+}
+
+export type ActionFunc<T> = (request: CallableRequest, callState: OpaDm.ICallState) => Promise<T>;
+export type ActionResult<T> = OPA.ICallResult<T | Error | string | unknown>;
+/**
+ * Cleans up resources upon completion of a server function call in the Open Personal Archive™ (OPA) system.
+ * @param {CallableRequest} request The Firebase request object.
+ * @param {OPA.DefaultFunc<string>} getModuleName The function that gets the module name for logging.
+ * @param {OPA.DefaultFunc<string>} getFunctionName The function that gets the module name for logging.
+ * @param {ActionFunc<T>} doAction The function that performs the action.
+ * @return {Promise<ActionResult<T>>}
+ */
+export async function performAuthenticatedActionWithResult<T>(request: CallableRequest, getModuleName: OPA.DefaultFunc<string>, getFunctionName: OPA.DefaultFunc<string>, doAction: ActionFunc<T>): Promise<ActionResult<T>> { // eslint-disable-line max-len
+  let adminApp = ((null as unknown) as admin.app.App);
+  let callState = ((null as unknown) as OpaDm.ICallState);
+  const getLogMessage = (state: ExecutionState) => getFunctionCallLogMessage(getModuleName(), getFunctionName(), state);
+
+  try {
+    logger.info(getLogMessage(ExecutionStates.entry), {structuredData: true});
+    adminApp = admin.app();
+    callState = await getCallStateForFirebaseContextAndApp(request, adminApp);
+
+    await setExternalLogState(callState.dataStorageState, request);
+    await logFunctionCall(callState.dataStorageState, callState.authenticationState, request, getLogMessage(ExecutionStates.ready));
+
+    const result = await doAction(request, callState);
+    return OPA.getSuccessResult(result);
+  } catch (error) {
+    await logFunctionError(callState.dataStorageState, callState.authenticationState, request, error);
+    return OPA.getFailureResult(error);
+  } finally {
+    await cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, request);
   }
 }

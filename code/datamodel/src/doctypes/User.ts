@@ -23,13 +23,6 @@ export interface IUserPartial {
   recentQueries?: Array<string> | firestore.FieldValue;
 }
 
-interface ICitationAccessor {
-  readonly requestedCitationIds: Array<string>;
-  readonly viewableCitationIds: Array<string>;
-  readonly dateOfLatestCitationChange: OPA.DateToUse | null;
-  readonly userIdOfLatestCitationChanger: string | null;
-}
-interface IDocument_CitationAccessor extends OPA.IDocument, ICitationAccessor { }
 interface ICitationAccessorPartial {
   requestedCitationIds?: Array<string> | firestore.FieldValue;
   viewableCitationIds?: Array<string> | firestore.FieldValue;
@@ -41,6 +34,14 @@ type UpdateHistoryItem = IUserPartial | ICitationAccessorPartial | OPA.IUpdateab
 interface IUserPartial_WithHistory extends IUserPartial, OPA.IUpdateable {
   updateHistory: Array<UpdateHistoryItem> | firestore.FieldValue;
 }
+
+interface ICitationAccessor {
+  readonly requestedCitationIds: Array<string>;
+  readonly viewableCitationIds: Array<string>;
+  readonly dateOfLatestCitationChange: OPA.DateToUse | null;
+  readonly userIdOfLatestCitationChanger: string | null;
+}
+interface IDocument_CitationAccessor extends OPA.IDocument, ICitationAccessor { }
 
 export interface IUser extends IDocument_CitationAccessor, OPA.IDocument_Creatable, OPA.IDocument_Updateable_ByUser_WithHistory<UpdateHistoryItem>, OPA.IDocument_AssignableToRole_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<OPA.ApprovalState>, OPA.IDocument_Suspendable_ByUser, OPA.IDocument_Deleteable_ByUser { // eslint-disable-line max-len
   readonly firebaseAuthUserId: string;
@@ -69,8 +70,8 @@ const IUser_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
  * @return {boolean} Whether the updates are valid or not.
  */
 export function areUpdatesValid(document: IUser, updateObject: IUserPartial): boolean {
-  OPA.assertNonNullish(document);
-  OPA.assertNonNullish(updateObject);
+  OPA.assertDocumentIsValid(document);
+  OPA.assertNonNullish(updateObject, "The processed Update Object must not be null.");
 
   const updateObject_AsUnknown = (updateObject as unknown);
   const updateObject_AsCitationAccessor = (updateObject_AsUnknown as ICitationAccessorPartial);
@@ -149,6 +150,10 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
  * @return {IUser} The new document instance.
  */
 function createInstance(id: string, firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, assignedRole: IRole, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): IUser { // eslint-disable-line max-len
+  OPA.assertDocumentIsValid(authProvider);
+  OPA.assertDocumentIsValid(assignedRole);
+  OPA.assertDocumentIsValid(locale);
+  OPA.assertDocumentIsValid(timeZoneGroup);
   OPA.assertIsTrue(assignedRole.id != Role_OwnerId, "The Archive Owner cannot be constructed as a normal User.");
 
   const now = OPA.nowToUse();
@@ -164,11 +169,11 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     firstName: firstName,
     lastName: lastName,
     preferredName: preferredName,
+    recentQueries: ([] as Array<string>),
     requestedCitationIds: ([] as Array<string>),
     viewableCitationIds: ([] as Array<string>),
     dateOfLatestCitationChange: null,
     userIdOfLatestCitationChanger: null,
-    recentQueries: ([] as Array<string>),
     updateHistory: ([] as Array<UpdateHistoryItem>),
     dateOfCreation: now,
     hasBeenUpdated: false,
@@ -185,6 +190,7 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     dateOfDecision: null,
     userIdOfDecider: null,
     isSuspended: false, // NOTE: Here this is data property, but all QuerySet functions proxy this into a computed property
+    numberOfTimesSuspended: 0,
     hasSuspensionStarted: false,
     hasSuspensionEnded: false,
     reasonForSuspensionStart: null,
@@ -217,6 +223,10 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
  * @return {IUser} The new document instance.
  */
 export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): IUser { // eslint-disable-line max-len
+  OPA.assertDocumentIsValid(authProvider);
+  OPA.assertDocumentIsValid(locale);
+  OPA.assertDocumentIsValid(timeZoneGroup);
+
   const now = OPA.nowToUse();
   const document: IUser = {
     id: User_OwnerId,
@@ -230,11 +240,11 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     firstName: firstName,
     lastName: lastName,
     preferredName: preferredName,
+    recentQueries: ([] as Array<string>),
     requestedCitationIds: ([] as Array<string>),
     viewableCitationIds: ([] as Array<string>),
     dateOfLatestCitationChange: null,
     userIdOfLatestCitationChanger: null,
-    recentQueries: ([] as Array<string>),
     updateHistory: ([] as Array<UpdateHistoryItem>),
     dateOfCreation: now,
     hasBeenUpdated: false,
@@ -251,6 +261,7 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     dateOfDecision: now,
     userIdOfDecider: User_OwnerId,
     isSuspended: false, // NOTE: Here this is data property, but all QuerySet functions proxy this into a computed property
+    numberOfTimesSuspended: 0,
     hasSuspensionStarted: false,
     hasSuspensionEnded: false,
     reasonForSuspensionStart: null,
@@ -311,6 +322,30 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   }
 
   /**
+   * Gets all Users stored in the database, filtering on ApprovalState if specified.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
+   * @param {OPA.ApprovalState | null} [approvalState=null] The ApprovalState desired for retrieval.
+   * @return {Promise<Array<IUser>>} The list of Users in the Collection.
+   */
+  async getAllForApprovalState(ds: OPA.IDataStorageState, approvalState: OPA.ApprovalState | null = null): Promise<Array<IUser>> {
+    if (OPA.isNullish(approvalState)) {
+      return await this.getAll(ds);
+    }
+
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
+
+    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
+    const approvalStateFieldName = OPA.getTypedPropertyKeyAsText<IUser>("approvalState");
+    const getQuery = collectionRef.where(approvalStateFieldName, "==", approvalState);
+    const querySnap = await getQuery.get();
+    const documents = querySnap.docs.map((value) => value.data());
+
+    const proxiedDocuments = documents.map((document) => this.documentProxyConstructor(document));
+    return proxiedDocuments;
+  }
+
+  /**
    * Gets the User that is the Owner of the Archive managed by the OPA installation.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @return {Promise<IUser>} The User corresponding to the UUID, or null if none exists.
@@ -339,7 +374,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     OPA.assertIdentifierIsValid(firebaseAuthUserId, "A valid Firebase Auth User ID must be provided.");
 
     const usersCollectionRef = this.collectionDescriptor.getTypedCollection(ds);
-    const getUserForUuidQuery = usersCollectionRef.where("firebaseAuthUserId", "==", firebaseAuthUserId);
+    const firebaseAuthUserIdFieldName = OPA.getTypedPropertyKeyAsText<IUser>("firebaseAuthUserId");
+    const getUserForUuidQuery = usersCollectionRef.where(firebaseAuthUserIdFieldName, "==", firebaseAuthUserId);
     const matchingUsersSnap = await getUserForUuidQuery.get();
 
     if (matchingUsersSnap.docs.length > 1) {
@@ -384,6 +420,9 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   async createArchiveOwner(ds: OPA.IDataStorageState, firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): Promise<IUser> { // eslint-disable-line max-len
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertDocumentIsValid(authProvider);
+    OPA.assertDocumentIsValid(locale);
+    OPA.assertDocumentIsValid(timeZoneGroup);
 
     const owner = createArchiveOwner(firebaseAuthUserId, authProvider, authAccountName, locale, timeZoneGroup, firstName, lastName, preferredName);
     const proxiedOwner = this.documentProxyConstructor(owner);
@@ -430,6 +469,10 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   async createWithRole(ds: OPA.IDataStorageState, firebaseAuthUserId: string, authProvider: IAuthenticationProvider, authAccountName: string, assignedRole: IRole, locale: ILocale, timeZoneGroup: ITimeZoneGroup, firstName: string, lastName: string, preferredName: string | null = null): Promise<string> { // eslint-disable-line max-len
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertDocumentIsValid(authProvider);
+    OPA.assertDocumentIsValid(assignedRole);
+    OPA.assertDocumentIsValid(locale);
+    OPA.assertDocumentIsValid(timeZoneGroup);
 
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc();
@@ -468,6 +511,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   async update(ds: OPA.IDataStorageState, documentId: string, updateObject: IUserPartial, userIdOfLatestUpdater: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertNonNullish(updateObject, "The incoming Update Object must not be null.");
 
     // NOTE: Get the document earlier to check validity before and after setting "updateHistory" to also make sure it was not set on the "updateObject" passed in
     const document = await this.getByIdWithAssert(ds, documentId);
@@ -492,7 +536,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   }
 
   /**
-   * Updates the User stored on the server by constructing an IViewable_ByUser object.
+   * Sets the assigned Role of the User stored on the server by constructing an IAssignableToRole_ByUser object.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the User within the OPA system.
    * @param {IRole} role The Role to which to assign the User within the OPA system.
@@ -502,7 +546,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   async assignToRole(ds: OPA.IDataStorageState, documentId: string, role: IRole, userIdOfLatestRoleAssigner: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
-    OPA.assertNonNullish(role);
+    OPA.assertDocumentIsValid(role);
 
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
@@ -524,7 +568,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   }
 
   /**
-   * Adds a requested Citation to the User stored on the server by constructing an ICitationAccessor_Updateable object.
+   * Adds a requested Citation to the User stored on the server by constructing an ICitationAccessorPartial object.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the User within the OPA system.
    * @param {string} requestedCitationId The Citation to which the User has requested access.
@@ -534,7 +578,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   async addRequestedCitation(ds: OPA.IDataStorageState, documentId: string, requestedCitationId: string, userIdOfLatestUpdater: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
-    OPA.assertNonNullishOrWhitespace(requestedCitationId);
+    OPA.assertIdentifierIsValid(requestedCitationId); // LATER: Replace "requestedCitationId" with the actual Citation object here
 
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
@@ -557,7 +601,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   }
 
   /**
-   * Adds a viewable Citation to the User stored on the server by constructing an ICitationAccessor_Updateable object.
+   * Adds a viewable Citation to the User stored on the server by constructing an ICitationAccessorPartial object.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the User within the OPA system.
    * @param {string} viewableCitationId The Citation to which the User has been granted permission to view.
@@ -567,7 +611,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   async addViewableCitation(ds: OPA.IDataStorageState, documentId: string, viewableCitationId: string, userIdOfLatestUpdater: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
-    OPA.assertNonNullishOrWhitespace(viewableCitationId);
+    OPA.assertIdentifierIsValid(viewableCitationId); // LATER: Replace "viewableCitationId" with the actual Citation object here
 
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
@@ -651,27 +695,40 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   }
 
   /**
-   * Updates the User stored on the server by constructing an ISuspendable_ByUser object.
+   * Sets the User's suspension state stored on the server by constructing an ISuspendable_ByUser object.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the User within the OPA system.
-   * @param {string} reason The reason for the suspension.
-   * @param {string} userIdOfSuspensionStarter The ID for the Starter within the OPA system.
+   * @param {OPA.SuspensionState} suspensionState The suspension state with which to mark the User.
+   * @param {string} reason The reason for the suspension state change.
+   * @param {string} userIdOfSuspensionChanger The ID for the Changer within the OPA system.
    * @return {Promise<void>}
    */
-  async setToSuspended(ds: OPA.IDataStorageState, documentId: string, reason: string, userIdOfSuspensionStarter: string): Promise<void> {
+  async setToSuspensionState(ds: OPA.IDataStorageState, documentId: string, suspensionState: OPA.SuspensionState, reason: string, userIdOfSuspensionChanger: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
     // NOTE: We need the document earlier in this function to get the existing values for ISuspendable_ByUser
     const document = await this.getByIdWithAssert(ds, documentId);
-    OPA.assertIsFalse(OPA.isSuspended(document), "The User must not be suspended before the User is suspended.");
+    const toBeSuspended = (suspensionState == OPA.SuspensionStates.suspended);
+    OPA.assertIsTrue((toBeSuspended != OPA.isSuspended(document)), "The User's suspension status is already of the desired value.");
 
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
-    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfSuspensionStarter} as OPA.IUpdateable_ByUser);
-    const updateObject_Suspendable = ({isSuspended: true, hasSuspensionStarted: true, hasSuspensionEnded: false, reasonForSuspensionStart: reason, reasonForSuspensionEnd: null, dateOfSuspensionStart: now, dateOfSuspensionEnd: null, userIdOfSuspensionStarter, userIdOfSuspensionEnder: null} as OPA.ISuspendable_ByUser); // eslint-disable-line max-len
+    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfSuspensionChanger} as OPA.IUpdateable_ByUser);
+    let updateObject_Suspendable = ((null as unknown) as OPA.ISuspendable_ByUser);
+    if (suspensionState == OPA.SuspensionStates.suspended) {
+      // eslint-disable-next-line max-len
+      // NOTE: It is better to force the FieldValue into the interface's "number" value here than to change the interface to support FieldValues directly (as it would become more difficult to work with documents read from queries)
+      const incrementAsNumber = ((ds.constructorProvider.increment(1) as unknown) as number);
+      updateObject_Suspendable = ({isSuspended: true, numberOfTimesSuspended: incrementAsNumber, hasSuspensionStarted: true, hasSuspensionEnded: false, reasonForSuspensionStart: reason, reasonForSuspensionEnd: null, dateOfSuspensionStart: now, dateOfSuspensionEnd: null, userIdOfSuspensionStarter: userIdOfSuspensionChanger, userIdOfSuspensionEnder: null} as OPA.ISuspendable_ByUser); // eslint-disable-line max-len
+    } else if (suspensionState == OPA.SuspensionStates.unsuspended) {
+      updateObject_Suspendable = ({isSuspended: false, hasSuspensionEnded: true, reasonForSuspensionEnd: reason, dateOfSuspensionEnd: now, userIdOfSuspensionEnder: userIdOfSuspensionChanger} as OPA.ISuspendable_ByUser); // eslint-disable-line max-len
+    } else {
+      throw new Error("Invalid SuspensionState encountered.");
+    }
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Suspendable};
-    const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
+    const updateObject_ForHistory = OPA.replaceFieldValuesWithSummaries({...updateObject});
+    const updateHistory = ds.constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
     const areValid = areUpdatesValid(document, updateObject_WithHistory);
@@ -685,93 +742,30 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   }
 
   /**
-   * Updates the User stored on the server by constructing an ISuspendable_ByUser object.
+   * Marks the User's deletion state stored on the server by constructing an IDeleteable_ByUser object.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} documentId The ID for the User within the OPA system.
-   * @param {string} reason The reason to end the suspension.
-   * @param {string} userIdOfSuspensionEnder The ID for the Ender within the OPA system.
+   * @param {OPA.DeletionState} deletionState The deletion state with which to mark the User.
+   * @param {string} userIdOfDeletionChanger The ID for the deletion state Changer within the OPA system.
    * @return {Promise<void>}
    */
-  async setToUnSuspended(ds: OPA.IDataStorageState, documentId: string, reason: string, userIdOfSuspensionEnder: string): Promise<void> {
+  async markWithDeletionState(ds: OPA.IDataStorageState, documentId: string, deletionState: OPA.DeletionState, userIdOfDeletionChanger: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
-    // NOTE: We need the document earlier in this function to get the existing values for ISuspendable_ByUser
+    // NOTE: We need the document earlier in this function to get the existing values for IDeleteable_ByUser
     const document = await this.getByIdWithAssert(ds, documentId);
-    OPA.assertIsTrue(OPA.isSuspended(document), "The User must be suspended before the User is un-suspended.");
-    // LATER: Rather than setting the following fields to their current value, explore deleting these fields from the update object
-    const reasonForSuspensionStart = document.reasonForSuspensionStart;
-    const dateOfSuspensionStart = document.dateOfSuspensionStart;
-    const userIdOfSuspensionStarter = document.userIdOfSuspensionStarter;
+    const toBeMarkedAsDeleted = (deletionState == OPA.DeletionStates.deleted);
+    OPA.assertIsTrue((toBeMarkedAsDeleted != document.isMarkedAsDeleted), "The User's deletion status is already of the desired value.");
 
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
-    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfSuspensionEnder} as OPA.IUpdateable_ByUser);
-    const updateObject_Suspendable = ({isSuspended: false, hasSuspensionStarted: true, hasSuspensionEnded: true, reasonForSuspensionStart, reasonForSuspensionEnd: reason, dateOfSuspensionStart, dateOfSuspensionEnd: now, userIdOfSuspensionStarter, userIdOfSuspensionEnder} as OPA.ISuspendable_ByUser); // eslint-disable-line max-len
-    const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Suspendable};
-    const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
-    const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
-
-    const areValid = areUpdatesValid(document, updateObject_WithHistory);
-    OPA.assertIsTrue(areValid, "The requested update is invalid.");
-
-    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
-    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
-    const documentRef = collectionRef.doc(documentId);
-    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
-  }
-
-  /**
-   * Marks the User as deleted on the server by constructing an IDeleteable_ByUser object.
-   * @param {OPA.IDataStorageState} ds The state container for data storage.
-   * @param {string} documentId The ID for the User within the OPA system.
-   * @param {string} userIdOfDeleter The ID for the Deleter within the OPA system.
-   * @return {Promise<void>}
-   */
-  async markAsDeleted(ds: OPA.IDataStorageState, documentId: string, userIdOfDeleter: string): Promise<void> {
-    OPA.assertDataStorageStateIsNotNullish(ds);
-    OPA.assertFirestoreIsNotNullish(ds.db);
-
-    const now = OPA.nowToUse();
-    const updateObject_Partial = ({} as IUserPartial);
-    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDeleter} as OPA.IUpdateable_ByUser);
-    const updateObject_Deleteable = ({isMarkedAsDeleted: true, dateOfDeletionChange: now, userIdOfDeletionChanger: userIdOfDeleter} as OPA.IDeleteable_ByUser);
+    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfDeletionChanger} as OPA.IUpdateable_ByUser);
+    const updateObject_Deleteable = ({isMarkedAsDeleted: toBeMarkedAsDeleted, dateOfDeletionChange: now, userIdOfDeletionChanger} as OPA.IDeleteable_ByUser);
     const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Deleteable};
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
-    const document = await this.getByIdWithAssert(ds, documentId);
-    const areValid = areUpdatesValid(document, updateObject_WithHistory);
-    OPA.assertIsTrue(areValid, "The requested update is invalid.");
-
-    const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
-    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
-    const documentRef = collectionRef.doc(documentId);
-    batchUpdate.set(documentRef, updateObject_WithHistory, {merge: true});
-    if (batchUpdate != ds.currentWriteBatch) {await batchUpdate.commit();} // eslint-disable-line brace-style
-  }
-
-  /**
-   * Marks the User as un-deleted on the server by constructing an IDeleteable_ByUser object.
-   * @param {OPA.IDataStorageState} ds The state container for data storage.
-   * @param {string} documentId The ID for the User within the OPA system.
-   * @param {string} userIdOfUnDeleter The ID for the Deleter within the OPA system.
-   * @return {Promise<void>}
-   */
-  async markAsUnDeleted(ds: OPA.IDataStorageState, documentId: string, userIdOfUnDeleter: string): Promise<void> {
-    OPA.assertDataStorageStateIsNotNullish(ds);
-    OPA.assertFirestoreIsNotNullish(ds.db);
-
-    const now = OPA.nowToUse();
-    const updateObject_Partial = ({} as IUserPartial);
-    const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater: userIdOfUnDeleter} as OPA.IUpdateable_ByUser);
-    const updateObject_Deleteable = ({isMarkedAsDeleted: false, dateOfDeletionChange: now, userIdOfDeletionChanger: userIdOfUnDeleter} as OPA.IDeleteable_ByUser);
-    const updateObject = {...updateObject_Partial, ...updateObject_Updateable, ...updateObject_Deleteable};
-    const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
-    const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
-
-    const document = await this.getByIdWithAssert(ds, documentId);
     const areValid = areUpdatesValid(document, updateObject_WithHistory);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 

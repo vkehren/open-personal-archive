@@ -9,28 +9,28 @@ const LocaleValidityRegExp = /^[a-zA-Z]{2}/;
  * @type {boolean}
  * @default
  */
-export const Default_AllowUndefinedValue = false; // eslint-disable-line camelcase
+export const DEFAULT_LOCALIZABLE_ALLOWS_UNDEFINED = false; // eslint-disable-line camelcase
 
 /**
  * @constant
  * @type {boolean}
  * @default
  */
-export const Default_AllowNullValue = true; // eslint-disable-line camelcase
+export const DEFAULT_LOCALIZABLE_ALLOWS_NULL = true; // eslint-disable-line camelcase
 
 /**
  * @constant
  * @type {boolean}
  * @default
  */
-export const Default_AllowWhitespaceValue = true; // eslint-disable-line camelcase
+export const DEFAULT_LOCALIZABLE_ALLOWS_WHITESPACE = true; // eslint-disable-line camelcase
 
 /**
  * @constant
  * @type {string}
  * @default
  */
-export const Default_Locale = "en"; // eslint-disable-line camelcase
+export const DEFAULT_LOCALE = "en"; // eslint-disable-line camelcase
 
 /**
  * Constructs an ILocalizable<string> and sets the desired value for the specified Locale (as well as the Default Locale).
@@ -43,7 +43,7 @@ export function localizableStringConstructor(locale: string, desiredValue: strin
   TC.assertNonNullishOrWhitespace(locale);
   const localizableString = ({} as Record<string, unknown> & BT.ILocalizable<string>);
   localizableString[locale] = (!TC.isNullishOrWhitespace(desiredValue) ? TC.convertNonNullish(desiredValue) : defaultValue);
-  localizableString[Default_Locale] = localizableString[locale];
+  localizableString[DEFAULT_LOCALE] = localizableString[locale];
   return localizableString;
 }
 
@@ -54,17 +54,17 @@ export function localizableStringConstructor(locale: string, desiredValue: strin
  * @param {boolean} [allowNullValue=Default_AllowNullValue] Whether to interpret "null" as a valid value for a given locale.
  * @return {[boolean, string]} Whether the Localizable object is valid and if not, a message describing the reason why not.
  */
-function isValidLocalizableInternal<T>(localizable: BT.ILocalizable<T>, allowUndefinedValue = Default_AllowUndefinedValue, allowNullValue = Default_AllowNullValue): [boolean, string] {
+function isValidLocalizableInternal<T>(localizable: BT.ILocalizable<T>, allowUndefinedValue = DEFAULT_LOCALIZABLE_ALLOWS_UNDEFINED, allowNullValue = DEFAULT_LOCALIZABLE_ALLOWS_NULL): [boolean, string] { // eslint-disable-line max-len
   if (TC.isNullish(localizable)) {
     return [false, "The Localizable object must NOT be undefined or null."];
   }
 
-  const defaultValue = localizable[Default_Locale];
+  const defaultValue = localizable[DEFAULT_LOCALE];
   if ((!allowUndefinedValue && TC.isUndefined(defaultValue))) {
-    return [false, "The Localizable object must contain a defined value for the default locale (i.e. \"" + Default_Locale + "\")."]; // eslint-disable-line camelcase
+    return [false, "The Localizable object must contain a defined value for the default locale (i.e. \"" + DEFAULT_LOCALE + "\")."]; // eslint-disable-line camelcase
   }
   if ((!allowNullValue && TC.isNull(defaultValue))) {
-    return [false, "The Localizable object must contain a non-null value for the default locale (i.e. \"" + Default_Locale + "\")."]; // eslint-disable-line camelcase
+    return [false, "The Localizable object must contain a non-null value for the default locale (i.e. \"" + DEFAULT_LOCALE + "\")."]; // eslint-disable-line camelcase
   }
   return [true, ""];
 }
@@ -76,7 +76,7 @@ function isValidLocalizableInternal<T>(localizable: BT.ILocalizable<T>, allowUnd
  * @param {boolean} [allowNullValue=Default_AllowNullValue] Whether to interpret "null" as a valid value for a given locale.
  * @return {boolean} Whether the Localizable object is valid.
  */
-export function isValidLocalizable<T>(localizable: BT.ILocalizable<T>, allowUndefinedValue = Default_AllowUndefinedValue, allowNullValue = Default_AllowNullValue): boolean {
+export function isValidLocalizable<T>(localizable: BT.ILocalizable<T>, allowUndefinedValue = DEFAULT_LOCALIZABLE_ALLOWS_UNDEFINED, allowNullValue = DEFAULT_LOCALIZABLE_ALLOWS_NULL): boolean {
   const result = isValidLocalizableInternal(localizable, allowUndefinedValue, allowNullValue);
   return result[0];
 }
@@ -88,7 +88,7 @@ export function isValidLocalizable<T>(localizable: BT.ILocalizable<T>, allowUnde
  * @param {boolean} [allowNullValue=Default_AllowNullValue] Whether to interpret "null" as a valid value for a given locale.
  * @return {void}
  */
-export function assertIsValidLocalizable<T>(localizable: BT.ILocalizable<T>, allowUndefinedValue = Default_AllowUndefinedValue, allowNullValue = Default_AllowNullValue): void {
+export function assertIsValidLocalizable<T>(localizable: BT.ILocalizable<T>, allowUndefinedValue = DEFAULT_LOCALIZABLE_ALLOWS_UNDEFINED, allowNullValue = DEFAULT_LOCALIZABLE_ALLOWS_NULL): void {
   const result = isValidLocalizableInternal(localizable, allowUndefinedValue, allowNullValue);
   if (!result[0]) {
     throw new Error(result[1]);
@@ -142,7 +142,7 @@ export function assertIsValidLocale(locale: string): void {
  * @param {boolean} [allowNullValue=Default_AllowNullValue] Whether to interpret "null" as a valid value for a given locale.
  * @return {string} The localized value.
  */
-export function getLocalizedValue<T>(localizable: BT.ILocalizable<T>, locale: string, allowUndefinedValue = Default_AllowUndefinedValue, allowNullValue = Default_AllowNullValue): T {
+export function getLocalizedValue<T>(localizable: BT.ILocalizable<T>, locale: string, allowUndefinedValue = DEFAULT_LOCALIZABLE_ALLOWS_UNDEFINED, allowNullValue = DEFAULT_LOCALIZABLE_ALLOWS_NULL): T {
   assertIsValidLocalizable(localizable, allowUndefinedValue, allowNullValue);
   assertIsValidLocale(locale);
 
@@ -159,7 +159,7 @@ export function getLocalizedValue<T>(localizable: BT.ILocalizable<T>, locale: st
     return baseLocalizedValue;
   }
 
-  const defaultLocalizedValue = localizable[Default_Locale];
+  const defaultLocalizedValue = localizable[DEFAULT_LOCALE];
   return defaultLocalizedValue;
 }
 
@@ -172,7 +172,7 @@ export function getLocalizedValue<T>(localizable: BT.ILocalizable<T>, locale: st
  * @param {boolean} [allowWhitespaceValue=Default_AllowWhitespaceValue] Whether to interpret whitespace (e.g. " ") as a valid value for a given locale.
  * @return {string} The localized text.
  */
-export function getLocalizedText(localizable: BT.ILocalizable<string>, locale: string, allowUndefinedValue = Default_AllowUndefinedValue, allowNullValue = Default_AllowNullValue, allowWhitespaceValue = Default_AllowWhitespaceValue): string { // eslint-disable-line max-len
+export function getLocalizedText(localizable: BT.ILocalizable<string>, locale: string, allowUndefinedValue = DEFAULT_LOCALIZABLE_ALLOWS_UNDEFINED, allowNullValue = DEFAULT_LOCALIZABLE_ALLOWS_NULL, allowWhitespaceValue = DEFAULT_LOCALIZABLE_ALLOWS_WHITESPACE): string { // eslint-disable-line max-len
   assertIsValidLocalizable(localizable, allowUndefinedValue, allowNullValue);
   assertIsValidLocale(locale);
 
@@ -189,6 +189,6 @@ export function getLocalizedText(localizable: BT.ILocalizable<string>, locale: s
     return baseLocalizedText;
   }
 
-  const defaultLocalizedText = localizable[Default_Locale];
+  const defaultLocalizedText = localizable[DEFAULT_LOCALE];
   return defaultLocalizedText;
 }

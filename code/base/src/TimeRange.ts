@@ -5,39 +5,39 @@ import * as TC from "./TypeChecking";
  * @constant
  * @type {number}
  */
-export const Timestamp_Seconds_MIN = -62135596800; // eslint-disable-line camelcase
+export const MIN_TIMESTAMP_SECONDS = -62135596800; // eslint-disable-line camelcase
 
 /**
  * @constant
  * @type {number}
  */
-export const Timestamp_Nanoseconds_MIN = 0; // eslint-disable-line camelcase
+export const MIN_TIMESTAMP_NANOSECONDS = 0; // eslint-disable-line camelcase
 
 /**
  * @constant
  * @type {number}
  */
-export const Timestamp_Seconds_MAX = 253402300799; // eslint-disable-line camelcase
+export const MAX_TIMESTAMP_SECONDS = 253402300799; // eslint-disable-line camelcase
 
 /**
  * @constant
  * @type {number}
  */
-export const Timestamp_Nanoseconds_MAX = 999999999; // eslint-disable-line camelcase
+export const MAX_TIMESTAMP_NANOSECONDS = 999999999; // eslint-disable-line camelcase
 
 /**
  * @constant
  * @type {boolean}
  * @default
  */
-export const Default_IncludeStartOfRange = true; // eslint-disable-line camelcase
+export const DEFAULT_TIME_RANGE_INCLUDES_START = true; // eslint-disable-line camelcase
 
 /**
  * @constant
  * @type {boolean}
  * @default
  */
-export const Default_IncludeEndOfRange = true; // eslint-disable-line camelcase
+export const DEFAULT_TIME_RANGE_INCLUDES_END = true; // eslint-disable-line camelcase
 
 /**
  * Gets the seconds value as a consistent-length, consistently-signed string.
@@ -131,17 +131,17 @@ export class TimeRange extends Object implements BT.ITimeRange {
   constructor(start: BT.ITimestamp, end: BT.ITimestamp | null = null) {
     super();
 
-    if (start.seconds < Timestamp_Seconds_MIN) { // eslint-disable-line camelcase
-      throw new Error("The Timestamp seconds at the start of the TimeRange must not subceed " + Timestamp_Seconds_MIN + " seconds."); // eslint-disable-line camelcase
+    if (start.seconds < MIN_TIMESTAMP_SECONDS) { // eslint-disable-line camelcase
+      throw new Error("The Timestamp seconds at the start of the TimeRange must not subceed " + MIN_TIMESTAMP_SECONDS + " seconds."); // eslint-disable-line camelcase
     }
-    if (start.nanoseconds < Timestamp_Nanoseconds_MIN) { // eslint-disable-line camelcase
-      throw new Error("The Timestamp nanoseconds at the start of the TimeRange must not subceed " + Timestamp_Nanoseconds_MIN + " nanoseconds."); // eslint-disable-line camelcase
+    if (start.nanoseconds < MIN_TIMESTAMP_NANOSECONDS) { // eslint-disable-line camelcase
+      throw new Error("The Timestamp nanoseconds at the start of the TimeRange must not subceed " + MIN_TIMESTAMP_NANOSECONDS + " nanoseconds."); // eslint-disable-line camelcase
     }
-    if (start.seconds > Timestamp_Seconds_MAX) { // eslint-disable-line camelcase
-      throw new Error("The Timestamp seconds at the start of the TimeRange must not exceed " + Timestamp_Seconds_MAX + " seconds."); // eslint-disable-line camelcase
+    if (start.seconds > MAX_TIMESTAMP_SECONDS) { // eslint-disable-line camelcase
+      throw new Error("The Timestamp seconds at the start of the TimeRange must not exceed " + MAX_TIMESTAMP_SECONDS + " seconds."); // eslint-disable-line camelcase
     }
-    if (start.nanoseconds > Timestamp_Nanoseconds_MAX) { // eslint-disable-line camelcase
-      throw new Error("The Timestamp nanoseconds at the start of the TimeRange must not exceed " + Timestamp_Nanoseconds_MAX + " nanoseconds."); // eslint-disable-line camelcase
+    if (start.nanoseconds > MAX_TIMESTAMP_NANOSECONDS) { // eslint-disable-line camelcase
+      throw new Error("The Timestamp nanoseconds at the start of the TimeRange must not exceed " + MAX_TIMESTAMP_NANOSECONDS + " nanoseconds."); // eslint-disable-line camelcase
     }
     if (TC.isNullish(end)) {
       this._start = start;
@@ -152,17 +152,17 @@ export class TimeRange extends Object implements BT.ITimeRange {
     // NOTE: If end is "null", then we already returned
     end = (end as BT.ITimestamp);
 
-    if (end.seconds < Timestamp_Seconds_MIN) { // eslint-disable-line camelcase
-      throw new Error("The Timestamp seconds at the end of the TimeRange must not subceed " + Timestamp_Seconds_MIN + " seconds."); // eslint-disable-line camelcase
+    if (end.seconds < MIN_TIMESTAMP_SECONDS) { // eslint-disable-line camelcase
+      throw new Error("The Timestamp seconds at the end of the TimeRange must not subceed " + MIN_TIMESTAMP_SECONDS + " seconds."); // eslint-disable-line camelcase
     }
-    if (end.nanoseconds < Timestamp_Nanoseconds_MIN) { // eslint-disable-line camelcase
-      throw new Error("The Timestamp nanoseconds at the end of the TimeRange must not subceed " + Timestamp_Nanoseconds_MIN + " nanoseconds."); // eslint-disable-line camelcase
+    if (end.nanoseconds < MIN_TIMESTAMP_NANOSECONDS) { // eslint-disable-line camelcase
+      throw new Error("The Timestamp nanoseconds at the end of the TimeRange must not subceed " + MIN_TIMESTAMP_NANOSECONDS + " nanoseconds."); // eslint-disable-line camelcase
     }
-    if (end.seconds > Timestamp_Seconds_MAX) { // eslint-disable-line camelcase
-      throw new Error("The Timestamp seconds at the end of the TimeRange must not exceed " + Timestamp_Seconds_MAX + " seconds."); // eslint-disable-line camelcase
+    if (end.seconds > MAX_TIMESTAMP_SECONDS) { // eslint-disable-line camelcase
+      throw new Error("The Timestamp seconds at the end of the TimeRange must not exceed " + MAX_TIMESTAMP_SECONDS + " seconds."); // eslint-disable-line camelcase
     }
-    if (end.nanoseconds > Timestamp_Nanoseconds_MAX) { // eslint-disable-line camelcase
-      throw new Error("The Timestamp nanoseconds at the end of the TimeRange must not exceed " + Timestamp_Nanoseconds_MAX + " nanoseconds."); // eslint-disable-line camelcase
+    if (end.nanoseconds > MAX_TIMESTAMP_NANOSECONDS) { // eslint-disable-line camelcase
+      throw new Error("The Timestamp nanoseconds at the end of the TimeRange must not exceed " + MAX_TIMESTAMP_NANOSECONDS + " nanoseconds."); // eslint-disable-line camelcase
     }
 
     if ((end.seconds < start.seconds) || ((end.seconds == start.seconds) && (end.nanoseconds <= start.nanoseconds))) {
@@ -224,7 +224,7 @@ export class TimeRange extends Object implements BT.ITimeRange {
    * @param {boolean} [includeEndOfRange=Default_IncludeEndOfRange] The timestamp to check.
    * @return {string} The string representation of the nanoseconds value.
    */
-  contains(timestamp: BT.ITimestamp, includeStartOfRange: boolean = Default_IncludeStartOfRange, includeEndOfRange: boolean = Default_IncludeEndOfRange): boolean {
+  contains(timestamp: BT.ITimestamp, includeStartOfRange: boolean = DEFAULT_TIME_RANGE_INCLUDES_START, includeEndOfRange: boolean = DEFAULT_TIME_RANGE_INCLUDES_END): boolean {
     const startValue = this.start.valueOf();
     const endValue = this.end.valueOf();
     const testValue = timestamp.valueOf();

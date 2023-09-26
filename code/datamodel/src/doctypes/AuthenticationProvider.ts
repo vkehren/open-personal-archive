@@ -33,8 +33,8 @@ type IAuthenticationProviderPartial = unknown;
  * @return {boolean} Whether the updates are valid or not.
  */
 export function areUpdatesValid(document: IAuthenticationProvider, updateObject: IAuthenticationProviderPartial): boolean {
-  OPA.assertNonNullish(document);
-  OPA.assertNonNullish(updateObject);
+  OPA.assertDocumentIsValid(document);
+  OPA.assertNonNullish(updateObject, "The processed Update Object must not be null.");
 
   const updateObject_AsUnknown = (updateObject as unknown);
 
@@ -79,7 +79,8 @@ export class AuthenticationProviderQuerySet extends OPA.QuerySet<IAuthentication
     OPA.assertIdentifierIsValid(externalId, "A valid external Authentication Provider ID must be provided.");
 
     const authProvidersCollectionRef = this.collectionDescriptor.getTypedCollection(ds);
-    const getAuthProvidersForIdQuery = authProvidersCollectionRef.where("externalId", "==", externalId);
+    const externalIdFieldName = OPA.getTypedPropertyKeyAsText<IAuthenticationProvider>("externalId");
+    const getAuthProvidersForIdQuery = authProvidersCollectionRef.where(externalIdFieldName, "==", externalId);
     const matchingAuthProvidersSnap = await getAuthProvidersForIdQuery.get();
 
     if (matchingAuthProvidersSnap.docs.length > 1) {

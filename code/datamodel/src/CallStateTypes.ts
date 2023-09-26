@@ -7,7 +7,7 @@ import {ITimeZone} from "./doctypes/TimeZone";
 import {ITimeZoneGroup} from "./doctypes/TimeZoneGroup";
 import {IUser} from "./doctypes/User";
 
-export type ICallState = OPA.ICallStateBase<ISystemState, IAuthorizationState>;
+export type ICallState = OPA.ICallStateBase<IDataStorageState, IAuthenticationState, ISystemState, IAuthorizationState>;
 export type IDataStorageState = OPA.IDataStorageState;
 export type IAuthenticationState = OPA.IAuthenticationState;
 
@@ -24,6 +24,9 @@ export interface IAuthorizationState {
   readonly timeZone: ITimeZone;
   isUserApproved(): boolean;
   assertUserApproved(): void;
+  isUserSameAs(userId: string): boolean;
+  assertUserSameAs(userId: string): void;
+  assertUserNotSameAs(userId: string): void;
   isRoleAllowed(allowedRoleIds: Array<string>): boolean;
   assertRoleAllowed(allowedRoleIds: Array<string>): void;
   isRoleDisallowed(disallowedRoleIds: Array<string>): boolean;
@@ -113,6 +116,37 @@ export class AuthorizationState implements IAuthorizationState {
   }
 
   /**
+   * Returns true if the current User's account matches the User ID to check.
+   * @param {string} userId The User ID to check.
+   * @return {boolean} Whether the current User's account matches the User ID to check.
+   */
+  isUserSameAs(userId: string): boolean {
+    return (this._user.id == userId);
+  }
+
+  /**
+   * Asserts that the current User's account matches the User ID to check.
+   * @param {string} userId The User ID to check.
+   * @return {void}
+   */
+  assertUserSameAs(userId: string): void {
+    if (!this.isUserSameAs(userId)) {
+      throw new Error("The current User's account does not match the specified ID.");
+    }
+  }
+
+  /**
+   * Asserts that the current User's account does not match the User ID to check.
+   * @param {string} userId The User ID to check.
+   * @return {void}
+   */
+  assertUserNotSameAs(userId: string): void {
+    if (this.isUserSameAs(userId)) {
+      throw new Error("The current User's account does actually match the specified ID.");
+    }
+  }
+
+  /**
    * Returns true if the current User's Role is in the list of allowed Roles.
    * @param {Array<string>} allowedRoleIds The list of allowed Roles.
    * @return {boolean} Whether the current User's Role is allowed.
@@ -173,7 +207,7 @@ export function assertSystemStateIsNotNullish(systemState: ISystemState | null |
  * @param {string} [message=default] The message to display on failure of assertion.
  * @return {void}
  */
-export function assertAuthorizationStateIsNotNullish(authorizationState: IAuthorizationState | null | undefined, message = "The Authorization State must not be null."): void {
+export function assertAuthorizationStateIsNotNullish(authorizationState: IAuthorizationState | null | undefined, message = "The Authorization State must not be null, and the current User account must be properly initialized."): void { // eslint-disable-line max-len
   if (OPA.isNullish(authorizationState)) {
     throw new Error(message);
   }

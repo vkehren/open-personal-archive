@@ -6,6 +6,7 @@ import * as VC from "./ValueChecking";
 export const DEFAULT_UNIQUENESS_INDEX_COLLECTION = "UniquenessIndices";
 export const BULK_WRITER_MAX_RETRY_ATTEMPTS = 4;
 export const FIREBASE_DEFAULT_REGION = "us-east1";
+export const DEFAULT_ANONYMOUS_DISPLAY_NAME = "(anonymous)";
 
 /** Provides workarounds for issues constructing Firebase objects across multiple packages (see https://github.com/googleapis/nodejs-firestore/issues/760) */
 export interface IFirebaseConstructorProvider {
@@ -46,13 +47,13 @@ export interface IAuthenticationState {
   readonly displayName?: string;
 }
 
-export interface ICallStateBase<S, A> {
-  readonly dataStorageState: IDataStorageState;
-  readonly authenticationState: IAuthenticationState;
+export interface ICallStateBase<DS extends IDataStorageState, ATC extends IAuthenticationState, SYS, ATZ> {
+  readonly dataStorageState: DS;
+  readonly authenticationState: ATC;
   readonly hasSystemState: boolean;
-  readonly systemState?: S;
+  readonly systemState?: SYS;
   readonly hasAuthorizationState: boolean;
-  readonly authorizationState?: A;
+  readonly authorizationState?: ATZ;
 }
 
 const FieldValue_MethodName_Unrecognized = "[UNRECOGNIZED]"; // eslint-disable-line camelcase
@@ -504,7 +505,7 @@ export function assertAuthenticationStateIsNotNullish(authenticationState: IAuth
  * @param {string} [message=default] The message to display on failure of assertion.
  * @return {void}
  */
-export function assertCallStateIsNotNullish<S, T>(callState: ICallStateBase<S, T> | null | undefined, message = "The Call State must not be null."): void {
+export function assertCallStateIsNotNullish<DS extends IDataStorageState, ATC extends IAuthenticationState, SYS, ATZ>(callState: ICallStateBase<DS, ATC, SYS, ATZ> | null | undefined, message = "The Call State must not be null."): void { // eslint-disable-line max-len
   if (TC.isNullish(callState)) {
     throw new Error(message);
   }

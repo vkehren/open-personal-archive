@@ -38,8 +38,8 @@ type IRolePartial = unknown;
  * @return {boolean} Whether the updates are valid or not.
  */
 export function areUpdatesValid(document: IRole, updateObject: IRolePartial): boolean {
-  OPA.assertNonNullish(document);
-  OPA.assertNonNullish(updateObject);
+  OPA.assertDocumentIsValid(document);
+  OPA.assertNonNullish(updateObject, "The processed Update Object must not be null.");
 
   const updateObject_AsUnknown = (updateObject as unknown);
 
@@ -83,7 +83,8 @@ export class RoleQuerySet extends OPA.QuerySet<IRole> {
     OPA.assertFirestoreIsNotNullish(ds.db);
 
     const rolesCollectionRef = this.collectionDescriptor.getTypedCollection(ds);
-    const getRolesForTypesQuery = rolesCollectionRef.where("type", "in", roleTypes);
+    const typeFieldName = OPA.getTypedPropertyKeyAsText<IRole>("type");
+    const getRolesForTypesQuery = rolesCollectionRef.where(typeFieldName, "in", roleTypes);
     const matchingRolesSnap = await getRolesForTypesQuery.get();
 
     const roles = matchingRolesSnap.docs.map((doc) => this.documentProxyConstructor(doc.data()));
