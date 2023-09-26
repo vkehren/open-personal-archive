@@ -195,7 +195,7 @@ describe("Tests using Firebase " + config.testEnvironment, function() {
     const applications = await OpaDb.Application.queries.getAll(config.dataStorageState);
     expect(applications.length).equals(1);
     const authProviders = await OpaDb.AuthProviders.queries.getAll(config.dataStorageState);
-    expect(authProviders.length).equals(OpaDb.AuthProviders.requiredDocuments.length).equals(1);
+    expect(authProviders.length).equals(OpaDb.AuthProviders.requiredDocuments.length).equals(2);
     const roles = await OpaDb.Roles.queries.getAll(config.dataStorageState);
     expect(roles.length).equals(OpaDb.Roles.requiredDocuments.length).equals(5);
     const locales = await OpaDb.Locales.queries.getAll(config.dataStorageState);
