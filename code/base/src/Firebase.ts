@@ -8,6 +8,12 @@ export const BULK_WRITER_MAX_RETRY_ATTEMPTS = 4;
 export const FIREBASE_DEFAULT_REGION = "us-east1";
 export const DEFAULT_ANONYMOUS_DISPLAY_NAME = "(anonymous)";
 
+export type FirebaseProviderType = "firebase" | "google.com";
+export const FirebaseProviderTypes = {
+  firebase: ("firebase" as FirebaseProviderType), // email and password
+  google: ("google.com" as FirebaseProviderType), // Google popup
+};
+
 /** Provides workarounds for issues constructing Firebase objects across multiple packages (see https://github.com/googleapis/nodejs-firestore/issues/760) */
 export interface IFirebaseConstructorProvider {
   arrayRemove: (...elements: any[]) => firestore.FieldValue; // eslint-disable-line @typescript-eslint/no-explicit-any

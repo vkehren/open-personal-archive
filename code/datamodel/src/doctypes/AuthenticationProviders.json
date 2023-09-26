@@ -2,10 +2,17 @@
   "requiredDocuments": [
     {
       "id": "OPA_AuthenticationProvider_Google",
-      "name": "Google",
+      "name": "Google OAuth Authentication",
       "externalId": "google.com",
       "displayOrder": 100,
       "isDefault": true
+    },
+    {
+      "id": "OPA_AuthenticationProvider_Firebase",
+      "name": "Firebase Email and Password Authentication",
+      "externalId": "firebase",
+      "displayOrder": 200,
+      "isDefault": false
     }
   ]
 }
