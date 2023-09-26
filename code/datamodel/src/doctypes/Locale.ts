@@ -63,5 +63,76 @@ export function areUpdatesValid(document: ILocale, updateObject: ILocalePartial)
   return false;
 }
 
-export type QuerySet = OPA.QuerySet<ILocale>;
-export const CollectionDescriptor = new OPA.CollectionDescriptor<ILocale, QuerySet, void>(SingularName, PluralName, IsSingleton, (cd) => new OPA.QuerySet(cd), null, getRequiredDocuments);
+/** Class providing queries for Locale collection. */
+export class LocaleQuerySet extends OPA.QuerySet<ILocale> {
+  /**
+   * Creates a LocaleQuerySet.
+   * @param {OPA.ITypedCollectionDescriptor<ILocale>} collectionDescriptor The collection descriptor to use for queries.
+   */
+  constructor(collectionDescriptor: OPA.ITypedCollectionDescriptor<ILocale>) {
+    super(collectionDescriptor);
+  }
+
+  /**
+   * The typed collection descriptor to use for queries.
+   * @type {OPA.ITypedQueryableCollectionDescriptor<ILocale, LocaleQuerySet>}
+   */
+  get typedCollectionDescriptor(): OPA.ITypedQueryableCollectionDescriptor<ILocale, LocaleQuerySet> {
+    return OPA.convertTo<OPA.ITypedQueryableCollectionDescriptor<ILocale, LocaleQuerySet>>(this.collectionDescriptor);
+  }
+
+  /**
+   * Gets the Locale by that Locale's Option Name, falling back to Option Base Name if none was found.
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
+   * @param {string} optionName The Option name for the Locale.
+   * @return {Promise<ILocale | null>}
+   */
+  async getByOptionName(ds: OPA.IDataStorageState, optionName: string): Promise<ILocale | null> {
+    OPA.assertDataStorageStateIsNotNullish(ds);
+    OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertNonNullishOrWhitespace(optionName, "A valid Locale option name must be provided.");
+
+    // "optionBaseName": "bn",
+
+    const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
+    const optionNameFieldName = OPA.getTypedPropertyKeyAsText<ILocale>("optionName");
+    const optionNameQuery = collectionRef.where(optionNameFieldName, "==", optionName);
+    const optionNameQuerySnap = await optionNameQuery.get();
+
+    if (optionNameQuerySnap.docs.length > 1) {
+      throw new Error("The option name corresponds to more than one OPA-recognized Locale.");
+    } else if (optionNameQuerySnap.docs.length == 1) {
+      const locale = optionNameQuerySnap.docs[0].data();
+      const proxiedLocale = this.documentProxyConstructor(locale);
+      return proxiedLocale;
+    } else {
+      const optionBaseNameFieldName = OPA.getTypedPropertyKeyAsText<ILocale>("optionBaseName");
+      const optionBaseNameQuery = collectionRef.where(optionBaseNameFieldName, "==", optionName);
+      const optionBaseNameQuerySnap = await optionBaseNameQuery.get();
+
+      if (optionBaseNameQuerySnap.docs.length < 1) {
+        return null;
+      }
+
+      const locale = optionBaseNameQuerySnap.docs[0].data();
+      const proxiedLocale = this.documentProxyConstructor(locale);
+      return proxiedLocale;
+    }
+  }
+
+  /**
+   * Gets the Locale by that Locale's Option Name, falling back to Option Base Name if none was found, and asserts that the Locale is valid (i.e. is non-null and has non-null "id" property).
+   * @param {OPA.IDataStorageState} ds The state container for data storage.
+   * @param {string} optionName The Option name for the Locale.
+   * @param {string} [assertionFailureMessage=default] The message to include in the Error if the assertion fails.
+   * @return {Promise<ILocale>}
+   */
+  async getByOptionNameWithAssert(ds: OPA.IDataStorageState, optionName: string, assertionFailureMessage = "The specified ID does not correspond to a valid Locale."): Promise<ILocale> { // eslint-disable-line max-len
+    const locale = await this.getByOptionName(ds, optionName);
+    OPA.assertDocumentIsValid(locale, assertionFailureMessage, assertionFailureMessage);
+    const localeNonNull = OPA.convertNonNullish(locale);
+    return localeNonNull;
+  }
+}
+
+export const CollectionDescriptor = new OPA.CollectionDescriptor<ILocale, LocaleQuerySet, void>(SingularName, PluralName, IsSingleton, (cd) => new LocaleQuerySet(cd), null, getRequiredDocuments);
