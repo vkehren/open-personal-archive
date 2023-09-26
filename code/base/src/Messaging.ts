@@ -3,7 +3,7 @@ import * as TC from "./TypeChecking";
 export interface ICallRequest {
   clientIpAddress: string,
   url: string,
-  data: any,
+  data: any, // eslint-disable-line @typescript-eslint/no-explicit-any
   // LATER: Add other desired properties here
 }
 
