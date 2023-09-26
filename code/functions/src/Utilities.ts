@@ -221,7 +221,7 @@ export async function setExternalLogState(dataStorageState: OpaDm.IDataStorageSt
 export async function logFunctionCall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, request: OPA.ICallRequest, message: string): Promise<void> { // eslint-disable-line max-len
   try {
     const activityType = OpaDm.ActivityTypes.server_function_call;
-    const requestor = request.clientIpAddress
+    const requestor = request.clientIpAddress;
     const resource = request.url;
     const errorState = {hasError: false};
     const otherState = {message: message, logWriteState: dataStorageState.logWriteState, errorState: errorState};
@@ -248,7 +248,7 @@ export async function logFunctionCall(dataStorageState: OpaDm.IDataStorageState,
 export async function logFunctionError(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, request: OPA.ICallRequest, caught: unknown): Promise<void> { // eslint-disable-line max-len
   try {
     const activityType = OpaDm.ActivityTypes.server_function_error;
-    const requestor = request.clientIpAddress
+    const requestor = request.clientIpAddress;
     const resource = request.url;
     const otherState = {message: OPA.UNRECOGNIZED_ERROR_MESSAGE, logWriteState: dataStorageState.logWriteState, errorState: caught};
 
