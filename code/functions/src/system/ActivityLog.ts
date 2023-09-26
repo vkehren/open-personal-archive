@@ -14,6 +14,7 @@ export const recordLogItem = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async
   let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
   let authenticationState = ((null as unknown) as OpaDm.IAuthenticationState | null);
   const getLogMessage = (state: UTL.ExecutionState) => UTL.getFunctionCallLogMessage(moduleName, recordLogItem_FunctionName(), state);
+  const shimmedRequest = UTL.getShimmedRequestObject(request);
 
   try {
     logger.info(getLogMessage(UTL.ExecutionStates.entry), {structuredData: true});
@@ -23,7 +24,7 @@ export const recordLogItem = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async
 
     await UTL.setExternalLogState(dataStorageState, request);
     // LATER: Consider not logging that is the System is ready to record the log item, as it seems redundant with the actual log item
-    await UTL.logFunctionCall(dataStorageState, authenticationState, request, getLogMessage(UTL.ExecutionStates.ready));
+    await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, getLogMessage(UTL.ExecutionStates.ready));
 
     const activityType = (request.data.query.activityType) ? request.data.query.activityType : undefined;
     const requestor = (request.data.query.requestor) ? request.data.query.requestor : undefined;
@@ -35,9 +36,9 @@ export const recordLogItem = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async
     await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, requestor, resource, action, data, otherState);
     return OPA.getSuccessResultForMessage("The request was logged successfully.");
   } catch (error) {
-    await UTL.logFunctionError(dataStorageState, authenticationState, request, error);
+    await UTL.logFunctionError(dataStorageState, authenticationState, shimmedRequest, error);
     return OPA.getFailureResult(error);
   } finally {
-    await UTL.cleanUpStateAfterCall(dataStorageState, authenticationState, adminApp, request);
+    await UTL.cleanUpStateAfterCall(dataStorageState, authenticationState, adminApp, shimmedRequest);
   }
 });
