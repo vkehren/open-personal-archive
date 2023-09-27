@@ -58,7 +58,7 @@ export async function convertContactToDisplayModel(callState: OpaDm.ICallState, 
 }
 
 /**
- * Gets the list of Contacts for the current User in the Open Personal Archive™ (OPA) system.
+ * Gets the list of Contacts in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
  * @return {Promise<Array<OpaDm.IContact>>}
  */
