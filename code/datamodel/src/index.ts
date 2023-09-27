@@ -11,6 +11,7 @@ import * as Application from "./doctypes/Application";
 import * as Archive from "./doctypes/Archive";
 import * as User from "./doctypes/User";
 // User Created
+import * as Contact from "./doctypes/Contact";
 import * as AccessRequest from "./doctypes/AccessRequest";
 
 // NOTE: If the CollectionDescriptor represents a singleton, export the singleton factory function directly later below
@@ -27,6 +28,7 @@ export interface IOpaDbDescriptor extends OPA.ICollection {
   readonly Application: OPA.ITypedQueryableCollectionDescriptor<Application.IApplication, Application.ApplicationQuerySet>;
   readonly Archive: OPA.ITypedQueryableCollectionDescriptor<Archive.IArchive, Archive.ArchiveQuerySet>;
   readonly Users: OPA.ITypedQueryableFactoryCollectionDescriptor<User.IUser, User.UserQuerySet, User.FactoryFunc>;
+  readonly Contacts: OPA.ITypedQueryableFactoryCollectionDescriptor<Contact.IContact, Contact.ContactQuerySet, Contact.FactoryFunc>;
   readonly AccessRequests: OPA.ITypedQueryableFactoryCollectionDescriptor<AccessRequest.IAccessRequest, AccessRequest.AccessRequestQuerySet, AccessRequest.FactoryFunc>;
   readonly RootCollections: Array<OPA.ICollectionDescriptor>;
   readonly NestedCollections: Array<OPA.ICollectionDescriptor>;
@@ -42,6 +44,7 @@ DbDescriptor.TimeZoneGroups = TimeZoneGroup.CollectionDescriptor;
 DbDescriptor.Application = Application.CollectionDescriptor;
 DbDescriptor.Archive = Archive.CollectionDescriptor;
 DbDescriptor.Users = User.CollectionDescriptor;
+DbDescriptor.Contacts = Contact.CollectionDescriptor;
 DbDescriptor.AccessRequests = AccessRequest.CollectionDescriptor;
 DbDescriptor.RootCollections = OPA.getCollectionFromObject<OPA.ICollectionDescriptor>(DbDescriptor, (colDesc) => (!OPA.isNullish(colDesc.collectionName)), (colDesc) => (!colDesc.isNestedCollection));
 DbDescriptor.NestedCollections = OPA.getCollectionFromObject<OPA.ICollectionDescriptor>(DbDescriptor, (colDesc) => (!OPA.isNullish(colDesc.collectionName)), (colDesc) => (colDesc.isNestedCollection));
@@ -58,5 +61,6 @@ export {ITimeZoneGroup, DefaultTimeZoneGroupId} from "./doctypes/TimeZoneGroup";
 export {IApplication, IApplicationPartial, SingletonId as ApplicationId} from "./doctypes/Application";
 export {IArchive, IArchivePartial, SingletonId as ArchiveId} from "./doctypes/Archive";
 export {IUser, IUserPartial, User_OwnerId} from "./doctypes/User"; // eslint-disable-line camelcase
+export {IContact, IContactPartial} from "./doctypes/Contact";
 export {IAccessRequest, IAccessRequestPartial} from "./doctypes/AccessRequest";
 export * as PackageInfo from "./PackageInfo";
