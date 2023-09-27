@@ -338,3 +338,38 @@ export async function setContactToArchived(callState: OpaDm.ICallState, contactI
 export async function setContactToNotArchived(callState: OpaDm.ICallState, contactIdToSet: string): Promise<OpaDm.IContact> {
   return await setContactToArchivalState(callState, contactIdToSet, OPA.ArchivalStates.not_archived);
 }
+
+/**
+ * Updates the Viewed status of the specified Contact in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} contactIdToSet The Contact to set the status of.
+ * @return {Promise<OpaDm.IContact>}
+ */
+export async function setContactToViewed(callState: OpaDm.ICallState, contactIdToSet: string): Promise<OpaDm.IContact> {
+  OPA.assertCallStateIsNotNullish(callState);
+  OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
+  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+
+  callState.dataStorageState.currentWriteBatch = callState.dataStorageState.constructorProvider.writeBatch();
+
+  const isSystemInstalled = await Application.isSystemInstalled(callState.dataStorageState);
+  OPA.assertSystemIsInstalled(isSystemInstalled);
+  OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
+  OpaDm.assertSystemStateIsNotNullish(callState.systemState);
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
+
+  const authorizationState = OPA.convertNonNullish(callState.authorizationState);
+  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
+  const authorizerIds = [...authorizersById.keys()];
+
+  authorizationState.assertUserApproved();
+  authorizationState.assertRoleAllowed(authorizerIds);
+
+  await OpaDb.Contacts.queries.setToViewed(callState.dataStorageState, contactIdToSet, authorizationState.user.id);
+
+  await callState.dataStorageState.currentWriteBatch.commit();
+  callState.dataStorageState.currentWriteBatch = null;
+
+  const contactReRead = await OpaDb.Contacts.queries.getByIdWithAssert(callState.dataStorageState, contactIdToSet, "The requested Contact does not exist.");
+  return contactReRead;
+}
