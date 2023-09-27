@@ -281,3 +281,60 @@ export async function addTagsToContact(callState: OpaDm.ICallState, contactIdToA
 export async function removeTagsFromContact(callState: OpaDm.ICallState, contactIdToRemoveFrom: string, tagsToRemove: Array<string>): Promise<OpaDm.IContact> {
   return await setTagsForContact(callState, contactIdToRemoveFrom, tagsToRemove, OPA.ArrayContentTypes.only_removed);
 }
+
+/**
+ * Set the ArchivalState of the specified Contact in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} contactIdToSet The Contact to set the ArchivalState of.
+ * @param {OpaDm.ArchivalState} archivalState The ArchivalState to set to.
+ * @return {Promise<OpaDm.IContact>}
+ */
+export async function setContactToArchivalState(callState: OpaDm.ICallState, contactIdToSet: string, archivalState: OPA.ArchivalState): Promise<OpaDm.IContact> {
+  OPA.assertCallStateIsNotNullish(callState);
+  OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
+  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+
+  callState.dataStorageState.currentWriteBatch = callState.dataStorageState.constructorProvider.writeBatch();
+
+  const isSystemInstalled = await Application.isSystemInstalled(callState.dataStorageState);
+  OPA.assertSystemIsInstalled(isSystemInstalled);
+  OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
+  OpaDm.assertSystemStateIsNotNullish(callState.systemState);
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
+
+  const authorizationState = OPA.convertNonNullish(callState.authorizationState);
+  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
+  const authorizerIds = [...authorizersById.keys()];
+
+  authorizationState.assertUserApproved();
+  authorizationState.assertRoleAllowed(authorizerIds);
+
+  const isArchived = (archivalState == OPA.ArchivalStates.archived);
+  await OpaDb.Contacts.queries.setToArchivalOption(callState.dataStorageState, contactIdToSet, isArchived, authorizationState.user.id);
+
+  await callState.dataStorageState.currentWriteBatch.commit();
+  callState.dataStorageState.currentWriteBatch = null;
+
+  const contactReRead = await OpaDb.Contacts.queries.getByIdWithAssert(callState.dataStorageState, contactIdToSet, "The requested Contact does not exist.");
+  return contactReRead;
+}
+
+/**
+ * Set the ArchivalState to Archived for the specified Contact in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} contactIdToSet The Contact to set the ArchivalState of.
+ * @return {Promise<OpaDm.IContact>}
+ */
+export async function setContactToArchived(callState: OpaDm.ICallState, contactIdToSet: string): Promise<OpaDm.IContact> {
+  return await setContactToArchivalState(callState, contactIdToSet, OPA.ArchivalStates.archived);
+}
+
+/**
+ * Set the ArchivalState to NotArchived for the specified Contact in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} contactIdToSet The Contact to set the ArchivalState of.
+ * @return {Promise<OpaDm.IContact>}
+ */
+export async function setContactToNotArchived(callState: OpaDm.ICallState, contactIdToSet: string): Promise<OpaDm.IContact> {
+  return await setContactToArchivalState(callState, contactIdToSet, OPA.ArchivalStates.not_archived);
+}
