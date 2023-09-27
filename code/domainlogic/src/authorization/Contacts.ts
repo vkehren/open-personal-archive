@@ -373,3 +373,59 @@ export async function setContactToViewed(callState: OpaDm.ICallState, contactIdT
   const contactReRead = await OpaDb.Contacts.queries.getByIdWithAssert(callState.dataStorageState, contactIdToSet, "The requested Contact does not exist.");
   return contactReRead;
 }
+
+/**
+ * Updates the deletion status of the specified Contact in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} contactIdToMark The Contact to mark the status of.
+ * @param {OPA.DeletionState} deletionState The DeletionState to set to.
+ * @return {Promise<OpaDm.IContact>}
+ */
+export async function markContactWithDeletionState(callState: OpaDm.ICallState, contactIdToMark: string, deletionState: OPA.DeletionState): Promise<OpaDm.IContact> {
+  OPA.assertCallStateIsNotNullish(callState);
+  OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
+  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+
+  callState.dataStorageState.currentWriteBatch = callState.dataStorageState.constructorProvider.writeBatch();
+
+  const isSystemInstalled = await Application.isSystemInstalled(callState.dataStorageState);
+  OPA.assertSystemIsInstalled(isSystemInstalled);
+  OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
+  OpaDm.assertSystemStateIsNotNullish(callState.systemState);
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
+
+  const authorizationState = OPA.convertNonNullish(callState.authorizationState);
+  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
+  const authorizerIds = [...authorizersById.keys()];
+
+  authorizationState.assertUserApproved();
+  authorizationState.assertRoleAllowed(authorizerIds);
+
+  await OpaDb.Contacts.queries.markWithDeletionState(callState.dataStorageState, contactIdToMark, deletionState, authorizationState.user.id);
+
+  await callState.dataStorageState.currentWriteBatch.commit();
+  callState.dataStorageState.currentWriteBatch = null;
+
+  const contactReRead = await OpaDb.Contacts.queries.getByIdWithAssert(callState.dataStorageState, contactIdToMark, "The requested Contact does not exist.");
+  return contactReRead;
+}
+
+/**
+ * Sets the Deletion status to "true" for the specified Contact in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} contactIdToMark The Contact to mark the status of.
+ * @return {Promise<OpaDm.IContact>}
+ */
+export async function markContactAsDeleted(callState: OpaDm.ICallState, contactIdToMark: string): Promise<OpaDm.IContact> {
+  return await markContactWithDeletionState(callState, contactIdToMark, OPA.DeletionStates.deleted);
+}
+
+/**
+ * Sets the Deletion status to "false" for the specified Contact in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} contactIdToMark The Contact to mark the status of.
+ * @return {Promise<OpaDm.IContact>}
+ */
+export async function markContactAsUnDeleted(callState: OpaDm.ICallState, contactIdToMark: string): Promise<OpaDm.IContact> {
+  return await markContactWithDeletionState(callState, contactIdToMark, OPA.DeletionStates.undeleted);
+}
