@@ -63,6 +63,11 @@ export async function performInstallForTest(dataStorageState: OpaDm.IDataStorage
 
   await dataStorageState.currentWriteBatch.commit();
   dataStorageState.currentWriteBatch = null;
+
+  const userIdsToAssert = [TestAuthData.owner.opaUserId, TestAuthData.admin.opaUserId, TestAuthData.editor.opaUserId, TestAuthData.viewer.opaUserId, TestAuthData.guest.opaUserId];
+  const usersReadForIds = await OpaDb.Users.queries.getForIdsWithAssert(dataStorageState, userIdsToAssert);
+  const usersReadAll = await OpaDb.Users.queries.getAll(dataStorageState);
+  OPA.assertIsTrue((userIdsToAssert.length == usersReadForIds.length) && (userIdsToAssert.length == usersReadAll.length));
 }
 
 /**
