@@ -192,7 +192,7 @@ export function isTimestamp(value: unknown): boolean {
     return false;
   }
 
-  const guardFunc = (value: firestore.Timestamp) => (!isNullish(value.seconds) && !isNullish(value.nanoseconds) && !isNullish(value.isEqual) && !isNullish(value.toDate) && !isNullish(value.toMillis) && !isNullish(value.valueOf));
+  const guardFunc = (value: firestore.Timestamp) => (!isNullish(value.seconds) && !isNullish(value.nanoseconds) && !isNullish(value.isEqual) && !isNullish(value.toDate) && !isNullish(value.toMillis) && !isNullish(value.valueOf)); // eslint-disable-line max-len
   return isOf<firestore.Timestamp>(value, guardFunc);
 }
 

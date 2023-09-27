@@ -215,7 +215,7 @@ export function areDatesEqual(date1: firestore.Timestamp | Date | null | undefin
  * @param {string} [message="The two dates are not value-wise equivalent."] The message to display on failure of assertion.
  * @return {void}
  */
-export function assertDatesAreEqual(date1: firestore.Timestamp | Date | null | undefined, date2: firestore.Timestamp | Date | null | undefined, message = "The two dates are not value-wise equivalent."): void {
+export function assertDatesAreEqual(date1: firestore.Timestamp | Date | null | undefined, date2: firestore.Timestamp | Date | null | undefined, message = "The two dates are not value-wise equivalent."): void { // eslint-disable-line max-len
   if (!areDatesEqual(date1, date2)) {
     throw new Error(message);
   }

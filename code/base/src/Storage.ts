@@ -301,8 +301,8 @@ export class CollectionDescriptor<T extends DT.IDocument, Q extends QR.IQuerySet
 
       // NOTE: Because the Firestore library rejects attempts to serialize Timestamps that are NOT constructed using the Timestamp constructor imported in the outermost package
       //       And because Required Documents are loaded from JSON, so they are converted into Timestamps BEFORE the IFirebaseConstructorProvider instance can be passed downard to lower packages
-      //       The following loop is necessary to ensure that Timestamps that are re-constructed using the Timestamp constructor imported in the outermost package BEFORE they are serialized for storage
-      const requiredDocumentAsRecord = (requiredDocument as Record<string, any>);
+      //       The following loop is necessary to ensure that Timestamps are re-constructed using the Timestamp constructor imported in the outermost package BEFORE they are serialized for storage
+      const requiredDocumentAsRecord = (requiredDocument as Record<string, any>); // eslint-disable-line @typescript-eslint/no-explicit-any
       const properties = VC.getOwnPropertyKeys(requiredDocumentAsRecord);
       for (let j = 0; j < properties.length; j++) {
         const property = properties[j];
