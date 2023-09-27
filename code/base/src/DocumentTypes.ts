@@ -43,6 +43,34 @@ export function assertDocumentIsValid<T extends IDocument>(document: T | null | 
 }
 
 /**
+ * Returns the ID of the Document, or null if no Document was specified.
+ * @param {T | null | undefined} document The Document.
+ * @return {string | null}
+ */
+export function getDocumentId<T extends IDocument>(document: T | null | undefined): string | null { // eslint-disable-line max-len
+  if (!isDocumentValid(document)) {
+    return null;
+  }
+
+  const documentNonNull = TC.convertNonNullish(document);
+  return documentNonNull.id;
+}
+
+/**
+ * Asserts that the Document and its corresponding ID are valid, then returns the ID of the Document.
+ * @param {T | null | undefined} document The Document.
+ * @param {string} [invalidDocMessage=default] The message to display on failure of Document assertion.
+ * @param {string} [invalidIdMessage=default] The message to display on failure of ID property assertion.
+ * @return {string}
+ */
+export function getDocumentIdWithAssert<T extends IDocument>(document: T | null | undefined, invalidDocMessage = "A valid document must be provided.", invalidIdMessage = "A valid document ID must be provided."): string { // eslint-disable-line max-len
+  assertDocumentIsValid(document, invalidDocMessage, invalidIdMessage);
+
+  const documentNonNull = TC.convertNonNullish(document);
+  return documentNonNull.id;
+}
+
+/**
  * Returns whether the updates to the object are valid from the perspective of the IDocument interface.
  * @param {IDocument} original The original object.
  * @param {IDocument} updated The updated object.
