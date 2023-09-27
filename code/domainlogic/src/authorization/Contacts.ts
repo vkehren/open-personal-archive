@@ -200,3 +200,25 @@ export async function setCorrespondingUsersForContact(callState: OpaDm.ICallStat
   const contactReRead = await OpaDb.Contacts.queries.getByIdWithAssert(callState.dataStorageState, contactIdToSet, "The requested Contact does not exist.");
   return contactReRead;
 }
+
+/**
+ * Adds the Corresponding Users to the specified Contact in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} contactIdToAddTo The Contact to which to add.
+ * @param {Array<string>} correspondingUserIdsToAdd The IDs of the Corresponding Users to add.
+ * @return {Promise<OpaDm.IContact>}
+ */
+export async function addCorrespondingUsersToContact(callState: OpaDm.ICallState, contactIdToAddTo: string, correspondingUserIdsToAdd: Array<string>): Promise<OpaDm.IContact> {
+  return await setCorrespondingUsersForContact(callState, contactIdToAddTo, correspondingUserIdsToAdd, OPA.ArrayContentTypes.only_added);
+}
+
+/**
+ * Removes the Corresponding Users from the specified Contact in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} contactIdToRemoveFrom The Contact from which to remove.
+ * @param {Array<string>} correspondingUserIdsToRemove The IDs of the Corresponding Users to remove.
+ * @return {Promise<OpaDm.IContact>}
+ */
+export async function removeCorrespondingUsersFromContact(callState: OpaDm.ICallState, contactIdToRemoveFrom: string, correspondingUserIdsToRemove: Array<string>): Promise<OpaDm.IContact> {
+  return await setCorrespondingUsersForContact(callState, contactIdToRemoveFrom, correspondingUserIdsToRemove, OPA.ArrayContentTypes.only_removed);
+}
