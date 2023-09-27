@@ -36,7 +36,7 @@ export async function convertAccessRequestsToDisplayModels(callState: OpaDm.ICal
  * Converts an IAccessRequest to an IAccessRequestDisplayModel.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
  * @param {OpaDm.IAccessRequest} accessRequest The IAccessRequest.
- * @return {Promise<Array<IAccessRequestDisplayModel>>}
+ * @return {Promise<IAccessRequestDisplayModel>}
  */
 export async function convertAccessRequestToDisplayModel(callState: OpaDm.ICallState, accessRequest: OpaDm.IAccessRequest): Promise<IAccessRequestDisplayModel> {
   const accessRequestDisplayModels = await convertAccessRequestsToDisplayModels(callState, [accessRequest]);

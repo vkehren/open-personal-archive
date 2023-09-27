@@ -76,7 +76,7 @@ export async function convertUsersToDisplayModels(callState: OpaDm.ICallState, u
  * @param {OpaDm.ICallState} callState The Call State for the current User.
  * @param {OpaDm.IUser} user The IUser.
  * @param {OpaDm.IRole | null} [role=null] The IRole for the IUser, if it has already been read.
- * @return {Promise<Array<IAccessRequestDisplayModel>>}
+ * @return {Promise<IUserDisplayModel>}
  */
 export async function convertUserToDisplayModel(callState: OpaDm.ICallState, user: OpaDm.IUser, role: OpaDm.IRole | null = null): Promise<IUserDisplayModel> {
   OPA.assertCallStateIsNotNullish(callState);
