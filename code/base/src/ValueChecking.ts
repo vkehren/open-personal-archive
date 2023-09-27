@@ -1,3 +1,4 @@
+import * as firestore from "@google-cloud/firestore";
 import * as BT from "./BaseTypes";
 import * as TC from "./TypeChecking";
 
@@ -174,40 +175,48 @@ export function assertIsFalse(value: boolean, message = "The value expected to b
 }
 
 /**
- * Returns whether two Dates are value-wise equivalent.
- * @param {Date | null | undefined} date1 The first date.
- * @param {Date | null | undefined} date2 The second date.
- * @param {boolean} [verbose=false] Whether to print debug info to the console or not.
+ * Returns whether two Dates or Timestamps are value-wise equivalent.
+ * @param {firestore.Timestamp | Date | null | undefined} date1 The first date.
+ * @param {firestore.Timestamp | Date | null | undefined} date2 The second date.
  * @return {boolean}
  */
-export function areDatesEqual(date1: Date | null | undefined, date2: Date | null | undefined, verbose = false): boolean {
-  if (TC.isNullish(date1) != TC.isNullish(date2)) {
-    return false;
-  }
-  if (TC.isNullish(date1)) {
+export function areDatesEqual(date1: firestore.Timestamp | Date | null | undefined, date2: firestore.Timestamp | Date | null | undefined): boolean {
+  const isDate1Nullish = TC.isNullish(date1);
+  const isDate2Nullish = TC.isNullish(date2);
+  if (isDate1Nullish && isDate2Nullish) {
     return true;
   }
+  if (isDate1Nullish != isDate2Nullish) {
+    return false;
+  }
+
   const date1NonNull = TC.convertNonNullish(date1);
   const date2NonNull = TC.convertNonNullish(date2);
-  // NOTE: While "<", ">", "<=", ">=" seem to provide value-wise results, "==" seems to test objects are the same instance
-  const areEqual = ((date1NonNull <= date2NonNull) && (date1NonNull >= date2NonNull));
-  if (verbose) {
-    console.log("Dates are equal using == is " + (date1NonNull == date2NonNull));
-    console.log("Dates are equal using <= and >= is " + areEqual);
+  const date1IsDate = TC.isDate(date1NonNull);
+  const date2IsDate = TC.isDate(date2NonNull);
+
+  if (date1IsDate && date2IsDate) {
+    // NOTE: For Dates, operators "<", ">", "<=", ">=" seem to provide value-wise results, but "==" seems to test objects are the same instance
+    const areEqual = ((date1NonNull <= date2NonNull) && (date1NonNull >= date2NonNull));
+    return areEqual;
+  } else {
+    const date1AsTimestamp = (date1IsDate) ? firestore.Timestamp.fromDate(date1NonNull as Date) : (date1NonNull as firestore.Timestamp);
+    const date2AsTimestamp = (date2IsDate) ? firestore.Timestamp.fromDate(date2NonNull as Date) : (date2NonNull as firestore.Timestamp);
+
+    const areEqual = date1AsTimestamp.isEqual(date2AsTimestamp);
+    return areEqual;
   }
-  return areEqual;
 }
 
 /**
- * Asserts that two Dates are value-wise equivalent.
- * @param {Date | null | undefined} date1 The first date.
- * @param {Date | null | undefined} date2 The second date.
- * @param {string} [message="The two Dates are not value-wise equivalent."] The message to display on failure of assertion.
- * @param {boolean} [verbose=false] Whether to print debug info to the console or not.
+ * Asserts that two Dates or Timestamps are value-wise equivalent.
+ * @param {firestore.Timestamp | Date | null | undefined} date1 The first date.
+ * @param {firestore.Timestamp | Date | null | undefined} date2 The second date.
+ * @param {string} [message="The two dates are not value-wise equivalent."] The message to display on failure of assertion.
  * @return {void}
  */
-export function assertDatesAreEqual(date1: Date | null | undefined, date2: Date | null | undefined, message = "The two Dates are not value-wise equivalent.", verbose = false): void {
-  if (!areDatesEqual(date1, date2, verbose)) {
+export function assertDatesAreEqual(date1: firestore.Timestamp | Date | null | undefined, date2: firestore.Timestamp | Date | null | undefined, message = "The two dates are not value-wise equivalent."): void { // eslint-disable-line max-len
+  if (!areDatesEqual(date1, date2)) {
     throw new Error(message);
   }
 }

@@ -4,6 +4,7 @@ import * as DT from "./DocumentTypes";
 import * as FB from "./Firebase";
 import * as QR from "./Queries";
 import * as TC from "./TypeChecking";
+import * as VC from "./ValueChecking";
 
 export const CollectionDescriptors: BT.IDictionary<ICollectionDescriptor> = {};
 
@@ -297,6 +298,25 @@ export class CollectionDescriptor<T extends DT.IDocument, Q extends QR.IQuerySet
     const requiredDocuments = this.requiredDocuments;
     for (let i = 0; i < requiredDocuments.length; i++) {
       const requiredDocument = requiredDocuments[i];
+
+      // NOTE: Because the Firestore library rejects attempts to serialize Timestamps that are NOT constructed using the Timestamp constructor imported in the outermost package
+      //       And because Required Documents are loaded from JSON, so they are converted into Timestamps BEFORE the IFirebaseConstructorProvider instance can be passed downard to lower packages
+      //       The following loop is necessary to ensure that Timestamps are re-constructed using the Timestamp constructor imported in the outermost package BEFORE they are serialized for storage
+      const requiredDocumentAsRecord = (requiredDocument as Record<string, any>); // eslint-disable-line @typescript-eslint/no-explicit-any
+      const properties = VC.getOwnPropertyKeys(requiredDocumentAsRecord);
+      for (let j = 0; j < properties.length; j++) {
+        const property = properties[j];
+        const value = requiredDocumentAsRecord[property];
+
+        if (!TC.isTimestamp(value)) {
+          continue;
+        }
+
+        const valueAsTimestamp = (value as firestore.Timestamp);
+        const valueAsTimestampFromOutermostPackage = ds.constructorProvider.timestampFromTimestamp(valueAsTimestamp);
+        requiredDocumentAsRecord[property] = valueAsTimestampFromOutermostPackage;
+      }
+
       const documentId = requiredDocument.id;
       const documentRef = collectionRef.doc(documentId);
       await documentRef.set(requiredDocument, {merge: true});

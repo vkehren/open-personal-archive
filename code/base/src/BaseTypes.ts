@@ -3,18 +3,21 @@ import * as TC from "./TypeChecking";
 
 export type Id = string;
 export type IdNullable = Id | null | undefined;
-/**
- * Use this Date type while issue with Firebase Firestore Timestamps is still unresolved (see https://github.com/jloosli/node-firestore-import-export/issues/46)
- * @type
- */
-export type DateToUse = Date;
-/**
- * Use this Date now() function while issue with Firebase Firestore Timestamps is still unresolved (see https://github.com/jloosli/node-firestore-import-export/issues/46)
- * @constant
- * @type {function}
- * @return {DateToUse} The current date and time.
- */
-export const nowToUse = (): DateToUse => firestore.Timestamp.now().toDate();
+
+// NOTE: The "dateToUseExample" constant is used locally to control the "DateToUse" type and the correct "nowToUse" implementation to use, so it should NOT be exported
+const dateToUseExample = firestore.Timestamp.now(); // NOTE: This value controls whether to use Dates or Timestamps to represent dates
+export type DateToUse = (typeof dateToUseExample);
+export interface INowProvider {
+  readonly now: DefaultFunc<DateToUse>,
+  readonly nowForDate: DefaultFunc<Date>,
+  nowForTimestamp: DefaultFunc<firestore.Timestamp>,
+}
+export const nowProvider: INowProvider = {
+  now: () => ((TC.isDate(dateToUseExample)) ? ((nowProvider.nowForDate as unknown) as DefaultFunc<DateToUse>) : ((nowProvider.nowForTimestamp as unknown) as DefaultFunc<DateToUse>))(),
+  nowForDate: () => firestore.Timestamp.now().toDate(),
+  nowForTimestamp: () => firestore.Timestamp.now(),
+};
+export const nowToUse = (): DateToUse => nowProvider.now();
 
 export type KeyText = string; // NOTE: " | symbol" causes Firebase Firestore query errors
 export type TypedKeyText<T> = (keyof T) & (KeyText);

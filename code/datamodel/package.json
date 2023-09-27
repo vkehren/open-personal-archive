@@ -1,6 +1,6 @@
 {
   "name": "open-personal-archive-data-model",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "This library contains the types, interfaces, and factory functions for data types specific to the Open Personal Archive™ (OPA) system.",
   "main": "lib/datamodel/src/index.js",
   "types": "lib/datamodel/src/index.d.ts",
@@ -10,7 +10,7 @@
   "author": "Ryan Stephen Ehrenreich",
   "copyright": "Copyright © 2021 Open Personal Archive™",
   "scripts": {
-    "lint": "eslint --ext .js,.ts .",
+    "lint": "cd ../base & npm run lint & cd ../datamodel & eslint --ext .js,.ts .",
     "prebuild": "node -p \"'export const NAME = ' + JSON.stringify(require('./package.json').name) + ';\\n' + 'export const VERSION = ' + JSON.stringify(require('./package.json').version) + ';\\n' + 'export const BUILD_DATE = ' + JSON.stringify((new Date()).toISOString()) + ';'\" > src/PackageInfo.ts",
     "build": "cd ../base & npm run build & cd ../datamodel & tsc",
     "test": "jest"

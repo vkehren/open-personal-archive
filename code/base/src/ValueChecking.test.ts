@@ -1,3 +1,4 @@
+import * as firestore from "@google-cloud/firestore";
 import * as VC from "./ValueChecking";
 
 /* eslint-disable camelcase */
@@ -309,6 +310,52 @@ test("checks that passing '1' as text to getBoolean(...) with default to 'false'
 
 test("checks that passing '1' as text to getBoolean(...) with default to 'true' returns 'true'", () => {
   expect(VC.getBoolean("1", true)).toBe(true);
+});
+
+// TESTS for areDatesEqual(...)
+test("checks that passing both nullish to areDatesEqual(...) returns 'true'", () => {
+  expect(VC.areDatesEqual(undefined, undefined)).toBe(true);
+  expect(VC.areDatesEqual(undefined, null)).toBe(true);
+  expect(VC.areDatesEqual(null, undefined)).toBe(true);
+  expect(VC.areDatesEqual(null, null)).toBe(true);
+});
+
+test("checks that passing one nullish to isOfValue(...) returns 'false'", () => {
+  const timestamp = firestore.Timestamp.now();
+  const date = timestamp.toDate();
+
+  expect(VC.areDatesEqual(date, undefined)).toBe(false);
+  expect(VC.areDatesEqual(date, null)).toBe(false);
+  expect(VC.areDatesEqual(timestamp, undefined)).toBe(false);
+  expect(VC.areDatesEqual(timestamp, null)).toBe(false);
+  expect(VC.areDatesEqual(undefined, date)).toBe(false);
+  expect(VC.areDatesEqual(null, date)).toBe(false);
+  expect(VC.areDatesEqual(undefined, timestamp)).toBe(false);
+  expect(VC.areDatesEqual(null, timestamp)).toBe(false);
+});
+
+test("checks that passing different values to isOfValue(...) returns 'false'", () => {
+  const timestamp1 = firestore.Timestamp.now();
+  const date1 = timestamp1.toDate();
+  const timestamp2 = new firestore.Timestamp(timestamp1.seconds + 1, timestamp1.nanoseconds);
+  const date2 = timestamp2.toDate();
+
+  expect(VC.areDatesEqual(timestamp1, timestamp2)).toBe(false);
+  expect(VC.areDatesEqual(timestamp1, date2)).toBe(false);
+  expect(VC.areDatesEqual(date1, timestamp2)).toBe(false);
+  expect(VC.areDatesEqual(date1, date2)).toBe(false);
+});
+
+test("checks that passing same values to isOfValue(...) returns 'true'", () => {
+  const timestamp1 = firestore.Timestamp.now();
+  const date1 = timestamp1.toDate();
+  const timestamp2 = new firestore.Timestamp(timestamp1.seconds, timestamp1.nanoseconds);
+  const date2 = timestamp2.toDate();
+
+  expect(VC.areDatesEqual(timestamp1, timestamp2)).toBe(true);
+  expect(VC.areDatesEqual(timestamp1, date2)).toBe(true);
+  expect(VC.areDatesEqual(date1, timestamp2)).toBe(true);
+  expect(VC.areDatesEqual(date1, date2)).toBe(true);
 });
 
 // TESTS for isOfValue(...)
