@@ -10,7 +10,7 @@
   "author": "Ryan Stephen Ehrenreich",
   "copyright": "Copyright © 2021 Open Personal Archive™",
   "scripts": {
-    "lint": "eslint --ext .js,.ts .",
+    "lint": "cd ../datamodel & npm run lint & cd ../domainlogic & eslint --ext .js,.ts .",
     "prebuild": "node -p \"'export const NAME = ' + JSON.stringify(require('./package.json').name) + ';\\n' + 'export const VERSION = ' + JSON.stringify(require('./package.json').version) + ';\\n' + 'export const BUILD_DATE = ' + JSON.stringify((new Date()).toISOString()) + ';'\" > src/PackageInfo.ts",
     "build": "cd ../datamodel & npm run build & cd ../domainlogic & tsc",
     "test": "node node_modules/mocha/bin/mocha --ui tdd --config './test-config.json' --require ts-node/register --reporter spec --color 'src/**/*.ts'"
