@@ -222,3 +222,62 @@ export async function addCorrespondingUsersToContact(callState: OpaDm.ICallState
 export async function removeCorrespondingUsersFromContact(callState: OpaDm.ICallState, contactIdToRemoveFrom: string, correspondingUserIdsToRemove: Array<string>): Promise<OpaDm.IContact> {
   return await setCorrespondingUsersForContact(callState, contactIdToRemoveFrom, correspondingUserIdsToRemove, OPA.ArrayContentTypes.only_removed);
 }
+
+/**
+ * Set the Tags of the specified Contact in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} contactIdToSet The Contact to set.
+ * @param {Array<string>} tags The tags that apply to the Contact.
+ * @param {OPA.ArrayContentType} [contentType="exact"] The content type of the array.
+ * @return {Promise<OpaDm.IContact>}
+ */
+export async function setTagsForContact(callState: OpaDm.ICallState, contactIdToSet: string, tags: Array<string>, contentType = OPA.ArrayContentTypes.exact): Promise<OpaDm.IContact> {
+  OPA.assertCallStateIsNotNullish(callState);
+  OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
+  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+
+  callState.dataStorageState.currentWriteBatch = callState.dataStorageState.constructorProvider.writeBatch();
+
+  const isSystemInstalled = await Application.isSystemInstalled(callState.dataStorageState);
+  OPA.assertSystemIsInstalled(isSystemInstalled);
+  OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
+  OpaDm.assertSystemStateIsNotNullish(callState.systemState);
+  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
+
+  const authorizationState = OPA.convertNonNullish(callState.authorizationState);
+  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
+  const authorizerIds = [...authorizersById.keys()];
+
+  authorizationState.assertUserApproved();
+  authorizationState.assertRoleAllowed(authorizerIds);
+
+  await OpaDb.Contacts.queries.setTags(callState.dataStorageState, contactIdToSet, tags, contentType, authorizationState.user.id);
+
+  await callState.dataStorageState.currentWriteBatch.commit();
+  callState.dataStorageState.currentWriteBatch = null;
+
+  const contactReRead = await OpaDb.Contacts.queries.getByIdWithAssert(callState.dataStorageState, contactIdToSet, "The requested Contact does not exist.");
+  return contactReRead;
+}
+
+/**
+ * Adds the Tags to the specified Contact in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} contactIdToAddTo The Contact to which to add Tags.
+ * @param {Array<string>} tagsToAdd The tags to add to the Contact.
+ * @return {Promise<OpaDm.IContact>}
+ */
+export async function addTagsToContact(callState: OpaDm.ICallState, contactIdToAddTo: string, tagsToAdd: Array<string>): Promise<OpaDm.IContact> {
+  return await setTagsForContact(callState, contactIdToAddTo, tagsToAdd, OPA.ArrayContentTypes.only_added);
+}
+
+/**
+ * Removes the Tags from the specified Contact in the Open Personal Archive™ (OPA) system.
+ * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * @param {string} contactIdToRemoveFrom The Contact from which to remove Tags.
+ * @param {Array<string>} tagsToRemove The tags to remove from the Contact.
+ * @return {Promise<OpaDm.IContact>}
+ */
+export async function removeTagsFromContact(callState: OpaDm.ICallState, contactIdToRemoveFrom: string, tagsToRemove: Array<string>): Promise<OpaDm.IContact> {
+  return await setTagsForContact(callState, contactIdToRemoveFrom, tagsToRemove, OPA.ArrayContentTypes.only_removed);
+}
