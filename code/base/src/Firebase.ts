@@ -52,6 +52,9 @@ export const REQUIRED_AUTH_AUTO_UNSUSPEND_REASON = "AUTOMATIC UNSUSPENSION FROM 
 
 /** Provides workarounds for issues constructing Firebase objects across multiple packages (see https://github.com/googleapis/nodejs-firestore/issues/760) */
 export interface IFirebaseConstructorProvider {
+  timestampNow: () => firestore.Timestamp;
+  timestampFromDate: (date: Date) => firestore.Timestamp;
+  timestampFromTimestamp: (timestamp: firestore.Timestamp) => firestore.Timestamp;
   arrayRemove: (...elements: any[]) => firestore.FieldValue; // eslint-disable-line @typescript-eslint/no-explicit-any
   arrayUnion: (...elements: any[]) => firestore.FieldValue; // eslint-disable-line @typescript-eslint/no-explicit-any
   delete: () => firestore.FieldValue;

@@ -55,6 +55,9 @@ export function getTestConfiguration(): ITestConfiguration {
     usesEmulators: (testEnvironment == "Emulators"),
     db: nullDb,
     constructorProvider: {
+      timestampNow: firestore.Timestamp.now,
+      timestampFromDate: firestore.Timestamp.fromDate,
+      timestampFromTimestamp: (timestamp: firestore.Timestamp) => (new firestore.Timestamp(timestamp.seconds, timestamp.nanoseconds)),
       arrayRemove: firestore.FieldValue.arrayRemove,
       arrayUnion: firestore.FieldValue.arrayUnion,
       delete: firestore.FieldValue.delete,

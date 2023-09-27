@@ -50,6 +50,9 @@ export async function getDataStorageStateForFirebaseApp(app: admin.app.App): Pro
     usesEmulators: usesEmulators,
     db: db,
     constructorProvider: {
+      timestampNow: firestore.Timestamp.now,
+      timestampFromDate: firestore.Timestamp.fromDate,
+      timestampFromTimestamp: (timestamp: firestore.Timestamp) => (new firestore.Timestamp(timestamp.seconds, timestamp.nanoseconds)),
       arrayRemove: firestore.FieldValue.arrayRemove,
       arrayUnion: firestore.FieldValue.arrayUnion,
       delete: firestore.FieldValue.delete,
