@@ -79,6 +79,7 @@ export function getTestConfiguration(): ITestConfiguration {
     currentBulkWriter: (null as firestore.BulkWriter | null),
     currentWriteBatch: (null as firestore.WriteBatch | null),
   };
+  OPA.nowProvider.nowForTimestamp = dataStorageState.constructorProvider.timestampNow;
 
   const testConfiguration: ITestConfiguration = {
     testEnvironment,

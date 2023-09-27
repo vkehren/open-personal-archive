@@ -74,6 +74,7 @@ export async function getDataStorageStateForFirebaseApp(app: admin.app.App): Pro
     currentBulkWriter: (null as firestore.BulkWriter | null),
     currentWriteBatch: (null as firestore.WriteBatch | null),
   };
+  OPA.nowProvider.nowForTimestamp = dataStorageState.constructorProvider.timestampNow;
   return dataStorageState;
 }
 
