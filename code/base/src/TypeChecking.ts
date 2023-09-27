@@ -1,3 +1,4 @@
+import * as firestore from "@google-cloud/firestore";
 import * as BT from "./BaseTypes";
 import * as JGT from "jest-get-type";
 import * as VC from "./ValueChecking";
@@ -179,6 +180,20 @@ export function isNumber(value: unknown): boolean {
  */
 export function isBoolean(value: unknown): boolean {
   return (JGT.getType(value) == BooleanType);
+}
+
+/**
+ * Checks whether a given argument is a Timestamp or not.
+ * @param {unknown} value The value to check.
+ * @return {boolean} The result of checking.
+ */
+export function isTimestamp(value: unknown): boolean {
+  if (isNullish(value)) {
+    return false;
+  }
+
+  const guardFunc = (value: firestore.Timestamp) => (!isNullish(value.seconds) && !isNullish(value.nanoseconds) && !isNullish(value.isEqual) && !isNullish(value.toDate) && !isNullish(value.toMillis) && !isNullish(value.valueOf));
+  return isOf<firestore.Timestamp>(value, guardFunc);
 }
 
 /**

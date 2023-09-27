@@ -1,3 +1,4 @@
+import * as firestore from "@google-cloud/firestore";
 import * as TC from "./TypeChecking";
 
 /* eslint-disable camelcase, brace-style */
@@ -1425,4 +1426,97 @@ test("checks that passing unnamed function to isBoolean(...) returns 'false'", (
 
 test("checks that passing arrow function to isBoolean(...) returns 'false'", () => {
   expect(TC.isBoolean(() => {return 12345;})).toBe(false);
+});
+
+// TESTS for isTimestamp(...)
+test("checks that passing 'undefined' to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp(undefined)).toBe(false);
+});
+
+test("checks that passing 'null' to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp(null)).toBe(false);
+});
+
+test("checks that passing 'false' to isTimestamp(...) returns 'true'", () => {
+  expect(TC.isTimestamp(false)).toBe(false);
+});
+
+test("checks that passing 'true' to isTimestamp(...) returns 'true'", () => {
+  expect(TC.isTimestamp(true)).toBe(false);
+});
+
+test("checks that passing '0' to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp(0)).toBe(false);
+});
+
+test("checks that passing '1' to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp(1)).toBe(false);
+});
+
+test("checks that passing '0n' to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp(BigInt(0))).toBe(false);
+});
+
+test("checks that passing '1n' to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp(BigInt(1))).toBe(false);
+});
+
+test("checks that passing '' to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp("")).toBe(false);
+});
+
+test("checks that passing ' ' to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp(" ")).toBe(false);
+});
+
+test("checks that passing 'a' to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp("a")).toBe(false);
+});
+
+test("checks that passing a date to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp(new Date())).toBe(false);
+});
+
+test("checks that passing empty object to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp({})).toBe(false);
+});
+
+test("checks that passing non-empty object to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp({num: 1})).toBe(false);
+});
+
+test("checks that passing empty array to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp([])).toBe(false);
+});
+
+test("checks that passing non-empty array to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp([1])).toBe(false);
+});
+
+test("checks that passing regexp to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp(new RegExp(/\*/))).toBe(false);
+});
+
+test("checks that passing map to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp(new Map())).toBe(false);
+});
+
+test("checks that passing set to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp(new Set())).toBe(false);
+});
+
+test("checks that passing named function to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp(function getTestValue() {return 12345;})).toBe(false);
+});
+
+test("checks that passing unnamed function to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp(function() {return 12345;})).toBe(false);
+});
+
+test("checks that passing arrow function to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp(() => {return 12345;})).toBe(false);
+});
+
+test("checks that passing arrow function to isTimestamp(...) returns 'false'", () => {
+  expect(TC.isTimestamp(firestore.Timestamp.now())).toBe(true);
 });
