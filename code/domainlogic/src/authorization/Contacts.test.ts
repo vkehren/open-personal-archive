@@ -1055,6 +1055,95 @@ describe("Contact Tests using Firebase " + config.testEnvironment, function() {
   test("checks that createContact(...) succeeds and Contact updates succeed when System is installed and User is Authorizer", testFunc3("query"));
   test("checks that createContact(...) succeeds and Contact updates succeed when System is installed and User is Authorizer", testFunc3("logic"));
 
+  const testFunc4 = () => (async () => {
+    let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
+    expect(isSystemInstalled).equals(false);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, TestAuthData.owner);
+
+    await TestUtils.performInstallForTest(config.dataStorageState, config.authenticationState);
+
+    isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
+    expect(isSystemInstalled).equals(true);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.owner);
+
+    config.authenticationState = TestAuthData.owner;
+    let callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    const contactO1 = await Contacts.createContact(callState, "O1", null, null, null, null, null, null);
+    const contactO2 = await Contacts.createContact(callState, "O2", null, null, null, null, null, null);
+    const contactO3 = await Contacts.createContact(callState, "O3", null, null, null, null, null, null);
+
+    config.authenticationState = TestAuthData.admin;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    const contactA1 = await Contacts.createContact(callState, "A1", null, null, null, null, null, null);
+    const contactA2 = await Contacts.createContact(callState, "A2", null, null, null, null, null, null);
+    const contactA3 = await Contacts.createContact(callState, "A3", null, null, null, null, null, null);
+
+    config.authenticationState = TestAuthData.owner;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    const contactO1DM = await Contacts.convertContactToDisplayModel(callState, contactO1);
+    expect(contactO1DM.id).equals(contactO1.id);
+    const contactO2DM = await Contacts.convertContactToDisplayModel(callState, contactO2);
+    expect(contactO2DM.id).equals(contactO2.id);
+    const contactO3DM = await Contacts.convertContactToDisplayModel(callState, contactO3);
+    expect(contactO3DM.id).equals(contactO3.id);
+    const contactA1DM = await Contacts.convertContactToDisplayModel(callState, contactA1);
+    expect(contactA1DM.id).equals(contactA1.id);
+    const contactA2DM = await Contacts.convertContactToDisplayModel(callState, contactA2);
+    expect(contactA2DM.id).equals(contactA2.id);
+    const contactA3DM = await Contacts.convertContactToDisplayModel(callState, contactA3);
+    expect(contactA3DM.id).equals(contactA3.id);
+
+    config.authenticationState = TestAuthData.owner;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    let contactsOwnerAll = await Contacts.getListOfContacts(callState);
+    let contactsOwnerAllIds = contactsOwnerAll.map((value) => (value.id));
+
+    expect(contactsOwnerAllIds.length).equals(6);
+    expect(contactsOwnerAllIds.includes(contactO1.id)).equals(true);
+    expect(contactsOwnerAllIds.includes(contactO2.id)).equals(true);
+    expect(contactsOwnerAllIds.includes(contactO3.id)).equals(true);
+    expect(contactsOwnerAllIds.includes(contactA1.id)).equals(true);
+    expect(contactsOwnerAllIds.includes(contactA2.id)).equals(true);
+    expect(contactsOwnerAllIds.includes(contactA3.id)).equals(true);
+
+    config.authenticationState = TestAuthData.admin;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    let contactsAdminAll = await Contacts.getListOfContacts(callState);
+    let contactsAdminAllIds = contactsAdminAll.map((value) => (value.id));
+
+    expect(contactsAdminAllIds.length).equals(6);
+    expect(contactsAdminAllIds.includes(contactO1.id)).equals(true);
+    expect(contactsAdminAllIds.includes(contactO2.id)).equals(true);
+    expect(contactsAdminAllIds.includes(contactO3.id)).equals(true);
+    expect(contactsAdminAllIds.includes(contactA1.id)).equals(true);
+    expect(contactsAdminAllIds.includes(contactA2.id)).equals(true);
+    expect(contactsAdminAllIds.includes(contactA3.id)).equals(true);
+
+    config.authenticationState = TestAuthData.editor;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    let contactsEditorAll = await Contacts.getListOfContacts(callState);
+    let contactsEditorAllIds = contactsEditorAll.map((value) => (value.id));
+
+    expect(contactsEditorAllIds.length).equals(6);
+    expect(contactsEditorAllIds.includes(contactO1.id)).equals(true);
+    expect(contactsEditorAllIds.includes(contactO2.id)).equals(true);
+    expect(contactsEditorAllIds.includes(contactO3.id)).equals(true);
+    expect(contactsEditorAllIds.includes(contactA1.id)).equals(true);
+    expect(contactsEditorAllIds.includes(contactA2.id)).equals(true);
+    expect(contactsEditorAllIds.includes(contactA3.id)).equals(true);
+
+    config.authenticationState = TestAuthData.viewer;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    await expect(Contacts.getListOfContacts(callState)).to.eventually.be.rejectedWith(Error);
+
+    config.authenticationState = TestAuthData.guest;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    await expect(Contacts.getListOfContacts(callState)).to.eventually.be.rejectedWith(Error);
+  });
+  test("checks that getListOfAccessRequests(...) succeeds and filters properly when System is installed", testFunc4());
+
   afterEach(async () => {
     await config.dataStorageState.db.terminate();
     await admin.app().delete();
