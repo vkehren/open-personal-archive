@@ -3,6 +3,8 @@ import * as OpaDm from "../../../datamodel/src";
 import {OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
 import * as Application from "../system/Application";
 
+// NOTE: Eventually, Contacts will provide the mechanism by which the Archive Owner and Administrators can invite unauthenticated users to create User accounts
+
 export interface IContactDisplayModel {
   readonly id: string;
   readonly organizationName: string | null;

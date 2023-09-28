@@ -7,6 +7,8 @@ import * as CSU from "../../../domainlogic/src/CallStateUtilities";
 import {Contacts} from "../../../domainlogic/src";
 import * as UTL from "../Utilities";
 
+// NOTE: Eventually, Contacts will provide the mechanism by which the Archive Owner and Administrators can invite unauthenticated users to create User accounts
+
 const moduleName = module.filename.split(".")[0];
 const getModuleName = () => moduleName;
 type IContactDisplayModel = Contacts.IContactDisplayModel;

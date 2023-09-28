@@ -3,6 +3,7 @@ import * as OPA from "../../../base/src";
 import {IUser} from "./User";
 
 /* eslint-disable camelcase */
+// NOTE: Eventually, Contacts will provide the mechanism by which the Archive Owner and Administrators can invite unauthenticated users to create User accounts
 
 const SingularName = "Contact";
 const PluralName = "Contacts";
