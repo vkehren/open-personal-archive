@@ -203,3 +203,18 @@ export const setContactToNotArchived = onCall({region: OPA.FIREBASE_DEFAULT_REGI
   }) as UTL.ActionResult<IContactDisplayModel>);
   return result;
 });
+
+const setContactToViewed_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setContactToViewed", {setContactToViewed})); // eslint-disable-line camelcase
+export const setContactToViewed = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, setContactToViewed_FunctionName, async (request, callState) => {
+    const data = request.data;
+    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
+
+    OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
+
+    const document = await Contacts.setContactToViewed(callState, contactId);
+    const displayModel = await Contacts.convertContactToDisplayModel(callState, document);
+    return displayModel;
+  }) as UTL.ActionResult<IContactDisplayModel>);
+  return result;
+});
