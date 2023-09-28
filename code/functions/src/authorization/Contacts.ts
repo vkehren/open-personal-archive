@@ -70,3 +70,37 @@ export const setCorrespondingUsersForContact = onCall({region: OPA.FIREBASE_DEFA
   }) as UTL.ActionResult<IContactDisplayModel>);
   return result;
 });
+
+const addCorrespondingUsersToContact_FunctionName = () => (OPA.getTypedPropertyKeyAsText("addCorrespondingUsersToContact", {addCorrespondingUsersToContact})); // eslint-disable-line camelcase
+export const addCorrespondingUsersToContact = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, addCorrespondingUsersToContact_FunctionName, async (request, callState) => {
+    const data = request.data;
+    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
+    const userIds = (data.query.userIds) ? JSON.parse(data.query.userIds) : undefined;
+
+    OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
+    OPA.assertNonNullish(userIds, "The corresponding User IDs must not be blank.");
+
+    const document = await Contacts.addCorrespondingUsersToContact(callState, contactId, contactId);
+    const displayModel = await Contacts.convertContactToDisplayModel(callState, document);
+    return displayModel;
+  }) as UTL.ActionResult<IContactDisplayModel>);
+  return result;
+});
+
+const removeCorrespondingUsersFromContact_FunctionName = () => (OPA.getTypedPropertyKeyAsText("removeCorrespondingUsersFromContact", {removeCorrespondingUsersFromContact})); // eslint-disable-line camelcase
+export const removeCorrespondingUsersFromContact = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, removeCorrespondingUsersFromContact_FunctionName, async (request, callState) => {
+    const data = request.data;
+    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
+    const userIds = (data.query.userIds) ? JSON.parse(data.query.userIds) : undefined;
+
+    OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
+    OPA.assertNonNullish(userIds, "The corresponding User IDs must not be blank.");
+
+    const document = await Contacts.removeCorrespondingUsersFromContact(callState, contactId, contactId);
+    const displayModel = await Contacts.convertContactToDisplayModel(callState, document);
+    return displayModel;
+  }) as UTL.ActionResult<IContactDisplayModel>);
+  return result;
+});
