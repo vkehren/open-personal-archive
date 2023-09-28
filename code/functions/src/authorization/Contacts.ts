@@ -218,3 +218,50 @@ export const setContactToViewed = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, 
   }) as UTL.ActionResult<IContactDisplayModel>);
   return result;
 });
+
+const markContactWithDeletionState_FunctionName = () => (OPA.getTypedPropertyKeyAsText("markContactWithDeletionState", {markContactWithDeletionState})); // eslint-disable-line camelcase, max-len
+export const markContactWithDeletionState = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, markContactWithDeletionState_FunctionName, async (request, callState) => {
+    const data = request.data;
+    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
+    const deletionState = (data.query.deletionState) ? data.query.deletionState : undefined;
+
+    OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
+    OPA.assertNonNullishOrWhitespace(deletionState, "The Contact deletion state must not be blank.");
+
+    const document = await Contacts.markContactWithDeletionState(callState, contactId, deletionState);
+    const displayModel = await Contacts.convertContactToDisplayModel(callState, document);
+    return displayModel;
+  }) as UTL.ActionResult<IContactDisplayModel>);
+  return result;
+});
+
+const markContactAsDeleted_FunctionName = () => (OPA.getTypedPropertyKeyAsText("markContactAsDeleted", {markContactAsDeleted})); // eslint-disable-line camelcase
+export const markContactAsDeleted = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, markContactAsDeleted_FunctionName, async (request, callState) => {
+    const data = request.data;
+    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
+
+    OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
+
+    const document = await Contacts.markContactAsDeleted(callState, contactId);
+    const displayModel = await Contacts.convertContactToDisplayModel(callState, document);
+    return displayModel;
+  }) as UTL.ActionResult<IContactDisplayModel>);
+  return result;
+});
+
+const markContactAsUnDeleted_FunctionName = () => (OPA.getTypedPropertyKeyAsText("markContactAsUnDeleted", {markContactAsUnDeleted})); // eslint-disable-line camelcase
+export const markContactAsUnDeleted = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, markContactAsUnDeleted_FunctionName, async (request, callState) => {
+    const data = request.data;
+    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
+
+    OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
+
+    const document = await Contacts.markContactAsUnDeleted(callState, contactId);
+    const displayModel = await Contacts.convertContactToDisplayModel(callState, document);
+    return displayModel;
+  }) as UTL.ActionResult<IContactDisplayModel>);
+  return result;
+});
