@@ -104,9 +104,9 @@ describe("Contact Tests using Firebase " + config.testEnvironment, function() {
     await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
     await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.viewer);
 
-    await expect(Contacts.createContact(callState.dataStorageState, callState.authenticationState, testOrgName, testFirstName, testLastName, null, null, null, null)).to.eventually.be.rejectedWith(Error); // eslint-disable-line max-len
+    await Contacts.createContact(callState.dataStorageState, callState.authenticationState, testOrgName, testFirstName, testLastName, null, null, null, null);
   });
-  test("checks that createContact(...) fails when System is installed and User is not Authorizer", testFunc2());
+  test("checks that createContact(...) succeeds when System is installed and User is not Authorizer", testFunc2());
 
   const testFunc3 = (functionType: TestConfig.TestFunctionType) => (async () => {
     let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);

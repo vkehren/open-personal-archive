@@ -203,7 +203,6 @@ export class ContactQuerySet extends OPA.QuerySet<IContact> {
   async create(ds: OPA.IDataStorageState, creator: IUser | null, organizationName: string | null, firstName: string | null, lastName: string | null, email: string | null, phoneNumber: string | null, address: string | null, message: string | null, otherInfo: Record<string, unknown> | null = null): Promise<string> { // eslint-disable-line max-len
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
-    OPA.assertDocumentIsValid(creator);
 
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const documentRef = collectionRef.doc();
