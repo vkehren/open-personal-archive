@@ -253,7 +253,7 @@ export async function removeAccessRequestTags(callState: OpaDm.ICallState, acces
 /**
  * Set the ArchivalState of the specified AccessRequest in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.ICallState} callState The Call State for the current User.
- * @param {string} accessRequestIdToSet The AccessRequest to set the ArchivalState   of.
+ * @param {string} accessRequestIdToSet The AccessRequest to set the ArchivalState of.
  * @param {OpaDm.ArchivalState} archivalState The ArchivalState to set to.
  * @return {Promise<OpaDm.IAccessRequest>}
  */
