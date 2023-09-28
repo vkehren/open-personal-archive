@@ -45,10 +45,10 @@ export interface IContact extends IDocument_ContactForUsers, OPA.IDocument_Creat
   phoneNumber: string | null;
   address: string | null;
   message: string | null;
-  readonly otherInfo: Record<string, unknown>;
+  otherInfo: Record<string, unknown>;
 }
 const IContact_ReadOnlyPropertyNames = ([ // eslint-disable-line camelcase
-  OPA.getTypedPropertyKeyAsText<IContact>("otherInfo"),
+  // LATER: Add readonly property names of IContact here
 ] as Array<string>);
 
 /**
