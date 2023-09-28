@@ -8,6 +8,7 @@ import * as OpaDm from "../../../datamodel/src";
 import {OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
 import * as CSU from "../CallStateUtilities";
 import * as Application from "../system/Application";
+import * as Users from "./Users";
 import * as Contacts from "./Contacts";
 import {TestAuthData} from "../TestData.test";
 import * as TestConfig from "../TestConfiguration.test";
@@ -16,6 +17,9 @@ import * as TestUtils from "../TestUtilities.test";
 /* eslint-disable brace-style, camelcase */
 
 const config = TestConfig.getTestConfiguration();
+const testOrgName = "Fake Organization";
+const testFirstName = "Fake";
+const testLastName = "Guy";
 
 describe("Contact Tests using Firebase " + config.testEnvironment, function() {
   if (!OPA.isNullish(config.timeout)) {
@@ -67,9 +71,41 @@ describe("Contact Tests using Firebase " + config.testEnvironment, function() {
       hasAuthorizationState: false,
     };
 
-    await expect(Contacts.createContact(callState, null, null, null, null, null, null, null)).to.eventually.be.rejectedWith(Error);
+    await expect(Contacts.createContact(callState, testOrgName, testFirstName, testLastName, null, null, null, null)).to.eventually.be.rejectedWith(Error);
   });
   test("checks that createContact(...) fails when System is not installed", testFunc1());
+
+  const testFunc2 = () => (async () => {
+    let isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
+    expect(isSystemInstalled).equals(false);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesNotExist(config.dataStorageState, TestAuthData.owner);
+
+    await TestUtils.performInstallForTest(config.dataStorageState, config.authenticationState);
+
+    isSystemInstalled = await Application.isSystemInstalled(config.dataStorageState);
+    expect(isSystemInstalled).equals(true);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.owner);
+
+    const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(config.dataStorageState, config.authenticationState.providerId);
+    expect(authProvider).not.equals(null);
+
+    // NOTE: Do NOT set the test AuthenticationState to a User other than the Archive Owner
+    let callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.owner);
+
+    await expect(Users.initializeUserAccount(callState, config.authenticationState.providerId, config.authenticationState.email)).to.eventually.be.rejectedWith(Error);
+    callState.dataStorageState.currentWriteBatch = null; // NOTE: This should be done in the outer try-catch-finally of the calling Firebase function
+    await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.owner);
+
+    config.authenticationState = TestAuthData.viewer;
+    callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    await expect(Contacts.createContact(callState, testOrgName, testFirstName, testLastName, null, null, null, null)).to.eventually.be.rejectedWith(Error);
+  });
+  test("checks that createContact(...) fails when System is installed and User is not Authorizer", testFunc2());
 
   afterEach(async () => {
     await config.dataStorageState.db.terminate();
