@@ -117,11 +117,13 @@ export class QuerySet<T extends DT.IDocument> implements IQuerySet<T> {
     FB.assertDataStorageStateIsNotNullish(ds);
     FB.assertFirestoreIsNotNullish(ds.db);
     TC.assertNonNullish(ids);
-    VC.assertIsTrue((ids.length > 0), "No incoming IDs were specified.");
     ids.forEach((id) => BT.assertIdentifierIsValid(id));
 
-    let documentSnaps: Array<firestore.QueryDocumentSnapshot<T>> = [];
+    if (ids.length <= 0) {
+      return ([] as Array<T>);
+    }
 
+    let documentSnaps: Array<firestore.QueryDocumentSnapshot<T>> = [];
     if (this.collectionDescriptor.isNestedCollection) {
       const collectionGroup = this.collectionDescriptor.getTypedCollectionGroup(ds);
       const querySnap = await collectionGroup.where(DT.IDocument_DocumentId_PropertyName, "in", ids).get();
