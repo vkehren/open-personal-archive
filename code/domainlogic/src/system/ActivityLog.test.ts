@@ -18,7 +18,7 @@ const config = TestConfig.getTestConfiguration();
 const localhost = "localhost";
 const indexPage = "index.html";
 
-describe("Tests using Firebase " + config.testEnvironment, function() {
+describe("ActivityLog Tests using Firebase " + config.testEnvironment, function() {
   if (!OPA.isNullish(config.timeout)) {
     this.timeout(OPA.convertNonNullish(config.timeout)); // eslint-disable-line no-invalid-this
   }

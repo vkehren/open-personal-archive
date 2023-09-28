@@ -33,7 +33,7 @@ const testString_EXCLAIM = "!";
 const testStartReason = "START reason";
 const testEndReason = "END reason";
 
-describe("Tests using Firebase " + config.testEnvironment, function() {
+describe("User Tests using Firebase " + config.testEnvironment, function() {
   if (!OPA.isNullish(config.timeout)) {
     this.timeout(OPA.convertNonNullish(config.timeout)); // eslint-disable-line no-invalid-this
   }

@@ -27,7 +27,7 @@ const testCitationId_Null: string | null = null;
 const testCitationId_NonNull = "CITATION_1234";
 const testResponse = "OK.";
 
-describe("Tests using Firebase " + config.testEnvironment, function() {
+describe("AccessRequest Tests using Firebase " + config.testEnvironment, function() {
   if (!OPA.isNullish(config.timeout)) {
     this.timeout(OPA.convertNonNullish(config.timeout)); // eslint-disable-line no-invalid-this
   }
