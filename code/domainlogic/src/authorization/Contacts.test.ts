@@ -1097,8 +1097,8 @@ describe("Contact Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    let contactsOwnerAll = await Contacts.getListOfContacts(callState);
-    let contactsOwnerAllIds = contactsOwnerAll.map((value) => (value.id));
+    const contactsOwnerAll = await Contacts.getListOfContacts(callState);
+    const contactsOwnerAllIds = contactsOwnerAll.map((value) => (value.id));
 
     expect(contactsOwnerAllIds.length).equals(6);
     expect(contactsOwnerAllIds.includes(contactO1.id)).equals(true);
@@ -1110,8 +1110,8 @@ describe("Contact Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.admin;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    let contactsAdminAll = await Contacts.getListOfContacts(callState);
-    let contactsAdminAllIds = contactsAdminAll.map((value) => (value.id));
+    const contactsAdminAll = await Contacts.getListOfContacts(callState);
+    const contactsAdminAllIds = contactsAdminAll.map((value) => (value.id));
 
     expect(contactsAdminAllIds.length).equals(6);
     expect(contactsAdminAllIds.includes(contactO1.id)).equals(true);
@@ -1123,8 +1123,8 @@ describe("Contact Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.editor;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    let contactsEditorAll = await Contacts.getListOfContacts(callState);
-    let contactsEditorAllIds = contactsEditorAll.map((value) => (value.id));
+    const contactsEditorAll = await Contacts.getListOfContacts(callState);
+    const contactsEditorAllIds = contactsEditorAll.map((value) => (value.id));
 
     expect(contactsEditorAllIds.length).equals(6);
     expect(contactsEditorAllIds.includes(contactO1.id)).equals(true);
