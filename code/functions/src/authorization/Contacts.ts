@@ -156,3 +156,50 @@ export const removeContactTags = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, a
   }) as UTL.ActionResult<IContactDisplayModel>);
   return result;
 });
+
+const setContactToArchivalState_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setContactToArchivalState", {setContactToArchivalState})); // eslint-disable-line camelcase
+export const setContactToArchivalState = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, setContactToArchivalState_FunctionName, async (request, callState) => {
+    const data = request.data;
+    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
+    const archivalState = (data.query.archivalState) ? data.query.archivalState : undefined;
+
+    OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
+    OPA.assertNonNullishOrWhitespace(archivalState, "The Contact archival state must not be blank.");
+
+    const document = await Contacts.setContactToArchivalState(callState, contactId, archivalState);
+    const displayModel = await Contacts.convertContactToDisplayModel(callState, document);
+    return displayModel;
+  }) as UTL.ActionResult<IContactDisplayModel>);
+  return result;
+});
+
+const setContactToArchived_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setContactToArchived", {setContactToArchived})); // eslint-disable-line camelcase
+export const setContactToArchived = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, setContactToArchived_FunctionName, async (request, callState) => {
+    const data = request.data;
+    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
+
+    OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
+
+    const document = await Contacts.setContactToArchived(callState, contactId);
+    const displayModel = await Contacts.convertContactToDisplayModel(callState, document);
+    return displayModel;
+  }) as UTL.ActionResult<IContactDisplayModel>);
+  return result;
+});
+
+const setContactToNotArchived_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setContactToNotArchived", {setContactToNotArchived})); // eslint-disable-line camelcase
+export const setContactToNotArchived = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, setContactToNotArchived_FunctionName, async (request, callState) => {
+    const data = request.data;
+    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
+
+    OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
+
+    const document = await Contacts.setContactToNotArchived(callState, contactId);
+    const displayModel = await Contacts.convertContactToDisplayModel(callState, document);
+    return displayModel;
+  }) as UTL.ActionResult<IContactDisplayModel>);
+  return result;
+});
