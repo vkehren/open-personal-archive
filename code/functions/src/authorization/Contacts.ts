@@ -104,3 +104,55 @@ export const removeCorrespondingUsersFromContact = onCall({region: OPA.FIREBASE_
   }) as UTL.ActionResult<IContactDisplayModel>);
   return result;
 });
+
+const setContactTags_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setContactTags", {setContactTags})); // eslint-disable-line camelcase
+export const setContactTags = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, setContactTags_FunctionName, async (request, callState) => {
+    const data = request.data;
+    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
+    const tags = (data.query.tags) ? JSON.parse(data.query.tags) : undefined;
+    const contentType = (data.query.contentType) ? data.query.contentType : undefined;
+
+    OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
+    OPA.assertNonNullishOrWhitespace(tags, "The Contact tags must not be blank.");
+
+    const document = await Contacts.setContactTags(callState, contactId, tags, contentType);
+    const displayModel = await Contacts.convertContactToDisplayModel(callState, document);
+    return displayModel;
+  }) as UTL.ActionResult<IContactDisplayModel>);
+  return result;
+});
+
+const addContactTags_FunctionName = () => (OPA.getTypedPropertyKeyAsText("addContactTags", {addContactTags})); // eslint-disable-line camelcase
+export const addContactTags = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, addContactTags_FunctionName, async (request, callState) => {
+    const data = request.data;
+    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
+    const tags = (data.query.tags) ? JSON.parse(data.query.tags) : undefined;
+
+    OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
+    OPA.assertNonNullishOrWhitespace(tags, "The Contact tags must not be blank.");
+
+    const document = await Contacts.addContactTags(callState, contactId, tags);
+    const displayModel = await Contacts.convertContactToDisplayModel(callState, document);
+    return displayModel;
+  }) as UTL.ActionResult<IContactDisplayModel>);
+  return result;
+});
+
+const removeContactTags_FunctionName = () => (OPA.getTypedPropertyKeyAsText("removeContactTags", {removeContactTags})); // eslint-disable-line camelcase
+export const removeContactTags = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, removeContactTags_FunctionName, async (request, callState) => {
+    const data = request.data;
+    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
+    const tags = (data.query.tags) ? JSON.parse(data.query.tags) : undefined;
+
+    OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
+    OPA.assertNonNullishOrWhitespace(tags, "The Contact tags must not be blank.");
+
+    const document = await Contacts.removeContactTags(callState, contactId, tags);
+    const displayModel = await Contacts.convertContactToDisplayModel(callState, document);
+    return displayModel;
+  }) as UTL.ActionResult<IContactDisplayModel>);
+  return result;
+});
