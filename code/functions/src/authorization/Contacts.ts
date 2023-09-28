@@ -1,5 +1,9 @@
 import {onCall} from "firebase-functions/v2/https";
+import * as logger from "firebase-functions/logger";
+import * as admin from "firebase-admin";
 import * as OPA from "../../../base/src";
+import * as OpaDm from "../../../datamodel/src";
+import * as CSU from "../../../domainlogic/src/CallStateUtilities";
 import {Contacts} from "../../../domainlogic/src";
 import * as UTL from "../Utilities";
 
@@ -19,7 +23,21 @@ export const getListOfContacts = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, a
 
 const createContact_FunctionName = () => (OPA.getTypedPropertyKeyAsText("createContact", {createContact})); // eslint-disable-line camelcase
 export const createContact = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, createContact_FunctionName, async (request, callState) => {
+  let adminApp = ((null as unknown) as admin.app.App);
+  let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
+  let authenticationState = ((null as unknown) as OpaDm.IAuthenticationState | null);
+  const getLogMessage = (state: UTL.ExecutionState) => UTL.getFunctionCallLogMessage(moduleName, createContact_FunctionName(), state);
+  const shimmedRequest = UTL.getShimmedRequestObject(request);
+
+  try {
+    logger.info(getLogMessage(UTL.ExecutionStates.entry), {structuredData: true});
+    adminApp = admin.app();
+    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp);
+    authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, adminApp);
+
+    await UTL.setExternalLogState(dataStorageState, request);
+    await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, getLogMessage(UTL.ExecutionStates.ready));
+
     const data = request.data;
     const organizationName = (data.query.organizationName) ? data.query.organizationName : null;
     const firstName = (data.query.firstName) ? data.query.firstName : null;
@@ -30,11 +48,24 @@ export const createContact = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async
     const message = (data.query.message) ? data.query.message : null;
     const otherInfo = (data.query.otherInfo) ? JSON.parse(data.query.otherInfo) : null;
 
-    const document = await Contacts.createContact(callState, organizationName, firstName, lastName, email, phoneNumber, address, message, otherInfo);
-    const displayModel = await Contacts.convertContactToDisplayModel(callState, document);
-    return displayModel;
-  }) as UTL.ActionResult<IContactDisplayModel>);
-  return result;
+    const document = await Contacts.createContact(dataStorageState, authenticationState, organizationName, firstName, lastName, email, phoneNumber, address, message, otherInfo);
+
+    if (OPA.isNullish(authenticationState)) {
+      const minDisplayModel = {id: OPA.getDocumentIdWithAssert(document)};
+      return OPA.getSuccessResult(minDisplayModel);
+    } else {
+      const authenticationStateNonNull = OPA.convertNonNullish(authenticationState);
+      const callState = await CSU.getCallStateForCurrentUser(dataStorageState, authenticationStateNonNull);
+
+      const displayModel = await Contacts.convertContactToDisplayModel(callState, document);
+      return OPA.getSuccessResult(displayModel);
+    }
+  } catch (error) {
+    await UTL.logFunctionError(dataStorageState, authenticationState, shimmedRequest, error);
+    return OPA.getFailureResult(error);
+  } finally {
+    await UTL.cleanUpStateAfterCall(dataStorageState, authenticationState, adminApp, shimmedRequest);
+  }
 });
 
 const updateContact_FunctionName = () => (OPA.getTypedPropertyKeyAsText("updateContact", {updateContact})); // eslint-disable-line camelcase

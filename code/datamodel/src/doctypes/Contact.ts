@@ -114,7 +114,7 @@ export function areUpdatesValid(document: IContact, updateObject: IContactPartia
 /**
  * Creates an instance of the IContact document type.
  * @param {string} id The ID for the Contact within the OPA system.
- * @param {IUser | null} creator The User creating the Contact.
+ * @param {IUser | null} creator The User creating the Contact, if created by an authenticated user.
  * @param {string | null} organizationName The Contact's organization name.
  * @param {string | null} firstName The Contact's first name.
  * @param {string | null} lastName The Contact's last name.
@@ -188,7 +188,7 @@ export class ContactQuerySet extends OPA.QuerySet<IContact> {
   /**
    * Creates an instance of the IContact document type stored on the server.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
-   * @param {IUser} creator The User creating the Contact.
+   * @param {IUser | null} creator The User creating the Contact, if created by an authenticated user.
    * @param {string | null} organizationName The Contact's organization name.
    * @param {string | null} firstName The Contact's first name.
    * @param {string | null} lastName The Contact's last name.
@@ -199,7 +199,7 @@ export class ContactQuerySet extends OPA.QuerySet<IContact> {
    * @param {Record<string, unknown> | null} [otherInfo=null] Other information about the Contact.
    * @return {Promise<string>} The new document ID.
    */
-  async create(ds: OPA.IDataStorageState, creator: IUser, organizationName: string | null, firstName: string | null, lastName: string | null, email: string | null, phoneNumber: string | null, address: string | null, message: string | null, otherInfo: Record<string, unknown> | null = null): Promise<string> { // eslint-disable-line max-len
+  async create(ds: OPA.IDataStorageState, creator: IUser | null, organizationName: string | null, firstName: string | null, lastName: string | null, email: string | null, phoneNumber: string | null, address: string | null, message: string | null, otherInfo: Record<string, unknown> | null = null): Promise<string> { // eslint-disable-line max-len
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
     OPA.assertDocumentIsValid(creator);

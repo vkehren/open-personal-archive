@@ -77,7 +77,7 @@ describe("Contact Tests using Firebase " + config.testEnvironment, function() {
       hasAuthorizationState: false,
     };
 
-    await expect(Contacts.createContact(callState, testOrgName, testFirstName, testLastName, null, null, null, null)).to.eventually.be.rejectedWith(Error);
+    await expect(Contacts.createContact(callState.dataStorageState, callState.authenticationState, testOrgName, testFirstName, testLastName, null, null, null, null)).to.eventually.be.rejectedWith(Error); // eslint-disable-line max-len
   });
   test("checks that createContact(...) fails when System is not installed", testFunc1());
 
@@ -104,7 +104,7 @@ describe("Contact Tests using Firebase " + config.testEnvironment, function() {
     await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
     await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.viewer);
 
-    await expect(Contacts.createContact(callState, testOrgName, testFirstName, testLastName, null, null, null, null)).to.eventually.be.rejectedWith(Error);
+    await expect(Contacts.createContact(callState.dataStorageState, callState.authenticationState, testOrgName, testFirstName, testLastName, null, null, null, null)).to.eventually.be.rejectedWith(Error); // eslint-disable-line max-len
   });
   test("checks that createContact(...) fails when System is installed and User is not Authorizer", testFunc2());
 
@@ -131,7 +131,7 @@ describe("Contact Tests using Firebase " + config.testEnvironment, function() {
     await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
     await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.admin);
 
-    let contact = await Contacts.createContact(callState, testOrgName, testFirstName, testLastName, null, null, null, null);
+    let contact = await Contacts.createContact(callState.dataStorageState, callState.authenticationState, testOrgName, testFirstName, testLastName, null, null, null, null);
     const contactId = contact.id;
     contact = await TestUtils.assertContactDoesExist(config.dataStorageState, contactId);
 
@@ -1070,15 +1070,15 @@ describe("Contact Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.owner;
     let callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    const contactO1 = await Contacts.createContact(callState, "O1", null, null, null, null, null, null);
-    const contactO2 = await Contacts.createContact(callState, "O2", null, null, null, null, null, null);
-    const contactO3 = await Contacts.createContact(callState, "O3", null, null, null, null, null, null);
+    const contactO1 = await Contacts.createContact(callState.dataStorageState, callState.authenticationState, "O1", null, null, null, null, null, null);
+    const contactO2 = await Contacts.createContact(callState.dataStorageState, callState.authenticationState, "O2", null, null, null, null, null, null);
+    const contactO3 = await Contacts.createContact(callState.dataStorageState, callState.authenticationState, "O3", null, null, null, null, null, null);
 
     config.authenticationState = TestAuthData.admin;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    const contactA1 = await Contacts.createContact(callState, "A1", null, null, null, null, null, null);
-    const contactA2 = await Contacts.createContact(callState, "A2", null, null, null, null, null, null);
-    const contactA3 = await Contacts.createContact(callState, "A3", null, null, null, null, null, null);
+    const contactA1 = await Contacts.createContact(callState.dataStorageState, callState.authenticationState, "A1", null, null, null, null, null, null);
+    const contactA2 = await Contacts.createContact(callState.dataStorageState, callState.authenticationState, "A2", null, null, null, null, null, null);
+    const contactA3 = await Contacts.createContact(callState.dataStorageState, callState.authenticationState, "A3", null, null, null, null, null, null);
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);

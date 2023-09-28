@@ -85,8 +85,9 @@ export async function getListOfContacts(callState: OpaDm.ICallState): Promise<Ar
 }
 
 /**
- * Creates a Contact in the Open Personal Archive™ (OPA) system.
- * @param {OpaDm.ICallState} callState The Call State for the current User.
+ * Creates a Contact in the Open Personal Archive™ (OPA) system. This funcion may be called by unauthenticated Users who submit their info through a form.
+ * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
+ * @param {OpaDm.IAuthenticationState | null} authenticationState The Firebase Authentication state for the User.
  * @param {string | null} organizationName The Contact's organization name.
  * @param {string | null} firstName The Contact's first name.
  * @param {string | null} lastName The Contact's last name.
@@ -97,33 +98,31 @@ export async function getListOfContacts(callState: OpaDm.ICallState): Promise<Ar
  * @param {Record<string, unknown> | null} [otherInfo=null] Other information about the Contact.
  * @return {Promise<OpaDm.IContact>}
  */
-export async function createContact(callState: OpaDm.ICallState, organizationName: string | null, firstName: string | null, lastName: string | null, email: string | null, phoneNumber: string | null, address: string | null, message: string | null, otherInfo: Record<string, unknown> | null = null): Promise<OpaDm.IContact> { // eslint-disable-line max-len
-  OPA.assertCallStateIsNotNullish(callState);
-  OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
-  OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
+export async function createContact(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, organizationName: string | null, firstName: string | null, lastName: string | null, email: string | null, phoneNumber: string | null, address: string | null, message: string | null, otherInfo: Record<string, unknown> | null = null): Promise<OpaDm.IContact> { // eslint-disable-line max-len
+  OPA.assertDataStorageStateIsNotNullish(dataStorageState);
+  OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
-  callState.dataStorageState.currentWriteBatch = callState.dataStorageState.constructorProvider.writeBatch();
+  dataStorageState.currentWriteBatch = dataStorageState.constructorProvider.writeBatch();
 
-  const isSystemInstalled = await Application.isSystemInstalled(callState.dataStorageState);
+  const isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
   OPA.assertSystemIsInstalled(isSystemInstalled);
-  OPA.assertAuthenticationStateIsNotNullish(callState.authenticationState);
-  OpaDm.assertSystemStateIsNotNullish(callState.systemState);
-  OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
-  const authorizationState = OPA.convertNonNullish(callState.authorizationState);
-  const user = authorizationState.user;
-  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
-  const authorizerIds = [...authorizersById.keys()];
+  let user = (null as OpaDm.IUser | null);
+  if (!OPA.isNullish(authenticationState)) {
+    const authenticationStateNonNull = OPA.convertNonNullish(authenticationState);
+    const firebaseAuthUserIdNonNull = authenticationStateNonNull.firebaseAuthUserId;
+    const userNonNull = await OpaDb.Users.queries.getByFirebaseAuthUserIdWithAssert(dataStorageState, firebaseAuthUserIdNonNull);
 
-  authorizationState.assertUserApproved();
-  authorizationState.assertRoleAllowed(authorizerIds);
+    // NOTE: Do not assert any authorization requirements, as this function should be callable by any User
+    user = userNonNull;
+  }
 
-  const contactId = await OpaDb.Contacts.queries.create(callState.dataStorageState, user, organizationName, firstName, lastName, email, phoneNumber, address, message, otherInfo);
+  const contactId = await OpaDb.Contacts.queries.create(dataStorageState, user, organizationName, firstName, lastName, email, phoneNumber, address, message, otherInfo);
 
-  await callState.dataStorageState.currentWriteBatch.commit();
-  callState.dataStorageState.currentWriteBatch = null;
+  await dataStorageState.currentWriteBatch.commit();
+  dataStorageState.currentWriteBatch = null;
 
-  const contactReRead = await OpaDb.Contacts.queries.getByIdWithAssert(callState.dataStorageState, contactId, "The requested Contact does not exist.");
+  const contactReRead = await OpaDb.Contacts.queries.getByIdWithAssert(dataStorageState, contactId, "The requested Contact does not exist.");
   return contactReRead;
 }
 
