@@ -1,6 +1,6 @@
 {
   "name": "open-personal-archive-functions",
-  "version": "2.2.2",
+  "version": "2.3.0",
   "description": "This library contains Firebase Functions implemented for the Open Personal Archive™ (OPA) system that expose the server-side functionality to the client-side applications (e.g. WebApp or MobileApp).",
   "main": "lib/functions/src/index.js",
   "types": "lib/functions/src/index.d.ts",
