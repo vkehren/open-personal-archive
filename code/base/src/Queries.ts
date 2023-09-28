@@ -142,7 +142,8 @@ export class QuerySet<T extends DT.IDocument> implements IQuerySet<T> {
   }
 
   /**
-   * Gets the Documents whose IDs are in the specified list and asserts that all Documents are present (i.e. length of result matches length of input) and valid (i.e. are non-null and have non-null "id" property).
+   * Gets the Documents whose IDs are in the specified list and asserts that all Documents are present (i.e. length of result matches length of input)
+   * and valid (i.e. are non-null and have non-null "id" property).
    * @param {FB.IDataStorageState} ds The state container for data storage.
    * @param {Array<string>} ids The IDs for the Documents within the OPA system.
    * @param {string} [assertionFailureMessage=default] The message to include in the Error if the assertion fails.
