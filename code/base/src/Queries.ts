@@ -1,5 +1,6 @@
 import * as firestore from "@google-cloud/firestore";
 import * as BT from "./BaseTypes";
+import * as CL from "./Collections";
 import * as DT from "./DocumentTypes";
 import * as FB from "./Firebase";
 import * as ST from "./Storage";
@@ -139,7 +140,9 @@ export class QuerySet<T extends DT.IDocument> implements IQuerySet<T> {
     }
 
     const documents = documentSnaps.map((value) => value.data());
-    const proxiedDocuments = documents.map((document) => this.documentProxyConstructor(document));
+    const documentsMap = CL.createMapFromArray(documents, (document) => document.id);
+    const documentsInputOrdered = ids.map((id) => TC.convertNonNullish(documentsMap.get(id)));
+    const proxiedDocuments = documentsInputOrdered.map((document) => this.documentProxyConstructor(document));
     return proxiedDocuments;
   }
 
