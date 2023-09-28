@@ -1,7 +1,7 @@
 import * as firestore from "@google-cloud/firestore";
-import * as OPA from "../../../base/src";
-import {SingletonId} from "./Archive";
-import {ILocale, DefaultLocale} from "./Locale";
+import * as OPA from "../../../../base/src";
+import {SingletonId} from "../system/Archive";
+import {ILocale, DefaultLocale} from "../Locale";
 import {IUser} from "./User";
 
 /* eslint-disable camelcase */

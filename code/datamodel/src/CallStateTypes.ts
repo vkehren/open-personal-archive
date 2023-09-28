@@ -1,11 +1,14 @@
 import * as OPA from "../../base/src";
-import {IApplication} from "./doctypes/Application";
-import {IArchive} from "./doctypes/Archive";
+// Required
 import {ILocale} from "./doctypes/Locale";
 import {IRole} from "./doctypes/Role";
 import {ITimeZone} from "./doctypes/TimeZone";
 import {ITimeZoneGroup} from "./doctypes/TimeZoneGroup";
-import {IUser} from "./doctypes/User";
+// System
+import {IApplication} from "./doctypes/system/Application";
+import {IArchive} from "./doctypes/system/Archive";
+// Authorization
+import {IUser} from "./doctypes/authorization/User";
 
 export type ICallState = OPA.ICallStateBase<IDataStorageState, IAuthenticationState, ISystemState, IAuthorizationState>;
 export type IDataStorageState = OPA.IDataStorageState;

@@ -1,5 +1,5 @@
 import * as firestore from "@google-cloud/firestore";
-import * as OPA from "../../../base/src";
+import * as OPA from "../../../../base/src";
 
 /* eslint-disable camelcase */
 
