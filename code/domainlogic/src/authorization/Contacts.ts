@@ -171,7 +171,7 @@ export async function updateContact(callState: OpaDm.ICallState, contactIdToUpda
  * @param {OPA.ArrayContentType} [contentType="exact"] The content type of the array.
  * @return {Promise<OpaDm.IContact>}
  */
-export async function setCorrespondingUsersForContact(callState: OpaDm.ICallState, contactIdToSet: string, correspondingUserIds: Array<string>, contentType = OPA.ArrayContentTypes.exact): Promise<OpaDm.IContact> {
+export async function setCorrespondingUsersForContact(callState: OpaDm.ICallState, contactIdToSet: string, correspondingUserIds: Array<string>, contentType = OPA.ArrayContentTypes.exact): Promise<OpaDm.IContact> { // eslint-disable-line max-len
   OPA.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
