@@ -29,7 +29,7 @@ const firebaseAppConfig = {
 const firebaseAuthUserEmail = "[REPLACE WITH FIREBASE AUTH USER EMAIL]";
 const firebaseAuthUserPassword = "[REPLACE WITH FIREBASE AUTH USER PASSWORD]";
 
-describe("Tests using Firebase " + config.testEnvironment, function() {
+describe("Firebase Auth Handler Tests using Firebase " + config.testEnvironment, function() {
   if (!OPA.isNullish(config.timeout)) {
     this.timeout(OPA.convertNonNullish(config.timeout)); // eslint-disable-line no-invalid-this
   }

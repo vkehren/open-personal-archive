@@ -23,7 +23,7 @@ const upgradeNotes = "UPGRADE FOR TEST";
 const samegradeNotes = "SAME VERSION FOR TEST";
 const downgradeNotes = "DOWNGRADE FOR TEST";
 
-describe("Tests using Firebase " + config.testEnvironment, function() {
+describe("Application Tests using Firebase " + config.testEnvironment, function() {
   if (!OPA.isNullish(config.timeout)) {
     this.timeout(OPA.convertNonNullish(config.timeout)); // eslint-disable-line no-invalid-this
   }

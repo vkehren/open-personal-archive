@@ -43,6 +43,34 @@ export function assertDocumentIsValid<T extends IDocument>(document: T | null | 
 }
 
 /**
+ * Returns the ID of the Document, or null if no Document was specified.
+ * @param {T | null | undefined} document The Document.
+ * @return {string | null}
+ */
+export function getDocumentId<T extends IDocument>(document: T | null | undefined): string | null { // eslint-disable-line max-len
+  if (!isDocumentValid(document)) {
+    return null;
+  }
+
+  const documentNonNull = TC.convertNonNullish(document);
+  return documentNonNull.id;
+}
+
+/**
+ * Asserts that the Document and its corresponding ID are valid, then returns the ID of the Document.
+ * @param {T | null | undefined} document The Document.
+ * @param {string} [invalidDocMessage=default] The message to display on failure of Document assertion.
+ * @param {string} [invalidIdMessage=default] The message to display on failure of ID property assertion.
+ * @return {string}
+ */
+export function getDocumentIdWithAssert<T extends IDocument>(document: T | null | undefined, invalidDocMessage = "A valid document must be provided.", invalidIdMessage = "A valid document ID must be provided."): string { // eslint-disable-line max-len
+  assertDocumentIsValid(document, invalidDocMessage, invalidIdMessage);
+
+  const documentNonNull = TC.convertNonNullish(document);
+  return documentNonNull.id;
+}
+
+/**
  * Returns whether the updates to the object are valid from the perspective of the IDocument interface.
  * @param {IDocument} original The original object.
  * @param {IDocument} updated The updated object.
@@ -54,6 +82,10 @@ export function areUpdatesValid_ForDocument(original: IDocument, updated: IDocum
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
   if (!BT.isIdentifierValid(original.id)) {
+    return false;
+  }
+  // NOTE: The value "undefined" is valid, but the value "null" is not
+  if (TC.isNull(updated.id)) {
     return false;
   }
   if (!TC.isNullish(updated.id)) {
@@ -101,6 +133,10 @@ export function areUpdatesValid_ForCreatable(original: ICreatable, updated: ICre
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
   if (TC.isNullish(original.dateOfCreation)) {
+    return false;
+  }
+  // NOTE: The value "undefined" is valid, but the value "null" is not
+  if (TC.isNull(updated.dateOfCreation)) {
     return false;
   }
   if (!TC.isNullish(updated.dateOfCreation)) {
@@ -227,6 +263,10 @@ export function areUpdatesValid_ForUpgradeable(original: IUpgradeable, updated: 
   if (!priorExistencesValid) {
     return false;
   }
+  // NOTE: The value "undefined" is valid, but the value "null" is not
+  if (TC.isNull(updated.hasBeenUpgraded)) {
+    return false;
+  }
   // NOTE: These values may optionally exist on any update
   const existencesMatch = (TC.isNullish(updated.hasBeenUpgraded) == TC.isNullish(updated.dateOfLatestUpgrade));
   if (!existencesMatch) {
@@ -326,6 +366,10 @@ export function areUpdatesValid_ForUpdateable(original: IUpdateable, updated: IU
   if (!priorExistencesValid) {
     return false;
   }
+  // NOTE: The value "undefined" is valid, but the value "null" is not
+  if (TC.isNull(updated.hasBeenUpdated)) {
+    return false;
+  }
   // NOTE: These values must exist on any update
   const existencesValid = (!TC.isNullish(updated.hasBeenUpdated) && !TC.isNullish(updated.dateOfLatestUpdate));
   if (!existencesValid) {
@@ -416,6 +460,10 @@ export function areUpdatesValid_ForAssignableToRole(original: IAssignableToRole,
   if (!priorExistencesValid) {
     return false;
   }
+  // NOTE: The value "undefined" is valid, but the value "null" is not
+  if (TC.isNull(updated.assignedRoleId)) {
+    return false;
+  }
   // NOTE: These values may optionally exist on any update
   const existencesMatch = (TC.isNullish(updated.assignedRoleId) == TC.isNullish(updated.dateOfLatestRoleAssignment));
   if (!existencesMatch) {
@@ -492,6 +540,10 @@ export function areUpdatesValid_ForTaggable(original: ITaggable, updated: ITagga
   // NOTE: These values may both be false or both be true, but not one of each
   const priorExistencesValid = (VC.isEmpty(original.tags) == TC.isNullish(original.dateOfLatestTagging));
   if (!priorExistencesValid) {
+    return false;
+  }
+  // NOTE: The value "undefined" is valid, but the value "null" is not
+  if (TC.isNull(updated.tags)) {
     return false;
   }
   // NOTE: These values may optionally exist on any update
@@ -573,6 +625,10 @@ export function areUpdatesValid_ForArchivable(original: IArchivable, updated: IA
   // NOTE: These values represent conditional IF operator, as in IF(isSet, hasDate)
   const priorExistencesValid = ((!original.isArchived) || (!TC.isNullish(original.dateOfArchivalChange)));
   if (!priorExistencesValid) {
+    return false;
+  }
+  // NOTE: The value "undefined" is valid, but the value "null" is not
+  if (TC.isNull(updated.isArchived)) {
     return false;
   }
   // NOTE: These values may optionally exist on any update
@@ -657,6 +713,10 @@ export function areUpdatesValid_ForViewable(original: IViewable, updated: IViewa
   if (!priorExistencesValid) {
     return false;
   }
+  // NOTE: The value "undefined" is valid, but the value "null" is not
+  if (TC.isNull(updated.hasBeenViewed)) {
+    return false;
+  }
   // NOTE: These values may optionally exist on any update
   const existencesMatch = (TC.isNullish(updated.hasBeenViewed) == TC.isNullish(updated.dateOfLatestViewing));
   if (!existencesMatch) {
@@ -739,6 +799,10 @@ export function areUpdatesValid_ForApprovable(original: IApprovable<BT.ApprovalS
   // NOTE: These values may both be false or both be true, but not one of each
   const priorExistencesValid = (((!original.hasBeenDecided) == (original.approvalState == BT.ApprovalStates.pending)) && ((!original.hasBeenDecided) == TC.isNullish(original.dateOfDecision)));
   if (!priorExistencesValid) {
+    return false;
+  }
+  // NOTE: The value "undefined" is valid, but the value "null" is not
+  if (TC.isNull(updated.hasBeenDecided) || TC.isNull(updated.approvalState)) {
     return false;
   }
   // NOTE: These values may optionally exist on any update
@@ -854,6 +918,10 @@ export function areUpdatesValid_ForSuspendable(original: ISuspendable, updated: 
   if (!(!TC.isNullish(original.isSuspended) && priorExistencesValidStart && priorExistencesValidEnd)) {
     return false;
   }
+  // NOTE: The value "undefined" is valid, but the value "null" is not
+  if (TC.isNull(updated.isSuspended) || TC.isNull(updated.numberOfTimesSuspended) || TC.isNull(updated.hasSuspensionStarted) || TC.isNull(updated.hasSuspensionEnded)) {
+    return false;
+  }
   // NOTE: Since the updated values are complicated to validate, this code tries to break validation into more steps
   const existencesValidToCheck = (!TC.isNullish(updated.isSuspended) || !TC.isNullish(updated.numberOfTimesSuspended) || !TC.isNullish(updated.hasSuspensionStarted) || !TC.isNullish(updated.hasSuspensionEnded) || !TC.isNullish(updated.dateOfSuspensionStart) || !TC.isNullish(updated.dateOfSuspensionEnd)); // eslint-disable-line max-len
   if (existencesValidToCheck) {
@@ -966,6 +1034,10 @@ export function areUpdatesValid_ForDeleteable(original: IDeleteable, updated: ID
   // NOTE: These values represent conditional IF operator, as in IF(isSet, hasDate)
   const priorExistencesValid = ((!original.isMarkedAsDeleted) || (!TC.isNullish(original.dateOfDeletionChange)));
   if (!priorExistencesValid) {
+    return false;
+  }
+  // NOTE: The value "undefined" is valid, but the value "null" is not
+  if (TC.isNull(updated.isMarkedAsDeleted)) {
     return false;
   }
   // NOTE: These values may optionally exist on any update

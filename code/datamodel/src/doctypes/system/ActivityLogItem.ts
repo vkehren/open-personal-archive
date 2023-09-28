@@ -1,5 +1,5 @@
-import * as OPA from "../../../base/src";
-import * as BT from "../BaseTypes";
+import * as OPA from "../../../../base/src";
+import * as BT from "../../BaseTypes";
 
 /* eslint-disable camelcase */
 

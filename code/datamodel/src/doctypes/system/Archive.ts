@@ -1,8 +1,8 @@
 import * as firestore from "@google-cloud/firestore";
-import * as OPA from "../../../base/src";
-import {ILocale} from "./Locale";
-import {ITimeZoneGroup} from "./TimeZoneGroup";
-import {IUser} from "./User";
+import * as OPA from "../../../../base/src";
+import {ILocale} from "../Locale";
+import {ITimeZoneGroup} from "../TimeZoneGroup";
+import {IUser} from "../authorization/User";
 
 /* eslint-disable camelcase */
 

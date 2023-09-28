@@ -1,9 +1,9 @@
 import * as firestore from "@google-cloud/firestore";
-import * as OPA from "../../../base/src";
-import {IAuthenticationProvider} from "./AuthenticationProvider";
-import {ILocale} from "./Locale";
-import {IRole, Role_OwnerId} from "./Role"; // eslint-disable-line camelcase
-import {ITimeZoneGroup} from "./TimeZoneGroup";
+import * as OPA from "../../../../base/src";
+import {IAuthenticationProvider} from "../AuthenticationProvider";
+import {ILocale} from "../Locale";
+import {IRole, Role_OwnerId} from "../Role"; // eslint-disable-line camelcase
+import {ITimeZoneGroup} from "../TimeZoneGroup";
 
 /* eslint-disable camelcase */
 

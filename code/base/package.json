@@ -1,6 +1,6 @@
 {
   "name": "open-personal-archive-base",
-  "version": "2.2.2",
+  "version": "2.3.0",
   "description": "This library contains various types, interfaces, classes and functions that are necessary for implementing the Open Personal Archive™ (OPA) system.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

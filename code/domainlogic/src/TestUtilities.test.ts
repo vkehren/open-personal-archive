@@ -63,6 +63,11 @@ export async function performInstallForTest(dataStorageState: OpaDm.IDataStorage
 
   await dataStorageState.currentWriteBatch.commit();
   dataStorageState.currentWriteBatch = null;
+
+  const userIdsToAssert = [TestAuthData.owner.opaUserId, TestAuthData.admin.opaUserId, TestAuthData.editor.opaUserId, TestAuthData.viewer.opaUserId, TestAuthData.guest.opaUserId];
+  const usersReadForIds = await OpaDb.Users.queries.getForIdsWithAssert(dataStorageState, userIdsToAssert);
+  const usersReadAll = await OpaDb.Users.queries.getAll(dataStorageState);
+  OPA.assertIsTrue((userIdsToAssert.length == usersReadForIds.length) && (userIdsToAssert.length == usersReadAll.length));
 }
 
 /**
@@ -99,4 +104,15 @@ export async function assertUserDoesExist(dataStorageState: OpaDm.IDataStorageSt
 export async function assertAccessRequestDoesExist(dataStorageState: OpaDm.IDataStorageState, accessRequestId: string): Promise<OpaDm.IAccessRequest> {
   const accessRequest = await OpaDb.AccessRequests.queries.getByIdWithAssert(dataStorageState, accessRequestId, "The AccessRequest was expected to exist.");
   return accessRequest;
+}
+
+/**
+ * Asserts that an Contact corresponding to the specified ID does exist in the Open Personal Archive™ (OPA) system and returns that Contact.
+ * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
+ * @param {string} contactId The ID for the Contact.
+ * @return {Promise<OpaDm.IContact>}
+ */
+export async function assertContactDoesExist(dataStorageState: OpaDm.IDataStorageState, contactId: string): Promise<OpaDm.IContact> {
+  const contact = await OpaDb.Contacts.queries.getByIdWithAssert(dataStorageState, contactId, "The Contact was expected to exist.");
+  return contact;
 }

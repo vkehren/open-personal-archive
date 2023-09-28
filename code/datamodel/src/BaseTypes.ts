@@ -32,5 +32,11 @@ export const RoleTypes = {
   viewer: ("viewer" as RoleType),
   guest: ("guest" as RoleType),
   authorizers: ([] as Array<RoleType>),
+  authViewers: ([] as Array<RoleType>),
+  editors: ([] as Array<RoleType>),
+  viewers: ([] as Array<RoleType>),
 };
 RoleTypes.authorizers = [RoleTypes.owner, RoleTypes.administrator];
+RoleTypes.editors = [RoleTypes.owner, RoleTypes.administrator, RoleTypes.editor];
+RoleTypes.authViewers = [...RoleTypes.editors]; // NOTE: "editors" are also "authViewers"
+RoleTypes.viewers = [RoleTypes.owner, RoleTypes.administrator, RoleTypes.editor, RoleTypes.viewer];
