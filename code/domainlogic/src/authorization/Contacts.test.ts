@@ -8,7 +8,6 @@ import * as OpaDm from "../../../datamodel/src";
 import {OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
 import * as CSU from "../CallStateUtilities";
 import * as Application from "../system/Application";
-import * as Users from "./Users";
 import * as Contacts from "./Contacts";
 import {TestAuthData} from "../TestData.test";
 import * as TestConfig from "../TestConfiguration.test";
@@ -88,21 +87,16 @@ describe("Contact Tests using Firebase " + config.testEnvironment, function() {
     await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
     await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.owner);
 
-    const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderId(config.dataStorageState, config.authenticationState.providerId);
-    expect(authProvider).not.equals(null);
-
-    // NOTE: Do NOT set the test AuthenticationState to a User other than the Archive Owner
+    config.authenticationState = TestAuthData.owner;
     let callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
-    await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.owner);
-
-    await expect(Users.initializeUserAccount(callState, config.authenticationState.providerId, config.authenticationState.email)).to.eventually.be.rejectedWith(Error);
-    callState.dataStorageState.currentWriteBatch = null; // NOTE: This should be done in the outer try-catch-finally of the calling Firebase function
     await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
     await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.owner);
 
     config.authenticationState = TestAuthData.viewer;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, config.authenticationState);
+    await TestUtils.assertUserDoesExist(config.dataStorageState, TestAuthData.viewer);
+
     await expect(Contacts.createContact(callState, testOrgName, testFirstName, testLastName, null, null, null, null)).to.eventually.be.rejectedWith(Error);
   });
   test("checks that createContact(...) fails when System is installed and User is not Authorizer", testFunc2());
