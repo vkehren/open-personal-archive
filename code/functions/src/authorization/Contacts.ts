@@ -36,3 +36,19 @@ export const createContact = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async
   }) as UTL.ActionResult<IContactDisplayModel>);
   return result;
 });
+
+const updateContact_FunctionName = () => (OPA.getTypedPropertyKeyAsText("updateContact", {updateContact})); // eslint-disable-line camelcase
+export const updateContact = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, updateContact_FunctionName, async (request, callState) => {
+    const data = request.data;
+    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
+    const updateObject = (data.query.updateObject) ? JSON.parse(data.query.updateObject) : undefined;
+
+    OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
+
+    const document = await Contacts.updateContact(callState, contactId, updateObject);
+    const displayModel = await Contacts.convertContactToDisplayModel(callState, document);
+    return displayModel;
+  }) as UTL.ActionResult<IContactDisplayModel>);
+  return result;
+});
