@@ -88,7 +88,7 @@ export const addCorrespondingUsersToContact = onCall({region: OPA.FIREBASE_DEFAU
   return result;
 });
 
-const removeCorrespondingUsersFromContact_FunctionName = () => (OPA.getTypedPropertyKeyAsText("removeCorrespondingUsersFromContact", {removeCorrespondingUsersFromContact})); // eslint-disable-line camelcase
+const removeCorrespondingUsersFromContact_FunctionName = () => (OPA.getTypedPropertyKeyAsText("removeCorrespondingUsersFromContact", {removeCorrespondingUsersFromContact})); // eslint-disable-line camelcase, max-len
 export const removeCorrespondingUsersFromContact = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, removeCorrespondingUsersFromContact_FunctionName, async (request, callState) => {
     const data = request.data;
