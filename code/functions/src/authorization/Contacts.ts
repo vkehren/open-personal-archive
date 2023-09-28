@@ -16,3 +16,23 @@ export const getListOfContacts = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, a
   }) as UTL.ActionResult<Array<IContactDisplayModel>>);
   return result;
 });
+
+const createContact_FunctionName = () => (OPA.getTypedPropertyKeyAsText("createContact", {createContact})); // eslint-disable-line camelcase
+export const createContact = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, createContact_FunctionName, async (request, callState) => {
+    const data = request.data;
+    const organizationName = (data.query.organizationName) ? data.query.organizationName : null;
+    const firstName = (data.query.firstName) ? data.query.firstName : null;
+    const lastName = (data.query.lastName) ? data.query.lastName : null;
+    const email = (data.query.email) ? data.query.email : null;
+    const phoneNumber = (data.query.phoneNumber) ? data.query.phoneNumber : null;
+    const address = (data.query.address) ? data.query.address : null;
+    const message = (data.query.message) ? data.query.message : null;
+    const otherInfo = (data.query.otherInfo) ? JSON.parse(data.query.otherInfo) : null;
+
+    const document = await Contacts.createContact(callState, organizationName, firstName, lastName, email, phoneNumber, address, message, otherInfo);
+    const displayModel = await Contacts.convertContactToDisplayModel(callState, document);
+    return displayModel;
+  }) as UTL.ActionResult<IContactDisplayModel>);
+  return result;
+});
