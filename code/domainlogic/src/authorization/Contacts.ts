@@ -231,7 +231,7 @@ export async function removeCorrespondingUsersFromContact(callState: OpaDm.ICall
  * @param {OPA.ArrayContentType} [contentType="exact"] The content type of the array.
  * @return {Promise<OpaDm.IContact>}
  */
-export async function setTagsForContact(callState: OpaDm.ICallState, contactIdToSet: string, tags: Array<string>, contentType = OPA.ArrayContentTypes.exact): Promise<OpaDm.IContact> {
+export async function setContactTags(callState: OpaDm.ICallState, contactIdToSet: string, tags: Array<string>, contentType = OPA.ArrayContentTypes.exact): Promise<OpaDm.IContact> {
   OPA.assertCallStateIsNotNullish(callState);
   OPA.assertDataStorageStateIsNotNullish(callState.dataStorageState);
   OPA.assertFirestoreIsNotNullish(callState.dataStorageState.db);
@@ -267,8 +267,8 @@ export async function setTagsForContact(callState: OpaDm.ICallState, contactIdTo
  * @param {Array<string>} tagsToAdd The tags to add to the Contact.
  * @return {Promise<OpaDm.IContact>}
  */
-export async function addTagsToContact(callState: OpaDm.ICallState, contactIdToAddTo: string, tagsToAdd: Array<string>): Promise<OpaDm.IContact> {
-  return await setTagsForContact(callState, contactIdToAddTo, tagsToAdd, OPA.ArrayContentTypes.only_added);
+export async function addContactTags(callState: OpaDm.ICallState, contactIdToAddTo: string, tagsToAdd: Array<string>): Promise<OpaDm.IContact> {
+  return await setContactTags(callState, contactIdToAddTo, tagsToAdd, OPA.ArrayContentTypes.only_added);
 }
 
 /**
@@ -278,8 +278,8 @@ export async function addTagsToContact(callState: OpaDm.ICallState, contactIdToA
  * @param {Array<string>} tagsToRemove The tags to remove from the Contact.
  * @return {Promise<OpaDm.IContact>}
  */
-export async function removeTagsFromContact(callState: OpaDm.ICallState, contactIdToRemoveFrom: string, tagsToRemove: Array<string>): Promise<OpaDm.IContact> {
-  return await setTagsForContact(callState, contactIdToRemoveFrom, tagsToRemove, OPA.ArrayContentTypes.only_removed);
+export async function removeContactTags(callState: OpaDm.ICallState, contactIdToRemoveFrom: string, tagsToRemove: Array<string>): Promise<OpaDm.IContact> {
+  return await setContactTags(callState, contactIdToRemoveFrom, tagsToRemove, OPA.ArrayContentTypes.only_removed);
 }
 
 /**
