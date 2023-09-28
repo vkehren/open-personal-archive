@@ -246,6 +246,7 @@ export async function initializeUserAccount(callState: OpaDm.ICallState, authPro
   const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getByIdWithAssert(callState.dataStorageState, systemState.archive.defaultTimeZoneGroupId, "The required TimeZoneGroup does not exist.");
 
   const userId = await OpaDb.Users.queries.createWithRole(callState.dataStorageState, firebaseAuthUserId, authProvider, authAccountName, assignedRole, locale, timeZoneGroup, firstName, lastName);
+
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
@@ -276,6 +277,7 @@ export async function updateUserProfile(callState: OpaDm.ICallState, updateObjec
   authorizationState.assertUserApproved();
 
   await OpaDb.Users.queries.update(callState.dataStorageState, authorizationState.user.id, updateObject, authorizationState.user.id);
+
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
@@ -313,6 +315,7 @@ export async function assignUserToRole(callState: OpaDm.ICallState, userIdToAssi
   const roleToAssign = await OpaDb.Roles.queries.getByIdWithAssert(callState.dataStorageState, roleIdToAssign);
 
   await OpaDb.Users.queries.assignToRole(callState.dataStorageState, userIdToAssign, roleToAssign, authorizationState.user.id);
+
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
@@ -347,6 +350,7 @@ export async function addRequestedCitationToUser(callState: OpaDm.ICallState, us
   // LATER: Check the Citation acually exists
 
   await OpaDb.Users.queries.addRequestedCitation(callState.dataStorageState, userIdToUpdate, requestedCitationId, authorizationState.user.id);
+
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
@@ -384,6 +388,7 @@ export async function addViewableCitationToUser(callState: OpaDm.ICallState, use
   // LATER: Check the Citation acually exists
 
   await OpaDb.Users.queries.addViewableCitation(callState.dataStorageState, userIdToUpdate, viewableCitationId, authorizationState.user.id);
+
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
@@ -418,6 +423,7 @@ export async function setUserToViewed(callState: OpaDm.ICallState, userIdToSet: 
   authorizationState.assertRoleAllowed(authorizerIds);
 
   await OpaDb.Users.queries.setToViewed(callState.dataStorageState, userIdToSet, authorizationState.user.id);
+
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
@@ -453,6 +459,7 @@ export async function setUserToApprovalState(callState: OpaDm.ICallState, userId
   authorizationState.assertRoleAllowed(authorizerIds);
 
   await OpaDb.Users.queries.setToDecidedOption(callState.dataStorageState, userIdToSet, approvalState, authorizationState.user.id);
+
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
@@ -509,6 +516,7 @@ export async function setUserToSuspensionState(callState: OpaDm.ICallState, user
   authorizationState.assertRoleAllowed(authorizerIds);
 
   await OpaDb.Users.queries.setToSuspensionState(callState.dataStorageState, userIdToSet, suspensionState, reason, authorizationState.user.id);
+
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
@@ -563,6 +571,7 @@ export async function markUserWithDeletionState(callState: OpaDm.ICallState, use
   authorizationState.assertUserSameAs(userIdToMark);
 
   await OpaDb.Users.queries.markWithDeletionState(callState.dataStorageState, userIdToMark, deletionState, authorizationState.user.id);
+
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 

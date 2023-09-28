@@ -146,6 +146,7 @@ export async function updateMessageForAccessRequest(callState: OpaDm.ICallState,
   const locale = authorizationState.locale.optionName;
   localizableMessage[locale] = message;
   await OpaDb.AccessRequests.queries.update(callState.dataStorageState, accessRequestIdToUpdate, {message: localizableMessage}, authorizationState.user.id);
+
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
@@ -185,6 +186,7 @@ export async function updateResponseToAccessRequest(callState: OpaDm.ICallState,
   const locale = authorizationState.locale.optionName;
   localizableResponse[locale] = response;
   await OpaDb.AccessRequests.queries.update(callState.dataStorageState, accessRequestIdToUpdate, {response: localizableResponse}, authorizationState.user.id);
+
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
@@ -221,6 +223,7 @@ export async function setAccessRequestTags(callState: OpaDm.ICallState, accessRe
   authorizationState.assertRoleAllowed(authorizerIds);
 
   await OpaDb.AccessRequests.queries.setTags(callState.dataStorageState, accessRequestIdToSet, tags, contentType, authorizationState.user.id);
+
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
@@ -279,6 +282,7 @@ export async function setAccessRequestToArchivalState(callState: OpaDm.ICallStat
 
   const isArchived = (archivalState == OPA.ArchivalStates.archived);
   await OpaDb.AccessRequests.queries.setToArchivalOption(callState.dataStorageState, accessRequestIdToSet, isArchived, authorizationState.user.id);
+
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
@@ -333,6 +337,7 @@ export async function setAccessRequestToViewed(callState: OpaDm.ICallState, acce
   authorizationState.assertRoleAllowed(authorizerIds);
 
   await OpaDb.AccessRequests.queries.setToViewed(callState.dataStorageState, accessRequestIdToSet, authorizationState.user.id);
+
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
@@ -378,6 +383,7 @@ export async function setAccessRequestToApprovalState(callState: OpaDm.ICallStat
   }
 
   await OpaDb.AccessRequests.queries.setToDecidedOption(callState.dataStorageState, accessRequestIdToSet, approvalState, authorizationState.user.id);
+
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
@@ -431,6 +437,7 @@ export async function markAccessRequestWithDeletionState(callState: OpaDm.ICallS
   authorizationState.assertUserSameAs(accessRequestPreRead.userIdOfCreator);
 
   await OpaDb.AccessRequests.queries.markWithDeletionState(callState.dataStorageState, accessRequestIdToMark, deletionState, authorizationState.user.id);
+
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 
