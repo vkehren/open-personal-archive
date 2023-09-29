@@ -48,8 +48,8 @@ const moduleName = module.filename.split(".")[0];
 export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT_OPTIONS, async (event: AuthBlockingEvent): Promise<void> => {
   let adminApp = ((null as unknown) as admin.app.App);
   let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
-  let firebaseAuthUserId = ((null as unknown) as string);
-  const getLogMessage = (state: OPA.ExecutionState) => UTL.getFunctionCallLogMessage(moduleName, "Authentication Trigger to initialize User " + firebaseAuthUserId, state);
+  const firebaseAuthUserId = () => (event.data.uid);
+  const getLogMessage = (state: OPA.ExecutionState) => UTL.getFunctionCallLogMessage(moduleName, "Authentication Trigger to initialize User " + firebaseAuthUserId(), state);
   const shimmedRequest: OPA.ICallRequest = {
     clientIpAddress: event.ipAddress,
     url: event.eventType,
@@ -60,7 +60,6 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
     logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
     dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp);
-    firebaseAuthUserId = event.data.uid;
     await UTL.logFunctionCall(dataStorageState, null, shimmedRequest, getLogMessage(OPA.ExecutionStates.ready));
 
     const userData: OPA.IFirebaseAuthUserData = {
