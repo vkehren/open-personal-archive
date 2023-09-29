@@ -26,6 +26,7 @@ After configuring this code, before you can run this code, you must:
     * Otherwise, accept the default value by pressing enter
 5. Run "firebase deploy"
 6. Navigate to the URL of your Google Firebase Hosting site where you deployed the code
+7. If you wish to use the OPA beforeUserSignedIn(...) auth-blocking event handler (or any other auth-blocking event handler), you must first enable [Google Identity Platform](https://console.cloud.google.com/marketplace/details/google-cloud-platform/customer-identity) for your Google Firebase project.
 
 
 Copyright © 2021 Open Personal Archive™
