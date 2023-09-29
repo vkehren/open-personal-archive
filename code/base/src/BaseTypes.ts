@@ -117,6 +117,14 @@ export const ArrayContentTypes = {
   only_removed: ("only_removed" as ArrayContentType),
 };
 
+export type ExecutionState = "entry" | "ready" | "complete" | "error";
+export const ExecutionStates = {
+  entry: ("entry" as ExecutionState),
+  ready: ("ready" as ExecutionState),
+  complete: ("complete" as ExecutionState),
+  error: ("error" as ExecutionState),
+};
+
 /**
  * Returns whether the ID is valid.
  * @param {DefaultFunc<IdNullable> | IdNullable} id The ID to check.

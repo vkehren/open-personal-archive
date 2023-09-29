@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OPA Auth Test App</title>
+  <meta name="description"
+    content="A Test App to verify that the authentication of your Open Personal Archive™ (OPA) deployment works correctly." />
+  <meta name="author" content="Ryan Stephen Ehrenreich" />
+  <meta name="version" content="2.3.1" />
+  <script src="https://www.gstatic.com/firebasejs/4.0.0/firebase.js"></script>
+</head>
+
+<body>
+  <h1>Open Personal Archive™ (OPA) Auth Test App</h1>
+  <hr />
+  <button id="google-button">Sign-In with Google using OAuth</button>
+  <label id="google-label"></label>
+  <hr />
+  <input id="email-input" type="text" />
+  <input id="password-input" type="password" />
+  <button id="firebase-button">Sign-In with Firebase using Email & Password</button>
+  <label id="firebase-label"></label>
+
+  <script type="module">
+    import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js';
+    import {GoogleAuthProvider, getAuth, signInWithEmailAndPassword, signInWithPopup} from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js';
+
+    const firebaseConfig = {
+      apiKey: "[REPLACE WITH FIREBASE VALUE]",
+      authDomain: "[REPLACE WITH FIREBASE VALUE]",
+      projectId: "[REPLACE WITH FIREBASE VALUE]",
+      storageBucket: "[REPLACE WITH FIREBASE VALUE]",
+      messagingSenderId: "[REPLACE WITH FIREBASE VALUE]",
+      appId: "[REPLACE WITH FIREBASE VALUE]"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    document.getElementById("google-button").onclick = () => {
+      const provider = new GoogleAuthProvider();
+
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          document.getElementById("google-label").innerText = JSON.stringify(credential);
+        }).catch((error) => {
+          document.getElementById("google-label").innerText = JSON.stringify(error);
+        });
+    };
+
+    document.getElementById("firebase-button").onclick = () => {
+      const email = document.getElementById("email-input").value;
+      const password = document.getElementById("password-input").value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          document.getElementById("firebase-label").innerText = JSON.stringify(userCredential);
+        }).catch((error) => {
+          document.getElementById("firebase-label").innerText = JSON.stringify(error);
+        });
+    };
+  </script>
+</body>
+
+</html>

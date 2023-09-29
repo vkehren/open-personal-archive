@@ -45,10 +45,11 @@ if (useCorsHandler) {
 
 const moduleName = module.filename.split(".")[0];
 
-export const firebaseAuthSignInHandler = beforeUserSignedIn(async (event: AuthBlockingEvent): Promise<void> => {
+export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT_OPTIONS, async (event: AuthBlockingEvent): Promise<void> => {
   let adminApp = ((null as unknown) as admin.app.App);
   let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
-  const getLogMessage = (state: UTL.ExecutionState) => UTL.getFunctionCallLogMessage(moduleName, "Authentication Trigger to initialize User", state);
+  const firebaseAuthUserId = () => (event.data.uid);
+  const getLogMessage = (state: OPA.ExecutionState) => UTL.getFunctionCallLogMessage(moduleName, "Authentication Trigger to initialize User " + firebaseAuthUserId(), state);
   const shimmedRequest: OPA.ICallRequest = {
     clientIpAddress: event.ipAddress,
     url: event.eventType,
@@ -56,30 +57,51 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(async (event: AuthBl
   };
 
   try {
-    logger.info(getLogMessage(UTL.ExecutionStates.entry), {structuredData: true});
+    logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
     dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp);
+    await UTL.logFunctionCall(dataStorageState, null, shimmedRequest, getLogMessage(OPA.ExecutionStates.ready));
 
+    if (OPA.isNullishOrWhitespace(event.data.email)) {
+      throw new Error("Currently, the OPA system requires a valid email address for each User.");
+    }
+
+    // LATER: Consider adding: event.eventId, event.eventType, and event.resource
     const userData: OPA.IFirebaseAuthUserData = {
-      authType: (event.authType as OPA.FirebaseAuthType),
+      authType: OPA.convertNonNullish<OPA.FirebaseAuthType>(event.authType, OPA.FirebaseAuthTypes.user),
       uid: event.data.uid,
       providerId: (event.data.providerData[0].providerId as OPA.FirebaseProviderType),
       email: OPA.convertNonNullish(event.data.email),
       emailVerified: event.data.emailVerified,
       isAnonymous: false,
-      displayName: event.data.displayName,
-      username: (!OPA.isNullish(event.additionalUserInfo)) ? event.additionalUserInfo?.username : undefined,
-      phoneNumber: event.data.phoneNumber,
       disabled: event.data.disabled,
-      isNewUser: (!OPA.isNullish(event.additionalUserInfo)) ? event.additionalUserInfo?.isNewUser : undefined,
-      locale: event.locale,
       ipAddress: event.ipAddress,
       timestamp: event.timestamp,
     };
+    if (!OPA.isNullishOrWhitespace(event.data.displayName)) {
+      userData.displayName = OPA.convertNonNullish(event.data.displayName);
+    }
+    if (!OPA.isNullishOrWhitespace(event.data.phoneNumber)) {
+      userData.phoneNumber = OPA.convertNonNullish(event.data.phoneNumber);
+    }
+    if (!OPA.isNullishOrWhitespace(event.locale)) {
+      userData.locale = OPA.convertNonNullish(event.locale);
+    }
+    if (!OPA.isNullish(event.additionalUserInfo)) {
+      const info = OPA.convertNonNullish(event.additionalUserInfo);
+      userData.isNewUser = info.isNewUser;
+      if (!OPA.isNullishOrWhitespace(info.username)) {
+        userData.username = OPA.convertNonNullish(info.username);
+      }
+    }
+
     const opaUser = await authenticationEventHandlerForFirebaseAuth(dataStorageState, userData);
+    if (OPA.isNull(opaUser)) {
+      throw new Error("A corrsponding User could not be found.");
+    }
 
     const messageSuffix = (!OPA.isNullish(opaUser)) ? (" for " + OPA.convertNonNullish(opaUser).authAccountName) : " without User";
-    logger.info(getLogMessage(UTL.ExecutionStates.complete) + messageSuffix, {structuredData: true});
+    logger.info(getLogMessage(OPA.ExecutionStates.complete) + messageSuffix, {structuredData: true});
   } catch (error) {
     await UTL.logFunctionError(dataStorageState, null, shimmedRequest, error as Error);
   } finally {

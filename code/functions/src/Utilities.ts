@@ -169,13 +169,6 @@ export function getFirebaseProjectUsesEmulators(): boolean {
   }
 }
 
-export type ExecutionState = "entry" | "ready" | "complete";
-export const ExecutionStates = {
-  entry: ("entry" as ExecutionState),
-  ready: ("ready" as ExecutionState),
-  complete: ("complete" as ExecutionState),
-};
-
 /**
  * Gets the log message for the function call in the Open Personal Archive™ (OPA) system.
  * @param {string} moduleName The module name.
@@ -183,7 +176,7 @@ export const ExecutionStates = {
  * @param {ExecutionState} executionState The execution state.
  * @return {Promise<OpaDm.void>}
  */
-export function getFunctionCallLogMessage(moduleName: string, functionName: string, executionState: ExecutionState): string { // eslint-disable-line max-len
+export function getFunctionCallLogMessage(moduleName: string, functionName: string, executionState: OPA.ExecutionState): string { // eslint-disable-line max-len
   const message = (moduleName + " -> " + functionName + "() : " + executionState.toUpperCase());
   return message;
 }
@@ -289,7 +282,6 @@ export async function cleanUpStateAfterCall(dataStorageState: OpaDm.IDataStorage
       await currentWriteBatchNonNull.commit();
       dataStorageState.currentWriteBatch = null;
     }
-    await adminApp.delete();
 
     if (!OPA.isNullish(dataStorageState.logWriteState.rootLogItemId)) {
       dataStorageState.logWriteState.rootLogItemId = null;
@@ -297,7 +289,10 @@ export async function cleanUpStateAfterCall(dataStorageState: OpaDm.IDataStorage
     if (!OPA.isNullish(dataStorageState.logWriteState.externalLogItemId)) {
       dataStorageState.logWriteState.externalLogItemId = null;
     }
-    await dataStorageState.db.terminate();
+
+    // NOTE: Do NOT do the following, as they will cause all future calls to fail
+    // await adminApp.delete();
+    // await dataStorageState.db.terminate();
   } catch (error) {
     logFunctionError(dataStorageState, authenticationState, request, error);
   }
@@ -316,16 +311,16 @@ export type ActionResult<T> = OPA.ICallResult<T | Error | string | unknown>;
 export async function performAuthenticatedActionWithResult<T>(request: CallableRequest, getModuleName: OPA.DefaultFunc<string>, getFunctionName: OPA.DefaultFunc<string>, doAction: ActionFunc<T>): Promise<ActionResult<T>> { // eslint-disable-line max-len
   let adminApp = ((null as unknown) as admin.app.App);
   let callState = ((null as unknown) as OpaDm.ICallState);
-  const getLogMessage = (state: ExecutionState) => getFunctionCallLogMessage(getModuleName(), getFunctionName(), state);
+  const getLogMessage = (state: OPA.ExecutionState) => getFunctionCallLogMessage(getModuleName(), getFunctionName(), state);
   const shimmedRequest = getShimmedRequestObject(request);
 
   try {
-    logger.info(getLogMessage(ExecutionStates.entry), {structuredData: true});
+    logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
     callState = await getCallStateForFirebaseContextAndApp(request, adminApp);
 
     await setExternalLogState(callState.dataStorageState, request);
-    await logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, getLogMessage(ExecutionStates.ready));
+    await logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, getLogMessage(OPA.ExecutionStates.ready));
 
     const result = await doAction(request, callState);
     return OPA.getSuccessResult(result);

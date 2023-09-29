@@ -6,6 +6,8 @@ import * as VC from "./ValueChecking";
 export const DEFAULT_UNIQUENESS_INDEX_COLLECTION = "UniquenessIndices";
 export const BULK_WRITER_MAX_RETRY_ATTEMPTS = 4;
 export const FIREBASE_DEFAULT_REGION = "us-east1";
+export const FIREBASE_DEFAULT_MAX_INSTANCES = 10;
+export const FIREBASE_DEFAULT_OPTIONS = {region: FIREBASE_DEFAULT_REGION, maxInstances: FIREBASE_DEFAULT_MAX_INSTANCES};
 export const DEFAULT_ANONYMOUS_DISPLAY_NAME = "(anonymous)";
 
 export type FirebaseAuthType = "ADMIN" | "USER" | "UNAUTHENTICATED";
