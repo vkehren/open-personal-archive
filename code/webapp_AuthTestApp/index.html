@@ -14,14 +14,22 @@
 
 <body>
   <h1>Open Personal Archive™ (OPA) Auth Test App</h1>
-  <hr />
-  <button id="google-button">Sign-In with Google using OAuth</button>
-  <label id="google-label"></label>
-  <hr />
-  <input id="email-input" type="text" />
-  <input id="password-input" type="password" />
-  <button id="firebase-button">Sign-In with Firebase using Email & Password</button>
-  <label id="firebase-label"></label>
+  <hr style="margin: 16px;" />
+  <p style="margin-left: 16px;">
+    <button id="google-button">Sign-In with Google using OAuth</button>
+    <br />
+    <label id="google-label"></label>
+  </p>
+  <hr style="margin: 16px;" />
+  <p style="margin-left: 16px;">
+    <label>Email:</label><input id="email-input" type="text" />
+    <br />
+    <label>Password:</label><input id="password-input" type="password" />
+    <br />
+    <button id="firebase-button">Sign-In with Firebase using Email & Password</button>
+    <br />
+    <label id="firebase-label"></label>
+  </p>
 
   <script type="module">
     import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js';
