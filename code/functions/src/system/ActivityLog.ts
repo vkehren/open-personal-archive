@@ -13,18 +13,18 @@ export const recordLogItem = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
   let adminApp = ((null as unknown) as admin.app.App);
   let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
   let authenticationState = ((null as unknown) as OpaDm.IAuthenticationState | null);
-  const getLogMessage = (state: UTL.ExecutionState) => UTL.getFunctionCallLogMessage(moduleName, recordLogItem_FunctionName(), state);
+  const getLogMessage = (state: OPA.ExecutionState) => UTL.getFunctionCallLogMessage(moduleName, recordLogItem_FunctionName(), state);
   const shimmedRequest = UTL.getShimmedRequestObject(request);
 
   try {
-    logger.info(getLogMessage(UTL.ExecutionStates.entry), {structuredData: true});
+    logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
     dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp);
     authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, adminApp);
 
     await UTL.setExternalLogState(dataStorageState, request);
     // LATER: Consider not logging that is the System is ready to record the log item, as it seems redundant with the actual log item
-    await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, getLogMessage(UTL.ExecutionStates.ready));
+    await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, getLogMessage(OPA.ExecutionStates.ready));
 
     const activityType = (request.data.query.activityType) ? request.data.query.activityType : undefined;
     const requestor = (request.data.query.requestor) ? request.data.query.requestor : undefined;
