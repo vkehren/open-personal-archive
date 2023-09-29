@@ -48,7 +48,8 @@ const moduleName = module.filename.split(".")[0];
 export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT_OPTIONS, async (event: AuthBlockingEvent): Promise<void> => {
   let adminApp = ((null as unknown) as admin.app.App);
   let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
-  const getLogMessage = (state: UTL.ExecutionState) => UTL.getFunctionCallLogMessage(moduleName, "Authentication Trigger to initialize User", state);
+  let firebaseAuthUserId = ((null as unknown) as string);
+  const getLogMessage = (state: OPA.ExecutionState) => UTL.getFunctionCallLogMessage(moduleName, "Authentication Trigger to initialize User " + firebaseAuthUserId, state);
   const shimmedRequest: OPA.ICallRequest = {
     clientIpAddress: event.ipAddress,
     url: event.eventType,
@@ -56,9 +57,11 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
   };
 
   try {
-    logger.info(getLogMessage(UTL.ExecutionStates.entry), {structuredData: true});
+    logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
     dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp);
+    firebaseAuthUserId = event.data.uid;
+    await UTL.logFunctionCall(dataStorageState, null, shimmedRequest, getLogMessage(OPA.ExecutionStates.ready));
 
     const userData: OPA.IFirebaseAuthUserData = {
       authType: (event.authType as OPA.FirebaseAuthType),
@@ -79,7 +82,7 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
     const opaUser = await authenticationEventHandlerForFirebaseAuth(dataStorageState, userData);
 
     const messageSuffix = (!OPA.isNullish(opaUser)) ? (" for " + OPA.convertNonNullish(opaUser).authAccountName) : " without User";
-    logger.info(getLogMessage(UTL.ExecutionStates.complete) + messageSuffix, {structuredData: true});
+    logger.info(getLogMessage(OPA.ExecutionStates.complete) + messageSuffix, {structuredData: true});
   } catch (error) {
     await UTL.logFunctionError(dataStorageState, null, shimmedRequest, error as Error);
   } finally {
