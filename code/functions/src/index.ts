@@ -96,6 +96,9 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
     }
 
     const opaUser = await authenticationEventHandlerForFirebaseAuth(dataStorageState, userData);
+    if (OPA.isNull(opaUser)) {
+      throw new Error("A corrsponding User could not be found.");
+    }
 
     const messageSuffix = (!OPA.isNullish(opaUser)) ? (" for " + OPA.convertNonNullish(opaUser).authAccountName) : " without User";
     logger.info(getLogMessage(OPA.ExecutionStates.complete) + messageSuffix, {structuredData: true});
