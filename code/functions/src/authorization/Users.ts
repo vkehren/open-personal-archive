@@ -9,7 +9,7 @@ type IUserDisplayModel = Users.IUserDisplayModel;
 type IUserAccountDisplayModel = Users.IUserAccountDisplayModel;
 
 const getListOfUsers_FunctionName = () => (OPA.getTypedPropertyKeyAsText("getListOfUsers", {getListOfUsers})); // eslint-disable-line camelcase
-export const getListOfUsers = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+export const getListOfUsers = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<Array<IUserDisplayModel>>(request, getModuleName, getListOfUsers_FunctionName, async (request, callState) => {
     const data = request.data;
     const approvalState = (data.query.approvalState) ? data.query.approvalState : null;
@@ -22,7 +22,7 @@ export const getListOfUsers = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, asyn
 });
 
 const getUserAccountDisplayModel_FunctionName = () => (OPA.getTypedPropertyKeyAsText("getUserAccountDisplayModel", {getUserAccountDisplayModel})); // eslint-disable-line camelcase
-export const getUserAccountDisplayModel = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+export const getUserAccountDisplayModel = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserAccountDisplayModel>(request, getModuleName, getUserAccountDisplayModel_FunctionName, async (request, callState) => {
     const displayModel = await Users.getUserAccountDisplayModel(callState);
     return displayModel;
@@ -31,7 +31,7 @@ export const getUserAccountDisplayModel = onCall({region: OPA.FIREBASE_DEFAULT_R
 });
 
 const initializeUserAccount_FunctionName = () => (OPA.getTypedPropertyKeyAsText("initializeUserAccount", {initializeUserAccount})); // eslint-disable-line camelcase
-export const initializeUserAccount = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+export const initializeUserAccount = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, initializeUserAccount_FunctionName, async (request, callState) => {
     const authProviderId = callState.authenticationState.providerId;
     const authAccountName = callState.authenticationState.email;
@@ -44,7 +44,7 @@ export const initializeUserAccount = onCall({region: OPA.FIREBASE_DEFAULT_REGION
 });
 
 const updateUserProfile_FunctionName = () => (OPA.getTypedPropertyKeyAsText("updateUserProfile", {updateUserProfile})); // eslint-disable-line camelcase
-export const updateUserProfile = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+export const updateUserProfile = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, updateUserProfile_FunctionName, async (request, callState) => {
     const data = request.data;
     const updateObject = (data.query.updateObject) ? JSON.parse(data.query.updateObject) : undefined;
@@ -59,7 +59,7 @@ export const updateUserProfile = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, a
 });
 
 const assignUserToRole_FunctionName = () => (OPA.getTypedPropertyKeyAsText("assignUserToRole", {assignUserToRole})); // eslint-disable-line camelcase
-export const assignUserToRole = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+export const assignUserToRole = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, assignUserToRole_FunctionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.query.userId) ? data.query.userId : undefined;
@@ -76,7 +76,7 @@ export const assignUserToRole = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, as
 });
 
 const addRequestedCitationToUser_FunctionName = () => (OPA.getTypedPropertyKeyAsText("addRequestedCitationToUser", {addRequestedCitationToUser})); // eslint-disable-line camelcase
-export const addRequestedCitationToUser = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+export const addRequestedCitationToUser = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, addRequestedCitationToUser_FunctionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.query.userId) ? data.query.userId : undefined;
@@ -93,7 +93,7 @@ export const addRequestedCitationToUser = onCall({region: OPA.FIREBASE_DEFAULT_R
 });
 
 const addViewableCitationToUser_FunctionName = () => (OPA.getTypedPropertyKeyAsText("addViewableCitationToUser", {addViewableCitationToUser})); // eslint-disable-line camelcase
-export const addViewableCitationToUser = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+export const addViewableCitationToUser = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, addViewableCitationToUser_FunctionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.query.userId) ? data.query.userId : undefined;
@@ -110,7 +110,7 @@ export const addViewableCitationToUser = onCall({region: OPA.FIREBASE_DEFAULT_RE
 });
 
 const setUserToViewed_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setUserToViewed", {setUserToViewed})); // eslint-disable-line camelcase
-export const setUserToViewed = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+export const setUserToViewed = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, setUserToViewed_FunctionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.query.userId) ? data.query.userId : undefined;
@@ -125,7 +125,7 @@ export const setUserToViewed = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, asy
 });
 
 const setUserToApprovalState_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setUserToApprovalState", {setUserToApprovalState})); // eslint-disable-line camelcase
-export const setUserToApprovalState = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+export const setUserToApprovalState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, setUserToApprovalState_FunctionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.query.userId) ? data.query.userId : undefined;
@@ -142,7 +142,7 @@ export const setUserToApprovalState = onCall({region: OPA.FIREBASE_DEFAULT_REGIO
 });
 
 const setUserToApproved_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setUserToApproved", {setUserToApproved})); // eslint-disable-line camelcase
-export const setUserToApproved = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+export const setUserToApproved = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, setUserToApproved_FunctionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.query.userId) ? data.query.userId : undefined;
@@ -157,7 +157,7 @@ export const setUserToApproved = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, a
 });
 
 const setUserToDenied_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setUserToDenied", {setUserToDenied})); // eslint-disable-line camelcase
-export const setUserToDenied = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+export const setUserToDenied = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, setUserToDenied_FunctionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.query.userId) ? data.query.userId : undefined;
@@ -172,7 +172,7 @@ export const setUserToDenied = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, asy
 });
 
 const setUserToSuspensionState_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setUserToSuspensionState", {setUserToSuspensionState})); // eslint-disable-line camelcase
-export const setUserToSuspensionState = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+export const setUserToSuspensionState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, setUserToSuspensionState_FunctionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.query.userId) ? data.query.userId : undefined;
@@ -190,7 +190,7 @@ export const setUserToSuspensionState = onCall({region: OPA.FIREBASE_DEFAULT_REG
 });
 
 const setUserToSuspended_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setUserToSuspended", {setUserToSuspended})); // eslint-disable-line camelcase
-export const setUserToSuspended = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+export const setUserToSuspended = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, setUserToSuspended_FunctionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.query.userId) ? data.query.userId : undefined;
@@ -206,7 +206,7 @@ export const setUserToSuspended = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, 
 });
 
 const setUserToUnSuspended_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setUserToUnSuspended", {setUserToUnSuspended})); // eslint-disable-line camelcase
-export const setUserToUnSuspended = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+export const setUserToUnSuspended = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, setUserToUnSuspended_FunctionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.query.userId) ? data.query.userId : undefined;
@@ -222,7 +222,7 @@ export const setUserToUnSuspended = onCall({region: OPA.FIREBASE_DEFAULT_REGION}
 });
 
 const markUserWithDeletionState_FunctionName = () => (OPA.getTypedPropertyKeyAsText("markUserWithDeletionState", {markUserWithDeletionState})); // eslint-disable-line camelcase, max-len
-export const markUserWithDeletionState = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+export const markUserWithDeletionState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, markUserWithDeletionState_FunctionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.query.userId) ? data.query.userId : undefined;
@@ -239,7 +239,7 @@ export const markUserWithDeletionState = onCall({region: OPA.FIREBASE_DEFAULT_RE
 });
 
 const markUserAsDeleted_FunctionName = () => (OPA.getTypedPropertyKeyAsText("markUserAsDeleted", {markUserAsDeleted})); // eslint-disable-line camelcase
-export const markUserAsDeleted = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+export const markUserAsDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, markUserAsDeleted_FunctionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.query.userId) ? data.query.userId : undefined;
@@ -254,7 +254,7 @@ export const markUserAsDeleted = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, a
 });
 
 const markUserAsUnDeleted_FunctionName = () => (OPA.getTypedPropertyKeyAsText("markUserAsUnDeleted", {markUserAsUnDeleted})); // eslint-disable-line camelcase
-export const markUserAsUnDeleted = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+export const markUserAsUnDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, markUserAsUnDeleted_FunctionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.query.userId) ? data.query.userId : undefined;

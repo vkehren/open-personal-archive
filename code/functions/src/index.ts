@@ -45,7 +45,7 @@ if (useCorsHandler) {
 
 const moduleName = module.filename.split(".")[0];
 
-export const firebaseAuthSignInHandler = beforeUserSignedIn(async (event: AuthBlockingEvent): Promise<void> => {
+export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT_OPTIONS, async (event: AuthBlockingEvent): Promise<void> => {
   let adminApp = ((null as unknown) as admin.app.App);
   let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
   const getLogMessage = (state: UTL.ExecutionState) => UTL.getFunctionCallLogMessage(moduleName, "Authentication Trigger to initialize User", state);

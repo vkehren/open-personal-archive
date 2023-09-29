@@ -9,7 +9,7 @@ import * as UTL from "../Utilities";
 const moduleName = module.filename.split(".")[0];
 
 const recordLogItem_FunctionName = () => (OPA.getTypedPropertyKeyAsText("recordLogItem", {recordLogItem})); // eslint-disable-line camelcase
-export const recordLogItem = onCall({region: OPA.FIREBASE_DEFAULT_REGION}, async (request) => {
+export const recordLogItem = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   let adminApp = ((null as unknown) as admin.app.App);
   let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
   let authenticationState = ((null as unknown) as OpaDm.IAuthenticationState | null);
