@@ -282,7 +282,6 @@ export async function cleanUpStateAfterCall(dataStorageState: OpaDm.IDataStorage
       await currentWriteBatchNonNull.commit();
       dataStorageState.currentWriteBatch = null;
     }
-    await adminApp.delete();
 
     if (!OPA.isNullish(dataStorageState.logWriteState.rootLogItemId)) {
       dataStorageState.logWriteState.rootLogItemId = null;
@@ -290,7 +289,10 @@ export async function cleanUpStateAfterCall(dataStorageState: OpaDm.IDataStorage
     if (!OPA.isNullish(dataStorageState.logWriteState.externalLogItemId)) {
       dataStorageState.logWriteState.externalLogItemId = null;
     }
-    await dataStorageState.db.terminate();
+
+    // NOTE: Do NOT do the following, as they will cause all future calls to fail
+    // await adminApp.delete();
+    // await dataStorageState.db.terminate();
   } catch (error) {
     logFunctionError(dataStorageState, authenticationState, request, error);
   }
