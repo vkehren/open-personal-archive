@@ -22,9 +22,11 @@
   </p>
   <hr style="margin: 16px;" />
   <p style="margin-left: 16px;">
-    <label>Email:</label><input id="email-input" type="text" />
+    <label>Email:</label>
+    <input id="firebase-email-input" type="text" />
     <br />
-    <label>Password:</label><input id="password-input" type="password" />
+    <label>Password:</label>
+    <input id="firebase-password-input" type="password" />
     <br />
     <button id="firebase-button">Sign-In with Firebase using Email & Password</button>
     <br />
@@ -60,8 +62,8 @@
     };
 
     document.getElementById("firebase-button").onclick = () => {
-      const email = document.getElementById("email-input").value;
-      const password = document.getElementById("password-input").value;
+      const email = document.getElementById("firebase-email-input").value;
+      const password = document.getElementById("firebase-password-input").value;
 
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
