@@ -101,10 +101,15 @@ export async function requestUserAccess(callState: OpaDm.ICallState, message: st
   OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
+  const viewersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.viewers);
+  const viewerIds = [...viewersById.keys()];
   const user = authorizationState.user;
   const locale = authorizationState.locale;
 
+  // NOTE: Do NOT assert "authorizationState.assertUserApproved();" to create AccessRequest
   OPA.assertIsFalse((user.id == OpaDm.User_OwnerId), "The Owner cannot request access as the Owner already has access to the entire Archive.");
+  OPA.assertIsFalse(viewerIds.includes(user.assignedRoleId), "Users with normal access to the Archive cannot request access to specific items.");
+
   const accessRequestId = await OpaDb.AccessRequests.queries.create(callState.dataStorageState, user, locale, message, citationId);
   if (!OPA.isNullish(citationId)) {
     await OpaDb.Users.queries.addRequestedCitation(callState.dataStorageState, user.id, OPA.convertNonNullish(citationId), user.id);
@@ -139,7 +144,8 @@ export async function updateMessageForAccessRequest(callState: OpaDm.ICallState,
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
   const accessRequestPreRead = await OpaDb.AccessRequests.queries.getByIdWithAssert(callState.dataStorageState, accessRequestIdToUpdate, "The requested AccessRequest does not exist.");
-  authorizationState.assertUserApproved();
+
+  // NOTE: Do NOT assert "authorizationState.assertUserApproved();" to update "message" of AccessRequest
   authorizationState.assertUserSameAs(accessRequestPreRead.userIdOfCreator);
 
   const localizableMessage = {...(accessRequestPreRead.message)};
