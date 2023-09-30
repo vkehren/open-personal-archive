@@ -75,7 +75,7 @@ export const setAccessRequestTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (
   const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, getModuleName, setAccessRequestTags_FunctionName, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
-    const tags = (data.tags) ? JSON.parse(data.tags) : undefined;
+    const tags = (data.tags) ? OPA.parseJsonIfNeeded(data.tags) : undefined;
     const contentType = (data.contentType) ? data.contentType : undefined;
 
     OPA.assertIdentifierIsValid(accessRequestId, "The Access Request ID must not be blank.");
@@ -94,7 +94,7 @@ export const addAccessRequestTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (
   const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, getModuleName, addAccessRequestTags_FunctionName, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
-    const tags = (data.tags) ? JSON.parse(data.tags) : undefined;
+    const tags = (data.tags) ? OPA.parseJsonIfNeeded(data.tags) : undefined;
 
     OPA.assertIdentifierIsValid(accessRequestId, "The Access Request ID must not be blank.");
     OPA.assertNonNullishOrWhitespace(tags, "The Access Request tags must not be blank.");
@@ -111,7 +111,7 @@ export const removeAccessRequestTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, asyn
   const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, getModuleName, removeAccessRequestTags_FunctionName, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
-    const tags = (data.tags) ? JSON.parse(data.tags) : undefined;
+    const tags = (data.tags) ? OPA.parseJsonIfNeeded(data.tags) : undefined;
 
     OPA.assertIdentifierIsValid(accessRequestId, "The Access Request ID must not be blank.");
     OPA.assertNonNullishOrWhitespace(tags, "The Access Request tags must not be blank.");

@@ -254,3 +254,33 @@ export function assertIsOfValue(actual: number | null | undefined, desired: numb
     throw new Error(message);
   }
 }
+
+/**
+ * Parses the input as JSON only if parsing is necessary.
+ * @param {string | unknown | null | undefined} input The input value.
+ * @return {any}
+ */
+export function parseJsonIfNeeded(input: string | unknown | null | undefined): any { // eslint-disable-line @typescript-eslint/no-explicit-any
+  if (TC.isNullishOrWhitespace(input)) {
+    return input;
+  }
+  if (TC.isObject(input)) {
+    return input;
+  }
+
+  const inputAsString = ("" + input);
+  if (input != inputAsString) {
+    return input;
+  }
+
+  const lastIndex = (inputAsString.length - 1);
+  if (!((inputAsString[0] == "{") || (inputAsString[0] == "["))) {
+    return input;
+  }
+  if (!((inputAsString[lastIndex] == "}") || (inputAsString[lastIndex] == "]"))) {
+    return input;
+  }
+
+  const inputAsObject = JSON.parse(inputAsString);
+  return inputAsObject;
+}

@@ -47,7 +47,7 @@ const updateUserProfile_FunctionName = () => (OPA.getTypedPropertyKeyAsText("upd
 export const updateUserProfile = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, updateUserProfile_FunctionName, async (request, callState) => {
     const data = request.data;
-    const updateObject = (data.updateObject) ? JSON.parse(data.updateObject) : undefined;
+    const updateObject = (data.updateObject) ? OPA.parseJsonIfNeeded(data.updateObject) : undefined;
 
     OPA.assertNonNullish(updateObject, "The User profile data must not be blank.");
 
