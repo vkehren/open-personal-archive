@@ -267,6 +267,9 @@ export function parseJsonIfNeeded(input: string | unknown | null | undefined): a
   if (TC.isObject(input)) {
     return input;
   }
+  if (TC.isArray(input)) {
+    return input;
+  }
 
   const inputAsString = ("" + input);
   if (input != inputAsString) {
