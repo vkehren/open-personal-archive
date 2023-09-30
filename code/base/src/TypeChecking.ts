@@ -210,6 +210,19 @@ export function isOf<T>(value: unknown, guardFunc: BT.GuardFunc<T>): value is T 
 }
 
 /**
+ * Asserts that a given argument is of generic type T by applying a type guard (see https://www.typescriptlang.org/docs/handbook/advanced-types.html).
+ * @param {unknown} value The value to check.
+ * @param {BT.GuardFunc<T>} guardFunc The guard function to apply.
+ * @param {string} [failureMessage="A valid value of type \"T\" must be provided."] The message to display on failure of assertion.
+ * @return {void}
+ */
+export function assertIsOf<T>(value: unknown, guardFunc: BT.GuardFunc<T>, failureMessage = "A valid value of type \"T\" must be provided."): void {
+  if (!isOf<T>(value, guardFunc)) {
+    throw new Error(failureMessage);
+  }
+}
+
+/**
  * Converts a value of unknown type to a value of type T.
  * @param {unknown} value The value to convert.
  * @param {BT.GuardFunc<T> | undefined} [guardFunc=undefined] The optional guard function to apply.

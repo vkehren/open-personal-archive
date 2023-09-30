@@ -115,7 +115,9 @@ export const ArrayContentTypes = {
   exact: ("exact" as ArrayContentType),
   only_added: ("only_added" as ArrayContentType),
   only_removed: ("only_removed" as ArrayContentType),
+  all: ([] as Array<ArrayContentType>),
 };
+ArrayContentTypes.all = [ArrayContentTypes.exact, ArrayContentTypes.only_added, ArrayContentTypes.only_removed];
 
 export type ExecutionState = "entry" | "ready" | "complete" | "error";
 export const ExecutionStates = {
