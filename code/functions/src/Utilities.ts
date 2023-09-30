@@ -223,7 +223,7 @@ export async function logFunctionCall(dataStorageState: OpaDm.IDataStorageState,
     const errorState = {hasError: false};
     const otherState = {message: message, logWriteState: dataStorageState.logWriteState, errorState: errorState};
 
-    logger.error(message, {structuredData: true, activityType, requestor, resource, otherState});
+    logger.info(message, {structuredData: true, activityType, requestor, resource, otherState});
     const logItem = await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, requestor, resource, null, request.data, otherState);
 
     if (OPA.isNullishOrWhitespace(dataStorageState.logWriteState.rootLogItemId)) {
