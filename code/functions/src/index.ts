@@ -54,7 +54,7 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
   const shimmedRequest: OPA.ICallRequest = {
     clientIpAddress: event.ipAddress,
     url: event.eventType,
-    data: {eventType: event.eventType, eventId: event.eventId, eventData: event.data},
+    data: {eventType: event.eventType, eventId: event.eventId, firebaseUserId: event.data.uid, eventData: JSON.stringify(event.data)},
   };
 
   try {
