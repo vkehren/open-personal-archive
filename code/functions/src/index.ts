@@ -110,6 +110,9 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
 });
 
 // NOTE: Export API functions
+export * from "./system/ActivityLog";
 export * from "./system/Application";
+export * from "./authorization/Users";
 export * from "./authorization/AccessRequests";
+export * from "./authorization/Contacts";
 export * as PackageInfo from "./PackageInfo";
