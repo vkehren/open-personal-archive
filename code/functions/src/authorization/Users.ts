@@ -12,7 +12,7 @@ const getListOfUsers_FunctionName = () => (OPA.getTypedPropertyKeyAsText("getLis
 export const getListOfUsers = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<Array<IUserDisplayModel>>(request, getModuleName, getListOfUsers_FunctionName, async (request, callState) => {
     const data = request.data;
-    const approvalState = (data.query.approvalState) ? data.query.approvalState : null;
+    const approvalState = (data.approvalState) ? data.approvalState : null;
 
     const documents = await Users.getListOfUsers(callState, approvalState);
     const displayModels = await Users.convertUsersToDisplayModels(callState, documents);
@@ -47,7 +47,7 @@ const updateUserProfile_FunctionName = () => (OPA.getTypedPropertyKeyAsText("upd
 export const updateUserProfile = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, updateUserProfile_FunctionName, async (request, callState) => {
     const data = request.data;
-    const updateObject = (data.query.updateObject) ? JSON.parse(data.query.updateObject) : undefined;
+    const updateObject = (data.updateObject) ? JSON.parse(data.updateObject) : undefined;
 
     OPA.assertNonNullish(updateObject, "The User profile data must not be blank.");
 
@@ -62,8 +62,8 @@ const assignUserToRole_FunctionName = () => (OPA.getTypedPropertyKeyAsText("assi
 export const assignUserToRole = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, assignUserToRole_FunctionName, async (request, callState) => {
     const data = request.data;
-    const userId = (data.query.userId) ? data.query.userId : undefined;
-    const roleId = (data.query.roleId) ? data.query.roleId : undefined;
+    const userId = (data.userId) ? data.userId : undefined;
+    const roleId = (data.roleId) ? data.roleId : undefined;
 
     OPA.assertIdentifierIsValid(userId, "The User ID must not be blank.");
     OPA.assertIdentifierIsValid(roleId, "The Role ID must not be blank.");
@@ -79,8 +79,8 @@ const addRequestedCitationToUser_FunctionName = () => (OPA.getTypedPropertyKeyAs
 export const addRequestedCitationToUser = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, addRequestedCitationToUser_FunctionName, async (request, callState) => {
     const data = request.data;
-    const userId = (data.query.userId) ? data.query.userId : undefined;
-    const citationId = (data.query.citationId) ? data.query.citationId : undefined;
+    const userId = (data.userId) ? data.userId : undefined;
+    const citationId = (data.citationId) ? data.citationId : undefined;
 
     OPA.assertIdentifierIsValid(userId, "The User ID must not be blank.");
     OPA.assertIdentifierIsValid(citationId, "The Citation ID must not be blank.");
@@ -96,8 +96,8 @@ const addViewableCitationToUser_FunctionName = () => (OPA.getTypedPropertyKeyAsT
 export const addViewableCitationToUser = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, addViewableCitationToUser_FunctionName, async (request, callState) => {
     const data = request.data;
-    const userId = (data.query.userId) ? data.query.userId : undefined;
-    const citationId = (data.query.citationId) ? data.query.citationId : undefined;
+    const userId = (data.userId) ? data.userId : undefined;
+    const citationId = (data.citationId) ? data.citationId : undefined;
 
     OPA.assertIdentifierIsValid(userId, "The User ID must not be blank.");
     OPA.assertIdentifierIsValid(citationId, "The Citation ID must not be blank.");
@@ -113,7 +113,7 @@ const setUserToViewed_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setUs
 export const setUserToViewed = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, setUserToViewed_FunctionName, async (request, callState) => {
     const data = request.data;
-    const userId = (data.query.userId) ? data.query.userId : undefined;
+    const userId = (data.userId) ? data.userId : undefined;
 
     OPA.assertIdentifierIsValid(userId, "The User ID must not be blank.");
 
@@ -128,8 +128,8 @@ const setUserToApprovalState_FunctionName = () => (OPA.getTypedPropertyKeyAsText
 export const setUserToApprovalState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, setUserToApprovalState_FunctionName, async (request, callState) => {
     const data = request.data;
-    const userId = (data.query.userId) ? data.query.userId : undefined;
-    const approvalState = (data.query.approvalState) ? data.query.approvalState : undefined;
+    const userId = (data.userId) ? data.userId : undefined;
+    const approvalState = (data.approvalState) ? data.approvalState : undefined;
 
     OPA.assertIdentifierIsValid(userId, "The User ID must not be blank.");
     OPA.assertNonNullishOrWhitespace(approvalState, "The User approval state must not be blank.");
@@ -145,7 +145,7 @@ const setUserToApproved_FunctionName = () => (OPA.getTypedPropertyKeyAsText("set
 export const setUserToApproved = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, setUserToApproved_FunctionName, async (request, callState) => {
     const data = request.data;
-    const userId = (data.query.userId) ? data.query.userId : undefined;
+    const userId = (data.userId) ? data.userId : undefined;
 
     OPA.assertIdentifierIsValid(userId, "The User ID must not be blank.");
 
@@ -160,7 +160,7 @@ const setUserToDenied_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setUs
 export const setUserToDenied = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, setUserToDenied_FunctionName, async (request, callState) => {
     const data = request.data;
-    const userId = (data.query.userId) ? data.query.userId : undefined;
+    const userId = (data.userId) ? data.userId : undefined;
 
     OPA.assertIdentifierIsValid(userId, "The User ID must not be blank.");
 
@@ -175,9 +175,9 @@ const setUserToSuspensionState_FunctionName = () => (OPA.getTypedPropertyKeyAsTe
 export const setUserToSuspensionState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, setUserToSuspensionState_FunctionName, async (request, callState) => {
     const data = request.data;
-    const userId = (data.query.userId) ? data.query.userId : undefined;
-    const suspensionState = (data.query.suspensionState) ? data.query.suspensionState : undefined;
-    const reason = (data.query.reason) ? data.query.reason : "";
+    const userId = (data.userId) ? data.userId : undefined;
+    const suspensionState = (data.suspensionState) ? data.suspensionState : undefined;
+    const reason = (data.reason) ? data.reason : "";
 
     OPA.assertIdentifierIsValid(userId, "The User ID must not be blank.");
     OPA.assertNonNullishOrWhitespace(suspensionState, "The User suspension state must not be blank.");
@@ -193,8 +193,8 @@ const setUserToSuspended_FunctionName = () => (OPA.getTypedPropertyKeyAsText("se
 export const setUserToSuspended = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, setUserToSuspended_FunctionName, async (request, callState) => {
     const data = request.data;
-    const userId = (data.query.userId) ? data.query.userId : undefined;
-    const reason = (data.query.reason) ? data.query.reason : "";
+    const userId = (data.userId) ? data.userId : undefined;
+    const reason = (data.reason) ? data.reason : "";
 
     OPA.assertIdentifierIsValid(userId, "The User ID must not be blank.");
 
@@ -209,8 +209,8 @@ const setUserToUnSuspended_FunctionName = () => (OPA.getTypedPropertyKeyAsText("
 export const setUserToUnSuspended = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, setUserToUnSuspended_FunctionName, async (request, callState) => {
     const data = request.data;
-    const userId = (data.query.userId) ? data.query.userId : undefined;
-    const reason = (data.query.reason) ? data.query.reason : "";
+    const userId = (data.userId) ? data.userId : undefined;
+    const reason = (data.reason) ? data.reason : "";
 
     OPA.assertIdentifierIsValid(userId, "The User ID must not be blank.");
 
@@ -225,8 +225,8 @@ const markUserWithDeletionState_FunctionName = () => (OPA.getTypedPropertyKeyAsT
 export const markUserWithDeletionState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, markUserWithDeletionState_FunctionName, async (request, callState) => {
     const data = request.data;
-    const userId = (data.query.userId) ? data.query.userId : undefined;
-    const deletionState = (data.query.deletionState) ? data.query.deletionState : undefined;
+    const userId = (data.userId) ? data.userId : undefined;
+    const deletionState = (data.deletionState) ? data.deletionState : undefined;
 
     OPA.assertIdentifierIsValid(userId, "The User ID must not be blank.");
     OPA.assertNonNullishOrWhitespace(deletionState, "The User deletion state must not be blank.");
@@ -242,7 +242,7 @@ const markUserAsDeleted_FunctionName = () => (OPA.getTypedPropertyKeyAsText("mar
 export const markUserAsDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, markUserAsDeleted_FunctionName, async (request, callState) => {
     const data = request.data;
-    const userId = (data.query.userId) ? data.query.userId : undefined;
+    const userId = (data.userId) ? data.userId : undefined;
 
     OPA.assertIdentifierIsValid(userId, "The User ID must not be blank.");
 
@@ -257,7 +257,7 @@ const markUserAsUnDeleted_FunctionName = () => (OPA.getTypedPropertyKeyAsText("m
 export const markUserAsUnDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, getModuleName, markUserAsUnDeleted_FunctionName, async (request, callState) => {
     const data = request.data;
-    const userId = (data.query.userId) ? data.query.userId : undefined;
+    const userId = (data.userId) ? data.userId : undefined;
 
     OPA.assertIdentifierIsValid(userId, "The User ID must not be blank.");
 

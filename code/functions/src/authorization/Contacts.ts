@@ -41,14 +41,14 @@ export const createContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
     await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, getLogMessage(OPA.ExecutionStates.ready));
 
     const data = request.data;
-    const organizationName = (data.query.organizationName) ? data.query.organizationName : null;
-    const firstName = (data.query.firstName) ? data.query.firstName : null;
-    const lastName = (data.query.lastName) ? data.query.lastName : null;
-    const email = (data.query.email) ? data.query.email : null;
-    const phoneNumber = (data.query.phoneNumber) ? data.query.phoneNumber : null;
-    const address = (data.query.address) ? data.query.address : null;
-    const message = (data.query.message) ? data.query.message : null;
-    const otherInfo = (data.query.otherInfo) ? JSON.parse(data.query.otherInfo) : null;
+    const organizationName = (data.organizationName) ? data.organizationName : null;
+    const firstName = (data.firstName) ? data.firstName : null;
+    const lastName = (data.lastName) ? data.lastName : null;
+    const email = (data.email) ? data.email : null;
+    const phoneNumber = (data.phoneNumber) ? data.phoneNumber : null;
+    const address = (data.address) ? data.address : null;
+    const message = (data.message) ? data.message : null;
+    const otherInfo = (data.otherInfo) ? JSON.parse(data.otherInfo) : null;
 
     const document = await Contacts.createContact(dataStorageState, authenticationState, organizationName, firstName, lastName, email, phoneNumber, address, message, otherInfo);
 
@@ -74,8 +74,8 @@ const updateContact_FunctionName = () => (OPA.getTypedPropertyKeyAsText("updateC
 export const updateContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, updateContact_FunctionName, async (request, callState) => {
     const data = request.data;
-    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
-    const updateObject = (data.query.updateObject) ? JSON.parse(data.query.updateObject) : undefined;
+    const contactId = (data.contactId) ? data.contactId : undefined;
+    const updateObject = (data.updateObject) ? JSON.parse(data.updateObject) : undefined;
 
     OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
 
@@ -90,9 +90,9 @@ const setCorrespondingUsersForContact_FunctionName = () => (OPA.getTypedProperty
 export const setCorrespondingUsersForContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, setCorrespondingUsersForContact_FunctionName, async (request, callState) => {
     const data = request.data;
-    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
-    const userIds = (data.query.userIds) ? JSON.parse(data.query.userIds) : undefined;
-    const contentType = (data.query.contentType) ? data.query.contentType : undefined;
+    const contactId = (data.contactId) ? data.contactId : undefined;
+    const userIds = (data.userIds) ? JSON.parse(data.userIds) : undefined;
+    const contentType = (data.contentType) ? data.contentType : undefined;
 
     OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
     OPA.assertNonNullish(userIds, "The corresponding User IDs must not be blank.");
@@ -108,8 +108,8 @@ const addCorrespondingUsersToContact_FunctionName = () => (OPA.getTypedPropertyK
 export const addCorrespondingUsersToContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, addCorrespondingUsersToContact_FunctionName, async (request, callState) => {
     const data = request.data;
-    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
-    const userIds = (data.query.userIds) ? JSON.parse(data.query.userIds) : undefined;
+    const contactId = (data.contactId) ? data.contactId : undefined;
+    const userIds = (data.userIds) ? JSON.parse(data.userIds) : undefined;
 
     OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
     OPA.assertNonNullish(userIds, "The corresponding User IDs must not be blank.");
@@ -125,8 +125,8 @@ const removeCorrespondingUsersFromContact_FunctionName = () => (OPA.getTypedProp
 export const removeCorrespondingUsersFromContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, removeCorrespondingUsersFromContact_FunctionName, async (request, callState) => {
     const data = request.data;
-    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
-    const userIds = (data.query.userIds) ? JSON.parse(data.query.userIds) : undefined;
+    const contactId = (data.contactId) ? data.contactId : undefined;
+    const userIds = (data.userIds) ? JSON.parse(data.userIds) : undefined;
 
     OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
     OPA.assertNonNullish(userIds, "The corresponding User IDs must not be blank.");
@@ -142,9 +142,9 @@ const setContactTags_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setCon
 export const setContactTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, setContactTags_FunctionName, async (request, callState) => {
     const data = request.data;
-    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
-    const tags = (data.query.tags) ? JSON.parse(data.query.tags) : undefined;
-    const contentType = (data.query.contentType) ? data.query.contentType : undefined;
+    const contactId = (data.contactId) ? data.contactId : undefined;
+    const tags = (data.tags) ? JSON.parse(data.tags) : undefined;
+    const contentType = (data.contentType) ? data.contentType : undefined;
 
     OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
     OPA.assertNonNullishOrWhitespace(tags, "The Contact tags must not be blank.");
@@ -160,8 +160,8 @@ const addContactTags_FunctionName = () => (OPA.getTypedPropertyKeyAsText("addCon
 export const addContactTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, addContactTags_FunctionName, async (request, callState) => {
     const data = request.data;
-    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
-    const tags = (data.query.tags) ? JSON.parse(data.query.tags) : undefined;
+    const contactId = (data.contactId) ? data.contactId : undefined;
+    const tags = (data.tags) ? JSON.parse(data.tags) : undefined;
 
     OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
     OPA.assertNonNullishOrWhitespace(tags, "The Contact tags must not be blank.");
@@ -177,8 +177,8 @@ const removeContactTags_FunctionName = () => (OPA.getTypedPropertyKeyAsText("rem
 export const removeContactTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, removeContactTags_FunctionName, async (request, callState) => {
     const data = request.data;
-    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
-    const tags = (data.query.tags) ? JSON.parse(data.query.tags) : undefined;
+    const contactId = (data.contactId) ? data.contactId : undefined;
+    const tags = (data.tags) ? JSON.parse(data.tags) : undefined;
 
     OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
     OPA.assertNonNullishOrWhitespace(tags, "The Contact tags must not be blank.");
@@ -194,8 +194,8 @@ const setContactToArchivalState_FunctionName = () => (OPA.getTypedPropertyKeyAsT
 export const setContactToArchivalState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, setContactToArchivalState_FunctionName, async (request, callState) => {
     const data = request.data;
-    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
-    const archivalState = (data.query.archivalState) ? data.query.archivalState : undefined;
+    const contactId = (data.contactId) ? data.contactId : undefined;
+    const archivalState = (data.archivalState) ? data.archivalState : undefined;
 
     OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
     OPA.assertNonNullishOrWhitespace(archivalState, "The Contact archival state must not be blank.");
@@ -211,7 +211,7 @@ const setContactToArchived_FunctionName = () => (OPA.getTypedPropertyKeyAsText("
 export const setContactToArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, setContactToArchived_FunctionName, async (request, callState) => {
     const data = request.data;
-    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
+    const contactId = (data.contactId) ? data.contactId : undefined;
 
     OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
 
@@ -226,7 +226,7 @@ const setContactToNotArchived_FunctionName = () => (OPA.getTypedPropertyKeyAsTex
 export const setContactToNotArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, setContactToNotArchived_FunctionName, async (request, callState) => {
     const data = request.data;
-    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
+    const contactId = (data.contactId) ? data.contactId : undefined;
 
     OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
 
@@ -241,7 +241,7 @@ const setContactToViewed_FunctionName = () => (OPA.getTypedPropertyKeyAsText("se
 export const setContactToViewed = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, setContactToViewed_FunctionName, async (request, callState) => {
     const data = request.data;
-    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
+    const contactId = (data.contactId) ? data.contactId : undefined;
 
     OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
 
@@ -256,8 +256,8 @@ const markContactWithDeletionState_FunctionName = () => (OPA.getTypedPropertyKey
 export const markContactWithDeletionState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, markContactWithDeletionState_FunctionName, async (request, callState) => {
     const data = request.data;
-    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
-    const deletionState = (data.query.deletionState) ? data.query.deletionState : undefined;
+    const contactId = (data.contactId) ? data.contactId : undefined;
+    const deletionState = (data.deletionState) ? data.deletionState : undefined;
 
     OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
     OPA.assertNonNullishOrWhitespace(deletionState, "The Contact deletion state must not be blank.");
@@ -273,7 +273,7 @@ const markContactAsDeleted_FunctionName = () => (OPA.getTypedPropertyKeyAsText("
 export const markContactAsDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, markContactAsDeleted_FunctionName, async (request, callState) => {
     const data = request.data;
-    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
+    const contactId = (data.contactId) ? data.contactId : undefined;
 
     OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
 
@@ -288,7 +288,7 @@ const markContactAsUnDeleted_FunctionName = () => (OPA.getTypedPropertyKeyAsText
 export const markContactAsUnDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, markContactAsUnDeleted_FunctionName, async (request, callState) => {
     const data = request.data;
-    const contactId = (data.query.contactId) ? data.query.contactId : undefined;
+    const contactId = (data.contactId) ? data.contactId : undefined;
 
     OPA.assertIdentifierIsValid(contactId, "The Contact ID must not be blank.");
 

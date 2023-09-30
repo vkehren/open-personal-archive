@@ -26,12 +26,12 @@ export const recordLogItem = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
     // LATER: Consider not logging that is the System is ready to record the log item, as it seems redundant with the actual log item
     await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, getLogMessage(OPA.ExecutionStates.ready));
 
-    const activityType = (request.data.query.activityType) ? request.data.query.activityType : undefined;
-    const requestor = (request.data.query.requestor) ? request.data.query.requestor : undefined;
-    const resource = (request.data.query.resource) ? request.data.query.resource : undefined;
-    const action = (request.data.query.action) ? request.data.query.action : undefined;
-    const data = (request.data.query.data) ? JSON.parse(request.data.query.data) : undefined;
-    const otherState = (request.data.query.otherState) ? JSON.parse(request.data.query.otherState) : undefined;
+    const activityType = (request.data.activityType) ? request.data.activityType : undefined;
+    const requestor = (request.data.requestor) ? request.data.requestor : undefined;
+    const resource = (request.data.resource) ? request.data.resource : undefined;
+    const action = (request.data.action) ? request.data.action : undefined;
+    const data = (request.data.data) ? JSON.parse(request.data.data) : undefined;
+    const otherState = (request.data.otherState) ? JSON.parse(request.data.otherState) : undefined;
 
     await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, requestor, resource, action, data, otherState);
     return OPA.getSuccessResultForMessage("The request was logged successfully.");

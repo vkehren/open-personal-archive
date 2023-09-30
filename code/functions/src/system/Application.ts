@@ -137,17 +137,17 @@ export const performInstall = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reques
     await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, getLogMessage(OPA.ExecutionStates.ready));
 
     const data = request.data;
-    const archiveName = (data.query.archiveName) ? data.query.archiveName : undefined;
+    const archiveName = (data.archiveName) ? data.archiveName : undefined;
     OPA.assertNonNullishOrWhitespace(archiveName, "The Archive name must not be blank.");
-    const archiveDescription = (data.query.archiveDescription) ? data.query.archiveDescription : undefined;
+    const archiveDescription = (data.archiveDescription) ? data.archiveDescription : undefined;
     OPA.assertNonNullishOrWhitespace(archiveDescription, "The Archive description must not be blank.");
-    const pathToStorageFolder = (data.query.pathToStorageFolder) ? data.query.pathToStorageFolder : undefined;
+    const pathToStorageFolder = (data.pathToStorageFolder) ? data.pathToStorageFolder : undefined;
     OPA.assertNonNullishOrWhitespace(pathToStorageFolder, "The Archive storage path must not be blank.");
-    const defaultLocaleId = (data.query.defaultLocaleId) ? data.query.defaultLocaleId : undefined;
+    const defaultLocaleId = (data.defaultLocaleId) ? data.defaultLocaleId : undefined;
     OPA.assertNonNullishOrWhitespace(defaultLocaleId, "The Archive default locale must not be blank.");
-    const defaultTimeZoneGroupId = (data.query.defaultTimeZoneGroupId) ? data.query.defaultTimeZoneGroupId : undefined;
+    const defaultTimeZoneGroupId = (data.defaultTimeZoneGroupId) ? data.defaultTimeZoneGroupId : undefined;
     OPA.assertNonNullishOrWhitespace(defaultTimeZoneGroupId, "The Archive default time zone group must not be blank.");
-    const installationNotes = OPA.convertNonNullish(data.query.installationNotes, "");
+    const installationNotes = OPA.convertNonNullish(data.installationNotes, "");
     const installResult = await Application.performInstall(callState.dataStorageState, callState.authenticationState, archiveName, archiveDescription, pathToStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, installationNotes); // eslint-disable-line max-len
 
     return OPA.getSuccessResult(installResult);
@@ -175,11 +175,11 @@ export const updateInstallationSettings = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, a
     await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, getLogMessage(OPA.ExecutionStates.ready));
 
     const data = request.data;
-    const archiveName = (data.query.archiveName) ? data.query.archiveName : undefined;
-    const archiveDescription = (data.query.archiveDescription) ? data.query.archiveDescription : undefined;
-    const defaultLocaleId = (data.query.defaultLocaleId) ? data.query.defaultLocaleId : undefined;
-    const defaultTimeZoneGroupId = (data.query.defaultTimeZoneGroupId) ? data.query.defaultTimeZoneGroupId : undefined;
-    const defaultTimeZoneId = (data.query.defaultTimeZoneId) ? data.query.defaultTimeZoneId : undefined;
+    const archiveName = (data.archiveName) ? data.archiveName : undefined;
+    const archiveDescription = (data.archiveDescription) ? data.archiveDescription : undefined;
+    const defaultLocaleId = (data.defaultLocaleId) ? data.defaultLocaleId : undefined;
+    const defaultTimeZoneGroupId = (data.defaultTimeZoneGroupId) ? data.defaultTimeZoneGroupId : undefined;
+    const defaultTimeZoneId = (data.defaultTimeZoneId) ? data.defaultTimeZoneId : undefined;
     await Application.updateInstallationSettings(callState, archiveName, archiveDescription, defaultLocaleId, defaultTimeZoneGroupId, defaultTimeZoneId);
 
     const displayModel = await Application.getInstallationScreenDisplayModel(callState);
@@ -208,8 +208,8 @@ export const performUpgrade = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reques
     await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, getLogMessage(OPA.ExecutionStates.ready));
 
     const data = request.data;
-    const upgradeNotes = OPA.convertNonNullish(data.query.upgradeNotes, "");
-    const doBackupFirst = OPA.convertNonNullish(OPA.getBoolean(data.query.doBackupFirst, true));
+    const upgradeNotes = OPA.convertNonNullish(data.upgradeNotes, "");
+    const doBackupFirst = OPA.convertNonNullish(OPA.getBoolean(data.doBackupFirst, true));
     const upgradeResult = await Application.performUpgrade(callState, upgradeNotes, doBackupFirst);
     return OPA.getSuccessResult(upgradeResult);
   } catch (error) {
@@ -236,7 +236,7 @@ export const performUninstall = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (requ
     await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, getLogMessage(OPA.ExecutionStates.ready));
 
     const data = request.data;
-    const doBackupFirst = OPA.convertNonNullish(OPA.getBoolean(data.query.doBackupFirst, true));
+    const doBackupFirst = OPA.convertNonNullish(OPA.getBoolean(data.doBackupFirst, true));
     const uninstallResult = await Application.performUninstall(callState.dataStorageState, callState.authenticationState, callState.authorizationState, doBackupFirst);
     return OPA.getSuccessResult(uninstallResult);
   } catch (error) {
