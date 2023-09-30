@@ -214,22 +214,40 @@
         });
     };
 
+    function parseJsonIfNeeded(obj) {
+      const objAsString = ("" + obj);
+      if (obj != objAsString) {
+        return obj;
+      }
+
+      const lastIndex = (objAsString.length - 1);
+      if (!((objAsString[0] == "{") || (objAsString[0] == "["))) {
+        return obj;
+      }
+      if (!((objAsString[lastIndex] == "}") || (objAsString[lastIndex] == "]"))) {
+        return obj;
+      }
+
+      const objAsJson = JSON.parse(objAsString);
+      return objAsJson;
+    }
+
     document.getElementById("function-button").onclick = () => {
       const functionSelect = document.getElementById("function-select");
       const functionIndex = functionSelect.selectedIndex;
       const functionOption = functionSelect.options[functionIndex];
       const functionName = functionOption.value;
       const functionText = functionOption.text;
-      const arg0 = document.getElementById("function-arg0-input").value;
-      const arg1 = document.getElementById("function-arg1-input").value;
-      const arg2 = document.getElementById("function-arg2-input").value;
-      const arg3 = document.getElementById("function-arg3-input").value;
-      const arg4 = document.getElementById("function-arg4-input").value;
-      const arg5 = document.getElementById("function-arg5-input").value;
-      const arg6 = document.getElementById("function-arg6-input").value;
-      const arg7 = document.getElementById("function-arg7-input").value;
-      const arg8 = document.getElementById("function-arg8-input").value;
-      const arg9 = document.getElementById("function-arg9-input").value;
+      const arg0 = parseJsonIfNeeded(document.getElementById("function-arg0-input").value);
+      const arg1 = parseJsonIfNeeded(document.getElementById("function-arg1-input").value);
+      const arg2 = parseJsonIfNeeded(document.getElementById("function-arg2-input").value);
+      const arg3 = parseJsonIfNeeded(document.getElementById("function-arg3-input").value);
+      const arg4 = parseJsonIfNeeded(document.getElementById("function-arg4-input").value);
+      const arg5 = parseJsonIfNeeded(document.getElementById("function-arg5-input").value);
+      const arg6 = parseJsonIfNeeded(document.getElementById("function-arg6-input").value);
+      const arg7 = parseJsonIfNeeded(document.getElementById("function-arg7-input").value);
+      const arg8 = parseJsonIfNeeded(document.getElementById("function-arg8-input").value);
+      const arg9 = parseJsonIfNeeded(document.getElementById("function-arg9-input").value);
 
       const functionArgNames = functionText.split("(")[1].split(")")[0].split(",");
       const functionArgValues = [arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9]
