@@ -8,9 +8,9 @@
       "isDefault": true
     },
     {
-      "id": "OPA_AuthenticationProvider_Firebase",
+      "id": "OPA_AuthenticationProvider_Password",
       "name": "Firebase Email and Password Authentication",
-      "externalId": "firebase",
+      "externalId": "password",
       "displayOrder": 200,
       "isDefault": false
     }

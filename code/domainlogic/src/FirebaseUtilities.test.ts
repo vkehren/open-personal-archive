@@ -71,10 +71,11 @@ describe("Firebase Auth Handler Tests using Firebase " + config.testEnvironment,
 
     const fbAuthUserCredential = await signInWithEmailAndPassword(auth, firebaseAuthUserEmail, firebaseAuthUserPassword);
     const fbAuthUser = fbAuthUserCredential.user;
+    const fbAuthProviderData = fbAuthUser.providerData[0];
     const userData: OPA.IFirebaseAuthUserData = {
       authType: OPA.FirebaseAuthTypes.user,
       uid: fbAuthUser.uid,
-      providerId: (OPA.convertNonNullish(fbAuthUserCredential.providerId, fbAuthUser.providerId) as OPA.FirebaseProviderType),
+      providerId: (fbAuthProviderData.providerId as OPA.FirebaseProviderType),
       email: OPA.convertNonNullish(fbAuthUser.email),
       emailVerified: treatEmailAsVerified,
       isAnonymous: fbAuthUser.isAnonymous,
@@ -114,10 +115,11 @@ describe("Firebase Auth Handler Tests using Firebase " + config.testEnvironment,
 
     const fbAuthUserCredential = await signInWithEmailAndPassword(auth, firebaseAuthUserEmail, firebaseAuthUserPassword);
     const fbAuthUser = fbAuthUserCredential.user;
+    const fbAuthProviderData = fbAuthUser.providerData[0];
     const userData: OPA.IFirebaseAuthUserData = {
       authType: OPA.FirebaseAuthTypes.user,
       uid: fbAuthUser.uid,
-      providerId: (OPA.convertNonNullish(fbAuthUserCredential.providerId, fbAuthUser.providerId) as OPA.FirebaseProviderType),
+      providerId: (fbAuthProviderData.providerId as OPA.FirebaseProviderType),
       email: OPA.convertNonNullish(fbAuthUser.email),
       emailVerified: fbAuthUser.emailVerified,
       isAnonymous: fbAuthUser.isAnonymous,
@@ -154,10 +156,11 @@ describe("Firebase Auth Handler Tests using Firebase " + config.testEnvironment,
 
     const fbAuthUserCredential = await signInWithEmailAndPassword(auth, firebaseAuthUserEmail, firebaseAuthUserPassword);
     const fbAuthUser = fbAuthUserCredential.user;
+    const fbAuthProviderData = fbAuthUser.providerData[0];
     const userData: OPA.IFirebaseAuthUserData = {
       authType: OPA.FirebaseAuthTypes.user,
       uid: fbAuthUser.uid,
-      providerId: (OPA.convertNonNullish(fbAuthUserCredential.providerId, fbAuthUser.providerId) as OPA.FirebaseProviderType),
+      providerId: (fbAuthProviderData.providerId as OPA.FirebaseProviderType),
       email: OPA.convertNonNullish(fbAuthUser.email),
       emailVerified: fbAuthUser.emailVerified,
       isAnonymous: fbAuthUser.isAnonymous,

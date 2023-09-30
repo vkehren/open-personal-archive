@@ -17,9 +17,9 @@ export const FirebaseAuthTypes = {
   unauthenticated: ("UNAUTHENTICATED" as FirebaseAuthType),
 };
 
-export type FirebaseProviderType = "firebase" | "google.com";
+export type FirebaseProviderType = "password" | "google.com";
 export const FirebaseProviderTypes = {
-  firebase: ("firebase" as FirebaseProviderType), // email and password
+  password: ("password" as FirebaseProviderType), // email and password
   google: ("google.com" as FirebaseProviderType), // Google popup
 };
 
