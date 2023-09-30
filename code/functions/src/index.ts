@@ -1,3 +1,4 @@
+// import {getAuth, sendEmailVerification} from "firebase/auth"; // LATER: Figure-out if it is possible to get the current User and send the verifiation email in the beforeUserSignedIn(...) handler
 import {AuthBlockingEvent, beforeUserSignedIn} from "firebase-functions/v2/identity"; // NOTE: Also has "beforeUserCreated"
 import * as logger from "firebase-functions/logger";
 import * as admin from "firebase-admin";
