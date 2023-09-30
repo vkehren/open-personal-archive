@@ -31,6 +31,7 @@
     <button id="firebase-button">Sign-In with Firebase using Email & Password</button>
     <br />
     <label id="firebase-label"></label>
+    <label id="firebase-verification-label"></label>
   </p>
   <hr style="margin: 16px;" />
   <p style="margin-left: 16px;">
@@ -164,7 +165,7 @@
 
   <script type="module">
     import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js';
-    import {GoogleAuthProvider, getAuth, signInWithEmailAndPassword, signInWithPopup} from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js';
+    import {GoogleAuthProvider, getAuth, sendEmailVerification, signInWithEmailAndPassword, signInWithPopup} from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js';
     import {getFunctions, httpsCallable} from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-functions.js';
 
     const firebaseConfig = {
@@ -199,6 +200,15 @@
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           document.getElementById("firebase-label").innerText = JSON.stringify(userCredential);
+          const user = userCredential.user;
+          if (!user.emailVerified) {
+            sendEmailVerification(auth.currentUser)
+              .then((result) => {
+                document.getElementById("firebase-verification-label").innerText = JSON.stringify(result);
+              }).catch((error) => {
+                document.getElementById("firebase-verification-label").innerText = JSON.stringify(error);
+              });
+          }
         }).catch((error) => {
           document.getElementById("firebase-label").innerText = JSON.stringify(error);
         });
