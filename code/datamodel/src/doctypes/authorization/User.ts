@@ -130,8 +130,14 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial, thr
     const isRequestedNotSelfAssigned = (!OPA.isNullish(updateObject_AsCitationAccessor.requestedCitationIds) && (updateObject_AsCitationAccessor.userIdOfLatestCitationChanger != document.id));
     const isViewableSelfAssigned = (!OPA.isNullish(updateObject_AsCitationAccessor.viewableCitationIds) && (updateObject_AsCitationAccessor.userIdOfLatestCitationChanger == document.id));
 
-    if ((dateNotSet && dateNotCreation) || (userNotSet && dateNotCreation) || isRequestedNotSelfAssigned || isViewableSelfAssigned) {
+    if ((dateNotSet && dateNotCreation) || (userNotSet && dateNotCreation)) {
       return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
+    }
+    if (isRequestedNotSelfAssigned) {
+      return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update can only be performed by the User requesting access.");
+    }
+    if (isViewableSelfAssigned) {
+      return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update cannot be performed by the User requesting access.");
     }
   }
   return true;

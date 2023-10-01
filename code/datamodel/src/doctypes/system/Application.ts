@@ -56,14 +56,14 @@ export function areUpdatesValid(document: IApplication, updateObject: IApplicati
   if (!OPA.isNullish(updateObject.applicationVersion)) {
     const applicationVersion_Updated = OPA.convertNonNullish(updateObject.applicationVersion);
     if (OPA.compareVersionNumberStrings(document.applicationVersion, applicationVersion_Updated) < 1) {
-      return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
+      return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The Application Version can only be upgraded.");
     }
   }
   // NOTE: The "schemaVersion" cannot be downgraded or updated to same value as current value
   if (!OPA.isNullish(updateObject.schemaVersion)) {
     const schemaVersion_Updated = OPA.convertNonNullish(updateObject.schemaVersion);
     if (OPA.compareVersionNumberStrings(document.schemaVersion, schemaVersion_Updated) < 1) {
-      return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
+      return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The Schema Version can only be upgraded.");
     }
   }
   return true;

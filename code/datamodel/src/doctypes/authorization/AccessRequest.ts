@@ -84,7 +84,7 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
     const userNotCreator = (updateObject_AsUpdateable_ByUser.userIdOfLatestUpdater != document.userIdOfCreator);
 
     if (userNotCreator) {
-      return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
+      return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update can only be performed by the User who created the AccessRequest.");
     }
   }
 
@@ -99,7 +99,7 @@ export function areUpdatesValid(document: IAccessRequest, updateObject: IAccessR
     const userNotDecider = (!userIdsOfDeciders.includes(OPA.convertNonNullish(updateObject_AsUpdateable_ByUser.userIdOfLatestUpdater)));
 
     if (userNotViewer && userNotDecider) {
-      return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
+      return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update can only be performed by a User who has viewed or decided the approval status of the AccessRequest.");
     }
   }
   return true;
