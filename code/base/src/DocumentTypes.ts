@@ -862,7 +862,7 @@ export function areUpdatesValid_ForApprovable(original: IApprovable<BT.ApprovalS
  * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForApprovable_ByUser(original: IApprovable_ByUser<BT.ApprovalState>, updated: IApprovable_ByUser<BT.ApprovalState>, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean {
+export function areUpdatesValid_ForApprovable_ByUser(original: IApprovable_ByUser<BT.ApprovalState>, updated: IApprovable_ByUser<BT.ApprovalState>, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean { // eslint-disable-line max-len
   if (!areUpdatesValid_ForApprovable(original, updated, preventUpdates)) {
     return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
