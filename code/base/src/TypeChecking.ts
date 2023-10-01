@@ -223,6 +223,36 @@ export function assertIsOf<T>(value: unknown, guardFunc: BT.GuardFunc<T>, failur
 }
 
 /**
+ * Checks whether a given argument is of string literal type T or not by using the options for that type.
+ * @param {unknown} value The value to check.
+ * @param {Array<T>} validOptions The valid options for the string literal type.
+ * @return {boolean} The result of checking.
+ */
+export function isOfLiteral<T>(value: unknown, validOptions: Array<T>): value is T {
+  if (isNullish(value)) {
+    return false;
+  }
+  const guardFunc = (possible: T) => (validOptions.includes(possible));
+  return isOf<T>(value, guardFunc);
+}
+
+/**
+ * Asserts that a given argument is of string literal type T by using the options for that type.
+ * @param {unknown} value The value to check.
+ * @param {Array<T>} validOptions The valid options for the string literal type.
+ * @param {string} [nameOfTypeT="\"T\""] The name of the string literal type.
+ * @param {boolean} [includeValidOptionsInMessage=true] Whether to include the list of valid options in the failure message.
+ * @return {void}
+ */
+export function assertIsOfLiteral<T>(value: unknown, validOptions: Array<T>, nameOfTypeT = "\"T\"", includeValidOptionsInMessage = true): void {
+  if (!isOfLiteral<T>(value, validOptions)) {
+    let failureMessage = ("The value provided was not of type \"" + nameOfTypeT + "\"");
+    failureMessage += (includeValidOptionsInMessage) ? (", for which valid options are: " + validOptions.toString() + ".") : ".";
+    throw new Error(failureMessage);
+  }
+}
+
+/**
  * Converts a value of unknown type to a value of type T.
  * @param {unknown} value The value to convert.
  * @param {BT.GuardFunc<T> | undefined} [guardFunc=undefined] The optional guard function to apply.
