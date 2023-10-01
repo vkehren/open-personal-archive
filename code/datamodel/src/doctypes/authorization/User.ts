@@ -334,6 +334,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
 
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertIsOfLiteral<OPA.ApprovalState>(approvalState, OPA.ApprovalStates.all, OPA.ApprovalStates._typeName);
 
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const approvalStateFieldName = OPA.getTypedPropertyKeyAsText<IUser>("approvalState");
@@ -674,6 +675,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   async setToDecidedOption(ds: OPA.IDataStorageState, documentId: string, approvalState: OPA.ApprovalState, userIdOfDecider: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertNonNullish(approvalState);
+    OPA.assertIsOfLiteral<OPA.ApprovalState>(approvalState, OPA.ApprovalStates.all, OPA.ApprovalStates._typeName);
 
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
@@ -706,6 +709,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   async setToSuspensionState(ds: OPA.IDataStorageState, documentId: string, suspensionState: OPA.SuspensionState, reason: string, userIdOfSuspensionChanger: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertNonNullish(suspensionState);
+    OPA.assertIsOfLiteral<OPA.SuspensionState>(suspensionState, OPA.SuspensionStates.all, OPA.SuspensionStates._typeName);
 
     // NOTE: We need the document earlier in this function to get the existing values for ISuspendable_ByUser
     const document = await this.getByIdWithAssert(ds, documentId);
@@ -752,6 +757,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   async markWithDeletionState(ds: OPA.IDataStorageState, documentId: string, deletionState: OPA.DeletionState, userIdOfDeletionChanger: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertNonNullish(deletionState);
+    OPA.assertIsOfLiteral<OPA.DeletionState>(deletionState, OPA.DeletionStates.all, OPA.DeletionStates._typeName);
 
     // NOTE: We need the document earlier in this function to get the existing values for IDeleteable_ByUser
     const document = await this.getByIdWithAssert(ds, documentId);
