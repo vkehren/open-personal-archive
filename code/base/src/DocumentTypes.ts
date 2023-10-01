@@ -75,29 +75,30 @@ export function getDocumentIdWithAssert<T extends IDocument>(document: T | null 
  * @param {IDocument} original The original object.
  * @param {IDocument} updated The updated object.
  * @param {Array<string>} [readOnlyPropertyNames=[]] The list of property names that are invalid to update.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForDocument(original: IDocument, updated: IDocument, readOnlyPropertyNames = ([] as Array<string>)): boolean {
+export function areUpdatesValid_ForDocument(original: IDocument, updated: IDocument, readOnlyPropertyNames = ([] as Array<string>), throwErrorOnInvalidUpdate = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
   if (!BT.isIdentifierValid(original.id)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The value "undefined" is valid, but the value "null" is not
   if (TC.isNull(updated.id)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   if (!TC.isNullish(updated.id)) {
     const idsMatch = (updated.id == original.id);
     if (!idsMatch) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   const updatedPropertyNames = VC.getOwnPropertyKeys(updated);
   const readOnlyPropertyUpdates = readOnlyPropertyNames.filter((value) => (updatedPropertyNames.includes(value)));
   if (readOnlyPropertyUpdates.length > 0) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   return true;
 }
@@ -126,23 +127,24 @@ export interface IDocument_Creatable_ByNullableUser extends IDocument_Creatable,
  * Returns whether the updates to the object are valid from the perspective of the ICreatable interface.
  * @param {ICreatable} original The original object.
  * @param {ICreatable} updated The updated object.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForCreatable(original: ICreatable, updated: ICreatable): boolean {
+export function areUpdatesValid_ForCreatable(original: ICreatable, updated: ICreatable, throwErrorOnInvalidUpdate = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
   if (TC.isNullish(original.dateOfCreation)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The value "undefined" is valid, but the value "null" is not
   if (TC.isNull(updated.dateOfCreation)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   if (!TC.isNullish(updated.dateOfCreation)) {
     const datesMatch = VC.areDatesEqual(updated.dateOfCreation, original.dateOfCreation);
     if (!datesMatch) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   return true;
@@ -152,24 +154,25 @@ export function areUpdatesValid_ForCreatable(original: ICreatable, updated: ICre
  * Returns whether the updates to the object are valid from the perspective of the ICreatable_ByUser interface.
  * @param {ICreatable_ByUser} original The original object.
  * @param {ICreatable_ByUser} updated The updated object.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForCreatable_ByUser(original: ICreatable_ByUser, updated: ICreatable_ByUser): boolean {
+export function areUpdatesValid_ForCreatable_ByUser(original: ICreatable_ByUser, updated: ICreatable_ByUser, throwErrorOnInvalidUpdate = false): boolean {
   if (!areUpdatesValid_ForCreatable(original, updated)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
 
   if (TC.isNullish(original.userIdOfCreator)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   const existencesMatch = (TC.isNullish(updated.userIdOfCreator) == TC.isNullish(updated.dateOfCreation));
   if (!existencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   if (!TC.isNullish(updated.userIdOfCreator)) {
     const userIdsMatch = (updated.userIdOfCreator == original.userIdOfCreator);
     if (!userIdsMatch) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   return true;
@@ -179,22 +182,23 @@ export function areUpdatesValid_ForCreatable_ByUser(original: ICreatable_ByUser,
  * Returns whether the updates to the object are valid from the perspective of the ICreatable_ByNullableUser interface.
  * @param {ICreatable_ByNullableUser} original The original object.
  * @param {ICreatable_ByNullableUser} updated The updated object.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForCreatable_ByNullableUser(original: ICreatable_ByNullableUser, updated: ICreatable_ByNullableUser): boolean {
+export function areUpdatesValid_ForCreatable_ByNullableUser(original: ICreatable_ByNullableUser, updated: ICreatable_ByNullableUser, throwErrorOnInvalidUpdate = false): boolean {
   if (!areUpdatesValid_ForCreatable(original, updated)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
 
   // NOTE: The original "userIdOfCreator" can be null
   if (!TC.isNullish(updated.userIdOfCreator)) {
     const existencesMatch = (!TC.isNullish(updated.dateOfCreation));
     if (!existencesMatch) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
     const userIdsMatch = (updated.userIdOfCreator == original.userIdOfCreator);
     if (!userIdsMatch) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   return true;
@@ -252,39 +256,40 @@ export interface IDocument_Upgradeable_ByUser_WithHistory<T> extends IDocument_U
  * @param {IUpgradeable} original The original object.
  * @param {IUpgradeable} updated The updated object.
  * @param {boolean} [preventUpdates=false] Whether updates to properties of the IUpgradeable interface should be prevented or not.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForUpgradeable(original: IUpgradeable, updated: IUpgradeable, preventUpdates = false): boolean {
+export function areUpdatesValid_ForUpgradeable(original: IUpgradeable, updated: IUpgradeable, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
   // NOTE: These values may both be false or both be true, but not one of each
   const priorExistencesValid = ((!original.hasBeenUpgraded) == TC.isNullish(original.dateOfLatestUpgrade));
   if (!priorExistencesValid) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The value "undefined" is valid, but the value "null" is not
   if (TC.isNull(updated.hasBeenUpgraded)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: These values may optionally exist on any update
   const existencesMatch = (TC.isNullish(updated.hasBeenUpgraded) == TC.isNullish(updated.dateOfLatestUpgrade));
   if (!existencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   if (!TC.isNullish(updated.hasBeenUpgraded)) {
     const stateValid = (updated.hasBeenUpgraded); // NOTE: This value must be "true" for updates
     if (!stateValid) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
     if (preventUpdates) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   if (!TC.isNullish(updated.dateOfLatestUpgrade)) {
     const datesValid = (TC.isNullish(original.dateOfLatestUpgrade) || (TC.convertNonNullish(updated.dateOfLatestUpgrade) > TC.convertNonNullish(original.dateOfLatestUpgrade)));
     if (!datesValid) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   if (TC.isOf<IUpgradeHistoryProvider<unknown>>(original, (value) => (!TC.isNullish(value.upgradeHistory)))) {
@@ -292,7 +297,7 @@ export function areUpdatesValid_ForUpgradeable(original: IUpgradeable, updated: 
       // NOTE: The "updated" object MUST NOT erase the read-only history of changes, so it MUST use ArrayUnion to perform updates on this property
       const upgradeHistory = VC.getOwnPropertyValue(updated, IUpgradeHistoryProvider_UpgradeHistory_PropertyName);
       if (!FB.isOfFieldValue_ArrayUnion<firestore.FieldValue>(upgradeHistory)) {
-        return false;
+        return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
       }
     }
   }
@@ -304,22 +309,23 @@ export function areUpdatesValid_ForUpgradeable(original: IUpgradeable, updated: 
  * @param {IUpgradeable_ByUser} original The original object.
  * @param {IUpgradeable_ByUser} updated The updated object.
  * @param {boolean} [preventUpdates=false] Whether updates to properties of the IUpgradeable_ByUser interface should be prevented or not.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForUpgradeable_ByUser(original: IUpgradeable_ByUser, updated: IUpgradeable_ByUser, preventUpdates = false): boolean {
+export function areUpdatesValid_ForUpgradeable_ByUser(original: IUpgradeable_ByUser, updated: IUpgradeable_ByUser, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean {
   if (!areUpdatesValid_ForUpgradeable(original, updated, preventUpdates)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
 
   // NOTE: These values may both be null or both be non-null, but not one of each
   const priorExistencesMatch = (TC.isNullish(original.userIdOfLatestUpgrader) == TC.isNullish(original.dateOfLatestUpgrade));
   if (!priorExistencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: These values may optionally exist on any update
   const existencesMatch = (TC.isNullish(updated.userIdOfLatestUpgrader) == TC.isNullish(updated.dateOfLatestUpgrade));
   if (!existencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The "userIdOf..." value must be validated via AuthorizationState, not here
   return true;
@@ -355,39 +361,40 @@ export interface IDocument_Updateable_ByUser_WithHistory<T> extends IDocument_Up
  * @param {IUpdateable} original The original object.
  * @param {IUpdateable} updated The updated object.
  * @param {boolean} [preventUpdates=false] Whether updates to properties of the IUpdateable interface should be prevented or not.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForUpdateable(original: IUpdateable, updated: IUpdateable, preventUpdates = false): boolean {
+export function areUpdatesValid_ForUpdateable(original: IUpdateable, updated: IUpdateable, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
   // NOTE: These values may both be false or both be true, but not one of each
   const priorExistencesValid = ((!original.hasBeenUpdated) == TC.isNullish(original.dateOfLatestUpdate));
   if (!priorExistencesValid) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The value "undefined" is valid, but the value "null" is not
   if (TC.isNull(updated.hasBeenUpdated)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: These values must exist on any update
   const existencesValid = (!TC.isNullish(updated.hasBeenUpdated) && !TC.isNullish(updated.dateOfLatestUpdate));
   if (!existencesValid) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   if (!TC.isNullish(updated.hasBeenUpdated)) {
     const stateValid = (updated.hasBeenUpdated); // NOTE: This value must be "true" for updates
     if (!stateValid) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
     if (preventUpdates) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   if (!TC.isNullish(updated.dateOfLatestUpdate)) {
     const datesValid = (TC.isNullish(original.dateOfLatestUpdate) || (TC.convertNonNullish(updated.dateOfLatestUpdate) > TC.convertNonNullish(original.dateOfLatestUpdate)));
     if (!datesValid) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   if (TC.isOf<IUpdateHistoryProvider<unknown>>(original, (value) => (!TC.isNullish(value.updateHistory)))) {
@@ -395,7 +402,7 @@ export function areUpdatesValid_ForUpdateable(original: IUpdateable, updated: IU
       // NOTE: The "updated" object MUST NOT erase the read-only history of changes, so it MUST use ArrayUnion to perform updates on this property
       const updateHistory = VC.getOwnPropertyValue(updated, IUpdateHistoryProvider_UpdateHistory_PropertyName);
       if (!FB.isOfFieldValue_ArrayUnion<firestore.FieldValue>(updateHistory)) {
-        return false;
+        return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
       }
     }
   }
@@ -407,22 +414,23 @@ export function areUpdatesValid_ForUpdateable(original: IUpdateable, updated: IU
  * @param {IUpdateable_ByUser} original The original object.
  * @param {IUpdateable_ByUser} updated The updated object.
  * @param {boolean} [preventUpdates=false] Whether updates to properties of the IUpdateable_ByUser interface should be prevented or not.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForUpdateable_ByUser(original: IUpdateable_ByUser, updated: IUpdateable_ByUser, preventUpdates = false): boolean {
+export function areUpdatesValid_ForUpdateable_ByUser(original: IUpdateable_ByUser, updated: IUpdateable_ByUser, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean {
   if (!areUpdatesValid_ForUpdateable(original, updated, preventUpdates)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
 
   // NOTE: These values may both be null or both be non-null, but not one of each
   const priorExistencesMatch = (TC.isNullish(original.userIdOfLatestUpdater) == TC.isNullish(original.dateOfLatestUpdate));
   if (!priorExistencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: These values must exist on any update
   const existencesValid = (!TC.isNullish(updated.userIdOfLatestUpdater));
   if (!existencesValid) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The "userIdOf..." value must be validated via AuthorizationState, not here
   return true;
@@ -449,35 +457,36 @@ export interface IDocument_AssignableToRole_ByUser extends IDocument_AssignableT
  * @param {IAssignableToRole} original The original object.
  * @param {IAssignableToRole} updated The updated object.
  * @param {boolean} [preventUpdates=false] Whether updates to properties of the IAssignableToRole interface should be prevented or not.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForAssignableToRole(original: IAssignableToRole, updated: IAssignableToRole, preventUpdates = false): boolean {
+export function areUpdatesValid_ForAssignableToRole(original: IAssignableToRole, updated: IAssignableToRole, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
   // NOTE: These values must exist on any original
   const priorExistencesValid = (!TC.isNullish(original.assignedRoleId) && !TC.isNullish(original.dateOfLatestRoleAssignment));
   if (!priorExistencesValid) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The value "undefined" is valid, but the value "null" is not
   if (TC.isNull(updated.assignedRoleId)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: These values may optionally exist on any update
   const existencesMatch = (TC.isNullish(updated.assignedRoleId) == TC.isNullish(updated.dateOfLatestRoleAssignment));
   if (!existencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   if (!TC.isNullish(updated.assignedRoleId)) {
     if (preventUpdates && (updated.assignedRoleId != original.assignedRoleId)) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   if (!TC.isNullish(updated.dateOfLatestRoleAssignment)) {
     const datesValid = (TC.convertNonNullish(updated.dateOfLatestRoleAssignment) > TC.convertNonNullish(original.dateOfLatestRoleAssignment));
     if (!datesValid) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   return true;
@@ -488,22 +497,23 @@ export function areUpdatesValid_ForAssignableToRole(original: IAssignableToRole,
  * @param {IAssignableToRole_ByUser} original The original object.
  * @param {IAssignableToRole_ByUser} updated The updated object.
  * @param {boolean} [preventUpdates=false] Whether updates to properties of the IAssignableToRole_ByUser interface should be prevented or not.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForAssignableToRole_ByUser(original: IAssignableToRole_ByUser, updated: IAssignableToRole_ByUser, preventUpdates = false): boolean {
+export function areUpdatesValid_ForAssignableToRole_ByUser(original: IAssignableToRole_ByUser, updated: IAssignableToRole_ByUser, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean {
   if (!areUpdatesValid_ForAssignableToRole(original, updated, preventUpdates)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
 
   // NOTE: When the System assigns the Role at creation, the "userId..." should be null, so use conditional IF operator
   const priorExistencesValid = ((!(!TC.isNullish(original.userIdOfLatestRoleAssigner))) || (!TC.isNullish(original.dateOfLatestRoleAssignment)));
   if (!priorExistencesValid) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: These values may optionally exist on any update
   const existencesMatch = (TC.isNullish(updated.userIdOfLatestRoleAssigner) == TC.isNullish(updated.dateOfLatestRoleAssignment));
   if (!existencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The "userIdOf..." value must be validated via AuthorizationState, not here
   return true;
@@ -531,35 +541,36 @@ export interface IDocument_Taggable_ByUser extends IDocument_Taggable, ITaggable
  * @param {ITaggable} original The original object.
  * @param {ITaggable} updated The updated object.
  * @param {boolean} [preventUpdates=false] Whether updates to properties of the ITaggable interface should be prevented or not.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForTaggable(original: ITaggable, updated: ITaggable, preventUpdates = false): boolean {
+export function areUpdatesValid_ForTaggable(original: ITaggable, updated: ITaggable, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
   // NOTE: These values may both be false or both be true, but not one of each
   const priorExistencesValid = (VC.isEmpty(original.tags) == TC.isNullish(original.dateOfLatestTagging));
   if (!priorExistencesValid) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The value "undefined" is valid, but the value "null" is not
   if (TC.isNull(updated.tags)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: These values may optionally exist on any update
   const existencesMatch = (TC.isNullish(updated.tags) == TC.isNullish(updated.dateOfLatestTagging));
   if (!existencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   if (!TC.isNullish(updated.tags)) {
     if (preventUpdates) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   if (!TC.isNullish(updated.dateOfLatestTagging)) {
     const datesValid = (TC.isNullish(original.dateOfLatestTagging) || (TC.convertNonNullish(updated.dateOfLatestTagging) > TC.convertNonNullish(original.dateOfLatestTagging)));
     if (!datesValid) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   return true;
@@ -570,22 +581,23 @@ export function areUpdatesValid_ForTaggable(original: ITaggable, updated: ITagga
  * @param {ITaggable_ByUser} original The original object.
  * @param {ITaggable_ByUser} updated The updated object.
  * @param {boolean} [preventUpdates=false] Whether updates to properties of the ITaggable_ByUser interface should be prevented or not.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForTaggable_ByUser(original: ITaggable_ByUser, updated: ITaggable_ByUser, preventUpdates = false): boolean {
+export function areUpdatesValid_ForTaggable_ByUser(original: ITaggable_ByUser, updated: ITaggable_ByUser, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean {
   if (!areUpdatesValid_ForTaggable(original, updated, preventUpdates)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
 
   // NOTE: These values may both be null or both be non-null, but not one of each
   const priorExistencesMatch = (TC.isNullish(original.userIdOfLatestTagger) == TC.isNullish(original.dateOfLatestTagging));
   if (!priorExistencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: These values may optionally exist on any update
   const existencesMatch = (TC.isNullish(updated.userIdOfLatestTagger) == TC.isNullish(updated.dateOfLatestTagging));
   if (!existencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The "userIdOf..." value must be validated via AuthorizationState, not here
   return true;
@@ -621,39 +633,40 @@ export const ArchivalStates = {
  * @param {IArchivable} original The original object.
  * @param {IArchivable} updated The updated object.
  * @param {boolean} [preventUpdates=false] Whether updates to properties of the IArchivable interface should be prevented or not.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForArchivable(original: IArchivable, updated: IArchivable, preventUpdates = false): boolean {
+export function areUpdatesValid_ForArchivable(original: IArchivable, updated: IArchivable, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
   // NOTE: These values represent conditional IF operator, as in IF(isSet, hasDate)
   const priorExistencesValid = ((!original.isArchived) || (!TC.isNullish(original.dateOfArchivalChange)));
   if (!priorExistencesValid) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The value "undefined" is valid, but the value "null" is not
   if (TC.isNull(updated.isArchived)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: These values may optionally exist on any update
   const existencesMatch = (TC.isNullish(updated.isArchived) == TC.isNullish(updated.dateOfArchivalChange));
   if (!existencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   if (!TC.isNullish(updated.isArchived)) {
     const stateValid = (updated.isArchived != original.isArchived); // NOTE: This value must change for updates
     if (!stateValid) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
     if (preventUpdates) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   if (!TC.isNullish(updated.dateOfArchivalChange)) {
     const datesValid = (TC.isNullish(original.dateOfArchivalChange) || (TC.convertNonNullish(updated.dateOfArchivalChange) > TC.convertNonNullish(original.dateOfArchivalChange)));
     if (!datesValid) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   return true;
@@ -664,22 +677,23 @@ export function areUpdatesValid_ForArchivable(original: IArchivable, updated: IA
  * @param {IArchivable_ByUser} original The original object.
  * @param {IArchivable_ByUser} updated The updated object.
  * @param {boolean} [preventUpdates=false] Whether updates to properties of the IArchivable_ByUser interface should be prevented or not.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForArchivable_ByUser(original: IArchivable_ByUser, updated: IArchivable_ByUser, preventUpdates = false): boolean {
+export function areUpdatesValid_ForArchivable_ByUser(original: IArchivable_ByUser, updated: IArchivable_ByUser, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean {
   if (!areUpdatesValid_ForArchivable(original, updated, preventUpdates)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
 
   // NOTE: These values may both be null or both be non-null, but not one of each
   const priorExistencesMatch = (TC.isNullish(original.userIdOfArchivalChanger) == TC.isNullish(original.dateOfArchivalChange));
   if (!priorExistencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: These values may optionally exist on any update
   const existencesMatch = (TC.isNullish(updated.userIdOfArchivalChanger) == TC.isNullish(updated.dateOfArchivalChange));
   if (!existencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The "userIdOf..." value must be validated via AuthorizationState, not here
   return true;
@@ -707,39 +721,40 @@ export interface IDocument_Viewable_ByUser extends IDocument_Viewable, IViewable
  * @param {IViewable} original The original object.
  * @param {IViewable} updated The updated object.
  * @param {boolean} [preventUpdates=false] Whether updates to properties of the IViewable interface should be prevented or not.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForViewable(original: IViewable, updated: IViewable, preventUpdates = false): boolean {
+export function areUpdatesValid_ForViewable(original: IViewable, updated: IViewable, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
   // NOTE: These values may both be false or both be true, but not one of each
   const priorExistencesValid = ((!original.hasBeenViewed) == TC.isNullish(original.dateOfLatestViewing));
   if (!priorExistencesValid) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The value "undefined" is valid, but the value "null" is not
   if (TC.isNull(updated.hasBeenViewed)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: These values may optionally exist on any update
   const existencesMatch = (TC.isNullish(updated.hasBeenViewed) == TC.isNullish(updated.dateOfLatestViewing));
   if (!existencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   if (!TC.isNullish(updated.hasBeenViewed)) {
     const stateValid = (updated.hasBeenViewed); // NOTE: This value must be "true" for updates
     if (!stateValid) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
     if (preventUpdates) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   if (!TC.isNullish(updated.dateOfLatestViewing)) {
     const datesValid = (TC.isNullish(original.dateOfLatestViewing) || (TC.convertNonNullish(updated.dateOfLatestViewing) > TC.convertNonNullish(original.dateOfLatestViewing)));
     if (!datesValid) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   return true;
@@ -750,22 +765,23 @@ export function areUpdatesValid_ForViewable(original: IViewable, updated: IViewa
  * @param {IViewable_ByUser} original The original object.
  * @param {IViewable_ByUser} updated The updated object.
  * @param {boolean} [preventUpdates=false] Whether updates to properties of the IViewable_ByUser interface should be prevented or not.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForViewable_ByUser(original: IViewable_ByUser, updated: IViewable_ByUser, preventUpdates = false): boolean {
+export function areUpdatesValid_ForViewable_ByUser(original: IViewable_ByUser, updated: IViewable_ByUser, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean {
   if (!areUpdatesValid_ForViewable(original, updated, preventUpdates)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
 
   // NOTE: These values may both be null or both be non-null, but not one of each
   const priorExistencesMatch = (TC.isNullish(original.userIdOfLatestViewer) == TC.isNullish(original.dateOfLatestViewing));
   if (!priorExistencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: These values may optionally exist on any update
   const existencesMatch = (TC.isNullish(updated.userIdOfLatestViewer) == TC.isNullish(updated.dateOfLatestViewing));
   if (!existencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The "userIdOf..." value must be validated via AuthorizationState, not here
   return true;
@@ -795,43 +811,44 @@ export interface IDocument_Approvable_ByUser<T> extends IDocument_Approvable<T>,
  * @param {IApprovable<BT.ApprovalState>} original The original object.
  * @param {IApprovable<BT.ApprovalState>} updated The updated object.
  * @param {boolean} [preventUpdates=false] Whether updates to properties of the IApprovable<BT.ApprovalState> interface should be prevented or not.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForApprovable(original: IApprovable<BT.ApprovalState>, updated: IApprovable<BT.ApprovalState>, preventUpdates = false): boolean {
+export function areUpdatesValid_ForApprovable(original: IApprovable<BT.ApprovalState>, updated: IApprovable<BT.ApprovalState>, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
   // NOTE: These values may both be false or both be true, but not one of each
   const priorExistencesValid = (((!original.hasBeenDecided) == (original.approvalState == BT.ApprovalStates.pending)) && ((!original.hasBeenDecided) == TC.isNullish(original.dateOfDecision)));
   if (!priorExistencesValid) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The value "undefined" is valid, but the value "null" is not
   if (TC.isNull(updated.hasBeenDecided) || TC.isNull(updated.approvalState)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: These values may optionally exist on any update
   const existencesMatch = ((TC.isNullish(updated.hasBeenDecided) == TC.isNullish(updated.approvalState)) && (TC.isNullish(updated.hasBeenDecided) == TC.isNullish(updated.dateOfDecision)));
   if (!existencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   if (!TC.isNullish(updated.hasBeenDecided)) {
     const stateValid = (updated.hasBeenDecided); // NOTE: This value must be "true" for updates
     if (!stateValid) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
     const approvalStateValid = (BT.ApprovalStates._decided.includes(updated.approvalState));
     if (!approvalStateValid) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
     if (preventUpdates) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   if (!TC.isNullish(updated.dateOfDecision)) {
     const datesValid = (TC.isNullish(original.dateOfDecision) || (TC.convertNonNullish(updated.dateOfDecision) > TC.convertNonNullish(original.dateOfDecision)));
     if (!datesValid) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   return true;
@@ -842,22 +859,23 @@ export function areUpdatesValid_ForApprovable(original: IApprovable<BT.ApprovalS
  * @param {IApprovable_ByUser<BT.ApprovalState>} original The original object.
  * @param {IApprovable_ByUser<BT.ApprovalState>} updated The updated object.
  * @param {boolean} [preventUpdates=false] Whether updates to properties of the IApprovable_ByUser<BT.ApprovalState> interface should be prevented or not.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForApprovable_ByUser(original: IApprovable_ByUser<BT.ApprovalState>, updated: IApprovable_ByUser<BT.ApprovalState>, preventUpdates = false): boolean {
+export function areUpdatesValid_ForApprovable_ByUser(original: IApprovable_ByUser<BT.ApprovalState>, updated: IApprovable_ByUser<BT.ApprovalState>, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean {
   if (!areUpdatesValid_ForApprovable(original, updated, preventUpdates)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
 
   // NOTE: These values may both be null or both be non-null, but not one of each
   const priorExistencesMatch = (TC.isNullish(original.userIdOfDecider) == TC.isNullish(original.dateOfDecision));
   if (!priorExistencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: These values may optionally exist on any update
   const existencesMatch = (TC.isNullish(updated.userIdOfDecider) == TC.isNullish(updated.dateOfDecision));
   if (!existencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The "userIdOf..." value must be validated via AuthorizationState, not here
   return true;
@@ -917,9 +935,10 @@ export function isSuspended<T extends ISuspendable>(document: T): boolean {
  * @param {ISuspendable} original The original object.
  * @param {ISuspendable} updated The updated object.
  * @param {boolean} [preventUpdates=false] Whether updates to properties of the ISuspendable interface should be prevented or not.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForSuspendable(original: ISuspendable, updated: ISuspendable, preventUpdates = false): boolean {
+export function areUpdatesValid_ForSuspendable(original: ISuspendable, updated: ISuspendable, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
@@ -927,11 +946,11 @@ export function areUpdatesValid_ForSuspendable(original: ISuspendable, updated: 
   const priorExistencesValidStart = ((!original.hasSuspensionStarted) || (!TC.isNullish(original.dateOfSuspensionStart)));
   const priorExistencesValidEnd = ((!original.hasSuspensionEnded) || (!TC.isNullish(original.dateOfSuspensionEnd)));
   if (!(!TC.isNullish(original.isSuspended) && priorExistencesValidStart && priorExistencesValidEnd)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The value "undefined" is valid, but the value "null" is not
   if (TC.isNull(updated.isSuspended) || TC.isNull(updated.numberOfTimesSuspended) || TC.isNull(updated.hasSuspensionStarted) || TC.isNull(updated.hasSuspensionEnded)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: Since the updated values are complicated to validate, this code tries to break validation into more steps
   const existencesValidToCheck = (!TC.isNullish(updated.isSuspended) || !TC.isNullish(updated.numberOfTimesSuspended) || !TC.isNullish(updated.hasSuspensionStarted) || !TC.isNullish(updated.hasSuspensionEnded) || !TC.isNullish(updated.dateOfSuspensionStart) || !TC.isNullish(updated.dateOfSuspensionEnd)); // eslint-disable-line max-len
@@ -939,34 +958,34 @@ export function areUpdatesValid_ForSuspendable(original: ISuspendable, updated: 
     if (!original.isSuspended) {
       const logicValidStart = (updated.isSuspended && updated.hasSuspensionStarted && !updated.hasSuspensionEnded);
       if (!logicValidStart) {
-        return false;
+        return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
       }
       const datesValidStart = (!TC.isNullish(updated.dateOfSuspensionStart) && TC.isNullish(updated.dateOfSuspensionEnd));
       if (!datesValidStart) {
-        return false;
+        return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
       }
       const dateValuesValidStart = (TC.isNullish(original.dateOfSuspensionEnd) || (TC.convertNonNullish(updated.dateOfSuspensionStart) > TC.convertNonNullish(original.dateOfSuspensionEnd)));
       if (!dateValuesValidStart) {
-        return false;
+        return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
       }
     } else {
       // NOTE: If "hasSuspensionStarted" is provided, then it must not change the "original" value
       const logicValidEnd = (!updated.isSuspended && updated.hasSuspensionEnded && (TC.isNullish(updated.hasSuspensionStarted) || updated.hasSuspensionStarted));
       if (!logicValidEnd) {
-        return false;
+        return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
       }
       // NOTE: If "dateOfSuspensionStart" is provided, then it must not change the "original" value
       const datesValidEnd = (!TC.isNullish(updated.dateOfSuspensionEnd) && (TC.isNullish(updated.dateOfSuspensionStart) || (VC.areDatesEqual(updated.dateOfSuspensionStart, original.dateOfSuspensionStart)))); // eslint-disable-line max-len
       if (!datesValidEnd) {
-        return false;
+        return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
       }
       const dateValuesValidStart = (!TC.isNullish(original.dateOfSuspensionStart) && (TC.convertNonNullish(updated.dateOfSuspensionEnd) > TC.convertNonNullish(original.dateOfSuspensionStart)));
       if (!dateValuesValidStart) {
-        return false;
+        return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
       }
     }
     if (preventUpdates) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   return true;
@@ -977,24 +996,25 @@ export function areUpdatesValid_ForSuspendable(original: ISuspendable, updated: 
  * @param {ISuspendable_ByUser} original The original object.
  * @param {ISuspendable_ByUser} updated The updated object.
  * @param {boolean} [preventUpdates=false] Whether updates to properties of the ISuspendable_ByUser interface should be prevented or not.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForSuspendable_ByUser(original: ISuspendable_ByUser, updated: ISuspendable_ByUser, preventUpdates = false): boolean {
+export function areUpdatesValid_ForSuspendable_ByUser(original: ISuspendable_ByUser, updated: ISuspendable_ByUser, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean {
   if (!areUpdatesValid_ForSuspendable(original, updated, preventUpdates)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
 
   // NOTE: These values may both be null or both be non-null, but not one of each
   const priorExistencesValidStart = (TC.isNullish(original.userIdOfSuspensionStarter) == TC.isNullish(original.dateOfSuspensionStart));
   const priorExistencesValidEnd = (TC.isNullish(original.userIdOfSuspensionEnder) == TC.isNullish(original.dateOfSuspensionEnd));
   if (!(priorExistencesValidStart && priorExistencesValidEnd)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: These values may optionally exist on any update
   const existencesMatchStart = (TC.isNullish(updated.userIdOfSuspensionStarter) == TC.isNullish(updated.dateOfSuspensionStart));
   const existencesMatchEnd = (TC.isNullish(updated.userIdOfSuspensionEnder) == TC.isNullish(updated.dateOfSuspensionEnd));
   if (!(existencesMatchStart && existencesMatchEnd)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The "userIdOf..." value must be validated via AuthorizationState, not here
   return true;
@@ -1042,33 +1062,34 @@ export const DeletionStates = {
  * @param {IDeleteable} original The original object.
  * @param {IDeleteable} updated The updated object.
  * @param {boolean} [preventUpdates=false] Whether updates to properties of the IDeleteable interface should be prevented or not.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForDeleteable(original: IDeleteable, updated: IDeleteable, preventUpdates = false): boolean {
+export function areUpdatesValid_ForDeleteable(original: IDeleteable, updated: IDeleteable, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean {
   TC.assertNonNullish(original, "The original object must not be null.");
   TC.assertNonNullish(updated, "The updated object must not be null.");
 
   // NOTE: These values represent conditional IF operator, as in IF(isSet, hasDate)
   const priorExistencesValid = ((!original.isMarkedAsDeleted) || (!TC.isNullish(original.dateOfDeletionChange)));
   if (!priorExistencesValid) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The value "undefined" is valid, but the value "null" is not
   if (TC.isNull(updated.isMarkedAsDeleted)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: These values may optionally exist on any update
   const existencesMatch = (TC.isNullish(updated.isMarkedAsDeleted) == TC.isNullish(updated.dateOfDeletionChange));
   if (!existencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   if (!TC.isNullish(updated.isMarkedAsDeleted)) {
     const stateValid = (updated.isMarkedAsDeleted != original.isMarkedAsDeleted); // NOTE: This value must change for updates
     if (!stateValid) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
     if (preventUpdates) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
     // NOTE: Un-deletion must be performed as a solitary action
     if (!updated.isMarkedAsDeleted) {
@@ -1077,17 +1098,17 @@ export function areUpdatesValid_ForDeleteable(original: IDeleteable, updated: ID
       // NOTE: The "updateHistory" property should always be updated when other updates are made, so ignore it in the list of changes
       const propertyNames_ForUpdate = VC.getOwnPropertyKeys(updated).filter((value) => (value != IUpdateable_WithHistory_UpdateHistory_PropertyName));
       if (propertyNames_ValidSet.length != propertyNames_ForUpdate.length) {
-        return false;
+        return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
       }
       if (propertyNames_ForUpdate.filter((value) => propertyNames_ValidSet.includes(value)).length != propertyNames_ForUpdate.length) {
-        return false;
+        return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
       }
     }
   }
   if (!TC.isNullish(updated.dateOfDeletionChange)) {
     const datesValid = (TC.isNullish(original.dateOfDeletionChange) || (TC.convertNonNullish(updated.dateOfDeletionChange) > TC.convertNonNullish(original.dateOfDeletionChange)));
     if (!datesValid) {
-      return false;
+      return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   return true;
@@ -1098,22 +1119,23 @@ export function areUpdatesValid_ForDeleteable(original: IDeleteable, updated: ID
  * @param {IDeleteable_ByUser} original The original object.
  * @param {IDeleteable_ByUser} updated The updated object.
  * @param {boolean} [preventUpdates=false] Whether updates to properties of the IDeleteable_ByUser interface should be prevented or not.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid_ForDeleteable_ByUser(original: IDeleteable_ByUser, updated: IDeleteable_ByUser, preventUpdates = false): boolean {
+export function areUpdatesValid_ForDeleteable_ByUser(original: IDeleteable_ByUser, updated: IDeleteable_ByUser, preventUpdates = false, throwErrorOnInvalidUpdate = false): boolean {
   if (!areUpdatesValid_ForDeleteable(original, updated, preventUpdates)) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
 
   // NOTE: These values may both be null or both be non-null, but not one of each
   const priorExistencesMatch = (TC.isNullish(original.userIdOfDeletionChanger) == TC.isNullish(original.dateOfDeletionChange));
   if (!priorExistencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: These values may optionally exist on any update
   const existencesMatch = (TC.isNullish(updated.userIdOfDeletionChanger) == TC.isNullish(updated.dateOfDeletionChange));
   if (!existencesMatch) {
-    return false;
+    return VC.falseUnlessThrowError(throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: The "userIdOf..." value must be validated via AuthorizationState, not here
   return true;
