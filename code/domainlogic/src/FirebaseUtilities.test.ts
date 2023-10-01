@@ -133,8 +133,13 @@ describe("Firebase Auth Handler Tests using Firebase " + config.testEnvironment,
       timestamp: OPA.nowToUse().toString(),
     };
 
+    // NOTE: Because authenticationEventHandlerForFirebaseAuth(...) may have already run for a "beforeUserSignedIn" listener in functions package, the User may have already been created
     const opaUser = await FBU.authenticationEventHandlerForFirebaseAuth(config.dataStorageState, userData);
-    expect(OPA.isNullish(opaUser)).equals(true);
+    if (!OPA.isNullish(opaUser)) {
+      const opaUserNonNull = OPA.convertNonNullish(opaUser);
+      // NOTE: Either the User will not exist, or if it already exists, it will have been changed to suspended
+      expect(opaUserNonNull.isSuspended).equals(true);
+    }
   });
   test("checks that authenticationEventHandlerForFirebaseAuth(...) fails when System is installed and Auth User is disabled ", testFunc2());
 
