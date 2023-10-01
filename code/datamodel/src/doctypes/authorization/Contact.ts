@@ -56,40 +56,41 @@ const IContact_ReadOnlyPropertyNames = ([ // eslint-disable-line camelcase
  * Checks whether the specified updates to the specified Contact document are valid.
  * @param {IContact} document The Contact document being updated.
  * @param {IContactPartial} updateObject The updates specified.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid(document: IContact, updateObject: IContactPartial): boolean {
+export function areUpdatesValid(document: IContact, updateObject: IContactPartial, throwErrorOnInvalidUpdate = false): boolean {
   OPA.assertNonNullish(document);
   OPA.assertNonNullish(updateObject);
 
   const updateObject_AsUnknown = (updateObject as unknown);
   const updateObject_AsContactForUsers = (updateObject_AsUnknown as IContactForUsersPartial);
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IContact_ReadOnlyPropertyNames)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IContact_ReadOnlyPropertyNames, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
-  if (!OPA.areUpdatesValid_ForCreatable_ByNullableUser(document, updateObject_AsUnknown as OPA.ICreatable_ByNullableUser)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForCreatable_ByNullableUser(document, updateObject_AsUnknown as OPA.ICreatable_ByNullableUser, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   const preventUpdates_ForUpdateable_ByUser = false;
-  if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObject_AsUnknown as OPA.IUpdateable_ByUser, preventUpdates_ForUpdateable_ByUser)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObject_AsUnknown as OPA.IUpdateable_ByUser, preventUpdates_ForUpdateable_ByUser, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   const preventUpdates_ForTaggable_ByUser = false;
-  if (!OPA.areUpdatesValid_ForTaggable_ByUser(document, updateObject_AsUnknown as OPA.ITaggable_ByUser, preventUpdates_ForTaggable_ByUser)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForTaggable_ByUser(document, updateObject_AsUnknown as OPA.ITaggable_ByUser, preventUpdates_ForTaggable_ByUser, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   const preventUpdates_ForArchivable_ByUser = false;
-  if (!OPA.areUpdatesValid_ForArchivable_ByUser(document, updateObject_AsUnknown as OPA.IArchivable_ByUser, preventUpdates_ForArchivable_ByUser)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForArchivable_ByUser(document, updateObject_AsUnknown as OPA.IArchivable_ByUser, preventUpdates_ForArchivable_ByUser, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   const preventUpdates_ForViewable_ByUser = false;
-  if (!OPA.areUpdatesValid_ForViewable_ByUser(document, updateObject_AsUnknown as OPA.IViewable_ByUser, preventUpdates_ForViewable_ByUser)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForViewable_ByUser(document, updateObject_AsUnknown as OPA.IViewable_ByUser, preventUpdates_ForViewable_ByUser, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   const preventUpdates_ForDeleteable_ByUser = false;
-  if (!OPA.areUpdatesValid_ForDeleteable_ByUser(document, updateObject_AsUnknown as OPA.IDeleteable_ByUser, preventUpdates_ForDeleteable_ByUser)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForDeleteable_ByUser(document, updateObject_AsUnknown as OPA.IDeleteable_ByUser, preventUpdates_ForDeleteable_ByUser, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
 
   if (OPA.isUndefined(updateObject_AsContactForUsers.correspondingUserIds)) {
@@ -97,7 +98,7 @@ export function areUpdatesValid(document: IContact, updateObject: IContactPartia
     const userIsSet = !OPA.isUndefined(updateObject_AsContactForUsers.userIdOfLatestCorrespondingUsersChanger);
 
     if (dateIsSet || userIsSet) {
-      return false;
+      return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   } else if (OPA.isNull(updateObject_AsContactForUsers.correspondingUserIds)) {
     throw new Error("The \"correspondingUserIds\" property must not be set to null.");
@@ -106,7 +107,7 @@ export function areUpdatesValid(document: IContact, updateObject: IContactPartia
     const userNotSet = OPA.isNullish(updateObject_AsContactForUsers.userIdOfLatestCorrespondingUsersChanger);
 
     if (dateNotSet || userNotSet) {
-      return false;
+      return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   }
   return true;
