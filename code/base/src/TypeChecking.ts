@@ -204,7 +204,7 @@ export function isTimestamp(value: unknown): boolean {
  */
 export function isOf<T>(value: unknown, guardFunc: BT.GuardFunc<T>): value is T {
   if (isNullish(value)) {
-    throw new Error("The value to check the type of must not be null or undefined.");
+    return false;
   }
   return guardFunc(value as T);
 }
