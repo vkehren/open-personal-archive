@@ -12,14 +12,18 @@ export const DEFAULT_ANONYMOUS_DISPLAY_NAME = "(anonymous)";
 
 export type FirebaseAuthType = "ADMIN" | "USER" | "UNAUTHENTICATED";
 export const FirebaseAuthTypes = {
+  _typeName: "FirebaseAuthType",
+  _all: (["ADMIN", "USER", "UNAUTHENTICATED"] as Array<FirebaseAuthType>),
   admin: ("ADMIN" as FirebaseAuthType),
   user: ("USER" as FirebaseAuthType),
   unauthenticated: ("UNAUTHENTICATED" as FirebaseAuthType),
 };
 
-export type FirebaseProviderType = "firebase" | "google.com";
+export type FirebaseProviderType = "password" | "google.com";
 export const FirebaseProviderTypes = {
-  firebase: ("firebase" as FirebaseProviderType), // email and password
+  _typeName: "FirebaseProviderType",
+  _all: (["password", "google.com"] as Array<FirebaseProviderType>),
+  password: ("password" as FirebaseProviderType), // email and password
   google: ("google.com" as FirebaseProviderType), // Google popup
 };
 

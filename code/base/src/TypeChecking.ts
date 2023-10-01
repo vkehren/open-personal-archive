@@ -204,9 +204,52 @@ export function isTimestamp(value: unknown): boolean {
  */
 export function isOf<T>(value: unknown, guardFunc: BT.GuardFunc<T>): value is T {
   if (isNullish(value)) {
-    throw new Error("The value to check the type of must not be null or undefined.");
+    return false;
   }
   return guardFunc(value as T);
+}
+
+/**
+ * Asserts that a given argument is of generic type T by applying a type guard (see https://www.typescriptlang.org/docs/handbook/advanced-types.html).
+ * @param {unknown} value The value to check.
+ * @param {BT.GuardFunc<T>} guardFunc The guard function to apply.
+ * @param {string} [failureMessage="A valid value of type \"T\" must be provided."] The message to display on failure of assertion.
+ * @return {void}
+ */
+export function assertIsOf<T>(value: unknown, guardFunc: BT.GuardFunc<T>, failureMessage = "A valid value of type \"T\" must be provided."): void {
+  if (!isOf<T>(value, guardFunc)) {
+    throw new Error(failureMessage);
+  }
+}
+
+/**
+ * Checks whether a given argument is of string literal type T or not by using the options for that type.
+ * @param {unknown} value The value to check.
+ * @param {Array<T>} validOptions The valid options for the string literal type.
+ * @return {boolean} The result of checking.
+ */
+export function isOfLiteral<T>(value: unknown, validOptions: Array<T>): value is T {
+  if (isNullish(value)) {
+    return false;
+  }
+  const guardFunc = (possible: T) => (validOptions.includes(possible));
+  return isOf<T>(value, guardFunc);
+}
+
+/**
+ * Asserts that a given argument is of string literal type T by using the options for that type.
+ * @param {unknown} value The value to check.
+ * @param {Array<T>} validOptions The valid options for the string literal type.
+ * @param {string} [nameOfTypeT="\"T\""] The name of the string literal type.
+ * @param {boolean} [includeValidOptionsInMessage=true] Whether to include the list of valid options in the failure message.
+ * @return {void}
+ */
+export function assertIsOfLiteral<T>(value: unknown, validOptions: Array<T>, nameOfTypeT = "\"T\"", includeValidOptionsInMessage = true): void {
+  if (!isOfLiteral<T>(value, validOptions)) {
+    let failureMessage = ("The value provided was not of type \"" + nameOfTypeT + "\"");
+    failureMessage += (includeValidOptionsInMessage) ? (", for which valid options are: " + VC.replaceAll(validOptions.toString(), ",", ", ") + ".") : ".";
+    throw new Error(failureMessage);
+  }
 }
 
 /**

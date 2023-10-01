@@ -11,7 +11,7 @@ const getListOfAccessRequests_FunctionName = () => (OPA.getTypedPropertyKeyAsTex
 export const getListOfAccessRequests = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<Array<IAccessRequestDisplayModel>>(request, getModuleName, getListOfAccessRequests_FunctionName, async (request, callState) => {
     const data = request.data;
-    const approvalState = (data.query.approvalState) ? data.query.approvalState : null;
+    const approvalState = (data.approvalState) ? data.approvalState : null;
 
     const documents = await AccessRequests.getListOfAccessRequests(callState, approvalState);
     const displayModels = await AccessRequests.convertAccessRequestsToDisplayModels(callState, documents);
@@ -24,8 +24,8 @@ const requestUserAccess_FunctionName = () => (OPA.getTypedPropertyKeyAsText("req
 export const requestUserAccess = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, getModuleName, requestUserAccess_FunctionName, async (request, callState) => {
     const data = request.data;
-    const message = (data.query.message) ? data.query.message : undefined;
-    const citationId = (data.query.citationId) ? data.query.citationId : null;
+    const message = (data.message) ? data.message : undefined;
+    const citationId = (data.citationId) ? data.citationId : null;
 
     OPA.assertNonNullishOrWhitespace(message, "The Access Request message must not be blank.");
 
@@ -40,8 +40,8 @@ const updateMessageForAccessRequest_FunctionName = () => (OPA.getTypedPropertyKe
 export const updateMessageForAccessRequest = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, getModuleName, updateMessageForAccessRequest_FunctionName, async (request, callState) => {
     const data = request.data;
-    const accessRequestId = (data.query.accessRequestId) ? data.query.accessRequestId : undefined;
-    const message = (data.query.message) ? data.query.message : undefined;
+    const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
+    const message = (data.message) ? data.message : undefined;
 
     OPA.assertIdentifierIsValid(accessRequestId, "The Access Request ID must not be blank.");
     OPA.assertNonNullishOrWhitespace(message, "The Access Request message must not be blank.");
@@ -57,8 +57,8 @@ const updateResponseToAccessRequest_FunctionName = () => (OPA.getTypedPropertyKe
 export const updateResponseToAccessRequest = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, getModuleName, updateResponseToAccessRequest_FunctionName, async (request, callState) => {
     const data = request.data;
-    const accessRequestId = (data.query.accessRequestId) ? data.query.accessRequestId : undefined;
-    const response = (data.query.response) ? data.query.response : undefined;
+    const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
+    const response = (data.response) ? data.response : undefined;
 
     OPA.assertIdentifierIsValid(accessRequestId, "The Access Request ID must not be blank.");
     OPA.assertNonNullishOrWhitespace(response, "The Access Request response must not be blank.");
@@ -74,9 +74,9 @@ const setAccessRequestTags_FunctionName = () => (OPA.getTypedPropertyKeyAsText("
 export const setAccessRequestTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, getModuleName, setAccessRequestTags_FunctionName, async (request, callState) => {
     const data = request.data;
-    const accessRequestId = (data.query.accessRequestId) ? data.query.accessRequestId : undefined;
-    const tags = (data.query.tags) ? JSON.parse(data.query.tags) : undefined;
-    const contentType = (data.query.contentType) ? data.query.contentType : undefined;
+    const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
+    const tags = (data.tags) ? OPA.parseJsonIfNeeded(data.tags) : undefined;
+    const contentType = (data.contentType) ? data.contentType : undefined;
 
     OPA.assertIdentifierIsValid(accessRequestId, "The Access Request ID must not be blank.");
     OPA.assertNonNullishOrWhitespace(tags, "The Access Request tags must not be blank.");
@@ -93,8 +93,8 @@ const addAccessRequestTags_FunctionName = () => (OPA.getTypedPropertyKeyAsText("
 export const addAccessRequestTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, getModuleName, addAccessRequestTags_FunctionName, async (request, callState) => {
     const data = request.data;
-    const accessRequestId = (data.query.accessRequestId) ? data.query.accessRequestId : undefined;
-    const tags = (data.query.tags) ? JSON.parse(data.query.tags) : undefined;
+    const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
+    const tags = (data.tags) ? OPA.parseJsonIfNeeded(data.tags) : undefined;
 
     OPA.assertIdentifierIsValid(accessRequestId, "The Access Request ID must not be blank.");
     OPA.assertNonNullishOrWhitespace(tags, "The Access Request tags must not be blank.");
@@ -110,8 +110,8 @@ const removeAccessRequestTags_FunctionName = () => (OPA.getTypedPropertyKeyAsTex
 export const removeAccessRequestTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, getModuleName, removeAccessRequestTags_FunctionName, async (request, callState) => {
     const data = request.data;
-    const accessRequestId = (data.query.accessRequestId) ? data.query.accessRequestId : undefined;
-    const tags = (data.query.tags) ? JSON.parse(data.query.tags) : undefined;
+    const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
+    const tags = (data.tags) ? OPA.parseJsonIfNeeded(data.tags) : undefined;
 
     OPA.assertIdentifierIsValid(accessRequestId, "The Access Request ID must not be blank.");
     OPA.assertNonNullishOrWhitespace(tags, "The Access Request tags must not be blank.");
@@ -127,8 +127,8 @@ const setAccessRequestToArchivalState_FunctionName = () => (OPA.getTypedProperty
 export const setAccessRequestToArchivalState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, getModuleName, setAccessRequestToArchivalState_FunctionName, async (request, callState) => {
     const data = request.data;
-    const accessRequestId = (data.query.accessRequestId) ? data.query.accessRequestId : undefined;
-    const archivalState = (data.query.archivalState) ? data.query.archivalState : undefined;
+    const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
+    const archivalState = (data.archivalState) ? data.archivalState : undefined;
 
     OPA.assertIdentifierIsValid(accessRequestId, "The Access Request ID must not be blank.");
     OPA.assertNonNullishOrWhitespace(archivalState, "The Access Request archival state must not be blank.");
@@ -144,7 +144,7 @@ const setAccessRequestToArchived_FunctionName = () => (OPA.getTypedPropertyKeyAs
 export const setAccessRequestToArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, getModuleName, setAccessRequestToArchived_FunctionName, async (request, callState) => {
     const data = request.data;
-    const accessRequestId = (data.query.accessRequestId) ? data.query.accessRequestId : undefined;
+    const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
     OPA.assertIdentifierIsValid(accessRequestId, "The Access Request ID must not be blank.");
 
@@ -159,7 +159,7 @@ const setAccessRequestToNotArchived_FunctionName = () => (OPA.getTypedPropertyKe
 export const setAccessRequestToNotArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, getModuleName, setAccessRequestToNotArchived_FunctionName, async (request, callState) => {
     const data = request.data;
-    const accessRequestId = (data.query.accessRequestId) ? data.query.accessRequestId : undefined;
+    const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
     OPA.assertIdentifierIsValid(accessRequestId, "The Access Request ID must not be blank.");
 
@@ -174,7 +174,7 @@ const setAccessRequestToViewed_FunctionName = () => (OPA.getTypedPropertyKeyAsTe
 export const setAccessRequestToViewed = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, getModuleName, setAccessRequestToViewed_FunctionName, async (request, callState) => {
     const data = request.data;
-    const accessRequestId = (data.query.accessRequestId) ? data.query.accessRequestId : undefined;
+    const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
     OPA.assertIdentifierIsValid(accessRequestId, "The Access Request ID must not be blank.");
 
@@ -189,8 +189,8 @@ const setAccessRequestToApprovalState_FunctionName = () => (OPA.getTypedProperty
 export const setAccessRequestToApprovalState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, getModuleName, setAccessRequestToApprovalState_FunctionName, async (request, callState) => {
     const data = request.data;
-    const accessRequestId = (data.query.accessRequestId) ? data.query.accessRequestId : undefined;
-    const approvalState = (data.query.approvalState) ? data.query.approvalState : undefined;
+    const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
+    const approvalState = (data.approvalState) ? data.approvalState : undefined;
 
     OPA.assertIdentifierIsValid(accessRequestId, "The Access Request ID must not be blank.");
     OPA.assertNonNullishOrWhitespace(approvalState, "The Access Request approval state must not be blank.");
@@ -206,7 +206,7 @@ const setAccessRequestToApproved_FunctionName = () => (OPA.getTypedPropertyKeyAs
 export const setAccessRequestToApproved = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, getModuleName, setAccessRequestToApproved_FunctionName, async (request, callState) => {
     const data = request.data;
-    const accessRequestId = (data.query.accessRequestId) ? data.query.accessRequestId : undefined;
+    const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
     OPA.assertIdentifierIsValid(accessRequestId, "The Access Request ID must not be blank.");
 
@@ -221,7 +221,7 @@ const setAccessRequestToDenied_FunctionName = () => (OPA.getTypedPropertyKeyAsTe
 export const setAccessRequestToDenied = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, getModuleName, setAccessRequestToDenied_FunctionName, async (request, callState) => {
     const data = request.data;
-    const accessRequestId = (data.query.accessRequestId) ? data.query.accessRequestId : undefined;
+    const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
     OPA.assertIdentifierIsValid(accessRequestId, "The Access Request ID must not be blank.");
 
@@ -236,8 +236,8 @@ const markAccessRequestWithDeletionState_FunctionName = () => (OPA.getTypedPrope
 export const markAccessRequestWithDeletionState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, getModuleName, markAccessRequestWithDeletionState_FunctionName, async (request, callState) => {
     const data = request.data;
-    const accessRequestId = (data.query.accessRequestId) ? data.query.accessRequestId : undefined;
-    const deletionState = (data.query.deletionState) ? data.query.deletionState : undefined;
+    const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
+    const deletionState = (data.deletionState) ? data.deletionState : undefined;
 
     OPA.assertIdentifierIsValid(accessRequestId, "The Access Request ID must not be blank.");
     OPA.assertNonNullishOrWhitespace(deletionState, "The Access Request deletion state must not be blank.");
@@ -253,7 +253,7 @@ const markAccessRequestAsDeleted_FunctionName = () => (OPA.getTypedPropertyKeyAs
 export const markAccessRequestAsDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, getModuleName, markAccessRequestAsDeleted_FunctionName, async (request, callState) => {
     const data = request.data;
-    const accessRequestId = (data.query.accessRequestId) ? data.query.accessRequestId : undefined;
+    const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
     OPA.assertIdentifierIsValid(accessRequestId, "The Access Request ID must not be blank.");
 
@@ -268,7 +268,7 @@ const markAccessRequestAsUnDeleted_FunctionName = () => (OPA.getTypedPropertyKey
 export const markAccessRequestAsUnDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, getModuleName, markAccessRequestAsUnDeleted_FunctionName, async (request, callState) => {
     const data = request.data;
-    const accessRequestId = (data.query.accessRequestId) ? data.query.accessRequestId : undefined;
+    const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
     OPA.assertIdentifierIsValid(accessRequestId, "The Access Request ID must not be blank.");
 

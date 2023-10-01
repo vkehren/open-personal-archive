@@ -24,9 +24,10 @@ After configuring this code, before you can run this code, you must:
     * Specify you are ready using "Y"
     * Select Firestore, Functions, Hosting (the first option, without GitHub), Storage, and optionally Emulators (if you desire to use them)
     * Otherwise, accept the default value by pressing enter
-5. Run "firebase deploy"
-6. Navigate to the URL of your Google Firebase Hosting site where you deployed the code
-7. If you wish to use the OPA beforeUserSignedIn(...) auth-blocking event handler (or any other auth-blocking event handler), you must first enable [Google Identity Platform](https://console.cloud.google.com/marketplace/details/google-cloud-platform/customer-identity) for your Google Firebase project.
+5. Enable [billing](https://firebase.google.com/pricing) for your Google Firebase project, as this is necessary to deploy Functions
+6. If you wish to use the OPA beforeUserSignedIn(...) auth-blocking event handler (or any other auth-blocking event handler), enable [Google Identity Platform](https://console.cloud.google.com/marketplace/details/google-cloud-platform/customer-identity) for your Google Firebase project.
+7. Run "firebase deploy"
+8. Navigate to the URL of your Google Firebase Hosting site where you deployed the code
 
 
 Copyright © 2021 Open Personal Archive™

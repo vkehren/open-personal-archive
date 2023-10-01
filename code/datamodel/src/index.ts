@@ -52,7 +52,7 @@ export const OpaDbDescriptor = OPA.convertTo<IOpaDbDescriptor>(DbDescriptor);
 
 export {DataConfiguration, ActivityType, ActivityTypes, RoleType, RoleTypes} from "./BaseTypes";
 export {ICallState, IDataStorageState, IAuthenticationState, ISystemState, IAuthorizationState, AuthorizationState, assertSystemStateIsNotNullish, assertAuthorizationStateIsNotNullish} from "./CallStateTypes"; // eslint-disable-line max-len
-export {IAuthenticationProvider, DefaultAuthenticationProviderId, AuthenticationProvider_GoogleId, AuthenticationProvider_FirebaseId, AuthenticationProvider_RequiredIds} from "./doctypes/AuthenticationProvider"; // eslint-disable-line camelcase, max-len
+export {IAuthenticationProvider, DefaultAuthenticationProviderId, AuthenticationProvider_GoogleId, AuthenticationProvider_PasswordId, AuthenticationProvider_RequiredIds} from "./doctypes/AuthenticationProvider"; // eslint-disable-line camelcase, max-len
 export {ILocale, DefaultLocaleId, DefaultLocale} from "./doctypes/Locale";
 export {IRole, DefaultRoleId, Role_OwnerId, Role_AdministratorId, Role_EditorId, Role_ViewerId, Role_GuestId, Role_RequiredIds} from "./doctypes/Role"; // eslint-disable-line camelcase
 export {ITimeZone} from "./doctypes/TimeZone";

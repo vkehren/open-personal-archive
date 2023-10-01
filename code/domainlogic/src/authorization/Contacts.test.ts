@@ -206,7 +206,7 @@ describe("Contact Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    const tags = ["a", "b", "c"];
+    const tags = OPA.parseJsonIfNeeded(["a", "b", "c"]);
     if (functionType == "logic") {await Contacts.setContactTags(callState, contactId, tags);}
     else {await OpaDb.Contacts.queries.setTags(config.dataStorageState, contactId, tags, OPA.ArrayContentTypes.exact, ambientUserId());}
     contact = await TestUtils.assertContactDoesExist(config.dataStorageState, contactId);
@@ -244,7 +244,7 @@ describe("Contact Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.admin;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    const tagsToAdd = ["d", "e", "f", "g"];
+    const tagsToAdd = OPA.parseJsonIfNeeded(["d", "e", "f", "g"]);
     if (functionType == "logic") {await Contacts.addContactTags(callState, contactId, tagsToAdd);}
     else {await OpaDb.Contacts.queries.setTags(config.dataStorageState, contactId, tagsToAdd, OPA.ArrayContentTypes.only_added, ambientUserId());}
     contact = await TestUtils.assertContactDoesExist(config.dataStorageState, contactId);
@@ -282,7 +282,7 @@ describe("Contact Tests using Firebase " + config.testEnvironment, function() {
 
     config.authenticationState = TestAuthData.owner;
     callState = await CSU.getCallStateForCurrentUser(config.dataStorageState, config.authenticationState);
-    const tagsToRemove = ["b", "d", "f"];
+    const tagsToRemove = OPA.parseJsonIfNeeded(["b", "d", "f"]);
     if (functionType == "logic") {await Contacts.removeContactTags(callState, contactId, tagsToRemove);}
     else {await OpaDb.Contacts.queries.setTags(config.dataStorageState, contactId, tagsToRemove, OPA.ArrayContentTypes.only_removed, ambientUserId());}
     contact = await TestUtils.assertContactDoesExist(config.dataStorageState, contactId);

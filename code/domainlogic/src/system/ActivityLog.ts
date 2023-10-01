@@ -43,7 +43,7 @@ export async function recordLogItem(dataStorageState: OpaDm.IDataStorageState, a
   }
 
   let resourceCanonical = resource;
-  if (OpaDm.ActivityTypes.web_page_types.includes(activityType)) {
+  if (OpaDm.ActivityTypes._web_page_types.includes(activityType)) {
     if (resourceCanonical.includes("?")) {
       const parts = resourceCanonical.split("?");
       const part0Length = parts[0].length;

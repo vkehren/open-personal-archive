@@ -7,8 +7,8 @@ const SingularName = "AuthenticationProvider";
 const PluralName = "AuthenticationProviders";
 const IsSingleton = false;
 export const AuthenticationProvider_GoogleId = "OPA_AuthenticationProvider_Google"; // eslint-disable-line camelcase
-export const AuthenticationProvider_FirebaseId = "OPA_AuthenticationProvider_Firebase"; // eslint-disable-line camelcase
-export const AuthenticationProvider_RequiredIds = [AuthenticationProvider_GoogleId, AuthenticationProvider_FirebaseId]; // eslint-disable-line camelcase
+export const AuthenticationProvider_PasswordId = "OPA_AuthenticationProvider_Password"; // eslint-disable-line camelcase
+export const AuthenticationProvider_RequiredIds = [AuthenticationProvider_GoogleId, AuthenticationProvider_PasswordId]; // eslint-disable-line camelcase
 const RequiredDocuments: Array<IAuthenticationProvider> = OPA.promoteDocumentsToCreatable(CollectionData.requiredDocuments, null);
 const DefaultDocument = (RequiredDocuments.find((v) => v.isDefault) as IAuthenticationProvider | undefined);
 export const DefaultAuthenticationProviderId = (!OPA.isNullish(DefaultDocument)) ? OPA.convertNonNullish(DefaultDocument).id : AuthenticationProvider_GoogleId; // eslint-disable-line camelcase
@@ -31,19 +31,20 @@ type IAuthenticationProviderPartial = unknown;
  * Checks whether the specified updates to the specified AuthenticationProvider document are valid.
  * @param {IAuthenticationProvider} document The AuthenticationProvider document being updated.
  * @param {IAuthenticationProviderPartial} updateObject The updates specified.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid(document: IAuthenticationProvider, updateObject: IAuthenticationProviderPartial): boolean {
+export function areUpdatesValid(document: IAuthenticationProvider, updateObject: IAuthenticationProviderPartial, throwErrorOnInvalidUpdate = false): boolean {
   OPA.assertDocumentIsValid(document);
   OPA.assertNonNullish(updateObject, "The processed Update Object must not be null.");
 
   const updateObject_AsUnknown = (updateObject as unknown);
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IAuthenticationProvider_ReadOnlyPropertyNames)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IAuthenticationProvider_ReadOnlyPropertyNames, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
-  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject_AsUnknown as OPA.ICreatable)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject_AsUnknown as OPA.ICreatable, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
 
   // NOTE: Currently, AuthenticationProviders are not updateable

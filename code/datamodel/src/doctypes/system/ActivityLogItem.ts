@@ -40,19 +40,20 @@ type IActivityLogItemPartial = unknown;
  * Checks whether the specified updates to the specified ActivityLogItem document are valid.
  * @param {IActivityLogItem} document The ActivityLogItem document being updated.
  * @param {IActivityLogItemPartial} updateObject The updates specified.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid(document: IActivityLogItem, updateObject: IActivityLogItemPartial): boolean {
+export function areUpdatesValid(document: IActivityLogItem, updateObject: IActivityLogItemPartial, throwErrorOnInvalidUpdate = false): boolean {
   OPA.assertDocumentIsValid(document);
   OPA.assertNonNullish(updateObject, "The processed Update Object must not be null.");
 
   const updateObject_AsUnknown = (updateObject as unknown);
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IActivityLogItem_ReadOnlyPropertyNames)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IActivityLogItem_ReadOnlyPropertyNames, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
-  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject_AsUnknown as OPA.ICreatable)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject_AsUnknown as OPA.ICreatable, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
 
   // NOTE: Currently, ActivityLogItems are not updateable
@@ -76,6 +77,8 @@ export function areUpdatesValid(document: IActivityLogItem, updateObject: IActiv
  * @return {IActivityLogItem} The new document instance.
  */
 function createInstance(id: string, rootLogItemId: string | null, externalLogItemId: string | null, activityType: BT.ActivityType, requestor: string, resource: string, resourceCanonical: string | null, action: string | null, data: Record<string, unknown>, firebaseAuthUserId: string | null = null, userId: string | null = null, otherState: Record<string, unknown> | null = null): IActivityLogItem { // eslint-disable-line max-len
+  OPA.assertNonNullish(activityType);
+  OPA.assertIsOfLiteral<BT.ActivityType>(activityType, BT.ActivityTypes._all, BT.ActivityTypes._typeName);
   if ((activityType == "browser_page_action") && OPA.isNullishOrWhitespace(action)) {
     throw new Error("The action name must be specified when logging web page actions.");
   }

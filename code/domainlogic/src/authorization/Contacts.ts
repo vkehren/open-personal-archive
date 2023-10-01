@@ -76,7 +76,7 @@ export async function getListOfContacts(callState: OpaDm.ICallState): Promise<Ar
   OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
-  const authViewersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authViewers);
+  const authViewersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes._authViewers);
   const authViewersIds = [...authViewersById.keys()];
 
   authorizationState.assertUserApproved();
@@ -149,7 +149,7 @@ export async function updateContact(callState: OpaDm.ICallState, contactIdToUpda
   OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
-  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
+  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes._authorizers);
   const authorizerIds = [...authorizersById.keys()];
 
   authorizationState.assertUserApproved();
@@ -186,7 +186,7 @@ export async function setCorrespondingUsersForContact(callState: OpaDm.ICallStat
   OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
-  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
+  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes._authorizers);
   const authorizerIds = [...authorizersById.keys()];
 
   authorizationState.assertUserApproved();
@@ -246,7 +246,7 @@ export async function setContactTags(callState: OpaDm.ICallState, contactIdToSet
   OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
-  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
+  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes._authorizers);
   const authorizerIds = [...authorizersById.keys()];
 
   authorizationState.assertUserApproved();
@@ -304,7 +304,7 @@ export async function setContactToArchivalState(callState: OpaDm.ICallState, con
   OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
-  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
+  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes._authorizers);
   const authorizerIds = [...authorizersById.keys()];
 
   authorizationState.assertUserApproved();
@@ -360,7 +360,7 @@ export async function setContactToViewed(callState: OpaDm.ICallState, contactIdT
   OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
-  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
+  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes._authorizers);
   const authorizerIds = [...authorizersById.keys()];
 
   authorizationState.assertUserApproved();
@@ -396,7 +396,7 @@ export async function markContactWithDeletionState(callState: OpaDm.ICallState, 
   OpaDm.assertAuthorizationStateIsNotNullish(callState.authorizationState);
 
   const authorizationState = OPA.convertNonNullish(callState.authorizationState);
-  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes.authorizers);
+  const authorizersById = await OpaDb.Roles.queries.getForRoleTypes(callState.dataStorageState, OpaDm.RoleTypes._authorizers);
   const authorizerIds = [...authorizersById.keys()];
 
   authorizationState.assertUserApproved();

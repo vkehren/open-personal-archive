@@ -1,3 +1,4 @@
+// import {getAuth, sendEmailVerification} from "firebase/auth"; // LATER: Figure-out if it is possible to get the current User and send the verifiation email in the beforeUserSignedIn(...) handler
 import {AuthBlockingEvent, beforeUserSignedIn} from "firebase-functions/v2/identity"; // NOTE: Also has "beforeUserCreated"
 import * as logger from "firebase-functions/logger";
 import * as admin from "firebase-admin";
@@ -53,7 +54,7 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
   const shimmedRequest: OPA.ICallRequest = {
     clientIpAddress: event.ipAddress,
     url: event.eventType,
-    data: {eventType: event.eventType, eventId: event.eventId, eventData: event.data},
+    data: {eventType: event.eventType, eventId: event.eventId, firebaseUserId: event.data.uid, eventData: JSON.stringify(event.data)},
   };
 
   try {
@@ -110,6 +111,9 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
 });
 
 // NOTE: Export API functions
+export * from "./system/ActivityLog";
 export * from "./system/Application";
+export * from "./authorization/Users";
 export * from "./authorization/AccessRequests";
+export * from "./authorization/Contacts";
 export * as PackageInfo from "./PackageInfo";

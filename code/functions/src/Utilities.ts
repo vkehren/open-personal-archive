@@ -217,13 +217,13 @@ export async function setExternalLogState(dataStorageState: OpaDm.IDataStorageSt
  */
 export async function logFunctionCall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, request: OPA.ICallRequest, message: string): Promise<void> { // eslint-disable-line max-len
   try {
-    const activityType = OpaDm.ActivityTypes.server_function_call;
+    const activityType = OpaDm.ActivityTypes._server_function_call;
     const requestor = request.clientIpAddress;
     const resource = request.url;
     const errorState = {hasError: false};
     const otherState = {message: message, logWriteState: dataStorageState.logWriteState, errorState: errorState};
 
-    logger.error(message, {structuredData: true, activityType, requestor, resource, otherState});
+    logger.info(message, {structuredData: true, activityType, requestor, resource, otherState});
     const logItem = await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, requestor, resource, null, request.data, otherState);
 
     if (OPA.isNullishOrWhitespace(dataStorageState.logWriteState.rootLogItemId)) {

@@ -1,5 +1,6 @@
 import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../../../base/src";
+import * as BT from "../../BaseTypes";
 import {IAuthenticationProvider} from "../AuthenticationProvider";
 import {ILocale} from "../Locale";
 import {IRole, Role_OwnerId} from "../Role"; // eslint-disable-line camelcase
@@ -67,9 +68,10 @@ const IUser_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
  * Checks whether the specified updates to the specified User document are valid.
  * @param {IUser} document The User document being updated.
  * @param {IUserPartial} updateObject The updates specified.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid(document: IUser, updateObject: IUserPartial): boolean {
+export function areUpdatesValid(document: IUser, updateObject: IUserPartial, throwErrorOnInvalidUpdate = false): boolean {
   OPA.assertDocumentIsValid(document);
   OPA.assertNonNullish(updateObject, "The processed Update Object must not be null.");
 
@@ -78,35 +80,35 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
   const docIsArchiveOwner = ((document.id == User_OwnerId) || (document.assignedRoleId == Role_OwnerId));
   const statusDate = OPA.convertNonNullish(OPA.getStatusDate(updateObject, OPA.getTypedPropertyKeyAsText<ICitationAccessor>("dateOfLatestCitationChange")), OPA.convertNonNullish(document.dateOfLatestUpdate, document.dateOfCreation)); // eslint-disable-line max-len
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IUser_ReadOnlyPropertyNames)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IUser_ReadOnlyPropertyNames, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
-  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject_AsUnknown as OPA.ICreatable)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject_AsUnknown as OPA.ICreatable, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   const preventUpdates_ForUpdateable_ByUser = false;
-  if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObject_AsUnknown as OPA.IUpdateable_ByUser, preventUpdates_ForUpdateable_ByUser)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForUpdateable_ByUser(document, updateObject_AsUnknown as OPA.IUpdateable_ByUser, preventUpdates_ForUpdateable_ByUser, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   const preventUpdates_ForAssignableToRole_ByUser = (((updateObject_AsUnknown as OPA.IAssignableToRole_ByUser).userIdOfLatestRoleAssigner == document.id) || docIsArchiveOwner);
-  if (!OPA.areUpdatesValid_ForAssignableToRole_ByUser(document, updateObject_AsUnknown as OPA.IAssignableToRole_ByUser, preventUpdates_ForAssignableToRole_ByUser)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForAssignableToRole_ByUser(document, updateObject_AsUnknown as OPA.IAssignableToRole_ByUser, preventUpdates_ForAssignableToRole_ByUser, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   const preventUpdates_ForViewable_ByUser = ((updateObject_AsUnknown as OPA.IViewable_ByUser).userIdOfLatestViewer == document.id);
-  if (!OPA.areUpdatesValid_ForViewable_ByUser(document, updateObject_AsUnknown as OPA.IViewable_ByUser, preventUpdates_ForViewable_ByUser)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForViewable_ByUser(document, updateObject_AsUnknown as OPA.IViewable_ByUser, preventUpdates_ForViewable_ByUser, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   const preventUpdates_ForApprovable_ByUser = (((updateObject_AsUnknown as OPA.IApprovable_ByUser<OPA.ApprovalState>).userIdOfDecider == document.id) || docIsArchiveOwner);
-  if (!OPA.areUpdatesValid_ForApprovable_ByUser(document, updateObject_AsUnknown as OPA.IApprovable_ByUser<OPA.ApprovalState>, preventUpdates_ForApprovable_ByUser)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForApprovable_ByUser(document, updateObject_AsUnknown as OPA.IApprovable_ByUser<OPA.ApprovalState>, preventUpdates_ForApprovable_ByUser, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   const preventUpdates_ForSuspendable_ByUser = (((updateObject_AsUnknown as OPA.ISuspendable_ByUser).userIdOfSuspensionStarter == document.id) || ((updateObject_AsUnknown as OPA.ISuspendable_ByUser).userIdOfSuspensionEnder == document.id) || docIsArchiveOwner); // eslint-disable-line max-len
-  if (!OPA.areUpdatesValid_ForSuspendable_ByUser(document, updateObject_AsUnknown as OPA.ISuspendable_ByUser, preventUpdates_ForSuspendable_ByUser)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForSuspendable_ByUser(document, updateObject_AsUnknown as OPA.ISuspendable_ByUser, preventUpdates_ForSuspendable_ByUser, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   const preventUpdates_ForDeleteable_ByUser = (((updateObject_AsUnknown as OPA.IDeleteable_ByUser).userIdOfDeletionChanger != document.id) || docIsArchiveOwner);
-  if (!OPA.areUpdatesValid_ForDeleteable_ByUser(document, updateObject_AsUnknown as OPA.IDeleteable_ByUser, preventUpdates_ForDeleteable_ByUser)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForDeleteable_ByUser(document, updateObject_AsUnknown as OPA.IDeleteable_ByUser, preventUpdates_ForDeleteable_ByUser, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
 
   // NOTE: Unlike most interfaces used in this fuction, ICitationAccessor only requires that one of the two array properties is updated
@@ -115,7 +117,7 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
     const userIsSet = !OPA.isUndefined(updateObject_AsCitationAccessor.userIdOfLatestCitationChanger);
 
     if (dateIsSet || userIsSet) {
-      return false;
+      return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
     }
   } else if (OPA.isNull(updateObject_AsCitationAccessor.requestedCitationIds)) {
     throw new Error("The \"requestedCitationIds\" property must not be set to null.");
@@ -128,8 +130,14 @@ export function areUpdatesValid(document: IUser, updateObject: IUserPartial): bo
     const isRequestedNotSelfAssigned = (!OPA.isNullish(updateObject_AsCitationAccessor.requestedCitationIds) && (updateObject_AsCitationAccessor.userIdOfLatestCitationChanger != document.id));
     const isViewableSelfAssigned = (!OPA.isNullish(updateObject_AsCitationAccessor.viewableCitationIds) && (updateObject_AsCitationAccessor.userIdOfLatestCitationChanger == document.id));
 
-    if ((dateNotSet && dateNotCreation) || (userNotSet && dateNotCreation) || isRequestedNotSelfAssigned || isViewableSelfAssigned) {
-      return false;
+    if ((dateNotSet && dateNotCreation) || (userNotSet && dateNotCreation)) {
+      return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
+    }
+    if (isRequestedNotSelfAssigned) {
+      return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update can only be performed by the User requesting access.");
+    }
+    if (isViewableSelfAssigned) {
+      return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update cannot be performed by the User requesting access.");
     }
   }
   return true;
@@ -334,6 +342,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
 
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertIsOfLiteral<OPA.ApprovalState>(approvalState, OPA.ApprovalStates._all, OPA.ApprovalStates._typeName);
 
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const approvalStateFieldName = OPA.getTypedPropertyKeyAsText<IUser>("approvalState");
@@ -519,13 +528,13 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const now = OPA.nowToUse();
     const updateObject_Updateable = ({hasBeenUpdated: true, dateOfLatestUpdate: now, userIdOfLatestUpdater} as OPA.IUpdateable_ByUser);
     updateObject = {...updateObject, ...updateObject_Updateable};
-    let areValid = areUpdatesValid(document, updateObject);
+    let areValid = areUpdatesValid(document, updateObject, BT.DataConfiguration.ThrowErrorOnInvalidUpdate);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const updateObject_ForHistory = OPA.replaceFieldValuesWithSummaries({...updateObject});
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
-    areValid = areUpdatesValid(document, updateObject_WithHistory);
+    areValid = areUpdatesValid(document, updateObject_WithHistory, BT.DataConfiguration.ThrowErrorOnInvalidUpdate);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
@@ -557,7 +566,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
     const document = await this.getByIdWithAssert(ds, documentId);
-    const areValid = areUpdatesValid(document, updateObject_WithHistory);
+    const areValid = areUpdatesValid(document, updateObject_WithHistory, BT.DataConfiguration.ThrowErrorOnInvalidUpdate);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
@@ -590,7 +599,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
     const document = await this.getByIdWithAssert(ds, documentId);
-    const areValid = areUpdatesValid(document, updateObject_WithHistory);
+    const areValid = areUpdatesValid(document, updateObject_WithHistory, BT.DataConfiguration.ThrowErrorOnInvalidUpdate);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
@@ -623,7 +632,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
     const document = await this.getByIdWithAssert(ds, documentId);
-    const areValid = areUpdatesValid(document, updateObject_WithHistory);
+    const areValid = areUpdatesValid(document, updateObject_WithHistory, BT.DataConfiguration.ThrowErrorOnInvalidUpdate);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
@@ -653,7 +662,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
     const document = await this.getByIdWithAssert(ds, documentId);
-    const areValid = areUpdatesValid(document, updateObject_WithHistory);
+    const areValid = areUpdatesValid(document, updateObject_WithHistory, BT.DataConfiguration.ThrowErrorOnInvalidUpdate);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
@@ -674,6 +683,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   async setToDecidedOption(ds: OPA.IDataStorageState, documentId: string, approvalState: OPA.ApprovalState, userIdOfDecider: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertNonNullish(approvalState);
+    OPA.assertIsOfLiteral<OPA.ApprovalState>(approvalState, OPA.ApprovalStates._all, OPA.ApprovalStates._typeName);
 
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IUserPartial);
@@ -684,7 +695,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
     const document = await this.getByIdWithAssert(ds, documentId);
-    const areValid = areUpdatesValid(document, updateObject_WithHistory);
+    const areValid = areUpdatesValid(document, updateObject_WithHistory, BT.DataConfiguration.ThrowErrorOnInvalidUpdate);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
@@ -706,6 +717,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   async setToSuspensionState(ds: OPA.IDataStorageState, documentId: string, suspensionState: OPA.SuspensionState, reason: string, userIdOfSuspensionChanger: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertNonNullish(suspensionState);
+    OPA.assertIsOfLiteral<OPA.SuspensionState>(suspensionState, OPA.SuspensionStates._all, OPA.SuspensionStates._typeName);
 
     // NOTE: We need the document earlier in this function to get the existing values for ISuspendable_ByUser
     const document = await this.getByIdWithAssert(ds, documentId);
@@ -731,7 +744,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
-    const areValid = areUpdatesValid(document, updateObject_WithHistory);
+    const areValid = areUpdatesValid(document, updateObject_WithHistory, BT.DataConfiguration.ThrowErrorOnInvalidUpdate);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());
@@ -752,6 +765,8 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
   async markWithDeletionState(ds: OPA.IDataStorageState, documentId: string, deletionState: OPA.DeletionState, userIdOfDeletionChanger: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertNonNullish(deletionState);
+    OPA.assertIsOfLiteral<OPA.DeletionState>(deletionState, OPA.DeletionStates._all, OPA.DeletionStates._typeName);
 
     // NOTE: We need the document earlier in this function to get the existing values for IDeleteable_ByUser
     const document = await this.getByIdWithAssert(ds, documentId);
@@ -766,7 +781,7 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject);
     const updateObject_WithHistory = ({...updateObject, updateHistory} as IUserPartial_WithHistory);
 
-    const areValid = areUpdatesValid(document, updateObject_WithHistory);
+    const areValid = areUpdatesValid(document, updateObject_WithHistory, BT.DataConfiguration.ThrowErrorOnInvalidUpdate);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());

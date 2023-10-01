@@ -35,19 +35,20 @@ type IRolePartial = unknown;
  * Checks whether the specified updates to the specified Role document are valid.
  * @param {IRole} document The Role document being updated.
  * @param {IRolePartial} updateObject The updates specified.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid(document: IRole, updateObject: IRolePartial): boolean {
+export function areUpdatesValid(document: IRole, updateObject: IRolePartial, throwErrorOnInvalidUpdate = false): boolean {
   OPA.assertDocumentIsValid(document);
   OPA.assertNonNullish(updateObject, "The processed Update Object must not be null.");
 
   const updateObject_AsUnknown = (updateObject as unknown);
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IRole_ReadOnlyPropertyNames)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IRole_ReadOnlyPropertyNames, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
-  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject_AsUnknown as OPA.ICreatable)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForCreatable(document, updateObject_AsUnknown as OPA.ICreatable, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
 
   // NOTE: Currently, Roles are not updateable
@@ -81,6 +82,12 @@ export class RoleQuerySet extends OPA.QuerySet<IRole> {
   async getForRoleTypes(ds: OPA.IDataStorageState, roleTypes: Array<BT.RoleType>): Promise<Map<string, IRole>> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
+    OPA.assertNonNullish(roleTypes);
+    roleTypes.forEach((roleType) => OPA.assertIsOfLiteral<BT.RoleType>(roleType, BT.RoleTypes._all, BT.RoleTypes._typeName));
+
+    if (roleTypes.length <= 0) {
+      return new Map<string, IRole>();
+    }
 
     const rolesCollectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const typeFieldName = OPA.getTypedPropertyKeyAsText<IRole>("type");

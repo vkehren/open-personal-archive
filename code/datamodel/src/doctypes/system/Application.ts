@@ -1,5 +1,6 @@
 import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../../../base/src";
+import * as BT from "../../BaseTypes";
 
 /* eslint-disable camelcase */
 
@@ -33,20 +34,21 @@ const IApplication_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
  * Checks whether the specified updates to the specified Application document are valid.
  * @param {IApplication} document The Application document being updated.
  * @param {IApplicationPartial} updateObject The updates specified.
+ * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid(document: IApplication, updateObject: IApplicationPartial): boolean {
+export function areUpdatesValid(document: IApplication, updateObject: IApplicationPartial, throwErrorOnInvalidUpdate = false): boolean {
   OPA.assertDocumentIsValid(document);
   OPA.assertNonNullish(updateObject, "The processed Update Object must not be null.");
 
   const updateObject_AsUnknown = (updateObject as unknown);
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IApplication_ReadOnlyPropertyNames)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IApplication_ReadOnlyPropertyNames, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   const preventUpdates_ForUpgradeable_ByUser = false;
-  if (!OPA.areUpdatesValid_ForUpgradeable_ByUser(document, updateObject_AsUnknown as OPA.IUpgradeable_ByUser, preventUpdates_ForUpgradeable_ByUser)) {
-    return false;
+  if (!OPA.areUpdatesValid_ForUpgradeable_ByUser(document, updateObject_AsUnknown as OPA.IUpgradeable_ByUser, preventUpdates_ForUpgradeable_ByUser, throwErrorOnInvalidUpdate)) {
+    return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   // NOTE: If any properties are added that can be updated without upgrading, implement IUpdateable_ByUser on Application
 
@@ -54,14 +56,14 @@ export function areUpdatesValid(document: IApplication, updateObject: IApplicati
   if (!OPA.isNullish(updateObject.applicationVersion)) {
     const applicationVersion_Updated = OPA.convertNonNullish(updateObject.applicationVersion);
     if (OPA.compareVersionNumberStrings(document.applicationVersion, applicationVersion_Updated) < 1) {
-      return false;
+      return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The Application Version can only be upgraded.");
     }
   }
   // NOTE: The "schemaVersion" cannot be downgraded or updated to same value as current value
   if (!OPA.isNullish(updateObject.schemaVersion)) {
     const schemaVersion_Updated = OPA.convertNonNullish(updateObject.schemaVersion);
     if (OPA.compareVersionNumberStrings(document.schemaVersion, schemaVersion_Updated) < 1) {
-      return false;
+      return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The Schema Version can only be upgraded.");
     }
   }
   return true;
@@ -161,13 +163,13 @@ export class ApplicationQuerySet extends OPA.QuerySet<IApplication> {
     const now = OPA.nowToUse();
     const updateObject_Upgradeable = ({hasBeenUpgraded: true, dateOfLatestUpgrade: now, userIdOfLatestUpgrader} as OPA.IUpgradeable_ByUser);
     updateObject = {...updateObject, ...updateObject_Upgradeable};
-    let areValid = areUpdatesValid(document, updateObject);
+    let areValid = areUpdatesValid(document, updateObject, BT.DataConfiguration.ThrowErrorOnInvalidUpdate);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const updateObject_ForHistory = OPA.replaceFieldValuesWithSummaries({...updateObject});
     const upgradeHistory = ds.constructorProvider.arrayUnion(updateObject_ForHistory);
     const updateObject_WithHistory = ({...updateObject, upgradeHistory} as IApplicationPartial_WithHistory);
-    areValid = areUpdatesValid(document, updateObject_WithHistory);
+    areValid = areUpdatesValid(document, updateObject_WithHistory, BT.DataConfiguration.ThrowErrorOnInvalidUpdate);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
     const batchUpdate = OPA.convertNonNullish(ds.currentWriteBatch, () => ds.constructorProvider.writeBatch());

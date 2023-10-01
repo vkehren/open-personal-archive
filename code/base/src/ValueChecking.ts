@@ -254,3 +254,87 @@ export function assertIsOfValue(actual: number | null | undefined, desired: numb
     throw new Error(message);
   }
 }
+
+/**
+ * Returns a value, unless instructed to throw an error.
+ * @param {BT.DefaultFunc<T> | T} valueOrGetter The value or the getter to get the value.
+ * @param {boolean} [throwError=false] Whether to throw an error.
+ * @param {string} [errorMessage="An error occurred."] The message for the error, if instructed to throw an error.
+ * @return {T}
+ */
+export function getUnlessThrowError<T>(valueOrGetter: BT.DefaultFunc<T> | T, throwError = false, errorMessage = "An error occurred."): T {
+  if (throwError) {
+    throw new Error(errorMessage);
+  }
+  if (!TC.isFunction(valueOrGetter)) {
+    const value = (valueOrGetter as T);
+    return value;
+  }
+  const getter = (valueOrGetter as BT.DefaultFunc<T>);
+  const value = getter();
+  return value;
+}
+
+/**
+ * Returns false, unless instructed to throw an error.
+ * @param {boolean} [throwError=false] Whether to throw an error.
+ * @param {string} [errorMessage="An error occurred."] The message for the error, if instructed to throw an error.
+ * @return {boolean}
+ */
+export function falseUnlessThrowError(throwError = false, errorMessage = "An error occurred."): boolean {
+  return getUnlessThrowError(false, throwError, errorMessage);
+}
+
+/**
+ * Parses the input as JSON only if parsing is necessary.
+ * @param {string | unknown | null | undefined} input The input value.
+ * @return {any}
+ */
+export function parseJsonIfNeeded(input: string | unknown | null | undefined): any { // eslint-disable-line @typescript-eslint/no-explicit-any
+  if (TC.isNullishOrWhitespace(input)) {
+    return input;
+  }
+  if (TC.isObject(input)) {
+    return input;
+  }
+  if (TC.isArray(input)) {
+    return input;
+  }
+
+  const inputAsString = ("" + input);
+  if (input != inputAsString) {
+    return input;
+  }
+
+  const lastIndex = (inputAsString.length - 1);
+  if (!((inputAsString[0] == "{") || (inputAsString[0] == "["))) {
+    return input;
+  }
+  if (!((inputAsString[lastIndex] == "}") || (inputAsString[lastIndex] == "]"))) {
+    return input;
+  }
+
+  const inputAsObject = JSON.parse(inputAsString);
+  return inputAsObject;
+}
+
+/**
+ * Returns a new string in which all occurrences of the search value in the input string have been replaced with the replacement value.
+ * @param {string} input The input string.
+ * @param {string | RegExp} searchValue The value to search for.
+ * @param {string} replaceValue The value to replace with.
+ * @return {string}
+ */
+export function replaceAll(input: string, searchValue: string | RegExp, replaceValue: string): string {
+  TC.assertNonNullish(input);
+  TC.assertNonNullish(searchValue);
+  TC.assertNonNullish(replaceValue);
+
+  let searchExp = (searchValue as RegExp);
+  if (TC.isString(searchValue)) {
+    searchExp = new RegExp((searchValue as string), "g");
+  }
+
+  const output = input.replace(searchExp, replaceValue);
+  return output;
+}

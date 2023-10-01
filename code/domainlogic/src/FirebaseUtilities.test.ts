@@ -71,10 +71,11 @@ describe("Firebase Auth Handler Tests using Firebase " + config.testEnvironment,
 
     const fbAuthUserCredential = await signInWithEmailAndPassword(auth, firebaseAuthUserEmail, firebaseAuthUserPassword);
     const fbAuthUser = fbAuthUserCredential.user;
+    const fbAuthProviderData = fbAuthUser.providerData[0];
     const userData: OPA.IFirebaseAuthUserData = {
       authType: OPA.FirebaseAuthTypes.user,
       uid: fbAuthUser.uid,
-      providerId: (OPA.convertNonNullish(fbAuthUserCredential.providerId, fbAuthUser.providerId) as OPA.FirebaseProviderType),
+      providerId: (fbAuthProviderData.providerId as OPA.FirebaseProviderType),
       email: OPA.convertNonNullish(fbAuthUser.email),
       emailVerified: treatEmailAsVerified,
       isAnonymous: fbAuthUser.isAnonymous,
@@ -114,10 +115,11 @@ describe("Firebase Auth Handler Tests using Firebase " + config.testEnvironment,
 
     const fbAuthUserCredential = await signInWithEmailAndPassword(auth, firebaseAuthUserEmail, firebaseAuthUserPassword);
     const fbAuthUser = fbAuthUserCredential.user;
+    const fbAuthProviderData = fbAuthUser.providerData[0];
     const userData: OPA.IFirebaseAuthUserData = {
       authType: OPA.FirebaseAuthTypes.user,
       uid: fbAuthUser.uid,
-      providerId: (OPA.convertNonNullish(fbAuthUserCredential.providerId, fbAuthUser.providerId) as OPA.FirebaseProviderType),
+      providerId: (fbAuthProviderData.providerId as OPA.FirebaseProviderType),
       email: OPA.convertNonNullish(fbAuthUser.email),
       emailVerified: fbAuthUser.emailVerified,
       isAnonymous: fbAuthUser.isAnonymous,
@@ -131,8 +133,13 @@ describe("Firebase Auth Handler Tests using Firebase " + config.testEnvironment,
       timestamp: OPA.nowToUse().toString(),
     };
 
+    // NOTE: Because authenticationEventHandlerForFirebaseAuth(...) may have already run for a "beforeUserSignedIn" listener in functions package, the User may have already been created
     const opaUser = await FBU.authenticationEventHandlerForFirebaseAuth(config.dataStorageState, userData);
-    expect(OPA.isNullish(opaUser)).equals(true);
+    if (!OPA.isNullish(opaUser)) {
+      const opaUserNonNull = OPA.convertNonNullish(opaUser);
+      // NOTE: Either the User will not exist, or if it already exists, it will have been changed to suspended
+      expect(opaUserNonNull.isSuspended).equals(true);
+    }
   });
   test("checks that authenticationEventHandlerForFirebaseAuth(...) fails when System is installed and Auth User is disabled ", testFunc2());
 
@@ -154,10 +161,11 @@ describe("Firebase Auth Handler Tests using Firebase " + config.testEnvironment,
 
     const fbAuthUserCredential = await signInWithEmailAndPassword(auth, firebaseAuthUserEmail, firebaseAuthUserPassword);
     const fbAuthUser = fbAuthUserCredential.user;
+    const fbAuthProviderData = fbAuthUser.providerData[0];
     const userData: OPA.IFirebaseAuthUserData = {
       authType: OPA.FirebaseAuthTypes.user,
       uid: fbAuthUser.uid,
-      providerId: (OPA.convertNonNullish(fbAuthUserCredential.providerId, fbAuthUser.providerId) as OPA.FirebaseProviderType),
+      providerId: (fbAuthProviderData.providerId as OPA.FirebaseProviderType),
       email: OPA.convertNonNullish(fbAuthUser.email),
       emailVerified: fbAuthUser.emailVerified,
       isAnonymous: fbAuthUser.isAnonymous,
