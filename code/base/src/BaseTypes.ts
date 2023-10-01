@@ -107,8 +107,10 @@ export const ApprovalStates = {
   approved: ("approved" as ApprovalState),
   denied: ("denied" as ApprovalState),
   decided: ([] as Array<ApprovalState>),
+  all: ([] as Array<ApprovalState>),
 };
 ApprovalStates.decided = [ApprovalStates.approved, ApprovalStates.denied];
+ApprovalStates.all = [ApprovalStates.pending, ApprovalStates.approved, ApprovalStates.denied];
 
 export type ArrayContentType = "exact" | "only_added" | "only_removed";
 export const ArrayContentTypes = {
@@ -125,7 +127,9 @@ export const ExecutionStates = {
   ready: ("ready" as ExecutionState),
   complete: ("complete" as ExecutionState),
   error: ("error" as ExecutionState),
+  all: ([] as Array<ExecutionState>),
 };
+ExecutionStates.all = [ExecutionStates.entry, ExecutionStates.ready, ExecutionStates.complete, ExecutionStates.error];
 
 /**
  * Returns whether the ID is valid.

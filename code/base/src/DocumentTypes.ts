@@ -609,7 +609,12 @@ export interface IDocument_Archivable extends IDocument, IArchivable { }
 export interface IDocument_Archivable_ByUser extends IDocument_Archivable, IArchivable_ByUser { }
 // Not to be stored
 export type ArchivalState = "archived" | "not_archived";
-export const ArchivalStates = {archived: ("archived" as ArchivalState), not_archived: ("not_archived" as ArchivalState)};
+export const ArchivalStates = {
+  archived: ("archived" as ArchivalState),
+  not_archived: ("not_archived" as ArchivalState),
+  all: ([] as Array<ArchivalState>),
+};
+ArchivalStates.all = [ArchivalStates.archived, ArchivalStates.not_archived];
 
 /**
  * Returns whether the updates to the object are valid from the perspective of the IArchivable interface.
@@ -888,7 +893,12 @@ export interface IDocument_Suspendable extends IDocument, ISuspendable { }
 export interface IDocument_Suspendable_ByUser extends IDocument_Suspendable, ISuspendable_ByUser { }
 // Not to be stored
 export type SuspensionState = "suspended" | "unsuspended";
-export const SuspensionStates = {suspended: ("suspended" as SuspensionState), unsuspended: ("unsuspended" as SuspensionState)};
+export const SuspensionStates = {
+  suspended: ("suspended" as SuspensionState),
+  unsuspended: ("unsuspended" as SuspensionState),
+  all: ([] as Array<SuspensionState>),
+};
+SuspensionStates.all = [SuspensionStates.suspended, SuspensionStates.unsuspended];
 
 /**
  * Gets whether the ISuspendable document is currently suspended.
@@ -1018,7 +1028,12 @@ export interface IDocument_Deleteable extends IDocument, IDeleteable { }
 export interface IDocument_Deleteable_ByUser extends IDocument_Deleteable, IDeleteable_ByUser { }
 // Not to be stored
 export type DeletionState = "deleted" | "undeleted";
-export const DeletionStates = {deleted: ("deleted" as DeletionState), undeleted: ("undeleted" as DeletionState)};
+export const DeletionStates = {
+  deleted: ("deleted" as DeletionState),
+  undeleted: ("undeleted" as DeletionState),
+  all: ([] as Array<DeletionState>),
+};
+DeletionStates.all = [DeletionStates.deleted, DeletionStates.undeleted];
 
 /**
  * Returns whether the updates to the object are valid from the perspective of the IDeleteable interface.

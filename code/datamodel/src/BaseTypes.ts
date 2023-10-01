@@ -19,9 +19,11 @@ export const ActivityTypes = {
   server_function_call: ("server_function_call" as ActivityType),
   server_function_error: ("server_function_error" as ActivityType),
   server_function_types: ([] as Array<ActivityType>),
+  all: ([] as Array<ActivityType>),
 };
 ActivityTypes.web_page_types = [ActivityTypes.web_page_load, ActivityTypes.web_page_view, ActivityTypes.web_page_action, ActivityTypes.web_page_error];
 ActivityTypes.server_function_types = [ActivityTypes.server_function_call, ActivityTypes.server_function_error];
+ActivityTypes.all = [ActivityTypes.web_page_load, ActivityTypes.web_page_view, ActivityTypes.web_page_action, ActivityTypes.web_page_error, ActivityTypes.server_function_call, ActivityTypes.server_function_error];
 
 export type RoleType = "owner" | "administrator" | "editor" | "viewer" | "guest";
 export const RoleTypes = {
@@ -35,8 +37,10 @@ export const RoleTypes = {
   authViewers: ([] as Array<RoleType>),
   editors: ([] as Array<RoleType>),
   viewers: ([] as Array<RoleType>),
+  all: ([] as Array<RoleType>),
 };
 RoleTypes.authorizers = [RoleTypes.owner, RoleTypes.administrator];
 RoleTypes.editors = [RoleTypes.owner, RoleTypes.administrator, RoleTypes.editor];
 RoleTypes.authViewers = [...RoleTypes.editors]; // NOTE: "editors" are also "authViewers"
 RoleTypes.viewers = [RoleTypes.owner, RoleTypes.administrator, RoleTypes.editor, RoleTypes.viewer];
+RoleTypes.all = [RoleTypes.owner, RoleTypes.administrator, RoleTypes.editor, RoleTypes.viewer, RoleTypes.guest];
