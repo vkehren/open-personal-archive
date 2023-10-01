@@ -610,6 +610,7 @@ export interface IDocument_Archivable_ByUser extends IDocument_Archivable, IArch
 // Not to be stored
 export type ArchivalState = "archived" | "not_archived";
 export const ArchivalStates = {
+  _typeName: "ArchivalState",
   archived: ("archived" as ArchivalState),
   not_archived: ("not_archived" as ArchivalState),
   all: ([] as Array<ArchivalState>),
@@ -894,6 +895,7 @@ export interface IDocument_Suspendable_ByUser extends IDocument_Suspendable, ISu
 // Not to be stored
 export type SuspensionState = "suspended" | "unsuspended";
 export const SuspensionStates = {
+  _typeName: "SuspensionState",
   suspended: ("suspended" as SuspensionState),
   unsuspended: ("unsuspended" as SuspensionState),
   all: ([] as Array<SuspensionState>),
@@ -1029,6 +1031,7 @@ export interface IDocument_Deleteable_ByUser extends IDocument_Deleteable, IDele
 // Not to be stored
 export type DeletionState = "deleted" | "undeleted";
 export const DeletionStates = {
+  _typeName: "DeletionState",
   deleted: ("deleted" as DeletionState),
   undeleted: ("undeleted" as DeletionState),
   all: ([] as Array<DeletionState>),

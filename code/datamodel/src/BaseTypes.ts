@@ -10,6 +10,7 @@ export const DataConfiguration = {
 
 export type ActivityType = "browser_page_load" | "browser_page_view" | "browser_page_action" | "browser_page_error" | "server_function_call" | "server_function_error";
 export const ActivityTypes = {
+  _typeName: "ActivityType",
   default: ("browser_page_view" as ActivityType),
   web_page_load: ("browser_page_load" as ActivityType),
   web_page_view: ("browser_page_view" as ActivityType),
@@ -27,6 +28,7 @@ ActivityTypes.all = [ActivityTypes.web_page_load, ActivityTypes.web_page_view, A
 
 export type RoleType = "owner" | "administrator" | "editor" | "viewer" | "guest";
 export const RoleTypes = {
+  _typeName: "RoleType",
   default: ("guest" as RoleType),
   owner: ("owner" as RoleType),
   administrator: ("administrator" as RoleType),

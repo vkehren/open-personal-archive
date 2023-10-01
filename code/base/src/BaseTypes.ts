@@ -102,6 +102,7 @@ export interface ITimeRangeCollection {
 
 export type ApprovalState = "pending" | "approved" | "denied";
 export const ApprovalStates = {
+  _typeName: "ApprovalState",
   default: ("pending" as ApprovalState),
   pending: ("pending" as ApprovalState),
   approved: ("approved" as ApprovalState),
@@ -114,6 +115,7 @@ ApprovalStates.all = [ApprovalStates.pending, ApprovalStates.approved, ApprovalS
 
 export type ArrayContentType = "exact" | "only_added" | "only_removed";
 export const ArrayContentTypes = {
+  _typeName: "ArrayContentType",
   exact: ("exact" as ArrayContentType),
   only_added: ("only_added" as ArrayContentType),
   only_removed: ("only_removed" as ArrayContentType),
@@ -123,6 +125,7 @@ ArrayContentTypes.all = [ArrayContentTypes.exact, ArrayContentTypes.only_added, 
 
 export type ExecutionState = "entry" | "ready" | "complete" | "error";
 export const ExecutionStates = {
+  _typeName: "ExecutionState",
   entry: ("entry" as ExecutionState),
   ready: ("ready" as ExecutionState),
   complete: ("complete" as ExecutionState),
