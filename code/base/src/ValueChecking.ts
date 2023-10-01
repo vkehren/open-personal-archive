@@ -256,6 +256,26 @@ export function assertIsOfValue(actual: number | null | undefined, desired: numb
 }
 
 /**
+ * Returns a value, unless instructed to throw an error.
+ * @param {BT.DefaultFunc<T> | T} valueOrGetter The value or the getter to get the value.
+ * @param {boolean} [throwError=false] Whether to throw an error.
+ * @param {string} [errorMessage="An error occurred."] The message for the error, if instructed to throw an error.
+ * @return {boolean}
+ */
+export function getUnlessThrowError<T>(valueOrGetter: BT.DefaultFunc<T> | T, throwError = false, errorMessage = "An error occurred."): T {
+  if (throwError) {
+    throw new Error(errorMessage);
+  }
+  if (!TC.isFunction(valueOrGetter)) {
+    const value = (valueOrGetter as T);
+    return value;
+  }
+  const getter = (valueOrGetter as BT.DefaultFunc<T>);
+  const value = getter();
+  return value;
+}
+
+/**
  * Parses the input as JSON only if parsing is necessary.
  * @param {string | unknown | null | undefined} input The input value.
  * @return {any}

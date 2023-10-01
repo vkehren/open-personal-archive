@@ -399,6 +399,51 @@ test("checks that passing '1' logically to isOfValue(...) returns correct value"
   expect(VC.isOfValue(1, 33, false)).toBe(false);
 });
 
+// TESTS for getUnlessThrowError(...)
+test("checks that passing basic values to getUnlessThrowError(...) with \"throwError = false\" returns that value", () => {
+  expect(VC.getUnlessThrowError(undefined, false)).toBe(undefined);
+  expect(VC.getUnlessThrowError(null, false)).toBe(null);
+  expect(VC.getUnlessThrowError(false, false)).toBe(false);
+  expect(VC.getUnlessThrowError(true, false)).toBe(true);
+  expect(VC.getUnlessThrowError(-1, false)).toBe(-1);
+  expect(VC.getUnlessThrowError(0, false)).toBe(0);
+  expect(VC.getUnlessThrowError(1, false)).toBe(1);
+  expect(VC.getUnlessThrowError("Hello", false)).toBe("Hello");
+});
+
+test("checks that passing getter values to getUnlessThrowError(...) with \"throwError = false\" returns the gotten value", () => {
+  expect(VC.getUnlessThrowError(() => undefined, false)).toBe(undefined);
+  expect(VC.getUnlessThrowError(() => null, false)).toBe(null);
+  expect(VC.getUnlessThrowError(() => false, false)).toBe(false);
+  expect(VC.getUnlessThrowError(() => true, false)).toBe(true);
+  expect(VC.getUnlessThrowError(() => -1, false)).toBe(-1);
+  expect(VC.getUnlessThrowError(() => 0, false)).toBe(0);
+  expect(VC.getUnlessThrowError(() => 1, false)).toBe(1);
+  expect(VC.getUnlessThrowError(() => "Hello", false)).toBe("Hello");
+});
+
+test("checks that passing basic values to getUnlessThrowError(...) with \"throwError = true\" throws error", () => {
+  expect(() => VC.getUnlessThrowError(undefined, true)).toThrowError();
+  expect(() => VC.getUnlessThrowError(null, true)).toThrowError();
+  expect(() => VC.getUnlessThrowError(false, true)).toThrowError();
+  expect(() => VC.getUnlessThrowError(true, true)).toThrowError();
+  expect(() => VC.getUnlessThrowError(-1, true)).toThrowError();
+  expect(() => VC.getUnlessThrowError(0, true)).toThrowError();
+  expect(() => VC.getUnlessThrowError(1, true)).toThrowError();
+  expect(() => VC.getUnlessThrowError("Hello", true)).toThrowError();
+});
+
+test("checks that passing getter values to getUnlessThrowError(...) with \"throwError = true\" throws error", () => {
+  expect(() => VC.getUnlessThrowError(() => undefined, true)).toThrowError();
+  expect(() => VC.getUnlessThrowError(() => null, true)).toThrowError();
+  expect(() => VC.getUnlessThrowError(() => false, true)).toThrowError();
+  expect(() => VC.getUnlessThrowError(() => true, true)).toThrowError();
+  expect(() => VC.getUnlessThrowError(() => -1, true)).toThrowError();
+  expect(() => VC.getUnlessThrowError(() => 0, true)).toThrowError();
+  expect(() => VC.getUnlessThrowError(() => 1, true)).toThrowError();
+  expect(() => VC.getUnlessThrowError(() => "Hello", true)).toThrowError();
+});
+
 // TESTS for isOfValue(...)
 test("checks that passing basic values to parseJsonIfNeeded(...) returns that value", () => {
   const now = Date.now();
