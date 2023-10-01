@@ -182,6 +182,8 @@
     const functions = getFunctions(app, "us-east1");
 
     document.getElementById("google-button").onclick = () => {
+      document.getElementById("google-label").innerText = "...working...";
+
       const provider = new GoogleAuthProvider();
 
       signInWithPopup(auth, provider)
@@ -194,6 +196,9 @@
     };
 
     document.getElementById("firebase-button").onclick = () => {
+      document.getElementById("firebase-label").innerText = "...working...";
+      document.getElementById("firebase-verification-label").innerText = "";
+
       const email = document.getElementById("firebase-email-input").value;
       const password = document.getElementById("firebase-password-input").value;
 
@@ -233,6 +238,8 @@
     }
 
     document.getElementById("function-button").onclick = () => {
+      document.getElementById("function-label").innerText = "...working...";
+
       const functionSelect = document.getElementById("function-select");
       const functionIndex = functionSelect.selectedIndex;
       const functionOption = functionSelect.options[functionIndex];
