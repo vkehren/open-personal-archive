@@ -6,6 +6,7 @@ export const DataConfiguration = {
   Locale_UseMin: false,
   TimeZoneGroup_UseMin: false,
   TimeZone_UseMin: false,
+  ThrowErrorOnInvalidUpdate: true,
 };
 
 export type ActivityType = "browser_page_load" | "browser_page_view" | "browser_page_action" | "browser_page_error" | "server_function_call" | "server_function_error";
