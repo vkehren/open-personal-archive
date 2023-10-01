@@ -24,7 +24,7 @@ export const ActivityTypes = {
 };
 ActivityTypes.web_page_types = [ActivityTypes.web_page_load, ActivityTypes.web_page_view, ActivityTypes.web_page_action, ActivityTypes.web_page_error];
 ActivityTypes.server_function_types = [ActivityTypes.server_function_call, ActivityTypes.server_function_error];
-ActivityTypes.all = [ActivityTypes.web_page_load, ActivityTypes.web_page_view, ActivityTypes.web_page_action, ActivityTypes.web_page_error, ActivityTypes.server_function_call, ActivityTypes.server_function_error];
+ActivityTypes.all = [ActivityTypes.web_page_load, ActivityTypes.web_page_view, ActivityTypes.web_page_action, ActivityTypes.web_page_error, ActivityTypes.server_function_call, ActivityTypes.server_function_error]; // eslint-disable-line max-len
 
 export type RoleType = "owner" | "administrator" | "editor" | "viewer" | "guest";
 export const RoleTypes = {
