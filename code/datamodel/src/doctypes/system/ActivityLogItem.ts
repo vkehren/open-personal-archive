@@ -77,7 +77,7 @@ export function areUpdatesValid(document: IActivityLogItem, updateObject: IActiv
  */
 function createInstance(id: string, rootLogItemId: string | null, externalLogItemId: string | null, activityType: BT.ActivityType, requestor: string, resource: string, resourceCanonical: string | null, action: string | null, data: Record<string, unknown>, firebaseAuthUserId: string | null = null, userId: string | null = null, otherState: Record<string, unknown> | null = null): IActivityLogItem { // eslint-disable-line max-len
   OPA.assertNonNullish(activityType);
-  OPA.assertIsOfLiteral<BT.ActivityType>(activityType, BT.ActivityTypes.all, BT.ActivityTypes._typeName);
+  OPA.assertIsOfLiteral<BT.ActivityType>(activityType, BT.ActivityTypes._all, BT.ActivityTypes._typeName);
   if ((activityType == "browser_page_action") && OPA.isNullishOrWhitespace(action)) {
     throw new Error("The action name must be specified when logging web page actions.");
   }

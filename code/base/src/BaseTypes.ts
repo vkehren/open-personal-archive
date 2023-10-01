@@ -103,36 +103,32 @@ export interface ITimeRangeCollection {
 export type ApprovalState = "pending" | "approved" | "denied";
 export const ApprovalStates = {
   _typeName: "ApprovalState",
-  default: ("pending" as ApprovalState),
+  _all: (["pending", "approved", "denied"] as Array<ApprovalState>),
+  _default: ("pending" as ApprovalState),
   pending: ("pending" as ApprovalState),
   approved: ("approved" as ApprovalState),
   denied: ("denied" as ApprovalState),
-  decided: ([] as Array<ApprovalState>),
-  all: ([] as Array<ApprovalState>),
+  _decided: (["approved", "denied"] as Array<ApprovalState>),
 };
-ApprovalStates.decided = [ApprovalStates.approved, ApprovalStates.denied];
-ApprovalStates.all = [ApprovalStates.pending, ApprovalStates.approved, ApprovalStates.denied];
 
 export type ArrayContentType = "exact" | "only_added" | "only_removed";
 export const ArrayContentTypes = {
   _typeName: "ArrayContentType",
+  _all: (["exact", "only_added", "only_removed"] as Array<ArrayContentType>),
   exact: ("exact" as ArrayContentType),
   only_added: ("only_added" as ArrayContentType),
   only_removed: ("only_removed" as ArrayContentType),
-  all: ([] as Array<ArrayContentType>),
 };
-ArrayContentTypes.all = [ArrayContentTypes.exact, ArrayContentTypes.only_added, ArrayContentTypes.only_removed];
 
 export type ExecutionState = "entry" | "ready" | "complete" | "error";
 export const ExecutionStates = {
   _typeName: "ExecutionState",
+  _all: (["entry", "ready", "complete", "error"] as Array<ExecutionState>),
   entry: ("entry" as ExecutionState),
   ready: ("ready" as ExecutionState),
   complete: ("complete" as ExecutionState),
   error: ("error" as ExecutionState),
-  all: ([] as Array<ExecutionState>),
 };
-ExecutionStates.all = [ExecutionStates.entry, ExecutionStates.ready, ExecutionStates.complete, ExecutionStates.error];
 
 /**
  * Returns whether the ID is valid.

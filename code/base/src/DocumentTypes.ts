@@ -611,11 +611,10 @@ export interface IDocument_Archivable_ByUser extends IDocument_Archivable, IArch
 export type ArchivalState = "archived" | "not_archived";
 export const ArchivalStates = {
   _typeName: "ArchivalState",
+  _all: (["archived", "not_archived"] as Array<ArchivalState>),
   archived: ("archived" as ArchivalState),
   not_archived: ("not_archived" as ArchivalState),
-  all: ([] as Array<ArchivalState>),
 };
-ArchivalStates.all = [ArchivalStates.archived, ArchivalStates.not_archived];
 
 /**
  * Returns whether the updates to the object are valid from the perspective of the IArchivable interface.
@@ -821,7 +820,7 @@ export function areUpdatesValid_ForApprovable(original: IApprovable<BT.ApprovalS
     if (!stateValid) {
       return false;
     }
-    const approvalStateValid = (BT.ApprovalStates.decided.includes(updated.approvalState));
+    const approvalStateValid = (BT.ApprovalStates._decided.includes(updated.approvalState));
     if (!approvalStateValid) {
       return false;
     }
@@ -896,11 +895,11 @@ export interface IDocument_Suspendable_ByUser extends IDocument_Suspendable, ISu
 export type SuspensionState = "suspended" | "unsuspended";
 export const SuspensionStates = {
   _typeName: "SuspensionState",
+  _all: (["suspended", "unsuspended"] as Array<SuspensionState>),
   suspended: ("suspended" as SuspensionState),
   unsuspended: ("unsuspended" as SuspensionState),
-  all: ([] as Array<SuspensionState>),
+
 };
-SuspensionStates.all = [SuspensionStates.suspended, SuspensionStates.unsuspended];
 
 /**
  * Gets whether the ISuspendable document is currently suspended.
@@ -1032,11 +1031,11 @@ export interface IDocument_Deleteable_ByUser extends IDocument_Deleteable, IDele
 export type DeletionState = "deleted" | "undeleted";
 export const DeletionStates = {
   _typeName: "DeletionState",
+  _all: (["deleted", "undeleted"] as Array<DeletionState>),
   deleted: ("deleted" as DeletionState),
   undeleted: ("undeleted" as DeletionState),
-  all: ([] as Array<DeletionState>),
+
 };
-DeletionStates.all = [DeletionStates.deleted, DeletionStates.undeleted];
 
 /**
  * Returns whether the updates to the object are valid from the perspective of the IDeleteable interface.

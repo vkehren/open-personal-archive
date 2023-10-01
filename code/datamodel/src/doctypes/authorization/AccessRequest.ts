@@ -185,7 +185,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
 
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
-    OPA.assertIsOfLiteral<OPA.ApprovalState>(approvalState, OPA.ApprovalStates.all, OPA.ApprovalStates._typeName);
+    OPA.assertIsOfLiteral<OPA.ApprovalState>(approvalState, OPA.ApprovalStates._all, OPA.ApprovalStates._typeName);
 
     const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
     const approvalStateFieldName = OPA.getTypedPropertyKeyAsText<IAccessRequest>("approvalState");
@@ -213,7 +213,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     const userIdFieldName = OPA.getTypedPropertyKeyAsText<IAccessRequest>("userIdOfCreator");
     let getAccessRequestsForUserIdQuery = accessRequestsCollectionRef.where(userIdFieldName, "==", userId);
     if (!OPA.isNullish(approvalState)) {
-      OPA.assertIsOfLiteral<OPA.ApprovalState>(approvalState, OPA.ApprovalStates.all, OPA.ApprovalStates._typeName);
+      OPA.assertIsOfLiteral<OPA.ApprovalState>(approvalState, OPA.ApprovalStates._all, OPA.ApprovalStates._typeName);
       const approvalStateFieldName = OPA.getTypedPropertyKeyAsText<IAccessRequest>("approvalState");
       getAccessRequestsForUserIdQuery = getAccessRequestsForUserIdQuery.where(approvalStateFieldName, "==", approvalState);
     }
@@ -305,7 +305,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     OPA.assertFirestoreIsNotNullish(ds.db);
     OPA.assertNonNullish(tags, "The array of Tags must not be null.");
     OPA.assertNonNullish(contentType);
-    OPA.assertIsOfLiteral<OPA.ArrayContentType>(contentType, OPA.ArrayContentTypes.all, OPA.ArrayContentTypes._typeName);
+    OPA.assertIsOfLiteral<OPA.ArrayContentType>(contentType, OPA.ArrayContentTypes._all, OPA.ArrayContentTypes._typeName);
 
     let tagsValue: Array<string> | firestore.FieldValue = tags;
     if (contentType == OPA.ArrayContentTypes.only_added) {
@@ -408,7 +408,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
     OPA.assertNonNullish(approvalState);
-    OPA.assertIsOfLiteral<OPA.ApprovalState>(approvalState, OPA.ApprovalStates.all, OPA.ApprovalStates._typeName);
+    OPA.assertIsOfLiteral<OPA.ApprovalState>(approvalState, OPA.ApprovalStates._all, OPA.ApprovalStates._typeName);
 
     const now = OPA.nowToUse();
     const updateObject_Partial = ({} as IAccessRequestPartial);
@@ -441,7 +441,7 @@ export class AccessRequestQuerySet extends OPA.QuerySet<IAccessRequest> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
     OPA.assertNonNullish(deletionState);
-    OPA.assertIsOfLiteral<OPA.DeletionState>(deletionState, OPA.DeletionStates.all, OPA.DeletionStates._typeName);
+    OPA.assertIsOfLiteral<OPA.DeletionState>(deletionState, OPA.DeletionStates._all, OPA.DeletionStates._typeName);
 
     // NOTE: We need the document earlier in this function to get the existing values for IDeleteable_ByUser
     const document = await this.getByIdWithAssert(ds, documentId);

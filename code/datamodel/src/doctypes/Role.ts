@@ -82,7 +82,7 @@ export class RoleQuerySet extends OPA.QuerySet<IRole> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
     OPA.assertNonNullish(roleTypes);
-    roleTypes.forEach((roleType) => OPA.assertIsOfLiteral<BT.RoleType>(roleType, BT.RoleTypes.all, BT.RoleTypes._typeName));
+    roleTypes.forEach((roleType) => OPA.assertIsOfLiteral<BT.RoleType>(roleType, BT.RoleTypes._all, BT.RoleTypes._typeName));
 
     if (roleTypes.length <= 0) {
       return new Map<string, IRole>();

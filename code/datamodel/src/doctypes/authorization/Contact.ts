@@ -271,7 +271,7 @@ export class ContactQuerySet extends OPA.QuerySet<IContact> {
     OPA.assertNonNullish(correspondingUsers, "The array of corresponding Users must not be null.");
     correspondingUsers.forEach((value) => OPA.assertDocumentIsValid(value));
     OPA.assertNonNullish(contentType);
-    OPA.assertIsOfLiteral<OPA.ArrayContentType>(contentType, OPA.ArrayContentTypes.all, OPA.ArrayContentTypes._typeName);
+    OPA.assertIsOfLiteral<OPA.ArrayContentType>(contentType, OPA.ArrayContentTypes._all, OPA.ArrayContentTypes._typeName);
 
     const correspondingUserIds = correspondingUsers.map((value) => OPA.getDocumentIdWithAssert(value));
     let correspondingUserIdsValue: Array<string> | firestore.FieldValue = correspondingUserIds;
@@ -316,7 +316,7 @@ export class ContactQuerySet extends OPA.QuerySet<IContact> {
     OPA.assertFirestoreIsNotNullish(ds.db);
     OPA.assertNonNullish(tags, "The array of Tags must not be null.");
     OPA.assertNonNullish(contentType);
-    OPA.assertIsOfLiteral<OPA.ArrayContentType>(contentType, OPA.ArrayContentTypes.all, OPA.ArrayContentTypes._typeName);
+    OPA.assertIsOfLiteral<OPA.ArrayContentType>(contentType, OPA.ArrayContentTypes._all, OPA.ArrayContentTypes._typeName);
 
     let tagsValue: Array<string> | firestore.FieldValue = tags;
     if (contentType == OPA.ArrayContentTypes.only_added) {
@@ -419,7 +419,7 @@ export class ContactQuerySet extends OPA.QuerySet<IContact> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
     OPA.assertNonNullish(deletionState);
-    OPA.assertIsOfLiteral<OPA.DeletionState>(deletionState, OPA.DeletionStates.all, OPA.DeletionStates._typeName);
+    OPA.assertIsOfLiteral<OPA.DeletionState>(deletionState, OPA.DeletionStates._all, OPA.DeletionStates._typeName);
 
     // NOTE: We need the document earlier in this function to get the existing values for IDeleteable_ByUser
     const document = await this.getByIdWithAssert(ds, documentId);
