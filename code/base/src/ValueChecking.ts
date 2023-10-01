@@ -335,6 +335,6 @@ export function replaceAll(input: string, searchValue: string | RegExp, replaceV
     searchExp = new RegExp((searchValue as string), "g");
   }
 
-  const output = input.replace(searchExp, replaceValue)
+  const output = input.replace(searchExp, replaceValue);
   return output;
 }
