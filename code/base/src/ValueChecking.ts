@@ -260,7 +260,7 @@ export function assertIsOfValue(actual: number | null | undefined, desired: numb
  * @param {BT.DefaultFunc<T> | T} valueOrGetter The value or the getter to get the value.
  * @param {boolean} [throwError=false] Whether to throw an error.
  * @param {string} [errorMessage="An error occurred."] The message for the error, if instructed to throw an error.
- * @return {boolean}
+ * @return {T}
  */
 export function getUnlessThrowError<T>(valueOrGetter: BT.DefaultFunc<T> | T, throwError = false, errorMessage = "An error occurred."): T {
   if (throwError) {
@@ -273,6 +273,16 @@ export function getUnlessThrowError<T>(valueOrGetter: BT.DefaultFunc<T> | T, thr
   const getter = (valueOrGetter as BT.DefaultFunc<T>);
   const value = getter();
   return value;
+}
+
+/**
+ * Returns false, unless instructed to throw an error.
+ * @param {boolean} [throwError=false] Whether to throw an error.
+ * @param {string} [errorMessage="An error occurred."] The message for the error, if instructed to throw an error.
+ * @return {boolean}
+ */
+export function falseUnlessThrowError(throwError = false, errorMessage = "An error occurred."): boolean {
+  return getUnlessThrowError(false, throwError, errorMessage);
 }
 
 /**
