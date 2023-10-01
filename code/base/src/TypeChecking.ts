@@ -247,7 +247,7 @@ export function isOfLiteral<T>(value: unknown, validOptions: Array<T>): value is
 export function assertIsOfLiteral<T>(value: unknown, validOptions: Array<T>, nameOfTypeT = "\"T\"", includeValidOptionsInMessage = true): void {
   if (!isOfLiteral<T>(value, validOptions)) {
     let failureMessage = ("The value provided was not of type \"" + nameOfTypeT + "\"");
-    failureMessage += (includeValidOptionsInMessage) ? (", for which valid options are: " + validOptions.toString() + ".") : ".";
+    failureMessage += (includeValidOptionsInMessage) ? (", for which valid options are: " + validOptions.toString().replace(",", ", ") + ".") : ".";
     throw new Error(failureMessage);
   }
 }
