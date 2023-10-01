@@ -444,7 +444,7 @@ test("checks that passing getter values to getUnlessThrowError(...) with \"throw
   expect(() => VC.getUnlessThrowError(() => "Hello", true)).toThrowError();
 });
 
-// TESTS for isOfValue(...)
+// TESTS for parseJsonIfNeeded(...)
 test("checks that passing basic values to parseJsonIfNeeded(...) returns that value", () => {
   const now = Date.now();
   expect(VC.parseJsonIfNeeded(undefined)).toBe(undefined);
@@ -488,4 +488,11 @@ test("checks that passing JSON to parseJsonIfNeeded(...) returns object", () => 
   expect(VC.parseJsonIfNeeded("{\"i\": \"Hello World!\"}")).toEqual({i: "Hello World!"});
   expect(VC.parseJsonIfNeeded("{\"j\": {\"k\": \"Hello\", \"l\": \"Hello World!\"}, \"m\": \"" + now.toString() + "\"}")).toEqual({j: {k: "Hello", l: "Hello World!"}, m: now.toString()});
   expect(VC.parseJsonIfNeeded("[null, false, true, 0, 1]")).toEqual([null, false, true, 0, 1]);
+});
+
+// TESTS for replaceAll(...)
+test("checks that calling replaceAll(...) actually replaces all occurrences", () => {
+  const values = ["a", "b", "c", "d"];
+  const valuesToString = values.toString();
+  expect(VC.replaceAll(valuesToString, ",", ", ")).toEqual("a, b, c, d");
 });

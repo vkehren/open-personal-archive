@@ -317,3 +317,24 @@ export function parseJsonIfNeeded(input: string | unknown | null | undefined): a
   const inputAsObject = JSON.parse(inputAsString);
   return inputAsObject;
 }
+
+/**
+ * Returns a new string in which all occurrences of the search value in the input string have been replaced with the replacement value.
+ * @param {string} input The input string.
+ * @param {string | RegExp} searchValue The value to search for.
+ * @param {string} replaceValue The value to replace with.
+ * @return {string}
+ */
+export function replaceAll(input: string, searchValue: string | RegExp, replaceValue: string): string {
+  TC.assertNonNullish(input);
+  TC.assertNonNullish(searchValue);
+  TC.assertNonNullish(replaceValue);
+
+  let searchExp = (searchValue as RegExp);
+  if (TC.isString(searchValue)) {
+    searchExp = new RegExp((searchValue as string), "g");
+  }
+
+  const output = input.replace(searchExp, replaceValue)
+  return output;
+}
