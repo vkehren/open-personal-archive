@@ -16,24 +16,24 @@ export const ActivityTypes = {
   web_page_error: "browser_page_error",
 };
 
-async function recordPageLoad(app, resource = window.location.href, data = {}, otherState = {}) {
+async function recordPageLoad(app, resource = window.location.href, data = {}, otherState = null) {
   await recordLogItem(app, ActivityTypes.web_page_load, resource, null, data, otherState);
 }
 
-async function recordPageView(app, resource = window.location.href, data = {}, otherState = {}) {
+async function recordPageView(app, resource = window.location.href, data = {}, otherState = null) {
   await recordLogItem(app, ActivityTypes.web_page_view, resource, null, data, otherState);
 }
 
-async function recordPageAction(app, resource = window.location.href, action, data = {}, otherState = {}) {
+async function recordPageAction(app, resource = window.location.href, action, data = {}, otherState = null) {
   await recordLogItem(app, ActivityTypes.web_page_view, resource, action, data, otherState);
 }
 
-async function recordPageError(app, error, resource = window.location.href, otherState = {}) {
+async function recordPageError(app, error, resource = window.location.href, otherState = null) {
   const data = {error: JSON.stringify(error)};
   await recordLogItem(app, ActivityTypes.web_page_view, resource, null, data, otherState);
 }
 
-async function recordLogItem(app, activityType, resource, action, data, otherState) {
+async function recordLogItem(app, activityType, resource, action, data, otherState = null) {
   try {
     const functions = getFunctions(app, FIREBASE_FUNCTIONS_REGION);
     const functionObject = httpsCallable(functions, "recordLogItem");
