@@ -30,7 +30,7 @@ export const recordLogItem = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
     const requestor = shimmedRequest.clientIpAddress;
     const resource = (request.data.resource) ? request.data.resource : undefined;
     const action = (request.data.action) ? request.data.action : undefined;
-    const data = (request.data.data) ? OPA.parseJsonIfNeeded(request.data.data) : undefined;
+    const data = (request.data.data) ? OPA.parseJsonIfNeeded(request.data.data) : {};
     const otherState = (request.data.otherState) ? OPA.parseJsonIfNeeded(request.data.otherState) : undefined;
 
     await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, requestor, resource, action, data, otherState);
