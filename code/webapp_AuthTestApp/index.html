@@ -165,14 +165,16 @@
 
   <script type="module">
     import {FIREBASE_CONFIG, FIREBASE_FUNCTIONS_REGION} from "./WebAppConfig.js";
-    import {parseJsonIfNeeded} from "./WebBaseLite.js";
     import {initializeApp} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
     import {GoogleAuthProvider, getAuth, sendEmailVerification, signInWithEmailAndPassword, signInWithPopup} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
     import {getFunctions, httpsCallable} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-functions.js";
+    import {parseJsonIfNeeded} from "./WebBaseLite.js";
+    import {recordPageView, recordPageError} from "./WebFunctions.js";
 
     const app = initializeApp(FIREBASE_CONFIG);
     const auth = getAuth(app);
     const functions = getFunctions(app, FIREBASE_FUNCTIONS_REGION);
+    await recordPageView(app);
 
     document.getElementById("google-button").onclick = () => {
       document.getElementById("google-label").innerText = "...working...";
@@ -183,8 +185,9 @@
         .then((result) => {
           const credential = GoogleAuthProvider.credentialFromResult(result);
           document.getElementById("google-label").innerText = JSON.stringify(credential);
-        }).catch((error) => {
+        }).catch(async (error) => {
           document.getElementById("google-label").innerText = JSON.stringify(error);
+          await recordPageError(error);
         });
     };
 
@@ -203,12 +206,14 @@
             sendEmailVerification(auth.currentUser)
               .then((result) => {
                 document.getElementById("firebase-verification-label").innerText = JSON.stringify(result);
-              }).catch((error) => {
+              }).catch(async (error) => {
                 document.getElementById("firebase-verification-label").innerText = JSON.stringify(error);
+                await recordPageError(error);
               });
           }
-        }).catch((error) => {
+        }).catch(async (error) => {
           document.getElementById("firebase-label").innerText = JSON.stringify(error);
+          await recordPageError(error);
         });
     };
 
@@ -250,8 +255,9 @@
         .then((result) => {
           document.getElementById("function-label").innerText = JSON.stringify(result);
         })
-        .catch((error) => {
+        .catch(async (error) => {
           document.getElementById("function-label").innerText = JSON.stringify(error);
+          await recordPageError(error);
         });
     };
   </script>
