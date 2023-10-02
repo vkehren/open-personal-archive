@@ -170,11 +170,14 @@
     import {getFunctions, httpsCallable} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-functions.js";
     import {parseJsonIfNeeded} from "./WebBaseLite.js";
     import {recordPageView, recordPageError} from "./WebFunctions.js";
+    import {schedulePageRefreshForInactivity} from "./WebRendering.js";
 
     const app = initializeApp(FIREBASE_CONFIG);
     const auth = getAuth(app);
     const functions = getFunctions(app, FIREBASE_FUNCTIONS_REGION);
+
     await recordPageView(app);
+    schedulePageRefreshForInactivity();
 
     document.getElementById("google-button").onclick = () => {
       document.getElementById("google-label").innerText = "...working...";
