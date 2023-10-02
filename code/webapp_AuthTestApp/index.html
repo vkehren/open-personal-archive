@@ -166,9 +166,9 @@
   <script type="module">
     import {FIREBASE_CONFIG, FIREBASE_FUNCTIONS_REGION} from "./WebAppConfig.js";
     import {parseJsonIfNeeded} from "./WebBaseLite.js";
-    import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js';
-    import {GoogleAuthProvider, getAuth, sendEmailVerification, signInWithEmailAndPassword, signInWithPopup} from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js';
-    import {getFunctions, httpsCallable} from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-functions.js';
+    import {initializeApp} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    import {GoogleAuthProvider, getAuth, sendEmailVerification, signInWithEmailAndPassword, signInWithPopup} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+    import {getFunctions, httpsCallable} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-functions.js";
 
     const app = initializeApp(FIREBASE_CONFIG);
     const auth = getAuth(app);
