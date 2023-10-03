@@ -7,12 +7,48 @@ function isUndefined(value) {
   return ((typeof value) === "undefined");
 }
 
+function assertIsUndefined(value, failureMessage = "The value is not \"undefined\".") {
+  if (!isUndefined(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function assertNotUndefined(value, failureMessage = "The value is \"undefined\".") {
+  if (isUndefined(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
 function isNull(value) {
   return (isNullish(value) && !isUndefined(value));
 }
 
+function assertIsNull(value, failureMessage = "The value is not \"null\".") {
+  if (!isNull(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function assertNotNull(value, failureMessage = "The value is \"null\".") {
+  if (isNull(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
 function isNullish(value) {
   return (value == undefined);
+}
+
+function assertIsNullish(value, failureMessage = "The value is not \"undefined\" and not \"null\".") {
+  if (!isNullish(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function assertNotNullish(value, failureMessage = "The value is \"undefined\" or \"null\".") {
+  if (isNullish(value)) {
+    throw new Error(failureMessage);
+  }
 }
 
 function isEmptyString(value) {
@@ -23,12 +59,36 @@ function isEmptyString(value) {
   return (valueAsString.length <= 0);
 }
 
+function assertIsEmptyString(value, failureMessage = "The value is not \"\".") {
+  if (!isEmptyString(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function assertNotEmptyString(value, failureMessage = "The value is \"\".") {
+  if (isEmptyString(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
 function isWhitespace(value) {
   if (isNullish(value)) {
     return false;
   }
   const valueAsTrimmedString = ("" + value).trim();
   return (valueAsTrimmedString.length <= 0);
+}
+
+function assertIsWhitespace(value, failureMessage = "The value is not trimmable to \"\".") {
+  if (!isWhitespace(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function assertNotWhitespace(value, failureMessage = "The value is trimmable to \"\".") {
+  if (isWhitespace(value)) {
+    throw new Error(failureMessage);
+  }
 }
 
 function isNullishOrWhitespace(value) {
@@ -38,8 +98,32 @@ function isNullishOrWhitespace(value) {
   return isWhitespace(value);
 }
 
+function assertIsNullishOrWhitespace(value, failureMessage = "The value is not \"undefined\" and not \"null\" and not trimmable to \"\".") {
+  if (!isNullishOrWhitespace(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function assertNotNullishOrWhitespace(value, failureMessage = "The value is \"undefined\" or \"null\" or trimmable to \"\".") {
+  if (isNullishOrWhitespace(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
 function isString(value) {
   return ((typeof value) === "string");
+}
+
+function assertIsString(value, failureMessage = "The value is not a string.") {
+  if (!isString(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function assertNotString(value, failureMessage = "The value is a string.") {
+  if (isString(value)) {
+    throw new Error(failureMessage);
+  }
 }
 
 function parseJsonIfNeeded(input) {
@@ -67,4 +151,4 @@ function parseJsonIfNeeded(input) {
   return inputAsJson;
 }
 
-export {isUndefined, isNull, isNullish, isEmptyString, isWhitespace, isNullishOrWhitespace, isString, parseJsonIfNeeded};
+export {isUndefined, assertIsUndefined, assertNotUndefined, isNull, assertIsNull, assertNotNull, isNullish, assertIsNullish, assertNotNullish, isEmptyString, assertIsEmptyString, assertNotEmptyString, isWhitespace, assertIsWhitespace, assertNotWhitespace, isNullishOrWhitespace, assertIsNullishOrWhitespace, assertNotNullishOrWhitespace, isString, assertIsString, assertNotString, parseJsonIfNeeded};
