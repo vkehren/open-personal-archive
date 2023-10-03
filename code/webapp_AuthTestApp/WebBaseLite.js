@@ -126,6 +126,22 @@ function assertNotString(value, failureMessage = "The value is a string.") {
   }
 }
 
+function isOfGuardedType(value, typeGuardFunc) {
+  return typeGuardFunc(value);
+}
+
+function assertIsOfGuardedType(value, typeGuardFunc, failureMessage = "The value is not of the guarded type.") {
+  if (!isOfGuardedType(value, typeGuardFunc)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function assertNotOfGuardedType(value, typeGuardFunc, failureMessage = "The value is of the guarded type.") {
+  if (isOfGuardedType(value, typeGuardFunc)) {
+    throw new Error(failureMessage);
+  }
+}
+
 function parseJsonIfNeeded(input) {
   if (isNullishOrWhitespace(input)) {
     return input;
@@ -151,4 +167,4 @@ function parseJsonIfNeeded(input) {
   return inputAsJson;
 }
 
-export {isUndefined, assertIsUndefined, assertNotUndefined, isNull, assertIsNull, assertNotNull, isNullish, assertIsNullish, assertNotNullish, isEmptyString, assertIsEmptyString, assertNotEmptyString, isWhitespace, assertIsWhitespace, assertNotWhitespace, isNullishOrWhitespace, assertIsNullishOrWhitespace, assertNotNullishOrWhitespace, isString, assertIsString, assertNotString, parseJsonIfNeeded};
+export {isUndefined, assertIsUndefined, assertNotUndefined, isNull, assertIsNull, assertNotNull, isNullish, assertIsNullish, assertNotNullish, isEmptyString, assertIsEmptyString, assertNotEmptyString, isWhitespace, assertIsWhitespace, assertNotWhitespace, isNullishOrWhitespace, assertIsNullishOrWhitespace, assertNotNullishOrWhitespace, isString, assertIsString, assertNotString, isOfGuardedType, assertIsOfGuardedType, assertNotOfGuardedType, parseJsonIfNeeded};
