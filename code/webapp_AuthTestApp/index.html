@@ -29,12 +29,19 @@
       height: 100%;
       overflow: auto;
     }
+
+    .scroll-pane {
+      width: auto;
+      height: auto;
+      padding: 8px;
+    }
   </style>
 </head>
 
 <body>
   <div style="width: 100%;height: 95vh;" class="scroll-container-parent">
     <div class="scroll-container">
+      <div class="scroll-pane">
       <h1>Open Personal Archive™ (OPA) Auth Test App</h1>
       <hr style="margin: 16px;" />
       <p style="margin-left: 16px;">
@@ -190,12 +197,15 @@
         <br />
         <label id="function-label"></label>
       </p>
+      </div>
     </div>
   </div>
   <div style="width: 100%;height: 5vh;position: relative;bottom: 0;background-color: burlywood;" id="copyright"
     class="scroll-container-parent">
     <div class="scroll-container">
+      <div class="scroll-pane">
       <b>Copyright © 2021 Open Personal Archive</b>
+      </div>
     </div>
   </div>
 
