@@ -32,4 +32,59 @@ function schedulePageRefreshForInactivity(inactivityWaitInMs = DEFAULT_INACTIVIT
   };
 }
 
-export {refreshPageOnTimeout, schedulePageRefreshForInactivity};
+function hasViewportChangedWithoutResize(bottomRightElement, maxDistanceFromXMax = null, maxDistanceFromYMax = null) {
+  if (isNullish(bottomRightElement)) {
+    throw new Error("A valid element that is expected to be alligned to the bottom-right of the viewport must be provided.");
+  }
+
+  const elementBounds = bottomRightElement.getBoundingClientRect();
+  const elementXMaxValue = (elementBounds.right + maxDistanceFromXMax);
+  const windowXMaxValue = window.innerWidth;
+  const xDifference = (elementXMaxValue - windowXMaxValue);
+  const elementYMaxValue = (elementBounds.bottom + maxDistanceFromYMax);
+  const windowYMaxValue = window.innerHeight;
+  const yDifference = (elementYMaxValue - windowYMaxValue);
+  const xNeedsRefresh = (!isNullish(maxDistanceFromXMax)) ? (xDifference < 0) : false;
+  const yNeedsRefresh = (!isNullish(maxDistanceFromYMax)) ? (yDifference < 0) : false;
+  const needsRefresh = (xNeedsRefresh || yNeedsRefresh);
+  return (needsRefresh);
+}
+
+function scheduleResizeEventIfNeeded(bottomRightElement, maxDistanceFromXMax = null, maxDistanceFromYMax = null) {
+  const resizeData = {resizeNeeded: false, timeoutId: null};
+  if (!hasViewportChangedWithoutResize(bottomRightElement, maxDistanceFromXMax, maxDistanceFromYMax)) {
+    return resizeData;
+  }
+
+  const timeoutId = setTimeout(function() {
+    const resizeEvent = new Event("resize");
+    window.dispatchEvent(resizeEvent);
+
+    // NOTE: Setting the "timeoutId" to "null" means the resize event was already dispatched
+    resizeData.timeoutId = null;
+  }, DEFAULT_REFRESH_WAIT_IN_MS);
+
+  resizeData.resizeNeeded = true;
+  resizeData.timeoutId = timeoutId;
+  return resizeData;
+}
+
+// NOTE: This function is useful when the mobile browser address bar collapses without causing a resize event
+function forceResizeEventIfNeeded(bottomRightElement, maxDistanceFromXMax = null, maxDistanceFromYMax = null) {
+  if (isNullish(bottomRightElement)) {
+    return;
+  }
+
+  let resizeData = null;
+  window.onresize = function(event) {
+    resizeData = scheduleResizeEventIfNeeded(bottomRightElement, maxDistanceFromXMax, maxDistanceFromYMax);
+  }
+  document.onscroll = function(event) {
+    resizeData = scheduleResizeEventIfNeeded(bottomRightElement, maxDistanceFromXMax, maxDistanceFromYMax);
+  }
+  document.ontouchmove = function(event) {
+    resizeData = scheduleResizeEventIfNeeded(bottomRightElement, maxDistanceFromXMax, maxDistanceFromYMax);
+  }
+}
+
+export {refreshPageOnTimeout, schedulePageRefreshForInactivity, forceResizeEventIfNeeded};
