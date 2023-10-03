@@ -4,7 +4,6 @@ const NAME = "open-personal-archive-web-rendering";
 const VERSION = "2.3.3";
 const AUTHOR = "Ryan Stephen Ehrenreich";
 const COPYRIGHT = "Copyright © 2021 Open Personal Archive™";
-const BUILD_DATE = "2023-10-02T09:40:21.822Z";
 
 const DEFAULT_REFRESH_WAIT_IN_MS = 1; // refresh on next tick
 function refreshPageOnTimeout(refreshWaitInMs = DEFAULT_REFRESH_WAIT_IN_MS) {

@@ -2,7 +2,6 @@ const NAME = "open-personal-archive-web-app-config";
 const VERSION = "2.3.3";
 const AUTHOR = "Ryan Stephen Ehrenreich";
 const COPYRIGHT = "Copyright © 2021 Open Personal Archive™";
-const BUILD_DATE = "2023-10-02T09:40:21.822Z";
 
 const FIREBASE_CONFIG = {
   apiKey: "[REPLACE WITH FIREBASE VALUE]",
