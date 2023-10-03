@@ -110,6 +110,54 @@ function assertNotNullishOrWhitespace(value, failureMessage = "The value is \"un
   }
 }
 
+function isBoolean(value) {
+  return ((typeof value) === "boolean");
+}
+
+function assertIsBoolean(value, failureMessage = "The value is not a boolean.") {
+  if (!isBoolean(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function assertNotBoolean(value, failureMessage = "The value is a boolean.") {
+  if (isBoolean(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function isNumber(value) {
+  return ((typeof value) === "number");
+}
+
+function assertIsNumber(value, failureMessage = "The value is not a number.") {
+  if (!isNumber(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function assertNotNumber(value, failureMessage = "The value is a number.") {
+  if (isNumber(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function isBigInt(value) {
+  return ((typeof value) === "bigint");
+}
+
+function assertIsBigInt(value, failureMessage = "The value is not a bigint.") {
+  if (!isBigInt(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function assertNotBigInt(value, failureMessage = "The value is a bigint.") {
+  if (isBigInt(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
 function isString(value) {
   return ((typeof value) === "string");
 }
@@ -122,6 +170,89 @@ function assertIsString(value, failureMessage = "The value is not a string.") {
 
 function assertNotString(value, failureMessage = "The value is a string.") {
   if (isString(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function isSymbol(value) {
+  return ((typeof value) === "symbol");
+}
+
+function assertIsSymbol(value, failureMessage = "The value is not a symbol.") {
+  if (!isSymbol(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function assertNotSymbol(value, failureMessage = "The value is a symbol.") {
+  if (isSymbol(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function isFunctionOrClass(value) {
+  return ((typeof value) === "function");
+}
+
+function assertIsFunctionOrClass(value, failureMessage = "The value is not a function (or class).") {
+  if (!isFunctionOrClass(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function assertNotFunctionOrClass(value, failureMessage = "The value is a function (or class).") {
+  if (isFunctionOrClass(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function isObjectOrNull(value) {
+  return ((typeof value) === "object");
+}
+
+function assertIsObjectOrNull(value, failureMessage = "The value is not an object (or null).") {
+  if (!isObjectOrNull(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function assertNotObjectOrNull(value, failureMessage = "The value is an object (or null).") {
+  if (isObjectOrNull(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function isObject(value) {
+  if (isNull(value)) {
+    return false;
+  }
+  return (isObject(value));
+}
+
+function assertIsObject(value, failureMessage = "The value is not an object.") {
+  if (!isObject(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function assertNotObject(value, failureMessage = "The value is an object.") {
+  if (isObject(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function isDate(value) {
+  return (value instanceof Date);
+}
+
+function assertIsDate(value, failureMessage = "The value is not an date.") {
+  if (!isDate(value)) {
+    throw new Error(failureMessage);
+  }
+}
+
+function assertNotDate(value, failureMessage = "The value is an date.") {
+  if (isDate(value)) {
     throw new Error(failureMessage);
   }
 }
@@ -167,4 +298,4 @@ function parseJsonIfNeeded(input) {
   return inputAsJson;
 }
 
-export {isUndefined, assertIsUndefined, assertNotUndefined, isNull, assertIsNull, assertNotNull, isNullish, assertIsNullish, assertNotNullish, isEmptyString, assertIsEmptyString, assertNotEmptyString, isWhitespace, assertIsWhitespace, assertNotWhitespace, isNullishOrWhitespace, assertIsNullishOrWhitespace, assertNotNullishOrWhitespace, isString, assertIsString, assertNotString, isOfGuardedType, assertIsOfGuardedType, assertNotOfGuardedType, parseJsonIfNeeded};
+export {isUndefined, assertIsUndefined, assertNotUndefined, isNull, assertIsNull, assertNotNull, isNullish, assertIsNullish, assertNotNullish, isEmptyString, assertIsEmptyString, assertNotEmptyString, isWhitespace, assertIsWhitespace, assertNotWhitespace, isNullishOrWhitespace, assertIsNullishOrWhitespace, assertNotNullishOrWhitespace, isBoolean, assertIsBoolean, assertNotBoolean, isNumber, assertIsNumber, assertNotNumber, isBigInt, assertIsBigInt, assertNotBigInt, isString, assertIsString, assertNotString, isSymbol, assertIsSymbol, assertNotSymbol, isFunctionOrClass, assertIsFunctionOrClass, assertNotFunctionOrClass, isObjectOrNull, assertIsObjectOrNull, assertNotObjectOrNull, isObject, assertIsObject, assertNotObject, isDate, assertIsDate, assertNotDate, isOfGuardedType, assertIsOfGuardedType, assertNotOfGuardedType, parseJsonIfNeeded};
