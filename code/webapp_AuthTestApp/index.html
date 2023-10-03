@@ -8,178 +8,239 @@
   <meta name="description"
     content="A Test App to verify that the authentication of your Open Personal Archive™ (OPA) deployment works correctly." />
   <meta name="author" content="Ryan Stephen Ehrenreich" />
-  <meta name="version" content="2.3.2" />
+  <meta name="version" content="2.3.3" />
   <script src="https://www.gstatic.com/firebasejs/4.0.0/firebase.js"></script>
+
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    .scroll-container-parent {
+      overflow: hidden;
+    }
+
+    .scroll-container {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+    }
+
+    /* NOTE: Text in "no-scroll-container" should be scaled based on viewport size (otherwise, it may be cut-off) */
+    .no-scroll-container {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      padding: 8px;
+      font-size: 20px;
+      font-size: calc(70% + .5vh);
+    }
+
+    .scroll-pane {
+      width: auto;
+      height: auto;
+      padding: 8px;
+    }
+  </style>
 </head>
 
 <body>
-  <h1>Open Personal Archive™ (OPA) Auth Test App</h1>
-  <hr style="margin: 16px;" />
-  <p style="margin-left: 16px;">
-    <button id="google-button">Sign-In with Google using OAuth</button>
-    <br />
-    <label id="google-label"></label>
-  </p>
-  <hr style="margin: 16px;" />
-  <p style="margin-left: 16px;">
-    <label>Email:</label>
-    <input id="firebase-email-input" type="text" />
-    <br />
-    <label>Password:</label>
-    <input id="firebase-password-input" type="password" />
-    <br />
-    <button id="firebase-button">Sign-In with Firebase using Email & Password</button>
-    <br />
-    <label id="firebase-label"></label>
-    <label id="firebase-verification-label"></label>
-  </p>
-  <hr style="margin: 16px;" />
-  <p style="margin-left: 16px;">
-    <label>Callable Function:</label>
-    <select id="function-select">
-      <optgroup label="System">
-        <option value="recordLogItem">recordLogItem(activityType, requestor, resource, action, data, otherState)
-        </option>
-        <option value="isInstalled">isInstalled()</option>
-        <option value="getInstallationScreenDisplayModel">getInstallationScreenDisplayModel()</option>
-        <option value="performInstall">performInstall(archiveName, archiveDescription, pathToStorageFolder,
-          defaultLocaleId, defaultTimeZoneGroupId, installationNotes)</option>
-        <option value="updateInstallationSettings">updateInstallationSettings(archiveName, archiveDescription,
-          defaultLocaleId, defaultTimeZoneGroupId, defaultTimeZoneId)</option>
-        <option value="performUpgrade">performUpgrade(upgradeNotes, doBackupFirst)</option>
-        <option value="performUninstall">performUninstall(doBackupFirst)</option>
-        <option value="firebaseAuthSignInHandler">firebaseAuthSignInHandler(event)</option>
-      </optgroup>
-      <optgroup label="Users">
-        <option value="getListOfUsers">getListOfUsers(approvalState)</option>
-        <option value="getUserAccountDisplayModel">getUserAccountDisplayModel()</option>
-        <option value="initializeUserAccount">initializeUserAccount(authProviderId, authAccountName)</option>
-        <option value="updateUserProfile">updateUserProfile(updateObject)</option>
-        <option value="assignUserToRole">assignUserToRole(userId, roleId)</option>
-        <option value="addRequestedCitationToUser">addRequestedCitationToUser(userId, citationId)</option>
-        <option value="addViewableCitationToUser">addViewableCitationToUser(userId, citationId)</option>
-        <option value="setUserToViewed">setUserToViewed(userId)</option>
-        <option value="setUserToApprovalState">setUserToApprovalState(userId, approvalState)</option>
-        <option value="setUserToApproved">setUserToApproved(userId)</option>
-        <option value="setUserToDenied">setUserToDenied(userId)</option>
-        <option value="setUserToSuspensionState">setUserToSuspensionState(userId, suspensionState, reason)</option>
-        <option value="setUserToSuspended">setUserToSuspended(userId, reason)</option>
-        <option value="setUserToUnSuspended">setUserToUnSuspended(userId, reason)</option>
-        <option value="markUserWithDeletionState">markUserWithDeletionState(userId, deletionState)</option>
-        <option value="markUserAsDeleted">markUserAsDeleted(userId)</option>
-        <option value="markUserAsUnDeleted">markUserAsUnDeleted(userId)</option>
-      </optgroup>
-      <optgroup label="Access Requests">
-        <option value="getListOfAccessRequests">getListOfAccessRequests(approvalState)</option>
-        <option value="requestUserAccess">requestUserAccess(message, citationId)</option>
-        <option value="updateMessageForAccessRequest">updateMessageForAccessRequest(accessRequestId, message)</option>
-        <option value="updateResponseToAccessRequest">updateResponseToAccessRequest(accessRequestId, response)</option>
-        <option value="setAccessRequestTags">setAccessRequestTags(accessRequestId, tags, contentType)</option>
-        <option value="addAccessRequestTags">addAccessRequestTags(accessRequestId, tags)</option>
-        <option value="removeAccessRequestTags">removeAccessRequestTags(accessRequestId, tags)</option>
-        <option value="setAccessRequestToArchivalState">setAccessRequestToArchivalState(accessRequestId, archivalState)
-        </option>
-        <option value="setAccessRequestToArchived">setAccessRequestToArchived(accessRequestId)</option>
-        <option value="setAccessRequestToNotArchived">setAccessRequestToNotArchived(accessRequestId)</option>
-        <option value="setAccessRequestToViewed">setAccessRequestToViewed(accessRequestId)</option>
-        <option value="setAccessRequestToApprovalState">setAccessRequestToApprovalState(accessRequestId, approvalState)
-        </option>
-        <option value="setAccessRequestToApproved">setAccessRequestToApproved(accessRequestId)</option>
-        <option value="setAccessRequestToDenied">setAccessRequestToDenied(accessRequestId)</option>
-        <option value="markAccessRequestWithDeletionState">markAccessRequestWithDeletionState(accessRequestId,
-          deletionState)</option>
-        <option value="markAccessRequestAsDeleted">markAccessRequestAsDeleted(accessRequestId)</option>
-        <option value="markAccessRequestAsUnDeleted">markAccessRequestAsUnDeleted(accessRequestId)</option>
-      </optgroup>
-      <optgroup label="Contacts">
-        <option value="getListOfContacts">getListOfContacts()</option>
-        <option value="createContact">createContact(organizationName, firstName, lastName, email, phoneNumber, address,
-          message, otherInfo)</option>
-        <option value="updateContact">updateContact(updateObject)</option>
-        <option value="setCorrespondingUsersForContact">setCorrespondingUsersForContact(contactId, userIds, contentType)
-        </option>
-        <option value="addCorrespondingUsersToContact">addCorrespondingUsersToContact(contactId, userIds)</option>
-        <option value="removeCorrespondingUsersFromContact">removeCorrespondingUsersFromContact(contactId, userIds)
-        </option>
-        <option value="setContactTags">setContactTags(contactId, tags, contentType)</option>
-        <option value="addContactTags">addContactTags(contactId, tags)</option>
-        <option value="removeContactTags">removeContactTags(contactId, tags)</option>
-        <option value="setContactToArchivalState">setContactToArchivalState(contactId, archivalState)</option>
-        <option value="setContactToArchived">setContactToArchived(contactId)</option>
-        <option value="setContactToNotArchived">setContactToNotArchived(contactId)</option>
-        <option value="setContactToViewed">setContactToViewed(contactId)</option>
-        <option value="markContactWithDeletionState">markContactWithDeletionState(contactId, deletionState)</option>
-        <option value="markContactAsDeleted">markContactAsDeleted(contactId)</option>
-        <option value="markContactAsUnDeleted">markContactAsUnDeleted(contactId)</option>
-      </optgroup>
-    </select>
-    <br />
-    <br />
-    <label>
-      <b>ActivityType:</b>"browser_page_load" | "browser_page_view" | "browser_page_action" | "browser_page_error" |
-      "server_function_call" | "server_function_error",
-      <b>ContentType:</b> "exact" | "only_added" | "only_removed",
-      <b>RoleType:</b> "owner" | "administrator" | "editor" | "viewer" | "guest",
-      <b>ApprovalState:</b> "pending" | "approved" | "denied",
-      <b>ArchivalState:</b> "archived" | "not_archived",
-      <b>SuspensionState:</b> "suspended" | "unsuspended",
-      <b>DeletionState:</b> "deleted" | "undeleted",
-      <b>UpdateObject:</b> IUserPartial | IAccessRequestPartial | IContactPartial | ...
-    </label>
-    <br />
-    <br />
-    <label>Argument 0:</label>
-    <input id="function-arg0-input" type="text" />
-    <br />
-    <label>Argument 1:</label>
-    <input id="function-arg1-input" type="text" />
-    <br />
-    <label>Argument 2:</label>
-    <input id="function-arg2-input" type="text" />
-    <br />
-    <label>Argument 3:</label>
-    <input id="function-arg3-input" type="text" />
-    <br />
-    <label>Argument 4:</label>
-    <input id="function-arg4-input" type="text" />
-    <br />
-    <label>Argument 5:</label>
-    <input id="function-arg5-input" type="text" />
-    <br />
-    <label>Argument 6:</label>
-    <input id="function-arg6-input" type="text" />
-    <br />
-    <label>Argument 7:</label>
-    <input id="function-arg7-input" type="text" />
-    <br />
-    <label>Argument 8:</label>
-    <input id="function-arg8-input" type="text" />
-    <br />
-    <label>Argument 9:</label>
-    <input id="function-arg9-input" type="text" />
-    <br />
-    <button id="function-button">Run the selected Callable Function</button>
-    <br />
-    <label id="function-label"></label>
-  </p>
+  <div style="width: 100%;height: 7vh;" class="scroll-container-parent">
+    <div class="no-scroll-container">
+      <h1 style="margin: 0;padding: 0;">Open Personal Archive™ (OPA) Auth Test App</h1>
+    </div>
+  </div>
+  <div style="width: 100%;height: 88vh;" class="scroll-container-parent">
+    <div class="scroll-container">
+      <div class="scroll-pane">
+        <hr style="margin-bottom: 16px;" />
+        <p style="margin-left: 16px;">
+          <button id="google-button">Sign-In with Google using OAuth</button>
+          <br />
+          <label id="google-label"></label>
+        </p>
+        <hr style="margin: 16px;" />
+        <p style="margin-left: 16px;">
+          <label>Email:</label>
+          <input id="firebase-email-input" type="text" />
+          <br />
+          <label>Password:</label>
+          <input id="firebase-password-input" type="password" />
+          <br />
+          <button id="firebase-button">Sign-In with Firebase using Email & Password</button>
+          <br />
+          <label id="firebase-label"></label>
+          <label id="firebase-verification-label"></label>
+        </p>
+        <hr style="margin: 16px;" />
+        <p style="margin-left: 16px;">
+          <label>Callable Function:</label>
+          <select id="function-select" style="max-width: 98%;">
+            <optgroup label="System">
+              <option value="recordLogItem">recordLogItem(activityType, resource, action, data, otherState)
+              </option>
+              <option value="isInstalled">isInstalled()</option>
+              <option value="getInstallationScreenDisplayModel">getInstallationScreenDisplayModel()</option>
+              <option value="performInstall">performInstall(archiveName, archiveDescription, pathToStorageFolder,
+                defaultLocaleId, defaultTimeZoneGroupId, installationNotes)</option>
+              <option value="updateInstallationSettings">updateInstallationSettings(archiveName, archiveDescription,
+                defaultLocaleId, defaultTimeZoneGroupId, defaultTimeZoneId)</option>
+              <option value="performUpgrade">performUpgrade(upgradeNotes, doBackupFirst)</option>
+              <option value="performUninstall">performUninstall(doBackupFirst)</option>
+              <option value="firebaseAuthSignInHandler">firebaseAuthSignInHandler(event)</option>
+            </optgroup>
+            <optgroup label="Users">
+              <option value="getListOfUsers">getListOfUsers(approvalState)</option>
+              <option value="getUserAccountDisplayModel">getUserAccountDisplayModel()</option>
+              <option value="initializeUserAccount">initializeUserAccount(authProviderId, authAccountName)</option>
+              <option value="updateUserProfile">updateUserProfile(updateObject)</option>
+              <option value="assignUserToRole">assignUserToRole(userId, roleId)</option>
+              <option value="addRequestedCitationToUser">addRequestedCitationToUser(userId, citationId)</option>
+              <option value="addViewableCitationToUser">addViewableCitationToUser(userId, citationId)</option>
+              <option value="setUserToViewed">setUserToViewed(userId)</option>
+              <option value="setUserToApprovalState">setUserToApprovalState(userId, approvalState)</option>
+              <option value="setUserToApproved">setUserToApproved(userId)</option>
+              <option value="setUserToDenied">setUserToDenied(userId)</option>
+              <option value="setUserToSuspensionState">setUserToSuspensionState(userId, suspensionState, reason)
+              </option>
+              <option value="setUserToSuspended">setUserToSuspended(userId, reason)</option>
+              <option value="setUserToUnSuspended">setUserToUnSuspended(userId, reason)</option>
+              <option value="markUserWithDeletionState">markUserWithDeletionState(userId, deletionState)</option>
+              <option value="markUserAsDeleted">markUserAsDeleted(userId)</option>
+              <option value="markUserAsUnDeleted">markUserAsUnDeleted(userId)</option>
+            </optgroup>
+            <optgroup label="Access Requests">
+              <option value="getListOfAccessRequests">getListOfAccessRequests(approvalState)</option>
+              <option value="requestUserAccess">requestUserAccess(message, citationId)</option>
+              <option value="updateMessageForAccessRequest">updateMessageForAccessRequest(accessRequestId, message)
+              </option>
+              <option value="updateResponseToAccessRequest">updateResponseToAccessRequest(accessRequestId, response)
+              </option>
+              <option value="setAccessRequestTags">setAccessRequestTags(accessRequestId, tags, contentType)</option>
+              <option value="addAccessRequestTags">addAccessRequestTags(accessRequestId, tags)</option>
+              <option value="removeAccessRequestTags">removeAccessRequestTags(accessRequestId, tags)</option>
+              <option value="setAccessRequestToArchivalState">setAccessRequestToArchivalState(accessRequestId,
+                archivalState)
+              </option>
+              <option value="setAccessRequestToArchived">setAccessRequestToArchived(accessRequestId)</option>
+              <option value="setAccessRequestToNotArchived">setAccessRequestToNotArchived(accessRequestId)</option>
+              <option value="setAccessRequestToViewed">setAccessRequestToViewed(accessRequestId)</option>
+              <option value="setAccessRequestToApprovalState">setAccessRequestToApprovalState(accessRequestId,
+                approvalState)
+              </option>
+              <option value="setAccessRequestToApproved">setAccessRequestToApproved(accessRequestId)</option>
+              <option value="setAccessRequestToDenied">setAccessRequestToDenied(accessRequestId)</option>
+              <option value="markAccessRequestWithDeletionState">markAccessRequestWithDeletionState(accessRequestId,
+                deletionState)</option>
+              <option value="markAccessRequestAsDeleted">markAccessRequestAsDeleted(accessRequestId)</option>
+              <option value="markAccessRequestAsUnDeleted">markAccessRequestAsUnDeleted(accessRequestId)</option>
+            </optgroup>
+            <optgroup label="Contacts">
+              <option value="getListOfContacts">getListOfContacts()</option>
+              <option value="createContact">createContact(organizationName, firstName, lastName, email, phoneNumber,
+                address,
+                message, otherInfo)</option>
+              <option value="updateContact">updateContact(updateObject)</option>
+              <option value="setCorrespondingUsersForContact">setCorrespondingUsersForContact(contactId, userIds,
+                contentType)
+              </option>
+              <option value="addCorrespondingUsersToContact">addCorrespondingUsersToContact(contactId, userIds)</option>
+              <option value="removeCorrespondingUsersFromContact">removeCorrespondingUsersFromContact(contactId,
+                userIds)
+              </option>
+              <option value="setContactTags">setContactTags(contactId, tags, contentType)</option>
+              <option value="addContactTags">addContactTags(contactId, tags)</option>
+              <option value="removeContactTags">removeContactTags(contactId, tags)</option>
+              <option value="setContactToArchivalState">setContactToArchivalState(contactId, archivalState)</option>
+              <option value="setContactToArchived">setContactToArchived(contactId)</option>
+              <option value="setContactToNotArchived">setContactToNotArchived(contactId)</option>
+              <option value="setContactToViewed">setContactToViewed(contactId)</option>
+              <option value="markContactWithDeletionState">markContactWithDeletionState(contactId, deletionState)
+              </option>
+              <option value="markContactAsDeleted">markContactAsDeleted(contactId)</option>
+              <option value="markContactAsUnDeleted">markContactAsUnDeleted(contactId)</option>
+            </optgroup>
+          </select>
+          <br />
+          <br />
+          <label>
+            <b>ActivityType:</b>"browser_page_load" | "browser_page_view" | "browser_page_action" | "browser_page_error"
+            |
+            "server_function_call" | "server_function_error",
+            <b>ContentType:</b> "exact" | "only_added" | "only_removed",
+            <b>RoleType:</b> "owner" | "administrator" | "editor" | "viewer" | "guest",
+            <b>ApprovalState:</b> "pending" | "approved" | "denied",
+            <b>ArchivalState:</b> "archived" | "not_archived",
+            <b>SuspensionState:</b> "suspended" | "unsuspended",
+            <b>DeletionState:</b> "deleted" | "undeleted",
+            <b>UpdateObject:</b> IUserPartial | IAccessRequestPartial | IContactPartial | ...
+          </label>
+          <br />
+          <br />
+          <label>Argument 0:</label>
+          <input id="function-arg0-input" type="text" />
+          <br />
+          <label>Argument 1:</label>
+          <input id="function-arg1-input" type="text" />
+          <br />
+          <label>Argument 2:</label>
+          <input id="function-arg2-input" type="text" />
+          <br />
+          <label>Argument 3:</label>
+          <input id="function-arg3-input" type="text" />
+          <br />
+          <label>Argument 4:</label>
+          <input id="function-arg4-input" type="text" />
+          <br />
+          <label>Argument 5:</label>
+          <input id="function-arg5-input" type="text" />
+          <br />
+          <label>Argument 6:</label>
+          <input id="function-arg6-input" type="text" />
+          <br />
+          <label>Argument 7:</label>
+          <input id="function-arg7-input" type="text" />
+          <br />
+          <label>Argument 8:</label>
+          <input id="function-arg8-input" type="text" />
+          <br />
+          <label>Argument 9:</label>
+          <input id="function-arg9-input" type="text" />
+          <br />
+          <button id="function-button">Run the selected Callable Function</button>
+          <br />
+          <label id="function-label"></label>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div style="width: 100%;height: 5vh;position: relative;bottom: 0;background-color: burlywood;" id="copyright"
+    class="scroll-container-parent">
+    <div class="no-scroll-container">
+      <b>Copyright © 2021 Open Personal Archive</b>
+    </div>
+  </div>
 
   <script type="module">
-    import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js';
-    import {GoogleAuthProvider, getAuth, sendEmailVerification, signInWithEmailAndPassword, signInWithPopup} from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js';
-    import {getFunctions, httpsCallable} from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-functions.js';
+    import {FIREBASE_CONFIG, FIREBASE_FUNCTIONS_REGION} from "./WebAppConfig.js";
+    import {initializeApp} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    import {GoogleAuthProvider, getAuth, sendEmailVerification, signInWithEmailAndPassword, signInWithPopup} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+    import {getFunctions, httpsCallable} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-functions.js";
+    import {parseJsonIfNeeded} from "./WebBaseLite.js";
+    import {recordPageView, recordPageError} from "./WebFunctions.js";
+    import {schedulePageRefreshForInactivity, forceResizeEventIfNeeded} from "./WebRendering.js";
 
-    const firebaseConfig = {
-      apiKey: "[REPLACE WITH FIREBASE VALUE]",
-      authDomain: "[REPLACE WITH FIREBASE VALUE]",
-      projectId: "[REPLACE WITH FIREBASE VALUE]",
-      storageBucket: "[REPLACE WITH FIREBASE VALUE]",
-      messagingSenderId: "[REPLACE WITH FIREBASE VALUE]",
-      appId: "[REPLACE WITH FIREBASE VALUE]"
-    };
-
-    const app = initializeApp(firebaseConfig);
+    const app = initializeApp(FIREBASE_CONFIG);
     const auth = getAuth(app);
-    const functions = getFunctions(app, "us-east1");
+    const functions = getFunctions(app, FIREBASE_FUNCTIONS_REGION);
+
+    await recordPageView(app);
+    schedulePageRefreshForInactivity();
+    forceResizeEventIfNeeded(document.getElementById("copyright"), 20, 20);
 
     document.getElementById("google-button").onclick = () => {
       document.getElementById("google-label").innerText = "...working...";
@@ -190,8 +251,9 @@
         .then((result) => {
           const credential = GoogleAuthProvider.credentialFromResult(result);
           document.getElementById("google-label").innerText = JSON.stringify(credential);
-        }).catch((error) => {
+        }).catch(async (error) => {
           document.getElementById("google-label").innerText = JSON.stringify(error);
+          await recordPageError(error);
         });
     };
 
@@ -210,12 +272,58 @@
             sendEmailVerification(auth.currentUser)
               .then((result) => {
                 document.getElementById("firebase-verification-label").innerText = JSON.stringify(result);
-              }).catch((error) => {
+              }).catch(async (error) => {
                 document.getElementById("firebase-verification-label").innerText = JSON.stringify(error);
+                await recordPageError(error);
               });
           }
-        }).catch((error) => {
+        }).catch(async (error) => {
           document.getElementById("firebase-label").innerText = JSON.stringify(error);
+          await recordPageError(error);
+        });
+    };
+
+    document.getElementById("function-button").onclick = () => {
+      document.getElementById("function-label").innerText = "...working...";
+
+      const functionSelect = document.getElementById("function-select");
+      const functionIndex = functionSelect.selectedIndex;
+      const functionOption = functionSelect.options[functionIndex];
+      const functionName = functionOption.value;
+      const functionText = functionOption.text;
+      const arg0 = parseJsonIfNeeded(document.getElementById("function-arg0-input").value);
+      const arg1 = parseJsonIfNeeded(document.getElementById("function-arg1-input").value);
+      const arg2 = parseJsonIfNeeded(document.getElementById("function-arg2-input").value);
+      const arg3 = parseJsonIfNeeded(document.getElementById("function-arg3-input").value);
+      const arg4 = parseJsonIfNeeded(document.getElementById("function-arg4-input").value);
+      const arg5 = parseJsonIfNeeded(document.getElementById("function-arg5-input").value);
+      const arg6 = parseJsonIfNeeded(document.getElementById("function-arg6-input").value);
+      const arg7 = parseJsonIfNeeded(document.getElementById("function-arg7-input").value);
+      const arg8 = parseJsonIfNeeded(document.getElementById("function-arg8-input").value);
+      const arg9 = parseJsonIfNeeded(document.getElementById("function-arg9-input").value);
+
+      const functionArgNames = functionText.split("(")[1].split(")")[0].split(",");
+      const functionArgValues = [arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9]
+      const functionArgs = {};
+      for (let i = 0; i < functionArgNames.length; i++) {
+        const functionArgName = functionArgNames[i].trim();
+        const functionArgValue = functionArgValues[i];
+
+        if (functionArgName.length < 1) {
+          continue;
+        } else {
+          functionArgs[functionArgName] = functionArgValue;
+        }
+      }
+
+      const functionObject = httpsCallable(functions, functionName);
+      functionObject(functionArgs)
+        .then((result) => {
+          document.getElementById("function-label").innerText = JSON.stringify(result);
+        })
+        .catch(async (error) => {
+          document.getElementById("function-label").innerText = JSON.stringify(error);
+          await recordPageError(error);
         });
     };
 
@@ -282,4 +390,4 @@
   </script>
 </body>
 
-</html>a
+</html>

@@ -19,7 +19,7 @@ export const ActivityTypes = {
   web_page_action: ("browser_page_action" as ActivityType),
   web_page_error: ("browser_page_error" as ActivityType),
   _web_page_types: (["browser_page_load", "browser_page_view", "browser_page_action", "browser_page_error"] as Array<ActivityType>),
-  _server_function_call: ("server_function_call" as ActivityType),
+  server_function_call: ("server_function_call" as ActivityType),
   server_function_error: ("server_function_error" as ActivityType),
   _server_function_types: (["server_function_call", "server_function_error"] as Array<ActivityType>),
 };
