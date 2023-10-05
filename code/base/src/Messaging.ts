@@ -4,13 +4,14 @@ export interface ICallRequest {
   clientIpAddress: string,
   url: string,
   data: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+  headers: any, // eslint-disable-line @typescript-eslint/no-explicit-any
   // LATER: Add other desired properties here
 }
 
 export interface ICallResult<T> {
   readonly success: boolean,
   readonly message: string,
-  readonly data: T | undefined
+  readonly data: T | undefined,
 }
 
 /**

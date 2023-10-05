@@ -55,6 +55,7 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
     clientIpAddress: event.ipAddress,
     url: event.eventType,
     data: {eventType: event.eventType, eventId: event.eventId, firebaseUserId: event.data.uid, eventData: JSON.stringify(event.data)},
+    headers: {}, // NOTE: Since "event" is not an HTTP Request, it will not provide headers
   };
 
   try {

@@ -31,7 +31,8 @@ export const recordLogItem = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
     const resource = (request.data.resource) ? request.data.resource : undefined;
     const action = (request.data.action) ? request.data.action : undefined;
     const data = (request.data.data) ? OPA.parseJsonIfNeeded(request.data.data) : {};
-    const otherState = (request.data.otherState) ? OPA.parseJsonIfNeeded(request.data.otherState) : undefined;
+    const otherState = (request.data.otherState) ? OPA.parseJsonIfNeeded(request.data.otherState) : {};
+    otherState.headers = shimmedRequest.headers;
 
     await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, requestor, resource, action, data, otherState);
     return OPA.getSuccessResultForMessage("The request was logged successfully.");
