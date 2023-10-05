@@ -9,7 +9,7 @@ export interface IInstallationScreenDisplayModel {
   readonly authorizationData: DMU.IAuthorizationData;
   archiveName: string;
   archiveDescription: string;
-  pathToStorageFolder: string;
+  pathToRootStorageFolder: string;
   validLocales: Array<OpaDm.ILocale>;
   selectedLocale: OpaDm.ILocale | null;
   validTimeZoneGroups: Array<OpaDm.ITimeZoneGroup>;
@@ -48,7 +48,7 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
     authorizationData: {firebaseProjectId, usesFirebaseEmulators, isSystemInstalled: isInstalled, userData: null, roleData: null},
     archiveName: "(a name for the archive)",
     archiveDescription: "(a description for the archive)",
-    pathToStorageFolder: "./",
+    pathToRootStorageFolder: "./",
     validLocales: OpaDb.Locales.requiredDocuments,
     selectedLocale: OpaDb.Locales.requiredDocuments.filter((value: OpaDm.ILocale) => value.isDefault)[0],
     validTimeZoneGroups: OpaDb.TimeZoneGroups.requiredDocuments,
@@ -96,7 +96,7 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
     authorizationData: DMU.getAuthorizationDataForDisplayModel(callState.dataStorageState, systemState, authorizationState),
     archiveName: OPA.getLocalizedText(configurationNonNull.name, localeToUse),
     archiveDescription: OPA.getLocalizedText(configurationNonNull.description, localeToUse),
-    pathToStorageFolder: configurationNonNull.pathToStorageFolder,
+    pathToRootStorageFolder: configurationNonNull.pathToRootStorageFolder,
     validLocales: locales,
     selectedLocale: selectedLocale,
     validTimeZoneGroups: timeZoneGroups,
@@ -111,13 +111,13 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
  * @param {OpaDm.IAuthenticationState} authenticationState The Firebase Authentication state for the User.
  * @param {string} archiveName The name of the Archive.
  * @param {string} archiveDescription A description of the Archive.
- * @param {string} pathToStorageFolder The path to the root folder for storing files in Firebase Storage.
+ * @param {string} pathToRootStorageFolder The path to the root folder for storing files in Firebase Storage.
  * @param {string} defaultLocaleId The ID of the default Locale for the Archive.
  * @param {string} defaultTimeZoneGroupId The ID of the default TimeZoneGroup for the Archive.
  * @param {string} installationNotes Any notes of documentation about the installation.
  * @return {Promise<void>}
  */
-export async function performInstall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState, archiveName: string, archiveDescription: string, pathToStorageFolder: string, defaultLocaleId: string, defaultTimeZoneGroupId: string, installationNotes: string): Promise<void> { // eslint-disable-line max-len
+export async function performInstall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState, archiveName: string, archiveDescription: string, pathToRootStorageFolder: string, defaultLocaleId: string, defaultTimeZoneGroupId: string, installationNotes: string): Promise<void> { // eslint-disable-line max-len
   OPA.assertDataStorageStateIsNotNullish(dataStorageState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
@@ -172,7 +172,7 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   const userOwner = await OpaDb.Users.queries.createArchiveOwner(dataStorageState, ownerFirebaseAuthUserId, authProvider, ownerAccountName, localeDefault, timeZoneGroupDefault, ownerFirstName, ownerLastName); // eslint-disable-line max-len
 
   // 4) Create the Configuration document for the Archive
-  await OpaDb.Configuration.queries.create(dataStorageState, archiveName, archiveDescription, pathToStorageFolder, userOwner, localeDefault, timeZoneGroupDefault);
+  await OpaDb.Configuration.queries.create(dataStorageState, archiveName, archiveDescription, pathToRootStorageFolder, userOwner, localeDefault, timeZoneGroupDefault);
   await dataStorageState.currentWriteBatch.commit();
   dataStorageState.currentWriteBatch = null;
 }

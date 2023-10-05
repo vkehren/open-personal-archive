@@ -141,14 +141,14 @@ export const performInstall = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reques
     OPA.assertNonNullishOrWhitespace(archiveName, "The Archive name must not be blank.");
     const archiveDescription = (data.archiveDescription) ? data.archiveDescription : undefined;
     OPA.assertNonNullishOrWhitespace(archiveDescription, "The Archive description must not be blank.");
-    const pathToStorageFolder = (data.pathToStorageFolder) ? data.pathToStorageFolder : undefined;
-    OPA.assertNonNullishOrWhitespace(pathToStorageFolder, "The Archive storage path must not be blank.");
+    const pathToRootStorageFolder = (data.pathToRootStorageFolder) ? data.pathToRootStorageFolder : undefined;
+    OPA.assertNonNullishOrWhitespace(pathToRootStorageFolder, "The Archive root storage path must not be blank.");
     const defaultLocaleId = (data.defaultLocaleId) ? data.defaultLocaleId : undefined;
     OPA.assertNonNullishOrWhitespace(defaultLocaleId, "The Archive default locale must not be blank.");
     const defaultTimeZoneGroupId = (data.defaultTimeZoneGroupId) ? data.defaultTimeZoneGroupId : undefined;
     OPA.assertNonNullishOrWhitespace(defaultTimeZoneGroupId, "The Archive default time zone group must not be blank.");
     const installationNotes = OPA.convertNonNullish(data.installationNotes, "");
-    const installResult = await Application.performInstall(callState.dataStorageState, callState.authenticationState, archiveName, archiveDescription, pathToStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, installationNotes); // eslint-disable-line max-len
+    const installResult = await Application.performInstall(callState.dataStorageState, callState.authenticationState, archiveName, archiveDescription, pathToRootStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, installationNotes); // eslint-disable-line max-len
 
     return OPA.getSuccessResult(installResult);
   } catch (error) {

@@ -27,7 +27,7 @@ interface IConfigurationPartial_WithHistory extends IConfigurationPartial, OPA.I
 
 export interface IConfiguration extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser_WithHistory<UpdateHistoryItem> {
   readonly ownerId: string;
-  readonly pathToStorageFolder: string;
+  readonly pathToRootStorageFolder: string;
   name: OPA.ILocalizable<string>;
   description: OPA.ILocalizable<string>;
   defaultLocaleId: string;
@@ -36,7 +36,7 @@ export interface IConfiguration extends OPA.IDocument_Creatable_ByUser, OPA.IDoc
 }
 const IConfiguration_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
   OPA.getTypedPropertyKeyAsText<IConfiguration>("ownerId"),
-  OPA.getTypedPropertyKeyAsText<IConfiguration>("pathToStorageFolder"),
+  OPA.getTypedPropertyKeyAsText<IConfiguration>("pathToRootStorageFolder"),
 ];
 
 /**
@@ -70,13 +70,13 @@ export function areUpdatesValid(document: IConfiguration, updateObject: IConfigu
  * Creates an instance of the IConfiguration document type.
  * @param {string} name The name of the Archive.
  * @param {string} description A description of the Archive.
- * @param {string} pathToStorageFolder The path to the root folder for storing files in Firebase Storage.
+ * @param {string} pathToRootStorageFolder The path to the root folder for storing files in Firebase Storage.
  * @param {IUser} owner The User who owns the Archive.
  * @param {ILocale} defaultLocale The default Locale to use for the Archive.
  * @param {ITimeZoneGroup} defaultTimeZoneGroup The default TimeZoneGroup to use for the Archive.
  * @return {IConfiguration} The new document instance.
  */
-export function createSingleton(name: string, description: string, pathToStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): IConfiguration {
+export function createSingleton(name: string, description: string, pathToRootStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): IConfiguration {
   OPA.assertDocumentIsValid(owner);
   OPA.assertDocumentIsValid(defaultLocale);
   OPA.assertDocumentIsValid(defaultTimeZoneGroup);
@@ -90,7 +90,7 @@ export function createSingleton(name: string, description: string, pathToStorage
   const document: IConfiguration = {
     id: SingletonId,
     ownerId: owner.id,
-    pathToStorageFolder: pathToStorageFolder,
+    pathToRootStorageFolder: pathToRootStorageFolder,
     name: names,
     description: descriptions,
     defaultLocaleId: defaultLocale.id,
@@ -133,20 +133,20 @@ export class ConfigurationQuerySet extends OPA.QuerySet<IConfiguration> {
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} name The name of the Archive.
    * @param {string} description A description of the Archive.
-   * @param {string} pathToStorageFolder The path to the root folder for storing files in Firebase Storage.
+   * @param {string} pathToRootStorageFolder The path to the root folder for storing files in Firebase Storage.
    * @param {IUser} owner The User who owns the Archive.
    * @param {ILocale} defaultLocale The default Locale to use for the Archive.
    * @param {ITimeZoneGroup} defaultTimeZoneGroup The default TimeZoneGroup to use for the Archive.
    * @return {Promise<string>} The new document ID.
    */
-  async create(ds: OPA.IDataStorageState, name: string, description: string, pathToStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): Promise<string> {
+  async create(ds: OPA.IDataStorageState, name: string, description: string, pathToRootStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): Promise<string> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
     OPA.assertDocumentIsValid(owner);
     OPA.assertDocumentIsValid(defaultLocale);
     OPA.assertDocumentIsValid(defaultTimeZoneGroup);
 
-    const document = createSingleton(name, description, pathToStorageFolder, owner, defaultLocale, defaultTimeZoneGroup);
+    const document = createSingleton(name, description, pathToRootStorageFolder, owner, defaultLocale, defaultTimeZoneGroup);
     const proxiedDocument = this.documentProxyConstructor(document);
     const documentId = proxiedDocument.id;
 
