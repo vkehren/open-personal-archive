@@ -13,6 +13,49 @@ body {
   padding: 0;
 }
 
+.whole-screen {
+  width: 100%;
+  height: 100vh;
+}
+
+.full-size {
+  width: 100%;
+  height: 100%;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.full-height {
+  height: 100%;
+}
+
+.auto-size {
+  width: auto;
+  height: auto;
+}
+
+.auto-width {
+  width: auto;
+}
+
+.auto-height {
+  height: auto;
+}
+
+.background-image {
+  object-fit: cover;
+}
+
+.visible {
+  visibility: visible;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
 .at-page-top-left {
   position: absolute;
   top: 0;
@@ -102,6 +145,28 @@ body {
   flex-wrap: wrap;
   align-content: center;
   justify-content: start;
+}
+
+/* NOTE: This is useful for a title that should be aligned to the center */
+.flex-container-row-center-center {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+}
+
+/* NOTE: This is useful for a title that should be aligned to the right */
+.flex-container-row-center-end {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: end;
 }
 
 .flex-container-row-center-spar {
