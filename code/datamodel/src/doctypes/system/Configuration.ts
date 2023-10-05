@@ -7,12 +7,12 @@ import {IUser} from "../authorization/User";
 
 /* eslint-disable camelcase */
 
-const SingularName = "Archive";
-const PluralName = "Archives";
+const SingularName = "Configuration";
+const PluralName = "Configurations";
 const IsSingleton = true;
-export const SingletonId = "OPA_Archive";
+export const SingletonId = "OPA_Configuration";
 
-export interface IArchivePartial {
+export interface IConfigurationPartial {
   name?: OPA.ILocalizable<string>;
   description?: OPA.ILocalizable<string>;
   defaultLocaleId?: string;
@@ -20,12 +20,12 @@ export interface IArchivePartial {
   defaultTimeZoneId?: string;
 }
 
-type UpdateHistoryItem = IArchivePartial | OPA.IUpdateable_ByUser;
-interface IArchivePartial_WithHistory extends IArchivePartial, OPA.IUpdateable_ByUser {
+type UpdateHistoryItem = IConfigurationPartial | OPA.IUpdateable_ByUser;
+interface IConfigurationPartial_WithHistory extends IConfigurationPartial, OPA.IUpdateable_ByUser {
   updateHistory: Array<UpdateHistoryItem> | firestore.FieldValue;
 }
 
-export interface IArchive extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser_WithHistory<UpdateHistoryItem> {
+export interface IConfiguration extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser_WithHistory<UpdateHistoryItem> {
   readonly ownerId: string;
   readonly pathToStorageFolder: string;
   name: OPA.ILocalizable<string>;
@@ -34,25 +34,25 @@ export interface IArchive extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_
   defaultTimeZoneGroupId: string;
   defaultTimeZoneId: string;
 }
-const IArchive_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
-  OPA.getTypedPropertyKeyAsText<IArchive>("ownerId"),
-  OPA.getTypedPropertyKeyAsText<IArchive>("pathToStorageFolder"),
+const IConfiguration_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
+  OPA.getTypedPropertyKeyAsText<IConfiguration>("ownerId"),
+  OPA.getTypedPropertyKeyAsText<IConfiguration>("pathToStorageFolder"),
 ];
 
 /**
- * Checks whether the specified updates to the specified Archive document are valid.
- * @param {IArchive} document The Archive document being updated.
- * @param {IArchivePartial} updateObject The updates specified.
+ * Checks whether the specified updates to the specified Configuration document are valid.
+ * @param {IConfiguration} document The Configuration document being updated.
+ * @param {IConfigurationPartial} updateObject The updates specified.
  * @param {boolean} [throwErrorOnInvalidUpdate=false] Whether to throw an error if the update is not valid.
  * @return {boolean} Whether the updates are valid or not.
  */
-export function areUpdatesValid(document: IArchive, updateObject: IArchivePartial, throwErrorOnInvalidUpdate = false): boolean {
+export function areUpdatesValid(document: IConfiguration, updateObject: IConfigurationPartial, throwErrorOnInvalidUpdate = false): boolean {
   OPA.assertDocumentIsValid(document);
   OPA.assertNonNullish(updateObject, "The processed Update Object must not be null.");
 
   const updateObject_AsUnknown = (updateObject as unknown);
 
-  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IArchive_ReadOnlyPropertyNames, throwErrorOnInvalidUpdate)) {
+  if (!OPA.areUpdatesValid_ForDocument(document, updateObject_AsUnknown as OPA.IDocument, IConfiguration_ReadOnlyPropertyNames, throwErrorOnInvalidUpdate)) {
     return OPA.getUnlessThrowError(false, throwErrorOnInvalidUpdate, "The specified update is not valid.");
   }
   if (!OPA.areUpdatesValid_ForCreatable_ByUser(document, updateObject_AsUnknown as OPA.ICreatable_ByUser, throwErrorOnInvalidUpdate)) {
@@ -67,16 +67,16 @@ export function areUpdatesValid(document: IArchive, updateObject: IArchivePartia
 }
 
 /**
- * Creates an instance of the IArchive document type.
+ * Creates an instance of the IConfiguration document type.
  * @param {string} name The name of the Archive.
  * @param {string} description A description of the Archive.
  * @param {string} pathToStorageFolder The path to the root folder for storing files in Firebase Storage.
  * @param {IUser} owner The User who owns the Archive.
  * @param {ILocale} defaultLocale The default Locale to use for the Archive.
  * @param {ITimeZoneGroup} defaultTimeZoneGroup The default TimeZoneGroup to use for the Archive.
- * @return {IArchive} The new document instance.
+ * @return {IConfiguration} The new document instance.
  */
-export function createSingleton(name: string, description: string, pathToStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): IArchive {
+export function createSingleton(name: string, description: string, pathToStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): IConfiguration {
   OPA.assertDocumentIsValid(owner);
   OPA.assertDocumentIsValid(defaultLocale);
   OPA.assertDocumentIsValid(defaultTimeZoneGroup);
@@ -87,7 +87,7 @@ export function createSingleton(name: string, description: string, pathToStorage
   const descriptions: OPA.ILocalizable<string> = {en: name};
   descriptions[defaultLocale.optionName] = description;
 
-  const document: IArchive = {
+  const document: IConfiguration = {
     id: SingletonId,
     ownerId: owner.id,
     pathToStorageFolder: pathToStorageFolder,
@@ -110,26 +110,26 @@ export function createSingleton(name: string, description: string, pathToStorage
   return document;
 }
 
-/** Class providing queries for Archive collection. */
-export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
+/** Class providing queries for Configuration collection. */
+export class ConfigurationQuerySet extends OPA.QuerySet<IConfiguration> {
   /**
-   * Creates a ArchiveQuerySet.
-   * @param {OPA.ITypedCollectionDescriptor<IArchive>} collectionDescriptor The collection descriptor to use for queries.
+   * Creates a ConfigurationQuerySet.
+   * @param {OPA.ITypedCollectionDescriptor<IConfiguration>} collectionDescriptor The collection descriptor to use for queries.
    */
-  constructor(collectionDescriptor: OPA.ITypedCollectionDescriptor<IArchive>) {
+  constructor(collectionDescriptor: OPA.ITypedCollectionDescriptor<IConfiguration>) {
     super(collectionDescriptor);
   }
 
   /**
    * The typed collection descriptor to use for queries.
-   * @type {OPA.ITypedQueryableFactoryCollectionDescriptor<IArchive, ArchiveQuerySet, FactoryFunc>}
+   * @type {OPA.ITypedQueryableFactoryCollectionDescriptor<IConfiguration, ConfigurationQuerySet, FactoryFunc>}
    */
-  get typedCollectionDescriptor(): OPA.ITypedQueryableFactoryCollectionDescriptor<IArchive, ArchiveQuerySet, FactoryFunc> {
-    return OPA.convertTo<OPA.ITypedQueryableFactoryCollectionDescriptor<IArchive, ArchiveQuerySet, FactoryFunc>>(this.collectionDescriptor);
+  get typedCollectionDescriptor(): OPA.ITypedQueryableFactoryCollectionDescriptor<IConfiguration, ConfigurationQuerySet, FactoryFunc> {
+    return OPA.convertTo<OPA.ITypedQueryableFactoryCollectionDescriptor<IConfiguration, ConfigurationQuerySet, FactoryFunc>>(this.collectionDescriptor);
   }
 
   /**
-   * Creates an instance of the IArchive document type stored on the server.
+   * Creates an instance of the IConfiguration document type stored on the server.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {string} name The name of the Archive.
    * @param {string} description A description of the Archive.
@@ -165,13 +165,13 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
   }
 
   /**
-   * Updates the Archive stored on the server using an IArchivePartial object.
+   * Updates the Configuration stored on the server using an IConfigurationPartial object.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
-   * @param {IArchivePartial} updateObject The object containing the updates.
+   * @param {IConfigurationPartial} updateObject The object containing the updates.
    * @param {string} userIdOfLatestUpdater The ID for the Updater within the OPA system.
    * @return {Promise<void>}
    */
-  async update(ds: OPA.IDataStorageState, updateObject: IArchivePartial, userIdOfLatestUpdater: string): Promise<void> {
+  async update(ds: OPA.IDataStorageState, updateObject: IConfigurationPartial, userIdOfLatestUpdater: string): Promise<void> {
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
     OPA.assertNonNullish(updateObject, "The incoming Update Object must not be null.");
@@ -188,7 +188,7 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
 
     const updateObject_ForHistory = OPA.replaceFieldValuesWithSummaries({...updateObject});
     const updateHistory = ds.constructorProvider.arrayUnion(updateObject_ForHistory);
-    const updateObject_WithHistory = ({...updateObject, updateHistory} as IArchivePartial_WithHistory);
+    const updateObject_WithHistory = ({...updateObject, updateHistory} as IConfigurationPartial_WithHistory);
     areValid = areUpdatesValid(document, updateObject_WithHistory, BT.DataConfiguration.ThrowErrorOnInvalidUpdate);
     OPA.assertIsTrue(areValid, "The requested update is invalid.");
 
@@ -201,4 +201,4 @@ export class ArchiveQuerySet extends OPA.QuerySet<IArchive> {
 }
 
 export type FactoryFunc = (...[params]: Parameters<typeof createSingleton>) => ReturnType<typeof createSingleton>;
-export const CollectionDescriptor = new OPA.CollectionDescriptor<IArchive, ArchiveQuerySet, FactoryFunc>(SingularName, PluralName, IsSingleton, (cd) => new ArchiveQuerySet(cd), null, []);
+export const CollectionDescriptor = new OPA.CollectionDescriptor<IConfiguration, ConfigurationQuerySet, FactoryFunc>(SingularName, PluralName, IsSingleton, (cd) => new ConfigurationQuerySet(cd), null, []);

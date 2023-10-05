@@ -34,9 +34,9 @@ export async function performInstallForTest(dataStorageState: OpaDm.IDataStorage
   const role_Viewer = await OpaDb.Roles.queries.getByIdWithAssert(dataStorageState, OpaDm.Role_ViewerId); // eslint-disable-line camelcase
   const role_Guest = await OpaDb.Roles.queries.getByIdWithAssert(dataStorageState, OpaDm.Role_GuestId); // eslint-disable-line camelcase
 
-  const archive = await OpaDb.Archive.queries.getByIdWithAssert(dataStorageState, OpaDm.ArchiveId);
-  const locale = await OpaDb.Locales.queries.getByIdWithAssert(dataStorageState, archive.defaultLocaleId);
-  const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getByIdWithAssert(dataStorageState, archive.defaultTimeZoneGroupId);
+  const configuration = await OpaDb.Configuration.queries.getByIdWithAssert(dataStorageState, OpaDm.ConfigurationId);
+  const locale = await OpaDb.Locales.queries.getByIdWithAssert(dataStorageState, configuration.defaultLocaleId);
+  const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getByIdWithAssert(dataStorageState, configuration.defaultTimeZoneGroupId);
 
   let authState = TestAuthData.admin;
   authState.opaUserId = await OpaDb.Users.queries.createWithRole(dataStorageState, authState.firebaseAuthUserId, authProvider, authState.email, role_Admin, locale, timeZoneGroup, authState.firstName ?? "", authState.lastName ?? "", authState.displayName); // eslint-disable-line max-len

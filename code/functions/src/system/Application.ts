@@ -32,20 +32,20 @@ export const isInstalled = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) 
     const isInstalled = await Application.isSystemInstalled(dataStorageState);
     const message = (isInstalled) ? "The OPA system is installed." : "The OPA system is NOT currently installed.";
 
-    let archive: OpaDm.IArchive | null = null;
+    let configuration: OpaDm.IConfiguration | null = null;
     let locale: OpaDm.ILocale | null = null;
     let data = {isInstalled, isAuthenticated: false, isAuthorized: false};
 
     if (isInstalled) {
-      archive = await OpaDb.Archive.queries.getById(dataStorageState, OpaDm.ArchiveId);
-      OPA.assertNonNullish(archive, "The Archive of the installation must not be null.");
-      const archiveNonNull = OPA.convertNonNullish(archive);
+      configuration = await OpaDb.Configuration.queries.getById(dataStorageState, OpaDm.ConfigurationId);
+      OPA.assertNonNullish(configuration, "The Configuration of the Archive must not be null.");
+      const configurationNonNull = OPA.convertNonNullish(configuration);
 
-      locale = await OpaDb.Locales.queries.getById(dataStorageState, archiveNonNull.defaultLocaleId);
+      locale = await OpaDb.Locales.queries.getById(dataStorageState, configurationNonNull.defaultLocaleId);
       OPA.assertNonNullish(locale, "The default Locale for the Archive must not be null.");
       const localeNonNull = OPA.convertNonNullish(locale);
 
-      const archiveName = OPA.getLocalizedText(archiveNonNull.name, localeNonNull.optionName);
+      const archiveName = OPA.getLocalizedText(configurationNonNull.name, localeNonNull.optionName);
       data = Object.assign(data, {archiveName: archiveName});
     }
 
@@ -59,13 +59,13 @@ export const isInstalled = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) 
       } else {
         const userNonNull = OPA.convertNonNullish(user);
 
-        if (!OPA.isNullish(archive)) {
+        if (!OPA.isNullish(configuration)) {
           locale = await OpaDb.Locales.queries.getById(dataStorageState, userNonNull.localeId);
           OPA.assertNonNullish(locale, "The Locale for the User must not be null.");
           const localeNonNull = OPA.convertNonNullish(locale);
 
-          const archiveNonNull = OPA.convertNonNullish(archive);
-          const archiveName = OPA.getLocalizedText(archiveNonNull.name, localeNonNull.optionName);
+          const configurationNonNull = OPA.convertNonNullish(configuration);
+          const archiveName = OPA.getLocalizedText(configurationNonNull.name, localeNonNull.optionName);
           data = Object.assign(data, {archiveName: archiveName});
         }
 

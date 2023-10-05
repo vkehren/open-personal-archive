@@ -62,14 +62,14 @@ export async function authenticationEventHandlerForFirebaseAuth(dataStorageState
 
   dataStorageState.currentWriteBatch = dataStorageState.constructorProvider.writeBatch();
 
-  const archive = await OpaDb.Archive.queries.getByIdWithAssert(dataStorageState, OpaDm.ArchiveId);
+  const configuration = await OpaDb.Configuration.queries.getByIdWithAssert(dataStorageState, OpaDm.ConfigurationId);
   const role = await OpaDb.Roles.queries.getByIdWithAssert(dataStorageState, OpaDm.DefaultRoleId);
-  const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getByIdWithAssert(dataStorageState, archive.defaultTimeZoneGroupId);
+  const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getByIdWithAssert(dataStorageState, configuration.defaultTimeZoneGroupId);
 
   const authProviderId = userData.providerId;
   const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderIdWithAssert(dataStorageState, authProviderId);
 
-  let locale = await OpaDb.Locales.queries.getByIdWithAssert(dataStorageState, archive.defaultLocaleId);
+  let locale = await OpaDb.Locales.queries.getByIdWithAssert(dataStorageState, configuration.defaultLocaleId);
   if (!OPA.isNullishOrWhitespace(userData.locale)) {
     const userLocaleName = OPA.convertNonNullish(userData.locale);
     const userLocale = await OpaDb.Locales.queries.getByOptionName(dataStorageState, userLocaleName);

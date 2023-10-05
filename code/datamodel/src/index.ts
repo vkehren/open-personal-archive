@@ -8,7 +8,7 @@ import * as TimeZoneGroup from "./doctypes/TimeZoneGroup";
 // System
 import * as ActivityLogItem from "./doctypes/system/ActivityLogItem";
 import * as Application from "./doctypes/system/Application";
-import * as Archive from "./doctypes/system/Archive";
+import * as Configuration from "./doctypes/system/Configuration";
 // Authorization
 import * as User from "./doctypes/authorization/User";
 import * as Contact from "./doctypes/authorization/Contact";
@@ -26,7 +26,7 @@ export interface IOpaDbDescriptor extends OPA.ICollection {
   readonly TimeZoneGroups: OPA.ITypedQueryableCollectionDescriptor<TimeZoneGroup.ITimeZoneGroup, TimeZoneGroup.QuerySet>;
   readonly ActivityLogItems: OPA.ITypedQueryableFactoryCollectionDescriptor<ActivityLogItem.IActivityLogItem, ActivityLogItem.ActivityLogItemQuerySet, ActivityLogItem.FactoryFunc>;
   readonly Application: OPA.ITypedQueryableCollectionDescriptor<Application.IApplication, Application.ApplicationQuerySet>;
-  readonly Archive: OPA.ITypedQueryableCollectionDescriptor<Archive.IArchive, Archive.ArchiveQuerySet>;
+  readonly Configuration: OPA.ITypedQueryableCollectionDescriptor<Configuration.IConfiguration, Configuration.ConfigurationQuerySet>;
   readonly Users: OPA.ITypedQueryableFactoryCollectionDescriptor<User.IUser, User.UserQuerySet, User.FactoryFunc>;
   readonly Contacts: OPA.ITypedQueryableFactoryCollectionDescriptor<Contact.IContact, Contact.ContactQuerySet, Contact.FactoryFunc>;
   readonly AccessRequests: OPA.ITypedQueryableFactoryCollectionDescriptor<AccessRequest.IAccessRequest, AccessRequest.AccessRequestQuerySet, AccessRequest.FactoryFunc>;
@@ -42,7 +42,7 @@ DbDescriptor.TimeZones = TimeZone.CollectionDescriptor;
 DbDescriptor.TimeZoneGroups = TimeZoneGroup.CollectionDescriptor;
 DbDescriptor.ActivityLogItems = ActivityLogItem.CollectionDescriptor;
 DbDescriptor.Application = Application.CollectionDescriptor;
-DbDescriptor.Archive = Archive.CollectionDescriptor;
+DbDescriptor.Configuration = Configuration.CollectionDescriptor;
 DbDescriptor.Users = User.CollectionDescriptor;
 DbDescriptor.Contacts = Contact.CollectionDescriptor;
 DbDescriptor.AccessRequests = AccessRequest.CollectionDescriptor;
@@ -59,7 +59,7 @@ export {ITimeZone} from "./doctypes/TimeZone";
 export {ITimeZoneGroup, DefaultTimeZoneGroupId} from "./doctypes/TimeZoneGroup";
 export {IActivityLogItem} from "./doctypes/system/ActivityLogItem";
 export {IApplication, IApplicationPartial, SingletonId as ApplicationId} from "./doctypes/system/Application";
-export {IArchive, IArchivePartial, SingletonId as ArchiveId} from "./doctypes/system/Archive";
+export {IConfiguration, IConfigurationPartial, SingletonId as ConfigurationId} from "./doctypes/system/Configuration";
 export {IUser, IUserPartial, User_OwnerId} from "./doctypes/authorization/User"; // eslint-disable-line camelcase
 export {IContact, IContactPartial} from "./doctypes/authorization/Contact";
 export {IAccessRequest, IAccessRequestPartial} from "./doctypes/authorization/AccessRequest";

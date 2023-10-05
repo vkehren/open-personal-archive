@@ -25,17 +25,17 @@ export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataSt
 
   // NOTE: Create System State
   const application = await OpaDb.Application.queries.getById(dataStorageState, OpaDm.ApplicationId);
-  const archive = await OpaDb.Archive.queries.getById(dataStorageState, OpaDm.ArchiveId);
+  const configuration = await OpaDb.Configuration.queries.getById(dataStorageState, OpaDm.ConfigurationId);
   let applicationNonNull = ((null as unknown) as OpaDm.IApplication);
-  let archiveNonNull = ((null as unknown) as OpaDm.IArchive);
+  let configurationNonNull = ((null as unknown) as OpaDm.IConfiguration);
 
   if (!OPA.isNullish(application)) {
-    OPA.assertDocumentIsValid(archive, "The Archive object must exist when the Application object exists.");
+    OPA.assertDocumentIsValid(configuration, "The Configuration object must exist when the Application object exists.");
 
     applicationNonNull = OPA.convertNonNullish(application);
-    archiveNonNull = OPA.convertNonNullish(archive);
+    configurationNonNull = OPA.convertNonNullish(configuration);
 
-    systemState = {application: applicationNonNull, archive: archiveNonNull};
+    systemState = {application: applicationNonNull, configuration: configurationNonNull};
     hasSystemState = true;
   }
 

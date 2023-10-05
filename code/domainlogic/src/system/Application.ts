@@ -71,16 +71,16 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
   authorizationState.assertUserApproved();
   authorizationState.assertRoleAllowed(authorizedRoleIds);
 
-  const archiveNonNull = systemState.archive;
+  const configurationNonNull = systemState.configuration;
   const localeNonNull = authorizationState.locale;
   const localeToUse = localeNonNull.optionName;
 
   const localeSnaps = await OpaDb.Locales.getTypedCollection(callState.dataStorageState).get();
   const locales = localeSnaps.docs.map((localeSnap) => localeSnap.data());
-  let selectedLocales = locales.filter((locale) => (locale.id == archiveNonNull.defaultLocaleId));
+  let selectedLocales = locales.filter((locale) => (locale.id == configurationNonNull.defaultLocaleId));
   const timeZoneGroupSnaps = await OpaDb.TimeZoneGroups.getTypedCollection(callState.dataStorageState).get();
   const timeZoneGroups = timeZoneGroupSnaps.docs.map((timeZoneGroupSnap) => timeZoneGroupSnap.data());
-  let selectedTimeZoneGroups = timeZoneGroups.filter((timeZoneGroup) => (timeZoneGroup.id == archiveNonNull.defaultTimeZoneGroupId));
+  let selectedTimeZoneGroups = timeZoneGroups.filter((timeZoneGroup) => (timeZoneGroup.id == configurationNonNull.defaultTimeZoneGroupId));
 
   if (selectedLocales.length < 1) {
     selectedLocales = locales.filter((locale) => locale.isDefault);
@@ -94,9 +94,9 @@ export async function getInstallationScreenDisplayModel(callState: OpaDm.ICallSt
   // LATER: Pass IAuthorizationState to getAuthorizationData(...) and include locale and timezone for User
   const displayModel: IInstallationScreenDisplayModel = {
     authorizationData: DMU.getAuthorizationDataForDisplayModel(callState.dataStorageState, systemState, authorizationState),
-    archiveName: OPA.getLocalizedText(archiveNonNull.name, localeToUse),
-    archiveDescription: OPA.getLocalizedText(archiveNonNull.description, localeToUse),
-    pathToStorageFolder: archiveNonNull.pathToStorageFolder,
+    archiveName: OPA.getLocalizedText(configurationNonNull.name, localeToUse),
+    archiveDescription: OPA.getLocalizedText(configurationNonNull.description, localeToUse),
+    pathToStorageFolder: configurationNonNull.pathToStorageFolder,
     validLocales: locales,
     selectedLocale: selectedLocale,
     validTimeZoneGroups: timeZoneGroups,
@@ -171,8 +171,8 @@ export async function performInstall(dataStorageState: OpaDm.IDataStorageState, 
   const timeZoneGroupDefault = await OpaDb.TimeZoneGroups.queries.getByIdWithAssert(dataStorageState, defaultTimeZoneGroupId, "The required TimeZoneGroup does not exist.");
   const userOwner = await OpaDb.Users.queries.createArchiveOwner(dataStorageState, ownerFirebaseAuthUserId, authProvider, ownerAccountName, localeDefault, timeZoneGroupDefault, ownerFirstName, ownerLastName); // eslint-disable-line max-len
 
-  // 4) Create the Archive document for the Archive
-  await OpaDb.Archive.queries.create(dataStorageState, archiveName, archiveDescription, pathToStorageFolder, userOwner, localeDefault, timeZoneGroupDefault);
+  // 4) Create the Configuration document for the Archive
+  await OpaDb.Configuration.queries.create(dataStorageState, archiveName, archiveDescription, pathToStorageFolder, userOwner, localeDefault, timeZoneGroupDefault);
   await dataStorageState.currentWriteBatch.commit();
   dataStorageState.currentWriteBatch = null;
 }
@@ -210,36 +210,36 @@ export async function updateInstallationSettings(callState: OpaDm.ICallState, ar
   const currentLocaleNonNull = authorizationState.locale;
   const localeToUse = currentLocaleNonNull.optionName;
 
-  const archive = await OpaDb.Archive.queries.getByIdWithAssert(callState.dataStorageState, OpaDm.ArchiveId, "The Archive does not exist.");
+  const configuration = await OpaDb.Configuration.queries.getByIdWithAssert(callState.dataStorageState, OpaDm.ConfigurationId, "The Configuration does not exist.");
 
-  const archivePartial: OpaDm.IArchivePartial = {};
-  if ((archiveName) && (archive.name[localeToUse] != archiveName)) {
-    archivePartial.name = {...archive.name};
-    archivePartial.name[localeToUse] = archiveName;
+  const configurationPartial: OpaDm.IConfigurationPartial = {};
+  if ((archiveName) && (configuration.name[localeToUse] != archiveName)) {
+    configurationPartial.name = {...configuration.name};
+    configurationPartial.name[localeToUse] = archiveName;
   }
-  if ((archiveDescription) && (archive.description[localeToUse] != archiveDescription)) {
-    archivePartial.description = {...archive.description};
-    archivePartial.description[localeToUse] = archiveDescription;
+  if ((archiveDescription) && (configuration.description[localeToUse] != archiveDescription)) {
+    configurationPartial.description = {...configuration.description};
+    configurationPartial.description[localeToUse] = archiveDescription;
   }
-  if ((defaultLocaleId) && (archive.defaultLocaleId != defaultLocaleId)) {
+  if ((defaultLocaleId) && (configuration.defaultLocaleId != defaultLocaleId)) {
     await OpaDb.Locales.queries.getByIdWithAssert(callState.dataStorageState, defaultLocaleId, "The Locale specified does not exist.");
-    archivePartial.defaultLocaleId = defaultLocaleId;
+    configurationPartial.defaultLocaleId = defaultLocaleId;
   }
-  if ((defaultTimeZoneGroupId) && (archive.defaultTimeZoneGroupId != defaultTimeZoneGroupId)) {
+  if ((defaultTimeZoneGroupId) && (configuration.defaultTimeZoneGroupId != defaultTimeZoneGroupId)) {
     await OpaDb.TimeZoneGroups.queries.getByIdWithAssert(callState.dataStorageState, defaultTimeZoneGroupId, "The TimeZoneGroup specified does not exist.");
-    archivePartial.defaultTimeZoneGroupId = defaultTimeZoneGroupId;
+    configurationPartial.defaultTimeZoneGroupId = defaultTimeZoneGroupId;
   }
-  if ((defaultTimeZoneId) && (archive.defaultTimeZoneId != defaultTimeZoneId)) {
+  if ((defaultTimeZoneId) && (configuration.defaultTimeZoneId != defaultTimeZoneId)) {
     await OpaDb.TimeZones.queries.getByIdWithAssert(callState.dataStorageState, defaultTimeZoneId, "The TimeZone specified does not exist.");
-    archivePartial.defaultTimeZoneId = defaultTimeZoneId;
+    configurationPartial.defaultTimeZoneId = defaultTimeZoneId;
   }
   // LATER: Consider allowing change to root storage folder if no files have been added yet
 
-  if (OPA.isEmpty(archivePartial)) {
+  if (OPA.isEmpty(configurationPartial)) {
     throw new Error("No updated setting was provided.");
   }
 
-  await OpaDb.Archive.queries.update(callState.dataStorageState, archivePartial, currentUserNonNull.id);
+  await OpaDb.Configuration.queries.update(callState.dataStorageState, configurationPartial, currentUserNonNull.id);
   await callState.dataStorageState.currentWriteBatch.commit();
   callState.dataStorageState.currentWriteBatch = null;
 }

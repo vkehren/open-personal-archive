@@ -6,7 +6,7 @@ import {ITimeZone} from "./doctypes/TimeZone";
 import {ITimeZoneGroup} from "./doctypes/TimeZoneGroup";
 // System
 import {IApplication} from "./doctypes/system/Application";
-import {IArchive} from "./doctypes/system/Archive";
+import {IConfiguration} from "./doctypes/system/Configuration";
 // Authorization
 import {IUser} from "./doctypes/authorization/User";
 
@@ -16,7 +16,7 @@ export type IAuthenticationState = OPA.IAuthenticationState;
 
 export interface ISystemState {
   readonly application: IApplication;
-  readonly archive: IArchive;
+  readonly configuration: IConfiguration;
 }
 
 export interface IAuthorizationState {
