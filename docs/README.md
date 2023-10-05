@@ -22,7 +22,7 @@
 
 <body>
   <h1><a href="http://openpersonalarchive.com">Open Personal Archive™</a></h1>
-  <img src="./code/webapp/images/OpenPersonalArchive_Small_Logo.png" width="500" />
+  <img src="../code/webapp/images/OpenPersonalArchive_Small_Logo.png" width="500" />
   <p>
     We created <a href="https://github.com/vkehren/open-personal-archive"><b>Open Personal Archive™</b></a> to address
     the pressing needs of Original Researchers of Primary Source Material as they perform research and prepare to use
