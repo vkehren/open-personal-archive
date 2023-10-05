@@ -139,7 +139,7 @@ export class ConfigurationQuerySet extends OPA.QuerySet<IConfiguration> {
    * @param {ITimeZoneGroup} defaultTimeZoneGroup The default TimeZoneGroup to use for the Archive.
    * @return {Promise<string>} The new document ID.
    */
-  async create(ds: OPA.IDataStorageState, name: string, description: string, pathToRootStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): Promise<string> {
+  async create(ds: OPA.IDataStorageState, name: string, description: string, pathToRootStorageFolder: string, owner: IUser, defaultLocale: ILocale, defaultTimeZoneGroup: ITimeZoneGroup): Promise<string> { // eslint-disable-line max-len
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
     OPA.assertDocumentIsValid(owner);
@@ -201,4 +201,4 @@ export class ConfigurationQuerySet extends OPA.QuerySet<IConfiguration> {
 }
 
 export type FactoryFunc = (...[params]: Parameters<typeof createSingleton>) => ReturnType<typeof createSingleton>;
-export const CollectionDescriptor = new OPA.CollectionDescriptor<IConfiguration, ConfigurationQuerySet, FactoryFunc>(SingularName, PluralName, IsSingleton, (cd) => new ConfigurationQuerySet(cd), null, []);
+export const CollectionDescriptor = new OPA.CollectionDescriptor<IConfiguration, ConfigurationQuerySet, FactoryFunc>(SingularName, PluralName, IsSingleton, (cd) => new ConfigurationQuerySet(cd), null, []); // eslint-disable-line max-len

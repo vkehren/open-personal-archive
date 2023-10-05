@@ -243,7 +243,7 @@ export async function initializeUserAccount(callState: OpaDm.ICallState, authPro
   const authProvider = await OpaDb.AuthProviders.queries.getByExternalAuthProviderIdWithAssert(callState.dataStorageState, authProviderId, "The required AuthProvider does not exist.");
   const assignedRole = await OpaDb.Roles.queries.getByIdWithAssert(callState.dataStorageState, OpaDm.DefaultRoleId, "The required Role does not exist.");
   const locale = await OpaDb.Locales.queries.getByIdWithAssert(callState.dataStorageState, systemState.configuration.defaultLocaleId, "The required Locale does not exist.");
-  const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getByIdWithAssert(callState.dataStorageState, systemState.configuration.defaultTimeZoneGroupId, "The required TimeZoneGroup does not exist.");
+  const timeZoneGroup = await OpaDb.TimeZoneGroups.queries.getByIdWithAssert(callState.dataStorageState, systemState.configuration.defaultTimeZoneGroupId, "The required TimeZoneGroup does not exist."); // eslint-disable-line max-len
 
   const userId = await OpaDb.Users.queries.createWithRole(callState.dataStorageState, firebaseAuthUserId, authProvider, authAccountName, assignedRole, locale, timeZoneGroup, firstName, lastName);
 
