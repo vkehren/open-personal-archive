@@ -13,6 +13,54 @@ body {
   padding: 0;
 }
 
+.at-page-top-left {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.at-page-top-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.at-page-bottom-left {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.at-page-bottom-right {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.at-container-top-left {
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
+.at-container-top-right {
+  position: relative;
+  top: 0;
+  right: 0;
+}
+
+.at-container-bottom-left {
+  position: relative;
+  bottom: 0;
+  left: 0;
+}
+
+.at-container-bottom-right {
+  position: relative;
+  bottom: 0;
+  right: 0;
+}
+
 .scroll-container-parent {
   overflow: hidden;
   margin: 0;
@@ -104,6 +152,42 @@ body {
   flex-wrap: wrap;
   align-content: center;
   justify-content: start;
+}
+
+.flex-item-center-start {
+  display: flex;
+  align-items: center;
+  justify-items: start;
+}
+
+.flex-item-center-center {
+  display: flex;
+  align-items: center;
+  justify-items: center;
+}
+
+.flex-item-center-end {
+  display: flex;
+  align-items: center;
+  justify-items: end;
+}
+
+.flex-self-center-start {
+  display: flex;
+  align-self: center;
+  justify-self: start;
+}
+
+.flex-self-center-center {
+  display: flex;
+  align-self: center;
+  justify-self: center;
+}
+
+.flex-self-center-end {
+  display: flex;
+  align-self: center;
+  justify-self: end;
 }
 
 .grid-container-cols-5 {
