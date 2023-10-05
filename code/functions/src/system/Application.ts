@@ -32,20 +32,20 @@ export const isInstalled = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) 
     const isInstalled = await Application.isSystemInstalled(dataStorageState);
     const message = (isInstalled) ? "The OPA system is installed." : "The OPA system is NOT currently installed.";
 
-    let archive: OpaDm.IArchive | null = null;
+    let configuration: OpaDm.IConfiguration | null = null;
     let locale: OpaDm.ILocale | null = null;
     let data = {isInstalled, isAuthenticated: false, isAuthorized: false};
 
     if (isInstalled) {
-      archive = await OpaDb.Archive.queries.getById(dataStorageState, OpaDm.ArchiveId);
-      OPA.assertNonNullish(archive, "The Archive of the installation must not be null.");
-      const archiveNonNull = OPA.convertNonNullish(archive);
+      configuration = await OpaDb.Configuration.queries.getById(dataStorageState, OpaDm.ConfigurationId);
+      OPA.assertNonNullish(configuration, "The Configuration of the Archive must not be null.");
+      const configurationNonNull = OPA.convertNonNullish(configuration);
 
-      locale = await OpaDb.Locales.queries.getById(dataStorageState, archiveNonNull.defaultLocaleId);
+      locale = await OpaDb.Locales.queries.getById(dataStorageState, configurationNonNull.defaultLocaleId);
       OPA.assertNonNullish(locale, "The default Locale for the Archive must not be null.");
       const localeNonNull = OPA.convertNonNullish(locale);
 
-      const archiveName = OPA.getLocalizedText(archiveNonNull.name, localeNonNull.optionName);
+      const archiveName = OPA.getLocalizedText(configurationNonNull.name, localeNonNull.optionName);
       data = Object.assign(data, {archiveName: archiveName});
     }
 
@@ -59,13 +59,13 @@ export const isInstalled = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) 
       } else {
         const userNonNull = OPA.convertNonNullish(user);
 
-        if (!OPA.isNullish(archive)) {
+        if (!OPA.isNullish(configuration)) {
           locale = await OpaDb.Locales.queries.getById(dataStorageState, userNonNull.localeId);
           OPA.assertNonNullish(locale, "The Locale for the User must not be null.");
           const localeNonNull = OPA.convertNonNullish(locale);
 
-          const archiveNonNull = OPA.convertNonNullish(archive);
-          const archiveName = OPA.getLocalizedText(archiveNonNull.name, localeNonNull.optionName);
+          const configurationNonNull = OPA.convertNonNullish(configuration);
+          const archiveName = OPA.getLocalizedText(configurationNonNull.name, localeNonNull.optionName);
           data = Object.assign(data, {archiveName: archiveName});
         }
 
@@ -141,14 +141,14 @@ export const performInstall = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reques
     OPA.assertNonNullishOrWhitespace(archiveName, "The Archive name must not be blank.");
     const archiveDescription = (data.archiveDescription) ? data.archiveDescription : undefined;
     OPA.assertNonNullishOrWhitespace(archiveDescription, "The Archive description must not be blank.");
-    const pathToStorageFolder = (data.pathToStorageFolder) ? data.pathToStorageFolder : undefined;
-    OPA.assertNonNullishOrWhitespace(pathToStorageFolder, "The Archive storage path must not be blank.");
+    const pathToRootStorageFolder = (data.pathToRootStorageFolder) ? data.pathToRootStorageFolder : undefined;
+    OPA.assertNonNullishOrWhitespace(pathToRootStorageFolder, "The Archive root storage path must not be blank.");
     const defaultLocaleId = (data.defaultLocaleId) ? data.defaultLocaleId : undefined;
     OPA.assertNonNullishOrWhitespace(defaultLocaleId, "The Archive default locale must not be blank.");
     const defaultTimeZoneGroupId = (data.defaultTimeZoneGroupId) ? data.defaultTimeZoneGroupId : undefined;
     OPA.assertNonNullishOrWhitespace(defaultTimeZoneGroupId, "The Archive default time zone group must not be blank.");
     const installationNotes = OPA.convertNonNullish(data.installationNotes, "");
-    const installResult = await Application.performInstall(callState.dataStorageState, callState.authenticationState, archiveName, archiveDescription, pathToStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, installationNotes); // eslint-disable-line max-len
+    const installResult = await Application.performInstall(callState.dataStorageState, callState.authenticationState, archiveName, archiveDescription, pathToRootStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, installationNotes); // eslint-disable-line max-len
 
     return OPA.getSuccessResult(installResult);
   } catch (error) {

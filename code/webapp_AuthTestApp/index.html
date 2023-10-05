@@ -6,58 +6,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>OPA Auth Test App</title>
   <meta name="description"
-    content="A Test App to verify that the authentication of your Open Personal Archive™ (OPA) deployment works correctly." />
+        content="A Test App to verify that the authentication of your Open Personal Archive™ (OPA) deployment works correctly." />
   <meta name="author" content="Ryan Stephen Ehrenreich" />
-  <meta name="version" content="2.3.3" />
+  <meta name="version" content="2.4.0" />
+  <link rel="stylesheet" type="text/css" href="./WebLayout.css">
+  <link rel="stylesheet" type="text/css" href="./WebText.css">
   <script src="https://www.gstatic.com/firebasejs/4.0.0/firebase.js"></script>
 
   <style>
-    html,
-    body {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
-
-    .scroll-container-parent {
-      overflow: hidden;
-    }
-
-    .scroll-container {
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-    }
-
-    /* NOTE: Text in "no-scroll-container" should be scaled based on viewport size (otherwise, it may be cut-off) */
-    .no-scroll-container {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      padding: 8px;
-      font-size: 20px;
-      font-size: calc(70% + .5vh);
-    }
-
-    .scroll-pane {
-      width: auto;
-      height: auto;
-      padding: 8px;
-    }
   </style>
 </head>
 
 <body>
   <div style="width: 100%;height: 7vh;" class="scroll-container-parent">
     <div class="no-scroll-container">
-      <h1 style="margin: 0;padding: 0;">Open Personal Archive™ (OPA) Auth Test App</h1>
+      <div class="flex-container-row-center-start text-single-line">
+        <h1 style="margin: 1vw;">Open Personal Archive™ (OPA) Auth Test App</h1>
+      </div>
     </div>
   </div>
   <div style="width: 100%;height: 88vh;" class="scroll-container-parent">
     <div class="scroll-container">
       <div class="scroll-pane">
-        <hr style="margin-bottom: 16px;" />
+        <hr style="margin: 0 16px 16px 0;" />
         <p style="margin-left: 16px;">
           <button id="google-button">Sign-In with Google using OAuth</button>
           <br />
@@ -218,10 +189,12 @@
       </div>
     </div>
   </div>
-  <div style="width: 100%;height: 5vh;position: relative;bottom: 0;background-color: burlywood;" id="copyright"
-    class="scroll-container-parent">
+  <div style="width: 100%;height: 5vh;background-color: burlywood;" id="copyright"
+       class="scroll-container-parent at-page-bottom-left">
     <div class="no-scroll-container">
-      <b>Copyright © 2021 Open Personal Archive</b>
+      <div class="flex-container-row-center-start text-notice">
+        <b style="margin: 1vw;">Copyright © 2021 Open Personal Archive</b>
+      </div>
     </div>
   </div>
 

@@ -191,7 +191,46 @@ export function getShimmedRequestObject(request: CallableRequest): OPA.ICallRequ
     clientIpAddress: request.rawRequest.ip,
     url: request.rawRequest.originalUrl,
     data: request.data,
+    headers: {},
   };
+  if (!OPA.isNullish(request.rawRequest.headers)) {
+    if (!OPA.isNullish(request.rawRequest.headers["client-ip"])) {
+      shimmedRequest.headers.clientIp = request.rawRequest.headers["client-ip"];
+    }
+    if (!OPA.isNullish(request.rawRequest.headers["content-language"])) {
+      shimmedRequest.headers.contentLanguage = request.rawRequest.headers["content-language"];
+    }
+    if (!OPA.isNullish(request.rawRequest.headers["content-location"])) {
+      shimmedRequest.headers.contentLocation = request.rawRequest.headers["content-location"];
+    }
+    if (!OPA.isNullish(request.rawRequest.headers["content-type"])) {
+      shimmedRequest.headers.contentType = request.rawRequest.headers["content-type"];
+    }
+    if (!OPA.isNullish(request.rawRequest.headers["date"])) {
+      shimmedRequest.headers.date = request.rawRequest.headers["date"];
+    }
+    if (!OPA.isNullish(request.rawRequest.headers["host"])) {
+      shimmedRequest.headers.host = request.rawRequest.headers["host"];
+    }
+    if (!OPA.isNullish(request.rawRequest.headers["latency"])) {
+      shimmedRequest.headers.latency = request.rawRequest.headers["latency"];
+    }
+    if (!OPA.isNullish(request.rawRequest.headers["location"])) {
+      shimmedRequest.headers.location = request.rawRequest.headers["location"];
+    }
+    if (!OPA.isNullish(request.rawRequest.headers["origin"])) {
+      shimmedRequest.headers.origin = request.rawRequest.headers["origin"];
+    }
+    if (!OPA.isNullish(request.rawRequest.headers["referer"])) {
+      shimmedRequest.headers.referer = request.rawRequest.headers["referer"];
+    }
+    if (!OPA.isNullish(request.rawRequest.headers["server-ip"])) {
+      shimmedRequest.headers.serverIp = request.rawRequest.headers["server-ip"];
+    }
+    if (!OPA.isNullish(request.rawRequest.headers["user-agent"])) {
+      shimmedRequest.headers.userAgent = request.rawRequest.headers["user-agent"];
+    }
+  }
   return shimmedRequest;
 }
 
@@ -221,7 +260,7 @@ export async function logFunctionCall(dataStorageState: OpaDm.IDataStorageState,
     const requestor = request.clientIpAddress;
     const resource = request.url;
     const errorState = {hasError: false};
-    const otherState = {message: message, logWriteState: dataStorageState.logWriteState, errorState: errorState};
+    const otherState = {message: message, logWriteState: dataStorageState.logWriteState, errorState: errorState, headers: request.headers};
 
     logger.info(message, {structuredData: true, activityType, requestor, resource, otherState});
     const logItem = await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, requestor, resource, null, request.data, otherState);
@@ -247,7 +286,7 @@ export async function logFunctionError(dataStorageState: OpaDm.IDataStorageState
     const activityType = OpaDm.ActivityTypes.server_function_error;
     const requestor = request.clientIpAddress;
     const resource = request.url;
-    const otherState = {message: OPA.UNRECOGNIZED_ERROR_MESSAGE, logWriteState: dataStorageState.logWriteState, errorState: caught};
+    const otherState = {message: OPA.UNRECOGNIZED_ERROR_MESSAGE, logWriteState: dataStorageState.logWriteState, errorState: caught, headers: request.headers};
 
     if (OPA.isOf<Error>(caught, (value) => (!OPA.isNullishOrWhitespace(value.message)))) {
       const error = (caught as Error);

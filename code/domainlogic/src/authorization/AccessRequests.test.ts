@@ -172,7 +172,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
       expect(user.requestedCitationIds[0]).equals(testCitationId);
     }
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage);
@@ -204,7 +204,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     await expect(OpaDb.AccessRequests.queries.update(config.dataStorageState, accessRequestId, invalidUpdateObject, ambientUserId())).to.eventually.be.rejectedWith(Error);
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage);
@@ -238,7 +238,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     else {await OpaDb.AccessRequests.queries.setTags(config.dataStorageState, accessRequestId, tags, OPA.ArrayContentTypes.exact, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage);
@@ -271,7 +271,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     else {await OpaDb.AccessRequests.queries.setTags(config.dataStorageState, accessRequestId, tagsToAdd, OPA.ArrayContentTypes.only_added, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage);
@@ -304,7 +304,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     else {await OpaDb.AccessRequests.queries.setTags(config.dataStorageState, accessRequestId, tagsToRemove, OPA.ArrayContentTypes.only_removed, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage);
@@ -336,7 +336,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     else {await OpaDb.AccessRequests.queries.setToViewed(config.dataStorageState, accessRequestId, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage);
@@ -375,7 +375,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     else {await OpaDb.AccessRequests.queries.setToViewed(config.dataStorageState, accessRequestId, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage);
@@ -408,7 +408,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     else {await OpaDb.AccessRequests.queries.update(config.dataStorageState, accessRequestId, accessRequestUpdateObject, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage);
@@ -442,7 +442,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     else {await OpaDb.AccessRequests.queries.update(config.dataStorageState, accessRequestId, accessRequestUpdateObject, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage);
@@ -476,7 +476,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     else {await OpaDb.AccessRequests.queries.update(config.dataStorageState, accessRequestId, accessRequestUpdateObject, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
@@ -514,7 +514,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     else {await OpaDb.AccessRequests.queries.setToArchivalOption(config.dataStorageState, accessRequestId, true, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
@@ -546,7 +546,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     else {await OpaDb.AccessRequests.queries.setToArchivalOption(config.dataStorageState, accessRequestId, false, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
@@ -579,7 +579,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     else {await OpaDb.AccessRequests.queries.setToArchivalOption(config.dataStorageState, accessRequestId, true, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
@@ -611,7 +611,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     else {await OpaDb.AccessRequests.queries.setToArchivalOption(config.dataStorageState, accessRequestId, false, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
@@ -643,7 +643,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     else {await OpaDb.AccessRequests.queries.setToDecidedOption(config.dataStorageState, accessRequestId, OPA.ApprovalStates.denied, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
@@ -675,7 +675,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     else {await OpaDb.AccessRequests.queries.setToDecidedOption(config.dataStorageState, accessRequestId, OPA.ApprovalStates.approved, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
@@ -707,7 +707,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     else {await expect(OpaDb.AccessRequests.queries.markWithDeletionState(config.dataStorageState, accessRequestId, OPA.DeletionStates.deleted, ambientUserId())).to.eventually.be.rejectedWith(Error);}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
@@ -739,7 +739,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     else {await OpaDb.AccessRequests.queries.markWithDeletionState(config.dataStorageState, accessRequestId, OPA.DeletionStates.deleted, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
@@ -771,7 +771,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     else {await OpaDb.AccessRequests.queries.markWithDeletionState(config.dataStorageState, accessRequestId, OPA.DeletionStates.undeleted, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
@@ -803,7 +803,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     else {await OpaDb.AccessRequests.queries.markWithDeletionState(config.dataStorageState, accessRequestId, OPA.DeletionStates.deleted, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);
@@ -835,7 +835,7 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
     else {await OpaDb.AccessRequests.queries.markWithDeletionState(config.dataStorageState, accessRequestId, OPA.DeletionStates.undeleted, ambientUserId());}
     accessRequest = await TestUtils.assertAccessRequestDoesExist(config.dataStorageState, accessRequestId);
 
-    expect(accessRequest.archiveId).equals(OpaDm.ArchiveId);
+    expect(accessRequest.id).equals(accessRequestId);
     expect(accessRequest.isSpecificToCitation).equals(hasCitationId);
     expect(accessRequest.citationId).equals(hasCitationId ? OPA.convertNonNullish(testCitationId) : null);
     expect(accessRequest.message[OpaDm.DefaultLocale]).equals(testMessage_Updated);

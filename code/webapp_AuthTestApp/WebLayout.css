@@ -1,0 +1,261 @@
+/*
+ * const NAME = "open-personal-archive-web-layout-css";
+ * const VERSION = "2.4.0";
+ * const AUTHOR = "Ryan Stephen Ehrenreich";
+ * const COPYRIGHT = "Copyright © 2021 Open Personal Archive™";
+ */
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.whole-screen {
+  width: 100%;
+  height: 100vh;
+}
+
+.full-size {
+  width: 100%;
+  height: 100%;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.full-height {
+  height: 100%;
+}
+
+.auto-size {
+  width: auto;
+  height: auto;
+}
+
+.auto-width {
+  width: auto;
+}
+
+.auto-height {
+  height: auto;
+}
+
+.background-image {
+  object-fit: cover;
+}
+
+.visible {
+  visibility: visible;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.at-page-top-left {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.at-page-top-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.at-page-bottom-left {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.at-page-bottom-right {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.at-container-top-left {
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
+.at-container-top-right {
+  position: relative;
+  top: 0;
+  right: 0;
+}
+
+.at-container-bottom-left {
+  position: relative;
+  bottom: 0;
+  left: 0;
+}
+
+.at-container-bottom-right {
+  position: relative;
+  bottom: 0;
+  right: 0;
+}
+
+.scroll-container-parent {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.scroll-container {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  margin: 0;
+  padding: 0;
+}
+
+/* NOTE: Text in "no-scroll-container" should be scaled based on viewport size (otherwise, it may be cut-off) */
+.no-scroll-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.scroll-pane {
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0;
+}
+
+/* NOTE: This is useful for a title that should be aligned to the left */
+.flex-container-row-center-start {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: start;
+}
+
+/* NOTE: This is useful for a title that should be aligned to the center */
+.flex-container-row-center-center {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+}
+
+/* NOTE: This is useful for a title that should be aligned to the right */
+.flex-container-row-center-end {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: end;
+}
+
+.flex-container-row-center-spar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: space-around;
+}
+
+.flex-container-row-stretch-spar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: stretch;
+  justify-content: space-around;
+}
+
+.flex-container-row-stretch-spar-nowrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-content: stretch;
+  justify-content: space-around;
+}
+
+.flex-container-column-center-spar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: space-around;
+}
+
+.flex-container-column-center-start {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: start;
+}
+
+.flex-item-center-start {
+  display: flex;
+  align-items: center;
+  justify-items: start;
+}
+
+.flex-item-center-center {
+  display: flex;
+  align-items: center;
+  justify-items: center;
+}
+
+.flex-item-center-end {
+  display: flex;
+  align-items: center;
+  justify-items: end;
+}
+
+.flex-self-center-start {
+  display: flex;
+  align-self: center;
+  justify-self: start;
+}
+
+.flex-self-center-center {
+  display: flex;
+  align-self: center;
+  justify-self: center;
+}
+
+.flex-self-center-end {
+  display: flex;
+  align-self: center;
+  justify-self: end;
+}
+
+.grid-container-cols-5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1vw;
+  grid-auto-rows: minmax(10vh, auto);
+}

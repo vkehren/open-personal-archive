@@ -25,7 +25,7 @@ export interface IAuthorizationData {
 }
 
 /**
- * Gets an AuthorizationData instance for the Archive, User, and Role specified in the input state objects.
+ * Gets an AuthorizationData instance for the User and Role specified in the input state objects.
  * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
  * @param {OpaDm.ISystemState} systemState The System state for the relevant Archive.
  * @param {OpaDm.IAuthorizationState} authorizationState The Authorization state for the current User.
@@ -40,7 +40,7 @@ export function getAuthorizationDataForDisplayModel(dataStorageState: OpaDm.IDat
     const authorizationData: IAuthorizationData = {
       firebaseProjectId: dataStorageState.projectId,
       usesFirebaseEmulators: dataStorageState.usesEmulators,
-      isSystemInstalled: (!OPA.isNullish(systemState.archive)),
+      isSystemInstalled: (!OPA.isNullish(systemState.configuration)),
       userData: null,
       roleData: null,
     };
@@ -94,7 +94,7 @@ export function getAuthorizationDataForDisplayModel(dataStorageState: OpaDm.IDat
   const authorizationData: IAuthorizationData = {
     firebaseProjectId: dataStorageState.projectId,
     usesFirebaseEmulators: dataStorageState.usesEmulators,
-    isSystemInstalled: (!OPA.isNullish(systemState.archive)),
+    isSystemInstalled: (!OPA.isNullish(systemState.configuration)),
     userData: userData,
     roleData: roleData,
   };

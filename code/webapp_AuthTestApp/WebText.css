@@ -1,0 +1,41 @@
+/*
+ * const NAME = "open-personal-archive-web-text-css";
+ * const VERSION = "2.4.0";
+ * const AUTHOR = "Ryan Stephen Ehrenreich";
+ * const COPYRIGHT = "Copyright © 2021 Open Personal Archive™";
+ */
+
+.text-single-line {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: clip;
+}
+
+.text-outline-1-black {
+  text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+}
+
+.text-outline-1-blur-black {
+  text-shadow: -1px -1px 2px black, 1px -1px 2px black, -1px 1px 2px black, 1px 1px 2px black;
+}
+
+.text-outline-2-blur-black {
+  text-shadow: -2px -2px 4px black, 2px -2px 4px black, -2px 2px 4px black, 2px 2px 4px black;
+}
+
+.text-outline-1-red {
+  text-shadow: -1px -1px 0 red, 1px -1px 0 red, -1px 1px 0 red, 1px 1px 0 red;
+}
+
+.text-outline-1-blur-red {
+  text-shadow: -1px -1px 2px red, 1px -1px 2px red, -1px 1px 2px red, 1px 1px 2px red;
+}
+
+.text-outline-2-blur-red {
+  text-shadow: -2px -2px 4px red, 2px -2px 4px red, -2px 2px 4px red, 2px 2px 4px red;
+}
+
+.text-notice {
+  font-size: 20px;
+  font-size: calc(80% + .5vh);
+}

@@ -1,0 +1,96 @@
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.scroll-container-parent {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.scroll-container {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  margin: 0;
+  padding: 0;
+}
+
+/* NOTE: Text in "no-scroll-container" should be scaled based on viewport size (otherwise, it may be cut-off) */
+.no-scroll-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  font-size: 20px;
+  font-size: calc(70% + .5vh);
+}
+
+.scroll-pane {
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0;
+}
+
+.flex-container-row-center-spar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: space-around;
+}
+
+.flex-container-row-stretch-spar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: stretch;
+  justify-content: space-around;
+}
+
+.flex-container-row-stretch-spar-nowrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-content: stretch;
+  justify-content: space-around;
+}
+
+.flex-container-column-center-spar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: space-around;
+}
+
+.flex-container-column-center-start {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: start;
+}
+
+.grid-container-cols-5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1vw;
+  grid-auto-rows: minmax(10vh, auto);
+}
