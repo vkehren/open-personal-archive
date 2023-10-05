@@ -1,7 +1,6 @@
 import * as firestore from "@google-cloud/firestore";
 import * as OPA from "../../../../base/src";
 import * as BT from "../../BaseTypes";
-import {SingletonId} from "../system/Archive";
 import {ILocale, DefaultLocale} from "../Locale";
 import {IUser} from "./User";
 
@@ -22,14 +21,12 @@ interface IAccessRequestPartial_WithHistory extends IAccessRequestPartial, OPA.I
 }
 
 export interface IAccessRequest extends OPA.IDocument_Creatable_ByUser, OPA.IDocument_Updateable_ByUser_WithHistory<UpdateHistoryItem>, OPA.IDocument_Taggable_ByUser, OPA.IDocument_Archivable_ByUser, OPA.IDocument_Viewable_ByUser, OPA.IDocument_Approvable_ByUser<OPA.ApprovalState>, OPA.IDocument_Deleteable_ByUser { // eslint-disable-line max-len
-  readonly archiveId: string; // NOTE: This field stores information necessary to extend the OPA system to manage multiple Archives
   readonly isSpecificToCitation: boolean;
   readonly citationId: string | null;
   message: OPA.ILocalizable<string>;
   response: OPA.ILocalizable<string>;
 }
 const IAccessRequest_ReadOnlyPropertyNames = [ // eslint-disable-line camelcase
-  OPA.getTypedPropertyKeyAsText<IAccessRequest>("archiveId"),
   OPA.getTypedPropertyKeyAsText<IAccessRequest>("isSpecificToCitation"),
   OPA.getTypedPropertyKeyAsText<IAccessRequest>("citationId"),
 ];
@@ -121,7 +118,6 @@ function createInstance(id: string, creator: IUser, locale: ILocale, message: st
   const now = OPA.nowToUse();
   const document: IAccessRequest = {
     id: id,
-    archiveId: SingletonId,
     isSpecificToCitation: (!OPA.isNullishOrWhitespace(citationId)),
     citationId: citationId,
     message: OPA.localizableStringConstructor(locale.optionName, message),
