@@ -84,7 +84,7 @@ export function createSingleton(name: string, description: string, pathToRootSto
   const now = OPA.nowToUse();
   const names: OPA.ILocalizable<string> = {en: name};
   names[defaultLocale.optionName] = name;
-  const descriptions: OPA.ILocalizable<string> = {en: name};
+  const descriptions: OPA.ILocalizable<string> = {en: description};
   descriptions[defaultLocale.optionName] = description;
 
   const document: IConfiguration = {
@@ -104,7 +104,7 @@ export function createSingleton(name: string, description: string, pathToRootSto
     userIdOfLatestUpdater: null,
   };
 
-  const documentCopy = OPA.copyObject(document);
+  const documentCopy = {...document};
   delete ((documentCopy as unknown) as Record<string, unknown>).updateHistory;
   document.updateHistory.push(documentCopy);
   return document;

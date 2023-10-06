@@ -1,6 +1,6 @@
 {
   "name": "open-personal-archive-domain-logic",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "This library contains domain logic that implements server-side functionality for the Open Personal Archive™ (OPA) system.",
   "main": "lib/domainlogic/src/index.js",
   "types": "lib/domainlogic/src/index.d.ts",

@@ -90,7 +90,7 @@ export function createSingleton(applicationVersion: string, schemaVersion: strin
     userIdOfLatestUpgrader: null,
   };
 
-  const documentCopy = OPA.copyObject(document);
+  const documentCopy = {...document};
   delete ((documentCopy as unknown) as Record<string, unknown>).upgradeHistory;
   document.upgradeHistory.push(documentCopy);
   return document;

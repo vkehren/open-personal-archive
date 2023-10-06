@@ -212,7 +212,7 @@ function createInstance(id: string, firebaseAuthUserId: string, authProvider: IA
     userIdOfDeletionChanger: null,
   };
 
-  const documentCopy = OPA.copyObject(document);
+  const documentCopy = {...document};
   delete ((documentCopy as unknown) as Record<string, unknown>).updateHistory;
   document.updateHistory.push(documentCopy);
   return document;
@@ -283,7 +283,7 @@ export function createArchiveOwner(firebaseAuthUserId: string, authProvider: IAu
     userIdOfDeletionChanger: null,
   };
 
-  const documentCopy = OPA.copyObject(document);
+  const documentCopy = {...document};
   delete ((documentCopy as unknown) as Record<string, unknown>).updateHistory;
   document.updateHistory.push(documentCopy);
   return document;
@@ -795,9 +795,9 @@ export class UserQuerySet extends OPA.QuerySet<IUser> {
 export type FactoryFunc = (...[params]: Parameters<typeof createInstance>) => ReturnType<typeof createInstance>;
 export const CollectionDescriptor = new OPA.CollectionDescriptor<IUser, UserQuerySet, FactoryFunc>(SingularName, PluralName, IsSingleton, (cd) => new UserQuerySet(cd), null, [], createInstance);
 
-export const Index_User_FirebaseAuthUserId = OPA.createPropertyIndexDescriptor(OPA.DEFAULT_UNIQUENESS_INDEX_COLLECTION, PluralName, "firebaseAuthUserId");
+export const Index_User_FirebaseAuthUserId = OPA.createPropertyIndexDescriptor(OPA.DEFAULT_UNIQUENESS_INDEX_COLLECTION, PluralName, OPA.getTypedPropertyKeyAsText<IUser>("firebaseAuthUserId"));
 CollectionDescriptor.propertyIndices.push(Index_User_FirebaseAuthUserId);
-export const Index_User_AuthAccountName = OPA.createPropertyIndexDescriptor(OPA.DEFAULT_UNIQUENESS_INDEX_COLLECTION, PluralName, "authAccountName");
+export const Index_User_AuthAccountName = OPA.createPropertyIndexDescriptor(OPA.DEFAULT_UNIQUENESS_INDEX_COLLECTION, PluralName, OPA.getTypedPropertyKeyAsText<IUser>("authAccountName"));
 CollectionDescriptor.propertyIndices.push(Index_User_AuthAccountName);
-export const Index_User_AuthAccountNameLowered = OPA.createPropertyIndexDescriptor(OPA.DEFAULT_UNIQUENESS_INDEX_COLLECTION, PluralName, "authAccountNameLowered");
+export const Index_User_AuthAccountNameLowered = OPA.createPropertyIndexDescriptor(OPA.DEFAULT_UNIQUENESS_INDEX_COLLECTION, PluralName, OPA.getTypedPropertyKeyAsText<IUser>("authAccountNameLowered"));
 CollectionDescriptor.propertyIndices.push(Index_User_AuthAccountNameLowered);
