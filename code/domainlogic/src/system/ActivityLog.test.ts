@@ -125,7 +125,7 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(serverLogItem0_Entry.userId).equals(userId);
     expect(serverLogItem0_Entry.rootLogItemId).equals(serverLogItem0_Entry.id);
     expect(serverLogItem0_Entry.externalLogItemId).equals(webLogItem0.id);
-    const serverLogItem0_Ready = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.entry, localhost, resource0, null, {}, null); // eslint-disable-line camelcase, max-len
+    const serverLogItem0_Ready = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource0, null, {}, null); // eslint-disable-line camelcase, max-len
     expect(serverLogItem0_Ready).not.equals(null);
     expect(serverLogItem0_Ready.id).not.equals(null);
     expect(serverLogItem0_Ready.activityType).equals(OpaDm.ActivityTypes.server_function_call);
