@@ -43,6 +43,8 @@
           <input id="firebase-password-input" type="password" />
           <br />
           <button id="firebase-button">Sign-In with Firebase using Email & Password</button>
+          <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+          <button id="signout-button">Sign-Out</button>
           <br />
           <label id="firebase-label"></label>
           <label id="firebase-verification-label"></label>
@@ -201,7 +203,7 @@
   <script type="module">
     import {FIREBASE_CONFIG, FIREBASE_FUNCTIONS_REGION} from "./WebAppConfig.js";
     import {initializeApp} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-    import {GoogleAuthProvider, getAuth, sendEmailVerification, signInWithEmailAndPassword, signInWithPopup} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+    import {GoogleAuthProvider, getAuth, sendEmailVerification, signInWithEmailAndPassword, signInWithPopup, signOut} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
     import {getFunctions, httpsCallable} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-functions.js";
     import {parseJsonIfNeeded} from "./WebBaseLite.js";
     import {recordPageView, recordPageAction, recordPageError} from "./WebFunctions.js";
@@ -224,8 +226,12 @@
         .then((result) => {
           const credential = GoogleAuthProvider.credentialFromResult(result);
           document.getElementById("google-label").innerText = JSON.stringify(credential);
+          document.getElementById("firebase-label").innerText = "";
+          document.getElementById("firebase-verification-label").innerText = "";
         }).catch(async (error) => {
           document.getElementById("google-label").innerText = JSON.stringify(error);
+          document.getElementById("firebase-label").innerText = "";
+          document.getElementById("firebase-verification-label").innerText = "";
           await recordPageError(error);
         });
     };
@@ -239,7 +245,9 @@
 
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
+          document.getElementById("google-label").innerText = "";
           document.getElementById("firebase-label").innerText = JSON.stringify(userCredential);
+          document.getElementById("firebase-verification-label").innerText = "";
           const user = userCredential.user;
           if (!user.emailVerified) {
             sendEmailVerification(auth.currentUser)
@@ -251,7 +259,23 @@
               });
           }
         }).catch(async (error) => {
+          document.getElementById("google-label").innerText = "";
           document.getElementById("firebase-label").innerText = JSON.stringify(error);
+          document.getElementById("firebase-verification-label").innerText = "";
+          await recordPageError(error);
+        });
+    };
+
+    document.getElementById("signout-button").onclick = () => {
+      signOut(auth)
+        .then(() => {
+          document.getElementById("google-label").innerText = "";
+          document.getElementById("firebase-label").innerText = "YOU HAVE SIGNED OUT!";
+          document.getElementById("firebase-verification-label").innerText = "";
+        }).catch(async (error) => {
+          document.getElementById("google-label").innerText = "";
+          document.getElementById("firebase-label").innerText = JSON.stringify(error);
+          document.getElementById("firebase-verification-label").innerText = "";
           await recordPageError(error);
         });
     };
