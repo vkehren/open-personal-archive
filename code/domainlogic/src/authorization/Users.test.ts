@@ -81,6 +81,8 @@ describe("User Tests using Firebase " + config.testEnvironment, function() {
       authenticationState: config.authenticationState,
       hasSystemState: false,
       hasAuthorizationState: false,
+      entryModuleName: "Users.test",
+      entryFunctionName: "testFunc1",
     };
 
     await expect(Users.initializeUserAccount(callState, config.authenticationState.providerId, config.authenticationState.email)).to.eventually.be.rejectedWith(Error);

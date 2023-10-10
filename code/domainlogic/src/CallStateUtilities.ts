@@ -7,9 +7,11 @@ import * as Application from "./system/Application";
  * Gets the Call State for the current User in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
  * @param {OpaDm.IAuthenticationState} authenticationState The Firebase Authentication state for the User.
+ * @param {OPA.DefaultFunc<string>} [moduleNameGetter=(() => "")] Gets the module name.
+ * @param {OPA.DefaultFunc<string>} [functionNameGetter=(() => "")] Gets the function name.
  * @return {Promise<OpaDm.ICallState>}
  */
-export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState): Promise<OpaDm.ICallState> {
+export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState, moduleNameGetter: OPA.DefaultFunc<string> = (() => ""), functionNameGetter: OPA.DefaultFunc<string> = (() => "")): Promise<OpaDm.ICallState> { // eslint-disable-line max-len
   OPA.assertDataStorageStateIsNotNullish(dataStorageState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
   OPA.assertAuthenticationStateIsNotNullish(authenticationState);
@@ -47,6 +49,8 @@ export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataSt
       systemState: undefined,
       hasAuthorizationState: false,
       authorizationState: undefined,
+      entryModuleName: moduleNameGetter(),
+      entryFunctionName: functionNameGetter(),
     };
     return callState;
   }
@@ -63,6 +67,8 @@ export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataSt
       systemState: systemStateNonNull,
       hasAuthorizationState: false,
       authorizationState: undefined,
+      entryModuleName: moduleNameGetter(),
+      entryFunctionName: functionNameGetter(),
     };
     return callState;
   }
@@ -76,6 +82,8 @@ export async function getCallStateForCurrentUser(dataStorageState: OpaDm.IDataSt
     systemState: systemStateNonNull,
     hasAuthorizationState: true,
     authorizationState: authorizationState,
+    entryModuleName: moduleNameGetter(),
+    entryFunctionName: functionNameGetter(),
   };
   return callState;
 }

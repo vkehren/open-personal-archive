@@ -75,6 +75,8 @@ describe("Contact Tests using Firebase " + config.testEnvironment, function() {
       authenticationState: config.authenticationState,
       hasSystemState: false,
       hasAuthorizationState: false,
+      entryModuleName: "Contacts.test",
+      entryFunctionName: "testFunc1",
     };
 
     await expect(Contacts.createContact(callState.dataStorageState, callState.authenticationState, testOrgName, testFirstName, testLastName, null, null, null, null)).to.eventually.be.rejectedWith(Error); // eslint-disable-line max-len
