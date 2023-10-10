@@ -62,7 +62,7 @@ export async function recordLogItem(dataStorageState: OpaDm.IDataStorageState, a
     }
   }
 
-  const activityLogItemId = await OpaDb.ActivityLogItems.queries.create(dataStorageState, activityType, executionState, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState);
+  const activityLogItemId = await OpaDb.ActivityLogItems.queries.create(dataStorageState, activityType, executionState, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState); // eslint-disable-line max-len
   await dataStorageState.currentWriteBatch.commit();
   dataStorageState.currentWriteBatch = null;
 

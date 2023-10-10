@@ -113,7 +113,7 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(webLogItem0.rootLogItemId).equals(webLogItem0.id);
     expect(webLogItem0.externalLogItemId).equals(null);
     config.dataStorageState.logWriteState.externalLogItemId = webLogItem0.id;
-    const serverLogItem0 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource0, null, {}, null);
+    const serverLogItem0 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource0, null, {}, null); // eslint-disable-line max-len
     expect(serverLogItem0).not.equals(null);
     expect(serverLogItem0.id).not.equals(null);
     expect(serverLogItem0.activityType).equals(OpaDm.ActivityTypes.server_function_call);
@@ -153,7 +153,7 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(webLogItem1.resourceCanonical).equals(resourceCanonical1);
     expect(webLogItem1.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(webLogItem1.userId).equals(userId);
-    const serverLogItem1 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource1, null, {}, null);
+    const serverLogItem1 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource1, null, {}, null); // eslint-disable-line max-len
     expect(serverLogItem1).not.equals(null);
     expect(serverLogItem1.id).not.equals(null);
     expect(serverLogItem1.activityType).equals(OpaDm.ActivityTypes.server_function_call);
@@ -176,7 +176,7 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(webLogItem2.resourceCanonical).equals(resourceCanonical2);
     expect(webLogItem2.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(webLogItem2.userId).equals(userId);
-    const serverLogItem2 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource2, null, {}, null);
+    const serverLogItem2 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource2, null, {}, null); // eslint-disable-line max-len
     expect(serverLogItem2).not.equals(null);
     expect(serverLogItem2.id).not.equals(null);
     expect(serverLogItem2.activityType).equals(OpaDm.ActivityTypes.server_function_call);
@@ -199,7 +199,7 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(webLogItem3.resourceCanonical).equals(resourceCanonical3);
     expect(webLogItem3.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(webLogItem3.userId).equals(userId);
-    const serverLogItem3 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource3, null, {}, null);
+    const serverLogItem3 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource3, null, {}, null); // eslint-disable-line max-len
     expect(serverLogItem3).not.equals(null);
     expect(serverLogItem3.id).not.equals(null);
     expect(serverLogItem3.activityType).equals(OpaDm.ActivityTypes.server_function_call);
@@ -222,7 +222,7 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(webLogItem4.resourceCanonical).equals(resourceCanonical4);
     expect(webLogItem4.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(webLogItem4.userId).equals(userId);
-    const serverLogItem4 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource4, null, {}, null);
+    const serverLogItem4 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource4, null, {}, null); // eslint-disable-line max-len
     expect(serverLogItem4).not.equals(null);
     expect(serverLogItem4.id).not.equals(null);
     expect(serverLogItem4.activityType).equals(OpaDm.ActivityTypes.server_function_call);
@@ -313,7 +313,7 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(webLogItem0.rootLogItemId).equals(webLogItem0.id);
     expect(webLogItem0.externalLogItemId).equals(null);
     config.dataStorageState.logWriteState.externalLogItemId = webLogItem0.id;
-    const serverLogItem0 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource0, null, {}, null);
+    const serverLogItem0 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource0, null, {}, null); // eslint-disable-line max-len
     expect(serverLogItem0).not.equals(null);
     expect(serverLogItem0.id).not.equals(null);
     expect(serverLogItem0.activityType).equals(OpaDm.ActivityTypes.server_function_call);
@@ -353,7 +353,7 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(webLogItem1.resourceCanonical).equals(resourceCanonical1);
     expect(webLogItem1.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(webLogItem1.userId).equals(userId);
-    const serverLogItem1 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource1, null, {}, null);
+    const serverLogItem1 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource1, null, {}, null); // eslint-disable-line max-len
     expect(serverLogItem1).not.equals(null);
     expect(serverLogItem1.id).not.equals(null);
     expect(serverLogItem1.activityType).equals(OpaDm.ActivityTypes.server_function_call);
@@ -376,7 +376,7 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(webLogItem2.resourceCanonical).equals(resourceCanonical2);
     expect(webLogItem2.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(webLogItem2.userId).equals(userId);
-    const serverLogItem2 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource2, null, {}, null);
+    const serverLogItem2 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource2, null, {}, null); // eslint-disable-line max-len
     expect(serverLogItem2).not.equals(null);
     expect(serverLogItem2.id).not.equals(null);
     expect(serverLogItem2.activityType).equals(OpaDm.ActivityTypes.server_function_call);
@@ -399,7 +399,7 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(webLogItem3.resourceCanonical).equals(resourceCanonical3);
     expect(webLogItem3.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(webLogItem3.userId).equals(userId);
-    const serverLogItem3 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource3, null, {}, null);
+    const serverLogItem3 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource3, null, {}, null); // eslint-disable-line max-len
     expect(serverLogItem3).not.equals(null);
     expect(serverLogItem3.id).not.equals(null);
     expect(serverLogItem3.activityType).equals(OpaDm.ActivityTypes.server_function_call);
@@ -422,7 +422,7 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(webLogItem4.resourceCanonical).equals(resourceCanonical4);
     expect(webLogItem4.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(webLogItem4.userId).equals(userId);
-    const serverLogItem4 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource4, null, {}, null);
+    const serverLogItem4 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource4, null, {}, null); // eslint-disable-line max-len
     expect(serverLogItem4).not.equals(null);
     expect(serverLogItem4.id).not.equals(null);
     expect(serverLogItem4.activityType).equals(OpaDm.ActivityTypes.server_function_call);
@@ -525,7 +525,7 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(webLogItem0.rootLogItemId).equals(webLogItem0.id);
     expect(webLogItem0.externalLogItemId).equals(null);
     config.dataStorageState.logWriteState.externalLogItemId = webLogItem0.id;
-    const serverLogItem0 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource0, null, {}, null);
+    const serverLogItem0 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource0, null, {}, null); // eslint-disable-line max-len
     expect(serverLogItem0).not.equals(null);
     expect(serverLogItem0.id).not.equals(null);
     expect(serverLogItem0.activityType).equals(OpaDm.ActivityTypes.server_function_call);
@@ -565,7 +565,7 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(webLogItem1.resourceCanonical).equals(resourceCanonical1);
     expect(webLogItem1.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(webLogItem1.userId).equals(userId);
-    const serverLogItem1 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource1, null, {}, null);
+    const serverLogItem1 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource1, null, {}, null); // eslint-disable-line max-len
     expect(serverLogItem1).not.equals(null);
     expect(serverLogItem1.id).not.equals(null);
     expect(serverLogItem1.activityType).equals(OpaDm.ActivityTypes.server_function_call);
@@ -588,7 +588,7 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(webLogItem2.resourceCanonical).equals(resourceCanonical2);
     expect(webLogItem2.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(webLogItem2.userId).equals(userId);
-    const serverLogItem2 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource2, null, {}, null);
+    const serverLogItem2 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource2, null, {}, null); // eslint-disable-line max-len
     expect(serverLogItem2).not.equals(null);
     expect(serverLogItem2.id).not.equals(null);
     expect(serverLogItem2.activityType).equals(OpaDm.ActivityTypes.server_function_call);
@@ -611,7 +611,7 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(webLogItem3.resourceCanonical).equals(resourceCanonical3);
     expect(webLogItem3.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(webLogItem3.userId).equals(userId);
-    const serverLogItem3 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource3, null, {}, null);
+    const serverLogItem3 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource3, null, {}, null); // eslint-disable-line max-len
     expect(serverLogItem3).not.equals(null);
     expect(serverLogItem3.id).not.equals(null);
     expect(serverLogItem3.activityType).equals(OpaDm.ActivityTypes.server_function_call);
@@ -634,7 +634,7 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(webLogItem4.resourceCanonical).equals(resourceCanonical4);
     expect(webLogItem4.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(webLogItem4.userId).equals(userId);
-    const serverLogItem4 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource4, null, {}, null);
+    const serverLogItem4 = await ActivityLog.recordLogItem(config.dataStorageState, authState(), OpaDm.ActivityTypes.server_function_call, OPA.ExecutionStates.ready, localhost, resource4, null, {}, null); // eslint-disable-line max-len
     expect(serverLogItem4).not.equals(null);
     expect(serverLogItem4.id).not.equals(null);
     expect(serverLogItem4.activityType).equals(OpaDm.ActivityTypes.server_function_call);
