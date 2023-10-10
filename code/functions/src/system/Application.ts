@@ -97,7 +97,7 @@ export const isInstalled = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) 
   }
 });
 
-const getInstallationScreenDisplayModel_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("getInstallationScreenDisplayModel", {getInstallationScreenDisplayModel})); // eslint-disable-line camelcase
+const getInstallationScreenDisplayModel_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("getInstallationScreenDisplayModel", {getInstallationScreenDisplayModel})); // eslint-disable-line camelcase, max-len
 export const getInstallationScreenDisplayModel = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   let adminApp = ((null as unknown) as admin.app.App);
   let callState = ((null as unknown) as OpaDm.ICallState);
@@ -110,7 +110,7 @@ export const getInstallationScreenDisplayModel = onCall(OPA.FIREBASE_DEFAULT_OPT
     callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp, moduleNameGetter, getInstallationScreenDisplayModel_FunctionNameGetter);
 
     await UTL.setExternalLogState(callState.dataStorageState, request);
-    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, moduleNameGetter, getInstallationScreenDisplayModel_FunctionNameGetter, OPA.ExecutionStates.ready);
+    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, moduleNameGetter, getInstallationScreenDisplayModel_FunctionNameGetter, OPA.ExecutionStates.ready); // eslint-disable-line max-len
 
     const displayModel = await Application.getInstallationScreenDisplayModel(callState);
     return OPA.getSuccessResult(displayModel);

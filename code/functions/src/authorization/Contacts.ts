@@ -123,7 +123,7 @@ export const addCorrespondingUsersToContact = onCall(OPA.FIREBASE_DEFAULT_OPTION
 
 const removeCorrespondingUsersFromContact_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("removeCorrespondingUsersFromContact", {removeCorrespondingUsersFromContact})); // eslint-disable-line camelcase, max-len
 export const removeCorrespondingUsersFromContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleNameGetter, removeCorrespondingUsersFromContact_FunctionNameGetter, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleNameGetter, removeCorrespondingUsersFromContact_FunctionNameGetter, async (request, callState) => { // eslint-disable-line max-len
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
     const userIds = (data.userIds) ? OPA.parseJsonIfNeeded(data.userIds) : undefined;

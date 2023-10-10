@@ -16,7 +16,7 @@ import * as ActivityLog from "../../domainlogic/src/system/ActivityLog";
  * @param {OPA.DefaultFunc<string>} functionNameGetter Gets the function name.
  * @return {Promise<OpaDm.ICallState>}
  */
-export async function getCallStateForFirebaseContextAndApp(context: functions.https.CallableContext, app: admin.app.App, moduleNameGetter: OPA.DefaultFunc<string>, functionNameGetter: OPA.DefaultFunc<string>): Promise<OpaDm.ICallState> {
+export async function getCallStateForFirebaseContextAndApp(context: functions.https.CallableContext, app: admin.app.App, moduleNameGetter: OPA.DefaultFunc<string>, functionNameGetter: OPA.DefaultFunc<string>): Promise<OpaDm.ICallState> { // eslint-disable-line max-len
   OPA.assertNonNullish(context, "The Firebase Callable Context must not be null.");
   OPA.assertNonNullish(app, "The Firebase Admin App provided must be non-null.");
 
