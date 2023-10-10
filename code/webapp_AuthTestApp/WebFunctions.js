@@ -3,9 +3,9 @@ import {FIREBASE_FUNCTIONS_REGION} from "./WebAppConfig.js";
 import {isNullish, isBoolean} from "./WebBaseLite.js";
 
 const NAME = "open-personal-archive-web-functions";
-const VERSION = "2.4.2.3";
+const VERSION = "2.4.3";
 const AUTHOR = "Ryan Stephen Ehrenreich";
-const COPYRIGHT = "Copyright © 2021 Open Personal Archive™";
+const COPYRIGHT = "Copyright ï¿½ 2021 Open Personal Archiveï¿½";
 
 export const ActivityTypes = {
   _typeName: "ActivityType",

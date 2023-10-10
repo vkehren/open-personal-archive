@@ -1,5 +1,5 @@
 const NAME = "open-personal-archive-web-base-lite";
-const VERSION = "2.4.0";
+const VERSION = "2.4.3";
 const AUTHOR = "Ryan Stephen Ehrenreich";
 const COPYRIGHT = "Copyright © 2021 Open Personal Archive™";
 

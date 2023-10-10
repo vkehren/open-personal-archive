@@ -1,6 +1,6 @@
 {
   "name": "open-personal-archive-data-model",
-  "version": "2.4.1",
+  "version": "2.4.3",
   "description": "This library contains the types, interfaces, and factory functions for data types specific to the Open Personal Archive™ (OPA) system.",
   "main": "lib/datamodel/src/index.js",
   "types": "lib/datamodel/src/index.d.ts",
