@@ -3,7 +3,7 @@ import {FIREBASE_FUNCTIONS_REGION} from "./WebAppConfig.js";
 import {isNullish, isBoolean} from "./WebBaseLite.js";
 
 const NAME = "open-personal-archive-web-functions";
-const VERSION = "2.4.2.2";
+const VERSION = "2.4.2.3";
 const AUTHOR = "Ryan Stephen Ehrenreich";
 const COPYRIGHT = "Copyright © 2021 Open Personal Archive™";
 
@@ -24,12 +24,12 @@ async function recordPageView(app, resource = window.location.href, data = {}, o
 }
 
 async function recordPageAction(app, resource = window.location.href, action, data = {}, otherState = null) {
-  await recordLogItem(app, ActivityTypes.web_page_view, resource, action, data, otherState);
+  await recordLogItem(app, ActivityTypes.web_page_action, resource, action, data, otherState);
 }
 
 async function recordPageError(app, error, resource = window.location.href, otherState = null) {
   const data = {error: JSON.stringify(error)};
-  await recordLogItem(app, ActivityTypes.web_page_view, resource, null, data, otherState, true);
+  await recordLogItem(app, ActivityTypes.web_page_error, resource, null, data, otherState, true);
 }
 
 async function recordLogItem(app, activityType, resource, action, data, otherState = null, isPageError = false) {
