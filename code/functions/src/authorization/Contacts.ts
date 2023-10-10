@@ -10,12 +10,12 @@ import * as UTL from "../Utilities";
 // NOTE: Eventually, Contacts will provide the mechanism by which the Archive Owner and Administrators can invite unauthenticated users to create User accounts
 
 const moduleName = OPA.getModuleNameFromSrc(module.filename);
-const getModuleName = () => moduleName;
+const moduleNameGetter = () => moduleName;
 type IContactDisplayModel = Contacts.IContactDisplayModel;
 
 const getListOfContacts_FunctionName = () => (OPA.getTypedPropertyKeyAsText("getListOfContacts", {getListOfContacts})); // eslint-disable-line camelcase
 export const getListOfContacts = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<Array<IContactDisplayModel>>(request, getModuleName, getListOfContacts_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<Array<IContactDisplayModel>>(request, moduleNameGetter, getListOfContacts_FunctionName, async (request, callState) => {
     const documents = await Contacts.getListOfContacts(callState);
     const displayModels = await Contacts.convertContactsToDisplayModels(callState, documents);
     return displayModels;
@@ -38,7 +38,7 @@ export const createContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
     authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, adminApp);
 
     await UTL.setExternalLogState(dataStorageState, request);
-    await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, getModuleName, createContact_FunctionName, OPA.ExecutionStates.ready);
+    await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, moduleNameGetter, createContact_FunctionName, OPA.ExecutionStates.ready);
 
     const data = request.data;
     const organizationName = (data.organizationName) ? data.organizationName : null;
@@ -63,16 +63,16 @@ export const createContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
       return OPA.getSuccessResult(displayModel);
     }
   } catch (error) {
-    await UTL.logFunctionError(dataStorageState, authenticationState, shimmedRequest, getModuleName, createContact_FunctionName, error);
+    await UTL.logFunctionError(dataStorageState, authenticationState, shimmedRequest, moduleNameGetter, createContact_FunctionName, error);
     return OPA.getFailureResult(error);
   } finally {
-    await UTL.cleanUpStateAfterCall(dataStorageState, authenticationState, adminApp, shimmedRequest, getModuleName, createContact_FunctionName);
+    await UTL.cleanUpStateAfterCall(dataStorageState, authenticationState, adminApp, shimmedRequest, moduleNameGetter, createContact_FunctionName);
   }
 });
 
 const updateContact_FunctionName = () => (OPA.getTypedPropertyKeyAsText("updateContact", {updateContact})); // eslint-disable-line camelcase
 export const updateContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, updateContact_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleNameGetter, updateContact_FunctionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
     const updateObject = (data.updateObject) ? OPA.parseJsonIfNeeded(data.updateObject) : undefined;
@@ -88,7 +88,7 @@ export const updateContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
 
 const setCorrespondingUsersForContact_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setCorrespondingUsersForContact", {setCorrespondingUsersForContact})); // eslint-disable-line camelcase
 export const setCorrespondingUsersForContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, setCorrespondingUsersForContact_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleNameGetter, setCorrespondingUsersForContact_FunctionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
     const userIds = (data.userIds) ? OPA.parseJsonIfNeeded(data.userIds) : undefined;
@@ -106,7 +106,7 @@ export const setCorrespondingUsersForContact = onCall(OPA.FIREBASE_DEFAULT_OPTIO
 
 const addCorrespondingUsersToContact_FunctionName = () => (OPA.getTypedPropertyKeyAsText("addCorrespondingUsersToContact", {addCorrespondingUsersToContact})); // eslint-disable-line camelcase
 export const addCorrespondingUsersToContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, addCorrespondingUsersToContact_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleNameGetter, addCorrespondingUsersToContact_FunctionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
     const userIds = (data.userIds) ? OPA.parseJsonIfNeeded(data.userIds) : undefined;
@@ -123,7 +123,7 @@ export const addCorrespondingUsersToContact = onCall(OPA.FIREBASE_DEFAULT_OPTION
 
 const removeCorrespondingUsersFromContact_FunctionName = () => (OPA.getTypedPropertyKeyAsText("removeCorrespondingUsersFromContact", {removeCorrespondingUsersFromContact})); // eslint-disable-line camelcase, max-len
 export const removeCorrespondingUsersFromContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, removeCorrespondingUsersFromContact_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleNameGetter, removeCorrespondingUsersFromContact_FunctionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
     const userIds = (data.userIds) ? OPA.parseJsonIfNeeded(data.userIds) : undefined;
@@ -140,7 +140,7 @@ export const removeCorrespondingUsersFromContact = onCall(OPA.FIREBASE_DEFAULT_O
 
 const setContactTags_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setContactTags", {setContactTags})); // eslint-disable-line camelcase
 export const setContactTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, setContactTags_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleNameGetter, setContactTags_FunctionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
     const tags = (data.tags) ? OPA.parseJsonIfNeeded(data.tags) : undefined;
@@ -158,7 +158,7 @@ export const setContactTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reques
 
 const addContactTags_FunctionName = () => (OPA.getTypedPropertyKeyAsText("addContactTags", {addContactTags})); // eslint-disable-line camelcase
 export const addContactTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, addContactTags_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleNameGetter, addContactTags_FunctionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
     const tags = (data.tags) ? OPA.parseJsonIfNeeded(data.tags) : undefined;
@@ -175,7 +175,7 @@ export const addContactTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reques
 
 const removeContactTags_FunctionName = () => (OPA.getTypedPropertyKeyAsText("removeContactTags", {removeContactTags})); // eslint-disable-line camelcase
 export const removeContactTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, removeContactTags_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleNameGetter, removeContactTags_FunctionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
     const tags = (data.tags) ? OPA.parseJsonIfNeeded(data.tags) : undefined;
@@ -192,7 +192,7 @@ export const removeContactTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (req
 
 const setContactToArchivalState_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setContactToArchivalState", {setContactToArchivalState})); // eslint-disable-line camelcase
 export const setContactToArchivalState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, setContactToArchivalState_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleNameGetter, setContactToArchivalState_FunctionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
     const archivalState = (data.archivalState) ? data.archivalState : undefined;
@@ -209,7 +209,7 @@ export const setContactToArchivalState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, as
 
 const setContactToArchived_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setContactToArchived", {setContactToArchived})); // eslint-disable-line camelcase
 export const setContactToArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, setContactToArchived_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleNameGetter, setContactToArchived_FunctionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
 
@@ -224,7 +224,7 @@ export const setContactToArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (
 
 const setContactToNotArchived_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setContactToNotArchived", {setContactToNotArchived})); // eslint-disable-line camelcase
 export const setContactToNotArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, setContactToNotArchived_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleNameGetter, setContactToNotArchived_FunctionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
 
@@ -239,7 +239,7 @@ export const setContactToNotArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, asyn
 
 const setContactToViewed_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setContactToViewed", {setContactToViewed})); // eslint-disable-line camelcase
 export const setContactToViewed = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, setContactToViewed_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleNameGetter, setContactToViewed_FunctionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
 
@@ -254,7 +254,7 @@ export const setContactToViewed = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (re
 
 const markContactWithDeletionState_FunctionName = () => (OPA.getTypedPropertyKeyAsText("markContactWithDeletionState", {markContactWithDeletionState})); // eslint-disable-line camelcase, max-len
 export const markContactWithDeletionState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, markContactWithDeletionState_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleNameGetter, markContactWithDeletionState_FunctionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
     const deletionState = (data.deletionState) ? data.deletionState : undefined;
@@ -271,7 +271,7 @@ export const markContactWithDeletionState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS,
 
 const markContactAsDeleted_FunctionName = () => (OPA.getTypedPropertyKeyAsText("markContactAsDeleted", {markContactAsDeleted})); // eslint-disable-line camelcase
 export const markContactAsDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, markContactAsDeleted_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleNameGetter, markContactAsDeleted_FunctionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
 
@@ -286,7 +286,7 @@ export const markContactAsDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (
 
 const markContactAsUnDeleted_FunctionName = () => (OPA.getTypedPropertyKeyAsText("markContactAsUnDeleted", {markContactAsUnDeleted})); // eslint-disable-line camelcase
 export const markContactAsUnDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, getModuleName, markContactAsUnDeleted_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleNameGetter, markContactAsUnDeleted_FunctionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
 

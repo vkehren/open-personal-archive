@@ -7,7 +7,7 @@ import {ActivityLog} from "../../../domainlogic/src";
 import * as UTL from "../Utilities";
 
 const moduleName = OPA.getModuleNameFromSrc(module.filename);
-const getModuleName = () => moduleName;
+const moduleNameGetter = () => moduleName;
 
 const recordLogItem_FunctionName = () => (OPA.getTypedPropertyKeyAsText("recordLogItem", {recordLogItem})); // eslint-disable-line camelcase
 export const recordLogItem = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
@@ -25,7 +25,7 @@ export const recordLogItem = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
 
     await UTL.setExternalLogState(dataStorageState, request);
     // LATER: Consider not logging that is the System is ready to record the log item, as it seems redundant with the actual log item
-    await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, getModuleName, recordLogItem_FunctionName, OPA.ExecutionStates.ready);
+    await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, moduleNameGetter, recordLogItem_FunctionName, OPA.ExecutionStates.ready);
 
     const activityType = (request.data.activityType) ? request.data.activityType : undefined;
     const requestor = shimmedRequest.clientIpAddress;
@@ -38,9 +38,9 @@ export const recordLogItem = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
     await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, requestor, resource, action, data, otherState);
     return OPA.getSuccessResultForMessage("The request was logged successfully.");
   } catch (error) {
-    await UTL.logFunctionError(dataStorageState, authenticationState, shimmedRequest, getModuleName, recordLogItem_FunctionName, error);
+    await UTL.logFunctionError(dataStorageState, authenticationState, shimmedRequest, moduleNameGetter, recordLogItem_FunctionName, error);
     return OPA.getFailureResult(error);
   } finally {
-    await UTL.cleanUpStateAfterCall(dataStorageState, authenticationState, adminApp, shimmedRequest, getModuleName, recordLogItem_FunctionName);
+    await UTL.cleanUpStateAfterCall(dataStorageState, authenticationState, adminApp, shimmedRequest, moduleNameGetter, recordLogItem_FunctionName);
   }
 });
