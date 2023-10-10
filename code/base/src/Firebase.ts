@@ -105,8 +105,6 @@ export interface ICallStateBase<DS extends IDataStorageState, ATC extends IAuthe
   readonly systemState?: SYS;
   readonly hasAuthorizationState: boolean;
   readonly authorizationState?: ATZ;
-  readonly entryModuleName: string;
-  readonly entryFunctionName: string;
 }
 
 const FieldValue_MethodName_Unrecognized = "[UNRECOGNIZED]"; // eslint-disable-line camelcase

@@ -75,8 +75,6 @@ describe("AccessRequest Tests using Firebase " + config.testEnvironment, functio
       authenticationState: config.authenticationState,
       hasSystemState: false,
       hasAuthorizationState: false,
-      entryModuleName: "AccessRequests.test",
-      entryFunctionName: "testFunc1",
     };
 
     await expect(AccessRequests.requestUserAccess(callState, testMessage, testCitationId)).to.eventually.be.rejectedWith(Error);
