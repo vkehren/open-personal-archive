@@ -7,9 +7,9 @@ const moduleName = OPA.getModuleNameFromSrc(module.filename);
 const moduleNameGetter = () => moduleName;
 type IAccessRequestDisplayModel = AccessRequests.IAccessRequestDisplayModel;
 
-const getListOfAccessRequests_FunctionName = () => (OPA.getTypedPropertyKeyAsText("getListOfAccessRequests", {getListOfAccessRequests})); // eslint-disable-line camelcase
+const getListOfAccessRequests_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("getListOfAccessRequests", {getListOfAccessRequests})); // eslint-disable-line camelcase
 export const getListOfAccessRequests = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<Array<IAccessRequestDisplayModel>>(request, moduleNameGetter, getListOfAccessRequests_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<Array<IAccessRequestDisplayModel>>(request, moduleNameGetter, getListOfAccessRequests_FunctionNameGetter, async (request, callState) => {
     const data = request.data;
     const approvalState = (data.approvalState) ? data.approvalState : null;
 
@@ -20,9 +20,9 @@ export const getListOfAccessRequests = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, asyn
   return result;
 });
 
-const requestUserAccess_FunctionName = () => (OPA.getTypedPropertyKeyAsText("requestUserAccess", {requestUserAccess})); // eslint-disable-line camelcase
+const requestUserAccess_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("requestUserAccess", {requestUserAccess})); // eslint-disable-line camelcase
 export const requestUserAccess = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, requestUserAccess_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, requestUserAccess_FunctionNameGetter, async (request, callState) => {
     const data = request.data;
     const message = (data.message) ? data.message : undefined;
     const citationId = (data.citationId) ? data.citationId : null;
@@ -36,9 +36,9 @@ export const requestUserAccess = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (req
   return result;
 });
 
-const updateMessageForAccessRequest_FunctionName = () => (OPA.getTypedPropertyKeyAsText("updateMessageForAccessRequest", {updateMessageForAccessRequest})); // eslint-disable-line camelcase
+const updateMessageForAccessRequest_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("updateMessageForAccessRequest", {updateMessageForAccessRequest})); // eslint-disable-line camelcase
 export const updateMessageForAccessRequest = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, updateMessageForAccessRequest_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, updateMessageForAccessRequest_FunctionNameGetter, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
     const message = (data.message) ? data.message : undefined;
@@ -53,9 +53,9 @@ export const updateMessageForAccessRequest = onCall(OPA.FIREBASE_DEFAULT_OPTIONS
   return result;
 });
 
-const updateResponseToAccessRequest_FunctionName = () => (OPA.getTypedPropertyKeyAsText("updateResponseToAccessRequest", {updateResponseToAccessRequest})); // eslint-disable-line camelcase
+const updateResponseToAccessRequest_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("updateResponseToAccessRequest", {updateResponseToAccessRequest})); // eslint-disable-line camelcase
 export const updateResponseToAccessRequest = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, updateResponseToAccessRequest_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, updateResponseToAccessRequest_FunctionNameGetter, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
     const response = (data.response) ? data.response : undefined;
@@ -70,9 +70,9 @@ export const updateResponseToAccessRequest = onCall(OPA.FIREBASE_DEFAULT_OPTIONS
   return result;
 });
 
-const setAccessRequestTags_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setAccessRequestTags", {setAccessRequestTags})); // eslint-disable-line camelcase
+const setAccessRequestTags_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("setAccessRequestTags", {setAccessRequestTags})); // eslint-disable-line camelcase
 export const setAccessRequestTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, setAccessRequestTags_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, setAccessRequestTags_FunctionNameGetter, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
     const tags = (data.tags) ? OPA.parseJsonIfNeeded(data.tags) : undefined;
@@ -89,9 +89,9 @@ export const setAccessRequestTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (
   return result;
 });
 
-const addAccessRequestTags_FunctionName = () => (OPA.getTypedPropertyKeyAsText("addAccessRequestTags", {addAccessRequestTags})); // eslint-disable-line camelcase
+const addAccessRequestTags_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("addAccessRequestTags", {addAccessRequestTags})); // eslint-disable-line camelcase
 export const addAccessRequestTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, addAccessRequestTags_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, addAccessRequestTags_FunctionNameGetter, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
     const tags = (data.tags) ? OPA.parseJsonIfNeeded(data.tags) : undefined;
@@ -106,9 +106,9 @@ export const addAccessRequestTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (
   return result;
 });
 
-const removeAccessRequestTags_FunctionName = () => (OPA.getTypedPropertyKeyAsText("removeAccessRequestTags", {removeAccessRequestTags})); // eslint-disable-line camelcase
+const removeAccessRequestTags_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("removeAccessRequestTags", {removeAccessRequestTags})); // eslint-disable-line camelcase
 export const removeAccessRequestTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, removeAccessRequestTags_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, removeAccessRequestTags_FunctionNameGetter, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
     const tags = (data.tags) ? OPA.parseJsonIfNeeded(data.tags) : undefined;
@@ -123,9 +123,9 @@ export const removeAccessRequestTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, asyn
   return result;
 });
 
-const setAccessRequestToArchivalState_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setAccessRequestToArchivalState", {setAccessRequestToArchivalState})); // eslint-disable-line camelcase
+const setAccessRequestToArchivalState_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("setAccessRequestToArchivalState", {setAccessRequestToArchivalState})); // eslint-disable-line camelcase
 export const setAccessRequestToArchivalState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, setAccessRequestToArchivalState_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, setAccessRequestToArchivalState_FunctionNameGetter, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
     const archivalState = (data.archivalState) ? data.archivalState : undefined;
@@ -140,9 +140,9 @@ export const setAccessRequestToArchivalState = onCall(OPA.FIREBASE_DEFAULT_OPTIO
   return result;
 });
 
-const setAccessRequestToArchived_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setAccessRequestToArchived", {setAccessRequestToArchived})); // eslint-disable-line camelcase
+const setAccessRequestToArchived_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("setAccessRequestToArchived", {setAccessRequestToArchived})); // eslint-disable-line camelcase
 export const setAccessRequestToArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, setAccessRequestToArchived_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, setAccessRequestToArchived_FunctionNameGetter, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
@@ -155,9 +155,9 @@ export const setAccessRequestToArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, a
   return result;
 });
 
-const setAccessRequestToNotArchived_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setAccessRequestToNotArchived", {setAccessRequestToNotArchived})); // eslint-disable-line camelcase
+const setAccessRequestToNotArchived_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("setAccessRequestToNotArchived", {setAccessRequestToNotArchived})); // eslint-disable-line camelcase
 export const setAccessRequestToNotArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, setAccessRequestToNotArchived_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, setAccessRequestToNotArchived_FunctionNameGetter, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
@@ -170,9 +170,9 @@ export const setAccessRequestToNotArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS
   return result;
 });
 
-const setAccessRequestToViewed_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setAccessRequestToViewed", {setAccessRequestToViewed})); // eslint-disable-line camelcase
+const setAccessRequestToViewed_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("setAccessRequestToViewed", {setAccessRequestToViewed})); // eslint-disable-line camelcase
 export const setAccessRequestToViewed = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, setAccessRequestToViewed_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, setAccessRequestToViewed_FunctionNameGetter, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
@@ -185,9 +185,9 @@ export const setAccessRequestToViewed = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, asy
   return result;
 });
 
-const setAccessRequestToApprovalState_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setAccessRequestToApprovalState", {setAccessRequestToApprovalState})); // eslint-disable-line camelcase
+const setAccessRequestToApprovalState_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("setAccessRequestToApprovalState", {setAccessRequestToApprovalState})); // eslint-disable-line camelcase
 export const setAccessRequestToApprovalState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, setAccessRequestToApprovalState_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, setAccessRequestToApprovalState_FunctionNameGetter, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
     const approvalState = (data.approvalState) ? data.approvalState : undefined;
@@ -202,9 +202,9 @@ export const setAccessRequestToApprovalState = onCall(OPA.FIREBASE_DEFAULT_OPTIO
   return result;
 });
 
-const setAccessRequestToApproved_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setAccessRequestToApproved", {setAccessRequestToApproved})); // eslint-disable-line camelcase
+const setAccessRequestToApproved_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("setAccessRequestToApproved", {setAccessRequestToApproved})); // eslint-disable-line camelcase
 export const setAccessRequestToApproved = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, setAccessRequestToApproved_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, setAccessRequestToApproved_FunctionNameGetter, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
@@ -217,9 +217,9 @@ export const setAccessRequestToApproved = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, a
   return result;
 });
 
-const setAccessRequestToDenied_FunctionName = () => (OPA.getTypedPropertyKeyAsText("setAccessRequestToDenied", {setAccessRequestToDenied})); // eslint-disable-line camelcase
+const setAccessRequestToDenied_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("setAccessRequestToDenied", {setAccessRequestToDenied})); // eslint-disable-line camelcase
 export const setAccessRequestToDenied = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, setAccessRequestToDenied_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, setAccessRequestToDenied_FunctionNameGetter, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
@@ -232,9 +232,9 @@ export const setAccessRequestToDenied = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, asy
   return result;
 });
 
-const markAccessRequestWithDeletionState_FunctionName = () => (OPA.getTypedPropertyKeyAsText("markAccessRequestWithDeletionState", {markAccessRequestWithDeletionState})); // eslint-disable-line camelcase, max-len
+const markAccessRequestWithDeletionState_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("markAccessRequestWithDeletionState", {markAccessRequestWithDeletionState})); // eslint-disable-line camelcase, max-len
 export const markAccessRequestWithDeletionState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, markAccessRequestWithDeletionState_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, markAccessRequestWithDeletionState_FunctionNameGetter, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
     const deletionState = (data.deletionState) ? data.deletionState : undefined;
@@ -249,9 +249,9 @@ export const markAccessRequestWithDeletionState = onCall(OPA.FIREBASE_DEFAULT_OP
   return result;
 });
 
-const markAccessRequestAsDeleted_FunctionName = () => (OPA.getTypedPropertyKeyAsText("markAccessRequestAsDeleted", {markAccessRequestAsDeleted})); // eslint-disable-line camelcase
+const markAccessRequestAsDeleted_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("markAccessRequestAsDeleted", {markAccessRequestAsDeleted})); // eslint-disable-line camelcase
 export const markAccessRequestAsDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, markAccessRequestAsDeleted_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, markAccessRequestAsDeleted_FunctionNameGetter, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
@@ -264,9 +264,9 @@ export const markAccessRequestAsDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, a
   return result;
 });
 
-const markAccessRequestAsUnDeleted_FunctionName = () => (OPA.getTypedPropertyKeyAsText("markAccessRequestAsUnDeleted", {markAccessRequestAsUnDeleted})); // eslint-disable-line camelcase
+const markAccessRequestAsUnDeleted_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("markAccessRequestAsUnDeleted", {markAccessRequestAsUnDeleted})); // eslint-disable-line camelcase
 export const markAccessRequestAsUnDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, markAccessRequestAsUnDeleted_FunctionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleNameGetter, markAccessRequestAsUnDeleted_FunctionNameGetter, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
