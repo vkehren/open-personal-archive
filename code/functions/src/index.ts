@@ -63,7 +63,7 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
   try {
     logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
-    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp);
+    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, moduleNameGetter, firebaseAuthSignInHandler_FunctionNameGetter);
     await UTL.logFunctionCall(dataStorageState, null, shimmedRequest, moduleNameGetter, firebaseAuthSignInHandler_FunctionNameGetter, OPA.ExecutionStates.ready);
 
     if (OPA.isNullishOrWhitespace(event.data.email)) {

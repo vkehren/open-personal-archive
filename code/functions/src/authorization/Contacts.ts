@@ -34,7 +34,7 @@ export const createContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
   try {
     logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
-    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp);
+    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, moduleNameGetter, createContact_FunctionNameGetter);
     authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, adminApp);
 
     await UTL.setExternalLogState(dataStorageState, request);

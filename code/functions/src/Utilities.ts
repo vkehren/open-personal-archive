@@ -11,13 +11,16 @@ import * as ActivityLog from "../../domainlogic/src/system/ActivityLog";
 /**
  * Gets the Call State for the Firebase context and app.
  * @param {functions.https.CallableContext} context The Firebase Callable Function context.
- * @param {admin.app.App | undefined} [app=undefined] The Firebase app to use.
+ * @param {admin.app.App} app The Firebase app to use.
+ * @param {OPA.DefaultFunc<string>} moduleNameGetter Gets the module name.
+ * @param {OPA.DefaultFunc<string>} functionNameGetter Gets the function name.
  * @return {Promise<OpaDm.ICallState>}
  */
-export async function getCallStateForFirebaseContextAndApp(context: functions.https.CallableContext, app: admin.app.App | undefined = undefined): Promise<OpaDm.ICallState> {
-  app = (!OPA.isNullish(app)) ? OPA.convertNonNullish(app) : admin.app();
+export async function getCallStateForFirebaseContextAndApp(context: functions.https.CallableContext, app: admin.app.App, moduleNameGetter: OPA.DefaultFunc<string>, functionNameGetter: OPA.DefaultFunc<string>): Promise<OpaDm.ICallState> {
+  OPA.assertNonNullish(context, "The Firebase Callable Context must not be null.");
+  OPA.assertNonNullish(app, "The Firebase Admin App provided must be non-null.");
 
-  const dataStorageState = await getDataStorageStateForFirebaseApp(app);
+  const dataStorageState = await getDataStorageStateForFirebaseApp(app, moduleNameGetter, functionNameGetter);
   const authenticationState = await getAuthenticationStateForContextAndApp(context, app);
 
   OPA.assertNonNullish(dataStorageState, "The data storage state could not be configured.");
@@ -32,10 +35,12 @@ export async function getCallStateForFirebaseContextAndApp(context: functions.ht
 /**
  * Gets the Data Storage State for the Firebase app.
  * @param {admin.app.App} app The Firebase app to use.
+ * @param {OPA.DefaultFunc<string>} moduleNameGetter Gets the module name.
+ * @param {OPA.DefaultFunc<string>} functionNameGetter Gets the function name.
  * @return {Promise<OpaDm.IDataStorageState>}
  */
-export async function getDataStorageStateForFirebaseApp(app: admin.app.App): Promise<OpaDm.IDataStorageState> {
-  OPA.assertNonNullish(app, "The Firebase App provided must be non-null.");
+export async function getDataStorageStateForFirebaseApp(app: admin.app.App, moduleNameGetter: OPA.DefaultFunc<string>, functionNameGetter: OPA.DefaultFunc<string>): Promise<OpaDm.IDataStorageState> {
+  OPA.assertNonNullish(app, "The Firebase Admin App provided must be non-null.");
 
   const appName = app.name;
   const projectId = getFirebaseProjectId(app);
@@ -68,6 +73,8 @@ export async function getDataStorageStateForFirebaseApp(app: admin.app.App): Pro
       writeBatch: () => (dataStorageState.db.batch()),
     },
     logWriteState: {
+      entryModuleName: moduleNameGetter(),
+      entryFunctionName: functionNameGetter(),
       rootLogItemId: (null as string | null),
       externalLogItemId: (null as string | null),
     },
@@ -367,7 +374,7 @@ export async function performAuthenticatedActionWithResult<T>(request: CallableR
     logger.info(message, {structuredData: true});
 
     adminApp = admin.app();
-    callState = await getCallStateForFirebaseContextAndApp(request, adminApp);
+    callState = await getCallStateForFirebaseContextAndApp(request, adminApp, moduleNameGetter, functionNameGetter);
 
     await setExternalLogState(callState.dataStorageState, request);
     await logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, moduleNameGetter, functionNameGetter, OPA.ExecutionStates.ready);

@@ -71,6 +71,8 @@ export interface IFirebaseConstructorProvider {
 }
 
 export interface ILogWriteState {
+  readonly entryModuleName: string;
+  readonly entryFunctionName: string;
   rootLogItemId: string | null;
   externalLogItemId: string | null;
 }

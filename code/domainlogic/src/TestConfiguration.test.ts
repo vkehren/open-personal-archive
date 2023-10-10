@@ -73,6 +73,8 @@ export function getTestConfiguration(): ITestConfiguration {
       writeBatch: () => (dataStorageState.db.batch()),
     },
     logWriteState: {
+      entryModuleName: "", // NOTE: This value is not necessary for testing
+      entryFunctionName: "", // NOTE: This value is not necessary for testing
       rootLogItemId: (null as string | null),
       externalLogItemId: (null as string | null),
     },
