@@ -77,12 +77,12 @@ test("checks that passing 'falseString' returns 'falseString'", () => {
 });
 
 test("checks that passing 'falseString' returns 'falseString'", () => {
-  const input = { a: 1, b: 2, c: true, d: "four" };
+  const input = {a: 1, b: 2, c: true, d: "four"};
   expect(AP.copyObject(input)).toEqual(input);
 });
 
 test("checks that passing 'falseString' returns 'falseString'", () => {
-  const input = { a: 1, b: 2, c: true, d: "four", e: [trueString, falseString], f: { x: "x", y: 2, z: "aaaaaaaa" } };
+  const input = {a: 1, b: 2, c: true, d: "four", e: [trueString, falseString], f: {x: "x", y: 2, z: "aaaaaaaa"}};
   expect(AP.copyObject(input)).toEqual(input);
 });
 
