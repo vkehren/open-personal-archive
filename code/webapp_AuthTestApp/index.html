@@ -204,7 +204,7 @@
     import {GoogleAuthProvider, getAuth, sendEmailVerification, signInWithEmailAndPassword, signInWithPopup} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
     import {getFunctions, httpsCallable} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-functions.js";
     import {parseJsonIfNeeded} from "./WebBaseLite.js";
-    import {recordPageView, recordPageError} from "./WebFunctions.js";
+    import {recordPageView, recordPageAction, recordPageError} from "./WebFunctions.js";
     import {schedulePageRefreshForInactivity, forceResizeEventIfNeeded} from "./WebRendering.js";
 
     const app = initializeApp(FIREBASE_CONFIG);
@@ -256,7 +256,7 @@
         });
     };
 
-    document.getElementById("function-button").onclick = () => {
+    document.getElementById("function-button").onclick = async () => {
       document.getElementById("function-label").innerText = "...working...";
 
       const functionSelect = document.getElementById("function-select");
@@ -288,6 +288,7 @@
           functionArgs[functionArgName] = functionArgValue;
         }
       }
+      await recordPageAction(app, window.location.href, functionName, functionArgs);
 
       const functionObject = httpsCallable(functions, functionName);
       functionObject(functionArgs)
