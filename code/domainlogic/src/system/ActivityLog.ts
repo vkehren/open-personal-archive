@@ -8,6 +8,7 @@ import * as Application from "./Application";
  * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
  * @param {OpaDm.IAuthenticationState | null} authenticationState The Firebase Authentication state for the User.
  * @param {BT.ActivityType} activityType The type of the ActivityLogItem.
+ * @param {OPA.ExecutionState} executionState The execution state of the call for the ActivityLogItem.
  * @param {string} requestor The URI of the requestor.
  * @param {string} resource The URI of the resource being requested.
  * @param {string | null} action The action being requested, if any.
@@ -15,7 +16,7 @@ import * as Application from "./Application";
  * @param {Record<string, unknown> | null} otherState Any other state for the request.
  * @return {Promise<OpaDm.IActivityLogItem>}
  */
-export async function recordLogItem(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, activityType: OpaDm.ActivityType, requestor: string, resource: string, action: string | null, data: Record<string, unknown>, otherState: Record<string, unknown> | null = null): Promise<OpaDm.IActivityLogItem> { // eslint-disable-line max-len
+export async function recordLogItem(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, activityType: OpaDm.ActivityType, executionState: OPA.ExecutionState, requestor: string, resource: string, action: string | null, data: Record<string, unknown>, otherState: Record<string, unknown> | null = null): Promise<OpaDm.IActivityLogItem> { // eslint-disable-line max-len
   OPA.assertDataStorageStateIsNotNullish(dataStorageState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
 
@@ -61,7 +62,7 @@ export async function recordLogItem(dataStorageState: OpaDm.IDataStorageState, a
     }
   }
 
-  const activityLogItemId = await OpaDb.ActivityLogItems.queries.create(dataStorageState, activityType, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState);
+  const activityLogItemId = await OpaDb.ActivityLogItems.queries.create(dataStorageState, activityType, executionState, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState);
   await dataStorageState.currentWriteBatch.commit();
   dataStorageState.currentWriteBatch = null;
 

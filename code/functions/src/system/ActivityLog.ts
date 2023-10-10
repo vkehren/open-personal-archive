@@ -28,6 +28,7 @@ export const recordLogItem = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
     await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, OPA.ExecutionStates.ready);
 
     const activityType = (request.data.activityType) ? request.data.activityType : undefined;
+    const executionState = OPA.ExecutionStates.remote;
     const requestor = shimmedRequest.clientIpAddress;
     const resource = (request.data.resource) ? request.data.resource : undefined;
     const action = (request.data.action) ? request.data.action : undefined;
@@ -35,7 +36,7 @@ export const recordLogItem = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
     const otherState = (request.data.otherState) ? OPA.parseJsonIfNeeded(request.data.otherState) : {};
     otherState.headers = shimmedRequest.headers;
 
-    await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, requestor, resource, action, data, otherState);
+    await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, executionState, requestor, resource, action, data, otherState);
     return OPA.getSuccessResultForMessage("The request was logged successfully.");
   } catch (error) {
     await UTL.logFunctionError(dataStorageState, authenticationState, shimmedRequest, error);

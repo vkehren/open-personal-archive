@@ -12,6 +12,7 @@ export interface IActivityLogItem extends OPA.IDocument_Creatable {
   readonly rootLogItemId: string;
   readonly externalLogItemId: string | null;
   readonly activityType: BT.ActivityType;
+  readonly executionState: OPA.ExecutionState,
   readonly requestor: string;
   readonly resource: string;
   readonly resourceCanonical: string;
@@ -25,6 +26,7 @@ const IActivityLogItem_ReadOnlyPropertyNames = [ // eslint-disable-line camelcas
   OPA.getTypedPropertyKeyAsText<IActivityLogItem>("rootLogItemId"),
   OPA.getTypedPropertyKeyAsText<IActivityLogItem>("externalLogItemId"),
   OPA.getTypedPropertyKeyAsText<IActivityLogItem>("activityType"),
+  OPA.getTypedPropertyKeyAsText<IActivityLogItem>("executionState"),
   OPA.getTypedPropertyKeyAsText<IActivityLogItem>("requestor"),
   OPA.getTypedPropertyKeyAsText<IActivityLogItem>("resource"),
   OPA.getTypedPropertyKeyAsText<IActivityLogItem>("resourceCanonical"),
@@ -66,6 +68,7 @@ export function areUpdatesValid(document: IActivityLogItem, updateObject: IActiv
  * @param {string | null} rootLogItemId The ID of the root ActivityLogItem for the current call.
  * @param {string | null} externalLogItemId The ID of the external ActivityLogItem of the requestor of the current call.
  * @param {BT.ActivityType} activityType The type of the ActivityLogItem.
+ * @param {OPA.ExecutionState} executionState The execution state of the call for the ActivityLogItem.
  * @param {string} requestor The URI of the requestor.
  * @param {string} resource The URI of the resource being requested.
  * @param {string | null} resourceCanonical The canonical URI of the resource being requested.
@@ -76,7 +79,7 @@ export function areUpdatesValid(document: IActivityLogItem, updateObject: IActiv
  * @param {Record<string, unknown> | null} otherState Any other state for the request.
  * @return {IActivityLogItem} The new document instance.
  */
-function createInstance(id: string, rootLogItemId: string | null, externalLogItemId: string | null, activityType: BT.ActivityType, requestor: string, resource: string, resourceCanonical: string | null, action: string | null, data: Record<string, unknown>, firebaseAuthUserId: string | null = null, userId: string | null = null, otherState: Record<string, unknown> | null = null): IActivityLogItem { // eslint-disable-line max-len
+function createInstance(id: string, rootLogItemId: string | null, externalLogItemId: string | null, activityType: BT.ActivityType, executionState: OPA.ExecutionState, requestor: string, resource: string, resourceCanonical: string | null, action: string | null, data: Record<string, unknown>, firebaseAuthUserId: string | null = null, userId: string | null = null, otherState: Record<string, unknown> | null = null): IActivityLogItem { // eslint-disable-line max-len
   OPA.assertNonNullish(activityType);
   OPA.assertIsOfLiteral<BT.ActivityType>(activityType, BT.ActivityTypes._all, BT.ActivityTypes._typeName);
   if ((activityType == "browser_page_action") && OPA.isNullishOrWhitespace(action)) {
@@ -89,6 +92,7 @@ function createInstance(id: string, rootLogItemId: string | null, externalLogIte
     rootLogItemId: (!OPA.isNullishOrWhitespace(rootLogItemId)) ? OPA.convertNonNullish(rootLogItemId) : id,
     externalLogItemId: externalLogItemId,
     activityType: activityType,
+    executionState: executionState,
     requestor: requestor,
     resource: resource,
     resourceCanonical: (!OPA.isNullishOrWhitespace(resourceCanonical)) ? OPA.convertNonNullish(resourceCanonical) : resource,
@@ -124,6 +128,7 @@ export class ActivityLogItemQuerySet extends OPA.QuerySet<IActivityLogItem> {
    * Creates an instance of the IActivityLogItem document type.
    * @param {OPA.IDataStorageState} ds The state container for data storage.
    * @param {BT.ActivityType} activityType The type of the ActivityLogItem.
+   * @param {OPA.ExecutionState} executionState The execution state of the call for the ActivityLogItem.
    * @param {string} requestor The URI of the requestor.
    * @param {string} resource The URI of the resource being requested.
    * @param {string | null} resourceCanonical The canonical URI of the resource being requested.
@@ -134,7 +139,7 @@ export class ActivityLogItemQuerySet extends OPA.QuerySet<IActivityLogItem> {
    * @param {Record<string, unknown> | null} otherState Any other state for the request.
    * @return {Promise<string>} The new document ID.
    */
-  async create(ds: OPA.IDataStorageState, activityType: BT.ActivityType, requestor: string, resource: string, resourceCanonical: string | null, action: string | null, data: Record<string, unknown>, firebaseAuthUserId: string | null = null, userId: string | null = null, otherState: Record<string, unknown> | null = null): Promise<string> { // eslint-disable-line max-len
+  async create(ds: OPA.IDataStorageState, activityType: BT.ActivityType, executionState: OPA.ExecutionState, requestor: string, resource: string, resourceCanonical: string | null, action: string | null, data: Record<string, unknown>, firebaseAuthUserId: string | null = null, userId: string | null = null, otherState: Record<string, unknown> | null = null): Promise<string> { // eslint-disable-line max-len
     OPA.assertDataStorageStateIsNotNullish(ds);
     OPA.assertFirestoreIsNotNullish(ds.db);
 
@@ -142,7 +147,7 @@ export class ActivityLogItemQuerySet extends OPA.QuerySet<IActivityLogItem> {
     const documentRef = collectionRef.doc();
     const documentId = documentRef.id;
     const logState = ds.logWriteState;
-    const document = createInstance(documentId, logState.rootLogItemId, logState.externalLogItemId, activityType, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState); // eslint-disable-line max-len
+    const document = createInstance(documentId, logState.rootLogItemId, logState.externalLogItemId, activityType, executionState, requestor, resource, resourceCanonical, action, data, firebaseAuthUserId, userId, otherState); // eslint-disable-line max-len
     const proxiedDocument = this.documentProxyConstructor(document);
 
     // NOTE: An ActivityLogItem should NOT be updateable

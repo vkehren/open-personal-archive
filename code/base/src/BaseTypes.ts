@@ -120,13 +120,14 @@ export const ArrayContentTypes = {
   only_removed: ("only_removed" as ArrayContentType),
 };
 
-export type ExecutionState = "entry" | "ready" | "complete" | "error";
+export type ExecutionState = "entry" | "ready" | "complete" | "remote" | "error";
 export const ExecutionStates = {
   _typeName: "ExecutionState",
   _all: (["entry", "ready", "complete", "error"] as Array<ExecutionState>),
   entry: ("entry" as ExecutionState),
   ready: ("ready" as ExecutionState),
   complete: ("complete" as ExecutionState),
+  remote: ("remote" as ExecutionState),
   error: ("error" as ExecutionState),
 };
 

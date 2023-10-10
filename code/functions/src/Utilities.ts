@@ -273,7 +273,7 @@ export async function logFunctionCall(dataStorageState: OpaDm.IDataStorageState,
     const otherState = {message: message, logWriteState: dataStorageState.logWriteState, errorState: errorState, headers: request.headers};
 
     logger.info(message, {structuredData: true, activityType, requestor, resource, action, otherState});
-    const logItem = await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, requestor, resource, action, request.data, otherState);
+    const logItem = await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, executionState, requestor, resource, action, request.data, otherState);
 
     if (OPA.isNullishOrWhitespace(dataStorageState.logWriteState.rootLogItemId)) {
       dataStorageState.logWriteState.rootLogItemId = logItem.id;
@@ -307,7 +307,7 @@ export async function logFunctionError(dataStorageState: OpaDm.IDataStorageState
     }
 
     logger.error(otherState.message, {structuredData: true, activityType, requestor, resource, action, otherState});
-    await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, requestor, resource, action, request.data, otherState);
+    await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, OPA.ExecutionStates.error, requestor, resource, action, request.data, otherState);
   } catch {
     // NOTE: Do nothing, as we are here because an error has already pccurred
   }
