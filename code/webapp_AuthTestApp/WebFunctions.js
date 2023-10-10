@@ -3,7 +3,7 @@ import {FIREBASE_FUNCTIONS_REGION} from "./WebAppConfig.js";
 import {isNullish, isBoolean} from "./WebBaseLite.js";
 
 const NAME = "open-personal-archive-web-functions";
-const VERSION = "2.4.1";
+const VERSION = "2.4.2";
 const AUTHOR = "Ryan Stephen Ehrenreich";
 const COPYRIGHT = "Copyright © 2021 Open Personal Archive™";
 
@@ -58,10 +58,12 @@ async function submitUserEmail(app, event, contactForm, emailInput, submitButton
     submitButton.style.display = "none";
     submitButton.style.visibility = "hidden";
 
+    const functions = getFunctions(app, FIREBASE_FUNCTIONS_REGION);
     const functionObject = httpsCallable(functions, "createContact");
     const functionArgs = {email: emailInput.value};
     const functionResult = await functionObject(functionArgs);
-    const functionSuccess = (isBoolean(functionResult.success) && functionResult.success);
+    const functionData = (!isNullish(functionResult.data)) ? functionResult.data : {};
+    const functionSuccess = (isBoolean(functionData.success) && functionData.success);
 
     if (!functionSuccess) {
       throw new Error("There was an error processing your submission.");
