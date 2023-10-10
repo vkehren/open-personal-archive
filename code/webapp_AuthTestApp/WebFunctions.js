@@ -3,7 +3,7 @@ import {FIREBASE_FUNCTIONS_REGION} from "./WebAppConfig.js";
 import {isNullish, isBoolean} from "./WebBaseLite.js";
 
 const NAME = "open-personal-archive-web-functions";
-const VERSION = "2.4.2";
+const VERSION = "2.4.2.1";
 const AUTHOR = "Ryan Stephen Ehrenreich";
 const COPYRIGHT = "Copyright © 2021 Open Personal Archive™";
 
@@ -71,8 +71,7 @@ async function submitUserEmail(app, event, contactForm, emailInput, submitButton
 
     contactResult.style.display = contactForm.style.display;
     contactResult.style.visibility = contactForm.style.visibility;
-    contactForm.style.display = "none";
-    contactForm.style.visibility = "hidden";
+    contactForm.remove();
   } catch (error) {
     emailInput.disabled = false;
     submitButton.disabled = false;
