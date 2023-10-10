@@ -3,7 +3,7 @@ import * as OPA from "../../../base/src";
 import {Users} from "../../../domainlogic/src";
 import * as UTL from "../Utilities";
 
-const moduleName = module.filename.split(".")[0];
+const moduleName = OPA.getModuleNameFromSrc(module.filename);
 const getModuleName = () => moduleName;
 type IUserDisplayModel = Users.IUserDisplayModel;
 type IUserAccountDisplayModel = Users.IUserAccountDisplayModel;

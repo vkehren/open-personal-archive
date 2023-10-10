@@ -6,7 +6,7 @@ import * as OpaDm from "../../../datamodel/src";
 import {ActivityLog} from "../../../domainlogic/src";
 import * as UTL from "../Utilities";
 
-const moduleName = module.filename.split(".")[0];
+const moduleName = OPA.getModuleNameFromSrc(module.filename);
 
 const recordLogItem_FunctionName = () => (OPA.getTypedPropertyKeyAsText("recordLogItem", {recordLogItem})); // eslint-disable-line camelcase
 export const recordLogItem = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {

@@ -7,7 +7,7 @@ import {OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
 import {Application} from "../../../domainlogic/src";
 import * as UTL from "../Utilities";
 
-const moduleName = module.filename.split(".")[0];
+const moduleName = OPA.getModuleNameFromSrc(module.filename);
 
 const isInstalled_FunctionName = () => (OPA.getTypedPropertyKeyAsText("isInstalled", {isInstalled})); // eslint-disable-line camelcase
 export const isInstalled = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {

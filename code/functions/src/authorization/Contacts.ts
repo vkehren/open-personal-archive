@@ -9,7 +9,7 @@ import * as UTL from "../Utilities";
 
 // NOTE: Eventually, Contacts will provide the mechanism by which the Archive Owner and Administrators can invite unauthenticated users to create User accounts
 
-const moduleName = module.filename.split(".")[0];
+const moduleName = OPA.getModuleNameFromSrc(module.filename);
 const getModuleName = () => moduleName;
 type IContactDisplayModel = Contacts.IContactDisplayModel;
 

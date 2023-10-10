@@ -44,7 +44,7 @@ if (useCorsHandler) {
   expressApp.use(corsHandler);
 }
 
-const moduleName = module.filename.split(".")[0];
+const moduleName = OPA.getModuleNameFromSrc(module.filename);
 
 export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT_OPTIONS, async (event: AuthBlockingEvent): Promise<void> => {
   let adminApp = ((null as unknown) as admin.app.App);
