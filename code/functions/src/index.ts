@@ -45,7 +45,9 @@ if (useCorsHandler) {
 }
 
 const moduleName = OPA.getModuleNameFromSrc(module.filename);
+const getModuleName = () => moduleName;
 
+const firebaseAuthSignInHandler_FunctionName = () => (OPA.getTypedPropertyKeyAsText("firebaseAuthSignInHandler", {firebaseAuthSignInHandler})); // eslint-disable-line camelcase
 export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT_OPTIONS, async (event: AuthBlockingEvent): Promise<void> => {
   let adminApp = ((null as unknown) as admin.app.App);
   let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
@@ -62,7 +64,7 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
     logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
     dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp);
-    await UTL.logFunctionCall(dataStorageState, null, shimmedRequest, getLogMessage(OPA.ExecutionStates.ready));
+    await UTL.logFunctionCall(dataStorageState, null, shimmedRequest, getModuleName, firebaseAuthSignInHandler_FunctionName, OPA.ExecutionStates.ready);
 
     if (OPA.isNullishOrWhitespace(event.data.email)) {
       throw new Error("Currently, the OPA system requires a valid email address for each User.");
@@ -105,9 +107,9 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
     const messageSuffix = (!OPA.isNullish(opaUser)) ? (" for " + OPA.convertNonNullish(opaUser).authAccountName) : " without User";
     logger.info(getLogMessage(OPA.ExecutionStates.complete) + messageSuffix, {structuredData: true});
   } catch (error) {
-    await UTL.logFunctionError(dataStorageState, null, shimmedRequest, error as Error);
+    await UTL.logFunctionError(dataStorageState, null, shimmedRequest, getModuleName, firebaseAuthSignInHandler_FunctionName, error as Error);
   } finally {
-    await UTL.cleanUpStateAfterCall(dataStorageState, null, adminApp, shimmedRequest);
+    await UTL.cleanUpStateAfterCall(dataStorageState, null, adminApp, shimmedRequest, getModuleName, firebaseAuthSignInHandler_FunctionName);
   }
 });
 
