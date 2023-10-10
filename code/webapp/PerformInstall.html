@@ -19,8 +19,8 @@
   <script defer src="https://www.gstatic.com/firebasejs/9.5.0/firebase-auth.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/9.5.0/firebase-functions.js"></script>
 
-  <script type="text/javascript" src="firebase_config.js"></script>
   <script type="module">
+    import {FIREBASE_CONFIG, FIREBASE_FUNCTIONS_REGION} from "./WebAppConfig.js";
     import {initializeApp} from "https://www.gstatic.com/firebasejs/9.5.0/firebase-app.js";
     import {getAuth, getRedirectResult, signInWithPopup, signInWithRedirect, GoogleAuthProvider} from "https://www.gstatic.com/firebasejs/9.5.0/firebase-auth.js";
     import {getFunctions, httpsCallable} from "https://www.gstatic.com/firebasejs/9.5.0/firebase-functions.js";
@@ -34,10 +34,10 @@
     var buttonIdPrefix = "selected-";
 
     try {
-      const app = initializeApp(firebaseConfig);
+      const app = initializeApp(FIREBASE_CONFIG);
       const provider = new GoogleAuthProvider();
       auth = getAuth();
-      functions = getFunctions(app);
+      functions = getFunctions(app, FIREBASE_FUNCTIONS_REGION);
 
       if (isTesting) {
         auth.onAuthStateChanged(async (user) => {
