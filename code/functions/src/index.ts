@@ -64,7 +64,7 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
     logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
     dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, moduleNameGetter, firebaseAuthSignInHandler_FunctionNameGetter);
-    await UTL.logFunctionCall(dataStorageState, null, shimmedRequest, moduleNameGetter, firebaseAuthSignInHandler_FunctionNameGetter, OPA.ExecutionStates.ready);
+    await UTL.logFunctionCall(dataStorageState, null, shimmedRequest, OPA.ExecutionStates.ready);
 
     if (OPA.isNullishOrWhitespace(event.data.email)) {
       throw new Error("Currently, the OPA system requires a valid email address for each User.");
@@ -107,9 +107,9 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
     const messageSuffix = (!OPA.isNullish(opaUser)) ? (" for " + OPA.convertNonNullish(opaUser).authAccountName) : " without User";
     logger.info(getLogMessage(OPA.ExecutionStates.complete) + messageSuffix, {structuredData: true});
   } catch (error) {
-    await UTL.logFunctionError(dataStorageState, null, shimmedRequest, moduleNameGetter, firebaseAuthSignInHandler_FunctionNameGetter, error as Error);
+    await UTL.logFunctionError(dataStorageState, null, shimmedRequest, error as Error);
   } finally {
-    await UTL.cleanUpStateAfterCall(dataStorageState, null, adminApp, shimmedRequest, moduleNameGetter, firebaseAuthSignInHandler_FunctionNameGetter);
+    await UTL.cleanUpStateAfterCall(dataStorageState, null, adminApp, shimmedRequest);
   }
 });
 

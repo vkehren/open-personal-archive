@@ -38,7 +38,7 @@ export const createContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
     authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, adminApp);
 
     await UTL.setExternalLogState(dataStorageState, request);
-    await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, moduleNameGetter, createContact_FunctionNameGetter, OPA.ExecutionStates.ready);
+    await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, OPA.ExecutionStates.ready);
 
     const data = request.data;
     const organizationName = (data.organizationName) ? data.organizationName : null;
@@ -63,10 +63,10 @@ export const createContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
       return OPA.getSuccessResult(displayModel);
     }
   } catch (error) {
-    await UTL.logFunctionError(dataStorageState, authenticationState, shimmedRequest, moduleNameGetter, createContact_FunctionNameGetter, error);
+    await UTL.logFunctionError(dataStorageState, authenticationState, shimmedRequest, error);
     return OPA.getFailureResult(error);
   } finally {
-    await UTL.cleanUpStateAfterCall(dataStorageState, authenticationState, adminApp, shimmedRequest, moduleNameGetter, createContact_FunctionNameGetter);
+    await UTL.cleanUpStateAfterCall(dataStorageState, authenticationState, adminApp, shimmedRequest);
   }
 });
 

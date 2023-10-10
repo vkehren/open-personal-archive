@@ -258,18 +258,17 @@ export async function setExternalLogState(dataStorageState: OpaDm.IDataStorageSt
  * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
  * @param {OpaDm.IAuthenticationState | null} authenticationState The Firebase Authentication state for the User.
  * @param {OPA.ICallRequest} request The shimmed request object.
- * @param {OPA.DefaultFunc<string>} moduleNameGetter Gets the module name.
- * @param {OPA.DefaultFunc<string>} functionNameGetter Gets the function name.
  * @param {OPA.ExecutionState} executionState The execution state for the function.
  * @return {Promise<OpaDm.void>}
  */
-export async function logFunctionCall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, request: OPA.ICallRequest, moduleNameGetter: OPA.DefaultFunc<string>, functionNameGetter: OPA.DefaultFunc<string>, executionState: OPA.ExecutionState): Promise<void> { // eslint-disable-line max-len
+export async function logFunctionCall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, request: OPA.ICallRequest, executionState: OPA.ExecutionState): Promise<void> { // eslint-disable-line max-len
   try {
-    const message = getFunctionCallLogMessage(moduleNameGetter(), functionNameGetter(), executionState);
+    const logState = dataStorageState.logWriteState;
+    const message = getFunctionCallLogMessage(logState.entryModuleName, logState.entryFunctionName, executionState);
     const activityType = OpaDm.ActivityTypes.server_function_call;
     const requestor = request.clientIpAddress;
     const resource = request.url;
-    const action = (moduleNameGetter() + "/" + functionNameGetter());
+    const action = (logState.entryModuleName + "/" + logState.entryFunctionName);
     const errorState = {hasError: false};
     const otherState = {message: message, logWriteState: dataStorageState.logWriteState, errorState: errorState, headers: request.headers};
 
@@ -280,7 +279,7 @@ export async function logFunctionCall(dataStorageState: OpaDm.IDataStorageState,
       dataStorageState.logWriteState.rootLogItemId = logItem.id;
     }
   } catch (error) {
-    await logFunctionError(dataStorageState, authenticationState, request, moduleNameGetter, functionNameGetter, error);
+    await logFunctionError(dataStorageState, authenticationState, request, error);
   }
 }
 
@@ -289,17 +288,16 @@ export async function logFunctionCall(dataStorageState: OpaDm.IDataStorageState,
  * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
  * @param {OpaDm.IAuthenticationState | null} authenticationState The Firebase Authentication state for the User.
  * @param {OPA.ICallRequest} request The shimmed request object.
- * @param {OPA.DefaultFunc<string>} moduleNameGetter Gets the module name.
- * @param {OPA.DefaultFunc<string>} functionNameGetter Gets the function name.
  * @param {unknown} caught The caught object encountered.
  * @return {Promise<OpaDm.void>}
  */
-export async function logFunctionError(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, request: OPA.ICallRequest, moduleNameGetter: OPA.DefaultFunc<string>, functionNameGetter: OPA.DefaultFunc<string>, caught: unknown): Promise<void> { // eslint-disable-line max-len
+export async function logFunctionError(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, request: OPA.ICallRequest, caught: unknown): Promise<void> { // eslint-disable-line max-len
   try {
+    const logState = dataStorageState.logWriteState;
     const activityType = OpaDm.ActivityTypes.server_function_error;
     const requestor = request.clientIpAddress;
     const resource = request.url;
-    const action = (moduleNameGetter() + "/" + functionNameGetter());
+    const action = (logState.entryModuleName + "/" + logState.entryFunctionName);
     const otherState = {message: OPA.UNRECOGNIZED_ERROR_MESSAGE, logWriteState: dataStorageState.logWriteState, errorState: caught, headers: request.headers};
 
     if (OPA.isOf<Error>(caught, (value) => (!OPA.isNullishOrWhitespace(value.message)))) {
@@ -321,11 +319,9 @@ export async function logFunctionError(dataStorageState: OpaDm.IDataStorageState
  * @param {OpaDm.IAuthenticationState | null} authenticationState The Firebase Authentication state for the User.
  * @param {admin.app.App} adminApp The Firebase admin app used in the call.
  * @param {OPA.ICallRequest} request The shimmed request object.
- * @param {OPA.DefaultFunc<string>} moduleNameGetter Gets the module name.
- * @param {OPA.DefaultFunc<string>} functionNameGetter Gets the function name.
  * @return {Promise<OpaDm.void>}
  */
-export async function cleanUpStateAfterCall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, adminApp: admin.app.App, request: OPA.ICallRequest, moduleNameGetter: OPA.DefaultFunc<string>, functionNameGetter: OPA.DefaultFunc<string>): Promise<void> { // eslint-disable-line max-len
+export async function cleanUpStateAfterCall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, adminApp: admin.app.App, request: OPA.ICallRequest): Promise<void> { // eslint-disable-line max-len
   try {
     if (!OPA.isNullish(dataStorageState.currentBulkWriter)) {
       const currentBulkWriterNonNull = OPA.convertNonNullish(dataStorageState.currentBulkWriter);
@@ -349,7 +345,7 @@ export async function cleanUpStateAfterCall(dataStorageState: OpaDm.IDataStorage
     // await adminApp.delete();
     // await dataStorageState.db.terminate();
   } catch (error) {
-    logFunctionError(dataStorageState, authenticationState, request, moduleNameGetter, functionNameGetter, error);
+    logFunctionError(dataStorageState, authenticationState, request, error);
   }
 }
 
@@ -377,14 +373,14 @@ export async function performAuthenticatedActionWithResult<T>(request: CallableR
     callState = await getCallStateForFirebaseContextAndApp(request, adminApp, moduleNameGetter, functionNameGetter);
 
     await setExternalLogState(callState.dataStorageState, request);
-    await logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, moduleNameGetter, functionNameGetter, OPA.ExecutionStates.ready);
+    await logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, OPA.ExecutionStates.ready);
 
     const result = await doAction(request, callState);
     return OPA.getSuccessResult(result);
   } catch (error) {
-    await logFunctionError(callState.dataStorageState, callState.authenticationState, shimmedRequest, moduleNameGetter, functionNameGetter, error);
+    await logFunctionError(callState.dataStorageState, callState.authenticationState, shimmedRequest, error);
     return OPA.getFailureResult(error);
   } finally {
-    await cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, shimmedRequest, moduleNameGetter, functionNameGetter);
+    await cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, shimmedRequest);
   }
 }

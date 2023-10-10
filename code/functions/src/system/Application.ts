@@ -25,7 +25,7 @@ export const isInstalled = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) 
     authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, adminApp);
 
     await UTL.setExternalLogState(dataStorageState, request);
-    await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, moduleNameGetter, isInstalled_FunctionNameGetter, OPA.ExecutionStates.ready);
+    await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, OPA.ExecutionStates.ready);
 
     const firebaseAuthUserId = (!OPA.isNullish(authenticationState)) ? OPA.convertNonNullish(authenticationState).firebaseAuthUserId : null;
     const isUserAuthenticated = (!OPA.isNullishOrWhitespace(firebaseAuthUserId));
@@ -90,10 +90,10 @@ export const isInstalled = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) 
 
     return OPA.getSuccessResult(data, message);
   } catch (error) {
-    await UTL.logFunctionError(dataStorageState, authenticationState, shimmedRequest, moduleNameGetter, isInstalled_FunctionNameGetter, error);
+    await UTL.logFunctionError(dataStorageState, authenticationState, shimmedRequest, error);
     return OPA.getFailureResult(error);
   } finally {
-    await UTL.cleanUpStateAfterCall(dataStorageState, authenticationState, adminApp, shimmedRequest, moduleNameGetter, isInstalled_FunctionNameGetter);
+    await UTL.cleanUpStateAfterCall(dataStorageState, authenticationState, adminApp, shimmedRequest);
   }
 });
 
@@ -110,15 +110,15 @@ export const getInstallationScreenDisplayModel = onCall(OPA.FIREBASE_DEFAULT_OPT
     callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp, moduleNameGetter, getInstallationScreenDisplayModel_FunctionNameGetter);
 
     await UTL.setExternalLogState(callState.dataStorageState, request);
-    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, moduleNameGetter, getInstallationScreenDisplayModel_FunctionNameGetter, OPA.ExecutionStates.ready); // eslint-disable-line max-len
+    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, OPA.ExecutionStates.ready);
 
     const displayModel = await Application.getInstallationScreenDisplayModel(callState);
     return OPA.getSuccessResult(displayModel);
   } catch (error) {
-    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, shimmedRequest, moduleNameGetter, getInstallationScreenDisplayModel_FunctionNameGetter, error);
+    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, shimmedRequest, error);
     return OPA.getFailureResult(error);
   } finally {
-    await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, shimmedRequest, moduleNameGetter, getInstallationScreenDisplayModel_FunctionNameGetter);
+    await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, shimmedRequest);
   }
 });
 
@@ -135,7 +135,7 @@ export const performInstall = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reques
     callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp, moduleNameGetter, performInstall_FunctionNameGetter);
 
     await UTL.setExternalLogState(callState.dataStorageState, request);
-    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, moduleNameGetter, performInstall_FunctionNameGetter, OPA.ExecutionStates.ready);
+    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, OPA.ExecutionStates.ready);
 
     const data = request.data;
     const archiveName = (data.archiveName) ? data.archiveName : undefined;
@@ -153,10 +153,10 @@ export const performInstall = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reques
 
     return OPA.getSuccessResult(installResult);
   } catch (error) {
-    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, shimmedRequest, moduleNameGetter, performInstall_FunctionNameGetter, error);
+    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, shimmedRequest, error);
     return OPA.getFailureResult(error);
   } finally {
-    await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, shimmedRequest, moduleNameGetter, performInstall_FunctionNameGetter);
+    await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, shimmedRequest);
   }
 });
 
@@ -173,7 +173,7 @@ export const updateInstallationSettings = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, a
     callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp, moduleNameGetter, updateInstallationSettings_FunctionNameGetter);
 
     await UTL.setExternalLogState(callState.dataStorageState, request);
-    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, moduleNameGetter, updateInstallationSettings_FunctionNameGetter, OPA.ExecutionStates.ready);
+    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, OPA.ExecutionStates.ready);
 
     const data = request.data;
     const archiveName = (data.archiveName) ? data.archiveName : undefined;
@@ -186,10 +186,10 @@ export const updateInstallationSettings = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, a
     const displayModel = await Application.getInstallationScreenDisplayModel(callState);
     return OPA.getSuccessResult(displayModel);
   } catch (error) {
-    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, shimmedRequest, moduleNameGetter, updateInstallationSettings_FunctionNameGetter, error);
+    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, shimmedRequest, error);
     return OPA.getFailureResult(error);
   } finally {
-    await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, shimmedRequest, moduleNameGetter, updateInstallationSettings_FunctionNameGetter);
+    await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, shimmedRequest);
   }
 });
 
@@ -206,7 +206,7 @@ export const performUpgrade = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reques
     callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp, moduleNameGetter, performUpgrade_FunctionNameGetter);
 
     await UTL.setExternalLogState(callState.dataStorageState, request);
-    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, moduleNameGetter, performUpgrade_FunctionNameGetter, OPA.ExecutionStates.ready);
+    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, OPA.ExecutionStates.ready);
 
     const data = request.data;
     const upgradeNotes = OPA.convertNonNullish(data.upgradeNotes, "");
@@ -214,10 +214,10 @@ export const performUpgrade = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reques
     const upgradeResult = await Application.performUpgrade(callState, upgradeNotes, doBackupFirst);
     return OPA.getSuccessResult(upgradeResult);
   } catch (error) {
-    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, shimmedRequest, moduleNameGetter, performUpgrade_FunctionNameGetter, error);
+    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, shimmedRequest, error);
     return OPA.getFailureResult(error);
   } finally {
-    await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, shimmedRequest, moduleNameGetter, performUpgrade_FunctionNameGetter);
+    await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, shimmedRequest);
   }
 });
 
@@ -234,16 +234,16 @@ export const performUninstall = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (requ
     callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp, moduleNameGetter, performUninstall_FunctionNameGetter);
 
     await UTL.setExternalLogState(callState.dataStorageState, request);
-    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, moduleNameGetter, performUninstall_FunctionNameGetter, OPA.ExecutionStates.ready);
+    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, OPA.ExecutionStates.ready);
 
     const data = request.data;
     const doBackupFirst = OPA.convertNonNullish(OPA.getBoolean(data.doBackupFirst, true));
     const uninstallResult = await Application.performUninstall(callState.dataStorageState, callState.authenticationState, callState.authorizationState, doBackupFirst);
     return OPA.getSuccessResult(uninstallResult);
   } catch (error) {
-    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, shimmedRequest, moduleNameGetter, performUninstall_FunctionNameGetter, error);
+    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, shimmedRequest, error);
     return OPA.getFailureResult(error);
   } finally {
-    await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, shimmedRequest, moduleNameGetter, performUninstall_FunctionNameGetter);
+    await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, shimmedRequest);
   }
 });
