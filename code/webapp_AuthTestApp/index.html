@@ -205,7 +205,7 @@
     import {initializeApp} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
     import {GoogleAuthProvider, getAuth, sendEmailVerification, signInWithEmailAndPassword, signInWithPopup, signOut} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
     import {getFunctions, httpsCallable} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-functions.js";
-    import {parseJsonIfNeeded} from "./WebBaseLite.js";
+    import {isNullish, parseJsonIfNeeded} from "./WebBaseLite.js";
     import {recordPageView, recordPageAction, recordPageError} from "./WebFunctions.js";
     import {schedulePageRefreshForInactivity, forceResizeEventIfNeeded} from "./WebRendering.js";
 
@@ -217,112 +217,120 @@
     schedulePageRefreshForInactivity();
     forceResizeEventIfNeeded(document.getElementById("copyright"), 20, 20);
 
-    document.getElementById("google-button").onclick = () => {
-      document.getElementById("google-label").innerText = "...working...";
+    document.getElementById("google-button").onclick = async () => {
+      try {
+        document.getElementById("google-label").innerText = "...working...";
 
-      const provider = new GoogleAuthProvider();
+        await recordPageAction(app, window.location.href, "signInWithPopup");
+        const provider = new GoogleAuthProvider();
+        const result = await signInWithPopup(auth, provider);
 
-      signInWithPopup(auth, provider)
-        .then((result) => {
-          const credential = GoogleAuthProvider.credentialFromResult(result);
-          document.getElementById("google-label").innerText = JSON.stringify(credential);
-          document.getElementById("firebase-label").innerText = "";
-          document.getElementById("firebase-verification-label").innerText = "";
-        }).catch(async (error) => {
-          document.getElementById("google-label").innerText = JSON.stringify(error);
-          document.getElementById("firebase-label").innerText = "";
-          document.getElementById("firebase-verification-label").innerText = "";
-          await recordPageError(error);
-        });
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        document.getElementById("google-label").innerText = JSON.stringify(credential);
+        document.getElementById("firebase-label").innerText = "";
+        document.getElementById("firebase-verification-label").innerText = "";
+      } catch (error) {
+        document.getElementById("google-label").innerText = JSON.stringify(error);
+        document.getElementById("firebase-label").innerText = "";
+        document.getElementById("firebase-verification-label").innerText = "";
+        await recordPageError(error);
+      }
     };
 
-    document.getElementById("firebase-button").onclick = () => {
-      document.getElementById("firebase-label").innerText = "...working...";
-      document.getElementById("firebase-verification-label").innerText = "";
+    document.getElementById("firebase-button").onclick = async () => {
+      let user = null;
 
-      const email = document.getElementById("firebase-email-input").value;
-      const password = document.getElementById("firebase-password-input").value;
+      try {
+        document.getElementById("firebase-label").innerText = "...working...";
+        document.getElementById("firebase-verification-label").innerText = "";
 
-      signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          document.getElementById("google-label").innerText = "";
-          document.getElementById("firebase-label").innerText = JSON.stringify(userCredential);
-          document.getElementById("firebase-verification-label").innerText = "";
-          const user = userCredential.user;
-          if (!user.emailVerified) {
-            sendEmailVerification(auth.currentUser)
-              .then((result) => {
-                document.getElementById("firebase-verification-label").innerText = JSON.stringify(result);
-              }).catch(async (error) => {
-                document.getElementById("firebase-verification-label").innerText = JSON.stringify(error);
-                await recordPageError(error);
-              });
-          }
-        }).catch(async (error) => {
-          document.getElementById("google-label").innerText = "";
+        const email = document.getElementById("firebase-email-input").value;
+        const password = document.getElementById("firebase-password-input").value;
+
+        await recordPageAction(app, window.location.href, "signInWithEmailAndPassword", {email, password: "[hidden]"});
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+        document.getElementById("google-label").innerText = "";
+        document.getElementById("firebase-label").innerText = JSON.stringify(userCredential);
+        document.getElementById("firebase-verification-label").innerText = "";
+
+        user = userCredential.user;
+        if (!user.emailVerified) {
+          const result = await sendEmailVerification(auth.currentUser);
+          document.getElementById("firebase-verification-label").innerText = JSON.stringify(result);
+        }
+
+      } catch (error) {
+        document.getElementById("google-label").innerText = "";
+        if (isNullish(user)) {
           document.getElementById("firebase-label").innerText = JSON.stringify(error);
           document.getElementById("firebase-verification-label").innerText = "";
-          await recordPageError(error);
-        });
+        } else {
+          document.getElementById("firebase-label").innerText = "";
+          document.getElementById("firebase-verification-label").innerText = JSON.stringify(error);
+        }
+        await recordPageError(error);
+      }
     };
 
-    document.getElementById("signout-button").onclick = () => {
-      signOut(auth)
-        .then(() => {
-          document.getElementById("google-label").innerText = "";
-          document.getElementById("firebase-label").innerText = "YOU HAVE SIGNED OUT!";
-          document.getElementById("firebase-verification-label").innerText = "";
-        }).catch(async (error) => {
-          document.getElementById("google-label").innerText = "";
-          document.getElementById("firebase-label").innerText = JSON.stringify(error);
-          document.getElementById("firebase-verification-label").innerText = "";
-          await recordPageError(error);
-        });
+    document.getElementById("signout-button").onclick = async () => {
+      try {
+        await recordPageAction(app, window.location.href, "signOut");
+        await signOut(auth);
+
+        document.getElementById("google-label").innerText = "";
+        document.getElementById("firebase-label").innerText = "YOU HAVE SIGNED OUT!";
+        document.getElementById("firebase-verification-label").innerText = "";
+      } catch (error) {
+        document.getElementById("google-label").innerText = "";
+        document.getElementById("firebase-label").innerText = JSON.stringify(error);
+        document.getElementById("firebase-verification-label").innerText = "";
+        await recordPageError(error);
+      }
     };
 
     document.getElementById("function-button").onclick = async () => {
-      document.getElementById("function-label").innerText = "...working...";
+      try {
+        document.getElementById("function-label").innerText = "...working...";
 
-      const functionSelect = document.getElementById("function-select");
-      const functionIndex = functionSelect.selectedIndex;
-      const functionOption = functionSelect.options[functionIndex];
-      const functionName = functionOption.value;
-      const functionText = functionOption.text;
-      const arg0 = parseJsonIfNeeded(document.getElementById("function-arg0-input").value);
-      const arg1 = parseJsonIfNeeded(document.getElementById("function-arg1-input").value);
-      const arg2 = parseJsonIfNeeded(document.getElementById("function-arg2-input").value);
-      const arg3 = parseJsonIfNeeded(document.getElementById("function-arg3-input").value);
-      const arg4 = parseJsonIfNeeded(document.getElementById("function-arg4-input").value);
-      const arg5 = parseJsonIfNeeded(document.getElementById("function-arg5-input").value);
-      const arg6 = parseJsonIfNeeded(document.getElementById("function-arg6-input").value);
-      const arg7 = parseJsonIfNeeded(document.getElementById("function-arg7-input").value);
-      const arg8 = parseJsonIfNeeded(document.getElementById("function-arg8-input").value);
-      const arg9 = parseJsonIfNeeded(document.getElementById("function-arg9-input").value);
+        const functionSelect = document.getElementById("function-select");
+        const functionIndex = functionSelect.selectedIndex;
+        const functionOption = functionSelect.options[functionIndex];
+        const functionName = functionOption.value;
+        const functionText = functionOption.text;
+        const arg0 = parseJsonIfNeeded(document.getElementById("function-arg0-input").value);
+        const arg1 = parseJsonIfNeeded(document.getElementById("function-arg1-input").value);
+        const arg2 = parseJsonIfNeeded(document.getElementById("function-arg2-input").value);
+        const arg3 = parseJsonIfNeeded(document.getElementById("function-arg3-input").value);
+        const arg4 = parseJsonIfNeeded(document.getElementById("function-arg4-input").value);
+        const arg5 = parseJsonIfNeeded(document.getElementById("function-arg5-input").value);
+        const arg6 = parseJsonIfNeeded(document.getElementById("function-arg6-input").value);
+        const arg7 = parseJsonIfNeeded(document.getElementById("function-arg7-input").value);
+        const arg8 = parseJsonIfNeeded(document.getElementById("function-arg8-input").value);
+        const arg9 = parseJsonIfNeeded(document.getElementById("function-arg9-input").value);
 
-      const functionArgNames = functionText.split("(")[1].split(")")[0].split(",");
-      const functionArgValues = [arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9]
-      const functionArgs = {};
-      for (let i = 0; i < functionArgNames.length; i++) {
-        const functionArgName = functionArgNames[i].trim();
-        const functionArgValue = functionArgValues[i];
+        const functionArgNames = functionText.split("(")[1].split(")")[0].split(",");
+        const functionArgValues = [arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9]
+        const functionArgs = {};
+        for (let i = 0; i < functionArgNames.length; i++) {
+          const functionArgName = functionArgNames[i].trim();
+          const functionArgValue = functionArgValues[i];
 
-        if (functionArgName.length < 1) {
-          continue;
-        } else {
-          functionArgs[functionArgName] = functionArgValue;
+          if (functionArgName.length < 1) {
+            continue;
+          } else {
+            functionArgs[functionArgName] = functionArgValue;
+          }
         }
-      }
-      await recordPageAction(app, window.location.href, functionName, functionArgs);
+        await recordPageAction(app, window.location.href, functionName, functionArgs);
 
-      const functionObject = httpsCallable(functions, functionName);
-      functionObject(functionArgs)
-        .then((result) => {
-          document.getElementById("function-label").innerText = JSON.stringify(result);
-        })
-        .catch(async (error) => {
-          document.getElementById("function-label").innerText = JSON.stringify(error);
-          await recordPageError(error);
-        });
+        const functionObject = httpsCallable(functions, functionName);
+        const functionResult = await functionObject(functionArgs)
+        document.getElementById("function-label").innerText = JSON.stringify(functionResult);
+      } catch (error) {
+        document.getElementById("function-label").innerText = JSON.stringify(error);
+        await recordPageError(error);
+      }
     };
   </script>
 </body>
