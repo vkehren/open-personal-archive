@@ -1,3 +1,5 @@
+import express from "express";
+import cors from "cors";
 // import {getAuth, sendEmailVerification} from "firebase/auth"; // LATER: Figure-out if it is possible to get the current User and send the verifiation email in the beforeUserSignedIn(...) handler
 import {AuthBlockingEvent, beforeUserSignedIn} from "firebase-functions/v2/identity"; // NOTE: Also has "beforeUserCreated"
 import * as logger from "firebase-functions/logger";
@@ -7,8 +9,6 @@ import * as OpaDm from "../../datamodel/src";
 import {authenticationEventHandlerForFirebaseAuth} from "../../domainlogic/src";
 import * as adminCredentialFile from "../open-personal-archive-firebase-adminsdk-credential.json";
 import * as UTL from "./Utilities";
-import express = require("express");
-import cors = require("cors");
 
 const useAdminCredentialFile = true;
 const useJsonParser = true;
