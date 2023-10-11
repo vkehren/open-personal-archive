@@ -69,7 +69,7 @@
     async function loadDefaults(isInstalledData) {
       $("#archive-name").val("");
       $("#archive-description").val("");
-      $("#path-to-storage-folder").val("");
+      $("#path-to-root-storage-folder").val("");
       // LATER: Consider showing the User's email as read-only, getting the value from the auth token
       $("#first-name").val(""); // LATER: Consider getting an initial value from the auth token
       $("#last-name").val(""); // LATER: Consider getting an initial value from the auth token
@@ -124,7 +124,7 @@
 
           const archiveName = $("#archive-name").val();
           const archiveDescription = $("#archive-description").val();
-          const pathToStorageFolder = $("#path-to-storage-folder").val();
+          const pathToRootStorageFolder = $("#path-to-root-storage-folder").val();
           const defaultLocaleId = $(localeButtonDiv).attr("id").replace(buttonIdPrefix, "");
           console.log("defaultLocaleId = " + defaultLocaleId);
           const defaultTimeZoneGroupId = $(timeZoneButtonDiv).attr("id").replace(buttonIdPrefix, "");
@@ -133,7 +133,7 @@
           const ownerFirstName = $("#first-name").val();
           const ownerLastName = $("#last-name").val();
 
-          const data = {archiveName, archiveDescription, pathToStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, ownerFirstName, ownerLastName, installationNotes};
+          const data = {archiveName, archiveDescription, pathToRootStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, ownerFirstName, ownerLastName, installationNotes};
           const performInstallFunc = httpsCallable(functions, "performInstall");
           const performInstallResult = await performInstallFunc(data);
           const installSucceeded = performInstallResult.data.success;
@@ -251,7 +251,7 @@
           <div class="col-5">
             <div class="input-group mb-3">
               <span class="input-group-text" id="basic-addon3">[storage_bucket_url]/</span>
-              <input id="path-to-storage-folder" type="text" class="form-control" placeholder="Relative Path" aria-label="Relative Path" />
+              <input id="path-to-root-storage-folder" type="text" class="form-control" placeholder="Relative Path" aria-label="Relative Path" />
             </div>
           </div>
           <div class="col">
