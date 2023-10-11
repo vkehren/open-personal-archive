@@ -133,7 +133,7 @@ export const performInstall = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reques
   try {
     logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
-    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, moduleNameGetter, isInstalled_FunctionNameGetter);
+    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, moduleNameGetter, performInstall_FunctionNameGetter);
     authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, adminApp);
     OPA.assertAuthenticationStateIsNotNullish(authenticationState);
     const authenticationStateNonNull = OPA.convertNonNullish(authenticationState);
