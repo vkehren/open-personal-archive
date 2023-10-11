@@ -50,8 +50,6 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
   const functionName = OPA.getTypedPropertyKeyAsText("firebaseAuthSignInHandler", {firebaseAuthSignInHandler});
   let adminApp = ((null as unknown) as admin.app.App);
   let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
-  const firebaseAuthUserId = () => (event.data.uid);
-  const getLogMessage = (state: OPA.ExecutionState) => UTL.getFunctionCallLogMessage(moduleName, "Authentication Trigger to initialize User " + firebaseAuthUserId(), state);
   const shimmedRequest: OPA.ICallRequest = {
     clientIpAddress: event.ipAddress,
     url: event.eventType,
@@ -60,10 +58,11 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
   };
 
   try {
-    logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
+    const logMessage = UTL.getFunctionCallLogMessage(moduleName, (functionName + " : Authentication Trigger to initialize User " + event.data.uid), OPA.ExecutionStates.entry);
+    logger.info(logMessage, {structuredData: true});
+
     adminApp = admin.app();
     dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, moduleName, functionName);
-    await UTL.logFunctionCall(dataStorageState, null, shimmedRequest, OPA.ExecutionStates.ready);
 
     if (OPA.isNullishOrWhitespace(event.data.email)) {
       throw new Error("Currently, the OPA system requires a valid email address for each User.");
@@ -98,13 +97,15 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
       }
     }
 
+    const authState = OPA.getAuthenticationStateFromUserData(userData);
+    await UTL.logFunctionCall(dataStorageState, authState, shimmedRequest, OPA.ExecutionStates.ready);
+
     const opaUser = await authenticationEventHandlerForFirebaseAuth(dataStorageState, userData);
     if (OPA.isNull(opaUser)) {
       throw new Error("A corrsponding User could not be found.");
     }
 
-    const messageSuffix = (!OPA.isNullish(opaUser)) ? (" for " + OPA.convertNonNullish(opaUser).authAccountName) : " without User";
-    logger.info(getLogMessage(OPA.ExecutionStates.complete) + messageSuffix, {structuredData: true});
+    await UTL.logFunctionCall(dataStorageState, authState, shimmedRequest, OPA.ExecutionStates.complete);
   } catch (error) {
     await UTL.logFunctionError(dataStorageState, null, shimmedRequest, error as Error);
   } finally {

@@ -109,6 +109,24 @@ export interface ICallStateBase<DS extends IDataStorageState, ATC extends IAuthe
   readonly authorizationState?: ATZ;
 }
 
+/**
+ * Gets an IAuthenticationState object from the IFirebaseAuthUserData object provided.
+ * @param {IFirebaseAuthUserData} authUserData The IFirebaseAuthUserData object.
+ * @return {IAuthenticationState}
+ */
+export function getAuthenticationStateFromUserData(authUserData: IFirebaseAuthUserData): IAuthenticationState {
+  TC.assertNonNullish(authUserData, "A valid IFirebaseAuthUserData object must be provided.");
+
+  const authState: IAuthenticationState = {
+    firebaseAuthUserId: authUserData.uid,
+    providerId: authUserData.providerId,
+    email: authUserData.email,
+    emailIsVerified: authUserData.emailVerified,
+    displayName: authUserData.displayName,
+  };
+  return authState;
+}
+
 const FieldValue_MethodName_Unrecognized = "[UNRECOGNIZED]"; // eslint-disable-line camelcase
 const FieldValue_MethodName_ArrayRemove = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("arrayRemove") as string); // eslint-disable-line camelcase
 const FieldValue_MethodName_ArrayUnion = (VC.getTypedPropertyKeyAsText<IFirebaseConstructorProvider>("arrayUnion") as string); // eslint-disable-line camelcase
