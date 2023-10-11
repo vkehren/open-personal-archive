@@ -49,6 +49,8 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
         const authorizationState = await CSU.readAuthorizationStateForFirebaseAuthUser(config.dataStorageState, OPA.convertNonNullish(ownerForUninstall).firebaseAuthUserId);
         await Application.performUninstall(config.dataStorageState, config.authenticationState, authorizationState, doBackup);
       }
+    } else {
+      await OPA.clearFirestoreCollectionByRef(config.dataStorageState, OpaDb.ActivityLogItems.getTypedCollection(config.dataStorageState));
     }
 
     // LATER: Consider terminating DB, deleting App, and re-creating App
