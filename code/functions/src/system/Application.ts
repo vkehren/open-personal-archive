@@ -153,6 +153,13 @@ export const performInstall = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reques
     const defaultTimeZoneGroupId = (data.defaultTimeZoneGroupId) ? data.defaultTimeZoneGroupId : undefined;
     OPA.assertNonNullishOrWhitespace(defaultTimeZoneGroupId, "The Archive default time zone group must not be blank.");
     const installationNotes = OPA.convertNonNullish(data.installationNotes, "");
+
+    if (!OPA.isNullishOrWhitespace(data.ownerFirstName)) {
+      ((authenticationStateNonNull as unknown) as Record<string, unknown>).firstName = data.ownerFirstName;
+    }
+    if (!OPA.isNullishOrWhitespace(data.ownerLastName)) {
+      ((authenticationStateNonNull as unknown) as Record<string, unknown>).lastName = data.ownerLastName;
+    }
     const installResult = await Application.performInstall(dataStorageState, authenticationStateNonNull, archiveName, archiveDescription, pathToRootStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, installationNotes); // eslint-disable-line max-len
 
     return OPA.getSuccessResult(installResult);
