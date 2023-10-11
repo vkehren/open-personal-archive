@@ -8,6 +8,8 @@ import * as TC from "./TypeChecking";
  */
 export const MAX_QUERY_CHAR_VALUE = "\uf8ff"; // eslint-disable-line camelcase
 
+export const TEXT_VALUE_NOT_SET = "[NOT_SET]";
+
 /**
  * Gets the module name relative to the "src" directory from the filename of the module.
  * @param {string} filename The filename of the module.

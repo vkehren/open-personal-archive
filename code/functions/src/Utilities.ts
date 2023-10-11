@@ -73,8 +73,8 @@ export async function getDataStorageStateForFirebaseApp(app: admin.app.App, modu
       writeBatch: () => (dataStorageState.db.batch()),
     },
     logWriteState: {
-      entryModuleName: moduleNameGetter(),
-      entryFunctionName: functionNameGetter(),
+      entryModuleName: (!OPA.isNullish(moduleNameGetter)) ? moduleNameGetter() : OPA.TEXT_VALUE_NOT_SET,
+      entryFunctionName: (!OPA.isNullish(functionNameGetter)) ? functionNameGetter() : OPA.TEXT_VALUE_NOT_SET,
       rootLogItemId: (null as string | null),
       externalLogItemId: (null as string | null),
     },
