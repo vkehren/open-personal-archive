@@ -1,0 +1,337 @@
+const NAME = "open-personal-archive-time-zones";
+const VERSION = "2.4.3";
+const AUTHOR = "Ryan Stephen Ehrenreich";
+const COPYRIGHT = "Copyright © 2021 Open Personal Archive™";
+
+const supportedTimeZoneGroups = [
+  {
+    "id": "OPA_TimeZone_Pacific_Kiritimati",
+    "name": "Pacific/Kiritimati",
+    "countryCode": "KI",
+    "geoCoordinates": "+0152-15720",
+    "comments": "Line Islands",
+    "displayOrder": 100
+  },
+  {
+    "id": "OPA_TimeZone_Pacific_Tongatapu",
+    "name": "Pacific/Tongatapu",
+    "countryCode": "TO",
+    "geoCoordinates": "-210800-1751200",
+    "comments": "",
+    "displayOrder": 200
+  },
+  {
+    "id": "OPA_TimeZone_Pacific_Chatham",
+    "name": "Pacific/Chatham",
+    "countryCode": "NZ",
+    "geoCoordinates": "-4357-17633",
+    "comments": "Chatham Islands",
+    "displayOrder": 300
+  },
+  {
+    "id": "OPA_TimeZone_Pacific_Auckland",
+    "name": "Pacific/Auckland",
+    "countryCode": "NZ",
+    "geoCoordinates": "-3652+17446",
+    "comments": "New Zealand (most areas)",
+    "displayOrder": 400
+  },
+  {
+    "id": "OPA_TimeZone_Pacific_Bougainville",
+    "name": "Pacific/Bougainville",
+    "countryCode": "PG",
+    "geoCoordinates": "-0613+15534",
+    "comments": "Bougainville",
+    "displayOrder": 500
+  },
+  {
+    "id": "OPA_TimeZone_Australia_Lord_Howe",
+    "name": "Australia/Lord_Howe",
+    "countryCode": "AU",
+    "geoCoordinates": "-3133+15905",
+    "comments": "Lord Howe Island",
+    "displayOrder": 600
+  },
+  {
+    "id": "OPA_TimeZone_Australia_Brisbane",
+    "name": "Australia/Brisbane",
+    "countryCode": "AU",
+    "geoCoordinates": "-2728+15302",
+    "comments": "Queensland (most areas)",
+    "displayOrder": 700
+  },
+  {
+    "id": "OPA_TimeZone_Australia_Darwin",
+    "name": "Australia/Darwin",
+    "countryCode": "AU",
+    "geoCoordinates": "-1228+13050",
+    "comments": "Northern Territory",
+    "displayOrder": 800
+  },
+  {
+    "id": "OPA_TimeZone_Asia_Seoul",
+    "name": "Asia/Seoul",
+    "countryCode": "KR",
+    "geoCoordinates": "+3733+12658",
+    "comments": "",
+    "displayOrder": 900
+  },
+  {
+    "id": "OPA_TimeZone_Asia_Tokyo",
+    "name": "Asia/Tokyo",
+    "countryCode": "JP",
+    "geoCoordinates": "+353916+1394441",
+    "comments": "",
+    "displayOrder": 1000
+  },
+  {
+    "id": "OPA_TimeZone_Australia_Eucla",
+    "name": "Australia/Eucla",
+    "countryCode": "AU",
+    "geoCoordinates": "-3143+12852",
+    "comments": "Western Australia (Eucla)",
+    "displayOrder": 1100
+  },
+  {
+    "id": "OPA_TimeZone_Asia_Shanghai",
+    "name": "Asia/Shanghai",
+    "countryCode": "CN",
+    "geoCoordinates": "+3114+12128",
+    "comments": "Beijing Time",
+    "displayOrder": 1200
+  },
+  {
+    "id": "OPA_TimeZone_Asia_Makassar",
+    "name": "Asia/Makassar",
+    "countryCode": "ID",
+    "geoCoordinates": "-0507+11924",
+    "comments": "Borneo (east, south); Sulawesi/Celebes, Bali, Nusa Tengarra; Timor (west)",
+    "displayOrder": 1300
+  },
+  {
+    "id": "OPA_TimeZone_Asia_Jakarta",
+    "name": "Asia/Jakarta",
+    "countryCode": "ID",
+    "geoCoordinates": "-0610+10648",
+    "comments": "Java, Sumatra",
+    "displayOrder": 1400
+  },
+  {
+    "id": "OPA_TimeZone_Asia_Omsk",
+    "name": "Asia/Omsk",
+    "countryCode": "RU",
+    "geoCoordinates": "+5500+07324",
+    "comments": "MSK+03 - Omsk",
+    "displayOrder": 1500
+  },
+  {
+    "id": "OPA_TimeZone_Asia_Kathmandu",
+    "name": "Asia/Kathmandu",
+    "countryCode": "NP",
+    "geoCoordinates": "+2743+08519",
+    "comments": "",
+    "displayOrder": 1600
+  },
+  {
+    "id": "OPA_TimeZone_Asia_Kolkata",
+    "name": "Asia/Kolkata",
+    "countryCode": "IN",
+    "geoCoordinates": "+2232+08822",
+    "comments": "",
+    "displayOrder": 1700
+  },
+  {
+    "id": "OPA_TimeZone_Asia_Karachi",
+    "name": "Asia/Karachi",
+    "countryCode": "PK",
+    "geoCoordinates": "+2452+06703",
+    "comments": "",
+    "displayOrder": 1800
+  },
+  {
+    "id": "OPA_TimeZone_Asia_Kabul",
+    "name": "Asia/Kabul",
+    "countryCode": "AF",
+    "geoCoordinates": "+3431+06912",
+    "comments": "",
+    "displayOrder": 1900
+  },
+  {
+    "id": "OPA_TimeZone_Asia_Tbilisi",
+    "name": "Asia/Tbilisi",
+    "countryCode": "GE",
+    "geoCoordinates": "+4143+04449",
+    "comments": "",
+    "displayOrder": 2000
+  },
+  {
+    "id": "OPA_TimeZone_Africa_Nairobi",
+    "name": "Africa/Nairobi",
+    "countryCode": "KE",
+    "geoCoordinates": "-0117+03649",
+    "comments": "",
+    "displayOrder": 2100
+  },
+  {
+    "id": "OPA_TimeZone_Europe_Moscow",
+    "name": "Europe/Moscow",
+    "countryCode": "RU",
+    "geoCoordinates": "+554521+0373704",
+    "comments": "MSK+00 - Moscow area",
+    "displayOrder": 2200
+  },
+  {
+    "id": "OPA_TimeZone_Europe_Kaliningrad",
+    "name": "Europe/Kaliningrad",
+    "countryCode": "RU",
+    "geoCoordinates": "+5443+02030",
+    "comments": "MSK-01 - Kaliningrad",
+    "displayOrder": 2300
+  },
+  {
+    "id": "OPA_TimeZone_Africa_Gaborone",
+    "name": "Africa/Gaborone",
+    "countryCode": "BW",
+    "geoCoordinates": "-2439+02555",
+    "comments": "",
+    "displayOrder": 2400
+  },
+  {
+    "id": "OPA_TimeZone_Africa_Lagos",
+    "name": "Africa/Lagos",
+    "countryCode": "NG",
+    "geoCoordinates": "+0627+00324",
+    "comments": "",
+    "displayOrder": 2500
+  },
+  {
+    "id": "OPA_TimeZone_Europe_Paris",
+    "name": "Europe/Paris",
+    "countryCode": "FR",
+    "geoCoordinates": "+4852+00220",
+    "comments": "",
+    "displayOrder": 2600
+  },
+  {
+    "id": "OPA_TimeZone_UTC",
+    "name": "UTC",
+    "countryCode": "UTC",
+    "geoCoordinates": "",
+    "comments": "",
+    "displayOrder": 2700
+  },
+  {
+    "id": "OPA_TimeZone_Europe_London",
+    "name": "Europe/London",
+    "countryCode": "GB",
+    "geoCoordinates": "+513030-0000731",
+    "comments": "",
+    "displayOrder": 2800
+  },
+  {
+    "id": "OPA_TimeZone_Atlantic_Azores",
+    "name": "Atlantic/Azores",
+    "countryCode": "PT",
+    "geoCoordinates": "+3744-02540",
+    "comments": "Azores",
+    "displayOrder": 2900
+  },
+  {
+    "id": "OPA_TimeZone_America_Noronha",
+    "name": "America/Noronha",
+    "countryCode": "BR",
+    "geoCoordinates": "-0351-03225",
+    "comments": "Atlantic islands",
+    "displayOrder": 3000
+  },
+  {
+    "id": "OPA_TimeZone_America_Nuuk",
+    "name": "America/Nuuk",
+    "countryCode": "GL",
+    "geoCoordinates": "+6411-05144",
+    "comments": "Greenland (most areas)",
+    "displayOrder": 3100
+  },
+  {
+    "id": "OPA_TimeZone_America_St_Johns",
+    "name": "America/St_Johns",
+    "countryCode": "CA",
+    "geoCoordinates": "+4734-05243",
+    "comments": "Newfoundland; Labrador (southeast)",
+    "displayOrder": 3200
+  },
+  {
+    "id": "OPA_TimeZone_America_Blanc_Sablon",
+    "name": "America/Blanc-Sablon",
+    "countryCode": "CA",
+    "geoCoordinates": "+5125-05707",
+    "comments": "AST - QC (Lower North Shore)",
+    "displayOrder": 3300
+  },
+  {
+    "id": "OPA_TimeZone_America_New_York",
+    "name": "America/New_York",
+    "countryCode": "US",
+    "geoCoordinates": "+404251-0740023",
+    "comments": "Eastern (most areas)",
+    "displayOrder": 3400
+  },
+  {
+    "id": "OPA_TimeZone_America_Chicago",
+    "name": "America/Chicago",
+    "countryCode": "US",
+    "geoCoordinates": "+415100-0873900",
+    "comments": "Central (most areas)",
+    "displayOrder": 3500
+  },
+  {
+    "id": "OPA_TimeZone_America_Denver",
+    "name": "America/Denver",
+    "countryCode": "US",
+    "geoCoordinates": "+394421-1045903",
+    "comments": "Mountain (most areas)",
+    "displayOrder": 3600
+  },
+  {
+    "id": "OPA_TimeZone_America_Los_Angeles",
+    "name": "America/Los_Angeles",
+    "countryCode": "US",
+    "geoCoordinates": "+340308-1181434",
+    "comments": "Pacific",
+    "displayOrder": 3700
+  },
+  {
+    "id": "OPA_TimeZone_America_Juneau",
+    "name": "America/Juneau",
+    "countryCode": "US",
+    "geoCoordinates": "+581807-1342511",
+    "comments": "Alaska - Juneau area",
+    "displayOrder": 3800
+  },
+  {
+    "id": "OPA_TimeZone_Pacific_Marquesas",
+    "name": "Pacific/Marquesas",
+    "countryCode": "PF",
+    "geoCoordinates": "-0900-13930",
+    "comments": "Marquesas Islands",
+    "displayOrder": 3900
+  },
+  {
+    "id": "OPA_TimeZone_Pacific_Honolulu",
+    "name": "Pacific/Honolulu",
+    "countryCode": "US",
+    "geoCoordinates": "+211825-1575130",
+    "comments": "Hawaii",
+    "displayOrder": 4000
+  },
+  {
+    "id": "OPA_TimeZone_Pacific_Apia",
+    "name": "Pacific/Apia",
+    "countryCode": "WS",
+    "geoCoordinates": "-1350-17144",
+    "comments": "",
+    "displayOrder": 4100
+  }
+];
+
+export {supportedTimeZones};

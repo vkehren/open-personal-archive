@@ -1,379 +1,406 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Install Open Personal Archive™</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <script defer src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Install Open Personal Archive™</title>
+  <meta name="author" content="Ryan Stephen Ehrenreich" />
+  <meta name="version" content="2.4.3" />
 
-    <script defer src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+        crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
+          crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
+          crossorigin="anonymous"></script>
 
-    <script defer src="https://www.gstatic.com/firebasejs/9.5.0/firebase-app.js"></script>
-    <script defer src="https://www.gstatic.com/firebasejs/9.5.0/firebase-auth.js"></script>
-    <script defer src="https://www.gstatic.com/firebasejs/9.5.0/firebase-functions.js"></script>
+  <script defer src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
-    <script type="text/javascript" src="firebase_config.js"></script>
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.5.0/firebase-app.js";
-      import { getAuth, getRedirectResult, signInWithPopup, signInWithRedirect, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/9.5.0/firebase-auth.js";
-      import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.5.0/firebase-functions.js";
+  <script defer src="https://www.gstatic.com/firebasejs/9.5.0/firebase-app.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/9.5.0/firebase-auth.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/9.5.0/firebase-functions.js"></script>
 
-      var isTesting = false;
-      var auth = null;
-      var functions = null;
-      var user = null;
-      var credential = null;
-      var token = null;
-      var buttonIdPrefix = "selected-";
+  <script type="module">
+    import {FIREBASE_CONFIG, FIREBASE_FUNCTIONS_REGION} from "./WebAppConfig.js";
+    import {isNullish} from "./WebBaseLite.js";
+    import {supportedLocales} from "./files/Locales.js";
+    import {supportedTimeZoneGroups} from "./files/TimeZoneGroups.js";
+    import {initializeApp} from "https://www.gstatic.com/firebasejs/9.5.0/firebase-app.js";
+    import {getAuth, getRedirectResult, signInWithPopup, signInWithRedirect, GoogleAuthProvider} from "https://www.gstatic.com/firebasejs/9.5.0/firebase-auth.js";
+    import {getFunctions, httpsCallable} from "https://www.gstatic.com/firebasejs/9.5.0/firebase-functions.js";
 
-      try {
-        const app = initializeApp(firebaseConfig);
-        const provider = new GoogleAuthProvider();
-        auth = getAuth();
-        functions = getFunctions(app);
+    var isTesting = false;
+    var auth = null;
+    var functions = null;
+    var user = null;
+    var credential = null;
+    var token = null;
+    var buttonIdPrefix = "selected-";
 
-        if (isTesting) {
-          auth.onAuthStateChanged(async (user) => {
-            if (user) {
-              await auth.signOut();
-              console.log("User " + user.uid + " signed out.");
-            }
-          });
-        }
+    try {
+      const app = initializeApp(FIREBASE_CONFIG);
+      const provider = new GoogleAuthProvider();
+      auth = getAuth();
+      functions = getFunctions(app, FIREBASE_FUNCTIONS_REGION);
 
-        const isInstalledFunc = httpsCallable(functions, "isInstalled");
-        const isInstalledResult = await isInstalledFunc({});
-        const isInstalledData = isInstalledResult.data.data;
-
-        if (isInstalledData.isInstalled || !isInstalledData.isAuthenticated) {
-          window.location.replace("./index.html");
-        } else {
-          await loadDefaults(isInstalledData);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-
-      async function loadDefaults(isInstalledData) {
-        const getDisplayModelFunc = httpsCallable(functions, "getInstallationScreenDisplayModel");
-        const getDisplayModelResult = await getDisplayModelFunc({});
-        const displayModel = getDisplayModelResult.data.data;
-
-        $("#archive-name").val(displayModel.archiveName);
-        $("#archive-description").val(displayModel.archiveDescription);
-        $("#path-to-storage-folder").val(displayModel.pathToStorageFolder);
-         // LATER: Consider showing the User's email as read-only, getting the value from the auth token
-        $("#first-name").val(""); // LATER: Consider getting an initial value from the auth token
-        $("#last-name").val(""); // LATER: Consider getting an initial value from the auth token
-
-        const selectedLocale = displayModel.selectedLocale;
-        let localesHtml = "";
-        for (let i = 0; i < displayModel.validLocales.length; i++) {
-          const locale = displayModel.validLocales[i];
-          const isSelected = (locale.id == selectedLocale.id);
-
-          localesHtml += "<li><a id=\"" + locale.id + "\" class=\"dropdown-item locale-item\" href=\"#\">" + locale.displayName + "</a></li>\n";
-
-          if (isSelected) {
-            $("#locale-button").html("<div id=\"" + (buttonIdPrefix + locale.id) + "\">" + locale.displayName + "</div>");
+      if (isTesting) {
+        auth.onAuthStateChanged(async (user) => {
+          if (user) {
+            await auth.signOut();
+            console.log("User " + user.uid + " signed out.");
           }
-        }
-        $("#locale-menu").html(localesHtml);
-        $(".locale-item").click(function (e) {
-          e.preventDefault();
-          selectDropDownOption(this, $("#locale-button"));
         });
+      }
 
-        const selectedTimeZoneGroup = displayModel.selectedTimeZoneGroup;
-        let timeZoneGroupsHtml = "";
-        for (let i = 0; i < displayModel.validTimeZoneGroups.length; i++) {
-          const timeZoneGroup = displayModel.validTimeZoneGroups[i];
-          const isSelected = (timeZoneGroup.id == selectedTimeZoneGroup.id);
+      const isInstalledFunc = httpsCallable(functions, "isInstalled");
+      const isInstalledResult = await isInstalledFunc({});
+      const isInstalledData = isInstalledResult.data.payload;
 
-          timeZoneGroupsHtml += "<li><a id=\"" + timeZoneGroup.id + "\" class=\"dropdown-item time-zone-item\" href=\"#\">" + timeZoneGroup.name + "</a></li>\n";
+      if (isInstalledData.isInstalled || !isInstalledData.isAuthenticated) {
+        window.location.replace("./index.html");
+      } else {
+        await loadDefaults(isInstalledData);
+      }
+    } catch (error) {
+      console.log(error);
+    }
 
-          if (isSelected) {
-            $("#time-zone-button").html("<div id=\"" + (buttonIdPrefix + timeZoneGroup.id) + "\">" + timeZoneGroup.name + "</div>");
-          }
+    async function loadDefaults(isInstalledData) {
+      $("#archive-name").val("");
+      $("#archive-description").val("");
+      $("#path-to-root-storage-folder").val("");
+      // LATER: Consider showing the User's email as read-only, getting the value from the auth token
+      $("#first-name").val(""); // LATER: Consider getting an initial value from the auth token
+      $("#last-name").val(""); // LATER: Consider getting an initial value from the auth token
+      $("#installation-notes").val("");
+
+      let selectedLocale = supportedLocales.filter((value) => value.isDefault)[0];
+      selectedLocale = (!isNullish(selectedLocale)) ? selectedLocale : supportedLocales[0];
+
+      let localesHtml = "";
+      for (let i = 0; i < supportedLocales.length; i++) {
+        const locale = supportedLocales[i];
+        const isSelected = (locale.id == selectedLocale.id);
+
+        localesHtml += "<li><a id=\"" + locale.id + "\" class=\"dropdown-item locale-item\" href=\"#\">" + locale.displayName + "</a></li>\n";
+
+        if (isSelected) {
+          $("#locale-button").html("<div id=\"" + (buttonIdPrefix + locale.id) + "\">" + locale.displayName + "</div>");
         }
-        $("#time-zone-menu").html(timeZoneGroupsHtml);
-        $(".time-zone-item").click(function (e) {
-          e.preventDefault();
-          selectDropDownOption(this, $("#time-zone-button"));
-        });
+      }
+      $("#locale-menu").html(localesHtml);
+      $(".locale-item").click(function(e) {
+        e.preventDefault();
+        selectDropDownOption(this, $("#locale-button"));
+      });
 
-        document.getElementById ("submit-button").onclick = async () => {
-          try {
-            const localeButton = $("#locale-button");
-            const localeButtonDiv = $(localeButton).children()[0];
-            const timeZoneButton = $("#time-zone-button");
-            const timeZoneButtonDiv = $(timeZoneButton).children()[0];
-            
-            const archiveName = $("#archive-name").val();
-            const archiveDescription = $("#archive-description").val();
-            const pathToStorageFolder = $("#path-to-storage-folder").val();
-            const defaultLocaleId = $(localeButtonDiv).attr("id").replace(buttonIdPrefix, "");
-            console.log("defaultLocaleId = " + defaultLocaleId);
-            const defaultTimeZoneGroupId = $(timeZoneButtonDiv).attr("id").replace(buttonIdPrefix, "");
-            console.log("defaultTimeZoneGroupId = " + defaultTimeZoneGroupId);
-            const ownerFirstName = $("#first-name").val();
-            const ownerLastName = $("#last-name").val();
+      let selectedTimeZoneGroup = supportedTimeZoneGroups.filter((value) => value.isDefault)[0];
+      selectedTimeZoneGroup = (!isNullish(selectedTimeZoneGroup)) ? selectedTimeZoneGroup : supportedTimeZoneGroups[0];
 
-            const data = { query: { archiveName, archiveDescription, pathToStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, ownerFirstName, ownerLastName } };
-            const performInstallFunc = httpsCallable(functions, "performInstall");
-            const performInstallResult = await performInstallFunc(data);
-            const installSucceeded = performInstallResult.data.success;
+      let timeZoneGroupsHtml = "";
+      for (let i = 0; i < supportedTimeZoneGroups.length; i++) {
+        const timeZoneGroup = supportedTimeZoneGroups[i];
+        const isSelected = (timeZoneGroup.id == selectedTimeZoneGroup.id);
 
-            if (!installSucceeded) {
-              throw new Error(performInstallResult.data.message);
-            }
+        timeZoneGroupsHtml += "<li><a id=\"" + timeZoneGroup.id + "\" class=\"dropdown-item time-zone-item\" href=\"#\">" + timeZoneGroup.name + "</a></li>\n";
 
-            // LATER: Show success dialog before navigating to Single Page App (SPA)
-            window.location.replace("./app/index.html");
-          } catch (error) {
-            // LATER: Show error dialog
-            $("#error-alert-top").html(error.message);
-            $("#error-alert-bottom").html(error.message);
-            $("#error-alert-top").show();
-            $("#error-alert-bottom").show();
+        if (isSelected) {
+          $("#time-zone-button").html("<div id=\"" + (buttonIdPrefix + timeZoneGroup.id) + "\">" + timeZoneGroup.name + "</div>");
+        }
+      }
+      $("#time-zone-menu").html(timeZoneGroupsHtml);
+      $(".time-zone-item").click(function(e) {
+        e.preventDefault();
+        selectDropDownOption(this, $("#time-zone-button"));
+      });
+
+      document.getElementById("submit-button").onclick = async () => {
+        try {
+          const localeButton = $("#locale-button");
+          const localeButtonDiv = $(localeButton).children()[0];
+          const timeZoneButton = $("#time-zone-button");
+          const timeZoneButtonDiv = $(timeZoneButton).children()[0];
+
+          const archiveName = $("#archive-name").val();
+          const archiveDescription = $("#archive-description").val();
+          const pathToRootStorageFolder = $("#path-to-root-storage-folder").val();
+          const defaultLocaleId = $(localeButtonDiv).attr("id").replace(buttonIdPrefix, "");
+          console.log("defaultLocaleId = " + defaultLocaleId);
+          const defaultTimeZoneGroupId = $(timeZoneButtonDiv).attr("id").replace(buttonIdPrefix, "");
+          console.log("defaultTimeZoneGroupId = " + defaultTimeZoneGroupId);
+          const installationNotes = $("#installation-notes").val();
+          const ownerFirstName = $("#first-name").val();
+          const ownerLastName = $("#last-name").val();
+
+          const data = {archiveName, archiveDescription, pathToRootStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, ownerFirstName, ownerLastName, installationNotes};
+          const performInstallFunc = httpsCallable(functions, "performInstall");
+          const performInstallResult = await performInstallFunc(data);
+          const installSucceeded = performInstallResult.data.success;
+
+          if (!installSucceeded) {
+            throw new Error(performInstallResult.data.message);
           }
-        };
-      }
 
-      function selectDropDownOption(anchor, buttonToUpdate) {
-        const id = $(anchor).attr("id");
-        console.log("id = " + id);
-        const name = $(anchor).html();
-        console.log("name = " + name);
-        $(buttonToUpdate).html("<div id=\"" + (buttonIdPrefix + id) + "\">" + name + "</div>");
-      }
-    </script>
-  </head>
-  <body>
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col">
-          <img src="./images/OpenPersonalArchive_Small_Logo.png" class="img-fluid mx-auto d-block" alt="Open Personal Archive™">
+          // LATER: Show success dialog before navigating to Single Page App (SPA)
+          window.location.replace("./app/index.html");
+        } catch (error) {
+          // LATER: Show error dialog
+          $("#error-alert-top").html(error.message);
+          $("#error-alert-bottom").html(error.message);
+          $("#error-alert-top").show();
+          $("#error-alert-bottom").show();
+        }
+      };
+    }
+
+    function selectDropDownOption(anchor, buttonToUpdate) {
+      const id = $(anchor).attr("id");
+      console.log("id = " + id);
+      const name = $(anchor).html();
+      console.log("name = " + name);
+      $(buttonToUpdate).html("<div id=\"" + (buttonIdPrefix + id) + "\">" + name + "</div>");
+    }
+  </script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col">
+        <img src="./images/OpenPersonalArchive_Small_Logo.png" class="img-fluid mx-auto d-block" alt="Open Personal Archive™">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h6>&nbsp;</h6>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col text-center">
+      <h2>Complete Your Installation of Open Personal Archive™</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h6>&nbsp;</h6>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col text-center">
+      <h5>You must provide the following information to complete your installation of the Open Personal Archive™ system...</h5>
+      <div id="error-alert-top" class="alert alert-danger" role="alert" style="display: none;"></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h3>&nbsp;</h3>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+    </div>
+    <div class="col-8">
+      <div class="border">
+        <div class="row">
+          <div class="col">
+            <h5 class="p-4"><b>Archive Fields:</b></h5>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+          </div>
+          <div class="col-3">
+            <label>OPA™ Archive Name:</label>
+          </div>
+          <div class="col-5">
+            <input id="archive-name" type="text" class="form-control" placeholder="Archive Name" aria-label="Archive Name" />
+          </div>
+          <div class="col">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <h6>&nbsp;</h6>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+          </div>
+          <div class="col-3">
+            <label>OPA™ Archive Description:</label>
+          </div>
+          <div class="col-5">
+            <input id="archive-description" type="text" class="form-control" placeholder="Archive Description" aria-label="Archive Description" />
+          </div>
+          <div class="col">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <h6>&nbsp;</h6>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+          </div>
+          <div class="col-3">
+            <label>Path to OPA™ Root Storage Folder:</label>
+          </div>
+          <div class="col-5">
+            <div class="input-group mb-3">
+              <span class="input-group-text" id="basic-addon3">[storage_bucket_url]/</span>
+              <input id="path-to-root-storage-folder" type="text" class="form-control" placeholder="Relative Path" aria-label="Relative Path" />
+            </div>
+          </div>
+          <div class="col">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <h6>&nbsp;</h6>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+          </div>
+          <div class="col-2">
+            <label>Default Language:</label>
+          </div>
+          <div class="col-6">
+            <div class="dropdown">
+              <button id="locale-button" type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                Language Dropdown
+              </button>
+              <ul id="locale-menu" class="dropdown-menu" aria-labelledby="locale-button">
+              </ul>
+            </div>
+          </div>
+          <div class="col">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <h6>&nbsp;</h6>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+          </div>
+          <div class="col-2">
+            <label>Default Time Zone:</label>
+          </div>
+          <div class="col-6">
+            <div class="dropdown">
+              <button id="time-zone-button" type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                Time Zone Dropdown
+              </button>
+              <ul id="time-zone-menu" class="dropdown-menu" aria-labelledby="time-zone-button">
+              </ul>
+            </div>
+          </div>
+          <div class="col">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <h6>&nbsp;</h6>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+          </div>
+          <div class="col-2">
+            <label>Installation Notes:</label>
+          </div>
+          <div class="col-6">
+            <div class="textarea">
+              <textarea id="installation-notes" rows="5" style="width: 100%;"></textarea>
+            </div>
+          </div>
+          <div class="col">
+          </div>
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col">
-        <h6>&nbsp;</h6>
-      </div>
+    <div class="col">
     </div>
-    <div class="row">
-      <div class="col text-center">
-        <h2>Complete Your Installation of Open Personal Archive™</h2>
-      </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h6>&nbsp;</h6>
     </div>
-    <div class="row">
-      <div class="col">
-        <h6>&nbsp;</h6>
-      </div>
+  </div>
+  <div class="row">
+    <div class="col">
     </div>
-    <div class="row">
-      <div class="col text-center">
-        <h5>You must provide the following information to complete your installation of the Open Personal Archive™ system...</h5>
-        <div id="error-alert-top" class="alert alert-danger" role="alert" style="display: none;"></div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <h3>&nbsp;</h3>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-      </div>
-      <div class="col-8">
-        <div class="border">
-          <div class="row">
-            <div class="col">
-              <h5 class="p-4"><b>Archive Fields:</b></h5>
-            </div>
+    <div class="col-8">
+      <div class="border">
+        <div class="row">
+          <div class="col">
+            <h5 class="p-4"><b>Archive Owner Fields:</b></h5>
           </div>
-          <div class="row">
-            <div class="col">
-            </div>
-            <div class="col-3">
-              <label>OPA™ Archive Name:</label>
-            </div>
-            <div class="col-5">
-              <input id="archive-name" type="text" class="form-control" placeholder="Archive Name" aria-label="Archive Name" />
-            </div>
-            <div class="col">
-            </div>
+        </div>
+        <div class="row">
+          <div class="col">
           </div>
-          <div class="row">
-            <div class="col">
-              <h6>&nbsp;</h6>
-            </div>
+          <div class="col-3">
+            <label>First Name:</label>
           </div>
-          <div class="row">
-            <div class="col">
-            </div>
-            <div class="col-3">
-              <label>OPA™ Archive Description:</label>
-            </div>
-            <div class="col-5">
-              <input id="archive-description" type="text" class="form-control" placeholder="Archive Description" aria-label="Archive Description" />
-            </div>
-            <div class="col">
-            </div>
+          <div class="col-5">
+            <input id="first-name" type="text" class="form-control" placeholder="First Name" aria-label="First Name" />
           </div>
-          <div class="row">
-            <div class="col">
-              <h6>&nbsp;</h6>
-            </div>
+          <div class="col">
           </div>
-          <div class="row">
-            <div class="col">
-            </div>
-            <div class="col-3">
-              <label>Path to OPA™ Root Storage Folder:</label>
-            </div>
-            <div class="col-5">
-              <div class="input-group mb-3">
-                <span class="input-group-text" id="basic-addon3">[storage_bucket_url]/</span>
-                <input id="path-to-storage-folder" type="text" class="form-control" placeholder="Relative Path" aria-label="Relative Path" />
-              </div>
-            </div>
-            <div class="col">
-            </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <h6>&nbsp;</h6>
           </div>
-          <div class="row">
-            <div class="col">
-              <h6>&nbsp;</h6>
-            </div>
+        </div>
+        <div class="row">
+          <div class="col">
           </div>
-          <div class="row">
-            <div class="col">
-            </div>
-            <div class="col-2">
-              <label>Default Language:</label>
-            </div>
-            <div class="col-6">
-              <div class="dropdown">
-                <button id="locale-button" type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                  Language Dropdown
-                </button>
-                <ul id="locale-menu" class="dropdown-menu" aria-labelledby="locale-button">
-                </ul>
-              </div>
-            </div>
-            <div class="col">
-            </div>
+          <div class="col-3">
+            <label>Last Name:</label>
           </div>
-          <div class="row">
-            <div class="col">
-              <h6>&nbsp;</h6>
-            </div>
+          <div class="col-5">
+            <input id="last-name" type="text" class="form-control" placeholder="Last Name" aria-label="Last Name" />
           </div>
-          <div class="row">
-            <div class="col">
-            </div>
-            <div class="col-2">
-              <label>Default Time Zone:</label>
-            </div>
-            <div class="col-6">
-              <div class="dropdown">
-                <button id="time-zone-button" type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                  Time Zone Dropdown
-                </button>
-                <ul id="time-zone-menu" class="dropdown-menu" aria-labelledby="time-zone-button">
-                </ul>
-              </div>
-            </div>
-            <div class="col">
-            </div>
+          <div class="col">
           </div>
-          <div class="row">
-            <div class="col">
-              <h6>&nbsp;</h6>
-            </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <h6>&nbsp;</h6>
           </div>
         </div>
       </div>
-      <div class="col">
-      </div>
     </div>
-    <div class="row">
-      <div class="col">
-        <h6>&nbsp;</h6>
-      </div>
+    <div class="col">
     </div>
-    <div class="row">
-      <div class="col">
-      </div>
-      <div class="col-8">
-        <div class="border">
-          <div class="row">
-            <div class="col">
-              <h5 class="p-4"><b>Archive Owner Fields:</b></h5>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-            </div>
-            <div class="col-3">
-              <label>First Name:</label>
-            </div>
-            <div class="col-5">
-              <input id="first-name" type="text" class="form-control" placeholder="First Name" aria-label="First Name" />
-            </div>
-            <div class="col">
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <h6>&nbsp;</h6>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-            </div>
-            <div class="col-3">
-              <label>Last Name:</label>
-            </div>
-            <div class="col-5">
-              <input id="last-name" type="text" class="form-control" placeholder="Last Name" aria-label="Last Name" />
-            </div>
-            <div class="col">
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <h6>&nbsp;</h6>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-      </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h6>&nbsp;</h6>
     </div>
-    <div class="row">
-      <div class="col">
-        <h6>&nbsp;</h6>
-      </div>
+  </div>
+  <div class="row">
+    <div class="col-8">
     </div>
-    <div class="row">
-      <div class="col-8">
-      </div>
-      <div class="col-2">
-        <button id="submit-button" type="button" class="btn btn-primary">Complete Install</button>
-      </div>
-      <div class="col">
-      </div>
+    <div class="col-2">
+      <button id="submit-button" type="button" class="btn btn-primary">Complete Install</button>
     </div>
-    <div class="row">
-      <div class="col">
-        <div id="error-alert-bottom" class="alert alert-danger" role="alert" style="display: none;"></div>
-        <h1>&nbsp;</h1>
-      </div>
+    <div class="col">
     </div>
-  </body>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div id="error-alert-bottom" class="alert alert-danger" role="alert" style="display: none;"></div>
+      <h1>&nbsp;</h1>
+    </div>
+  </div>
+</body>
+
 </html>

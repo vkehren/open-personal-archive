@@ -2,6 +2,9 @@ import * as AP from "./Application";
 
 /* eslint-disable camelcase */
 export const name = "ApplicationTests";
+const moduleFilename = "/workspace/lib/package_name/src/sub_folder/MyModule.js";
+const moduleNameFromSrc = "/sub_folder/MyModule";
+const moduleName = "MyModule";
 type EnumUnderscore = "a_b" | "b_c" | "c_d";
 type EnumDash = "a-b" | "b-c" | "c-d";
 const undefinedString = ((undefined as unknown) as string);
@@ -10,6 +13,42 @@ const falseString = ((false as unknown) as string);
 const trueString = ((true as unknown) as string);
 const zeroString = ((0 as unknown) as string);
 const oneString = ((1 as unknown) as string);
+
+
+// TESTS for getModuleNameFromSrc(...)
+test("checks that passing 'undefined' throws error", () => {
+  expect(() => AP.getModuleNameFromSrc(undefinedString)).toThrow();
+});
+
+test("checks that passing 'null' throws error", () => {
+  expect(() => AP.getModuleNameFromSrc(nullString)).toThrow();
+});
+
+test("checks that passing '' throws error", () => {
+  expect(() => AP.getModuleNameFromSrc("")).toThrow();
+});
+
+test("checks that passing valid filename returns correct result", () => {
+  expect(AP.getModuleNameFromSrc(moduleFilename)).toEqual(moduleNameFromSrc);
+});
+
+
+// TESTS for getModuleName(...)
+test("checks that passing 'undefined' throws error", () => {
+  expect(() => AP.getModuleName(undefinedString)).toThrow();
+});
+
+test("checks that passing 'null' throws error", () => {
+  expect(() => AP.getModuleName(nullString)).toThrow();
+});
+
+test("checks that passing '' throws error", () => {
+  expect(() => AP.getModuleName("")).toThrow();
+});
+
+test("checks that passing valid filename returns correct result", () => {
+  expect(AP.getModuleName(moduleFilename)).toEqual(moduleName);
+});
 
 
 // TESTS for copyObject(...)

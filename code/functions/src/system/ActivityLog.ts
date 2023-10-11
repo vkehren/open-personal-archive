@@ -6,27 +6,76 @@ import * as OpaDm from "../../../datamodel/src";
 import {ActivityLog} from "../../../domainlogic/src";
 import * as UTL from "../Utilities";
 
-const moduleName = module.filename.split(".")[0];
+const moduleName = OPA.getModuleNameFromSrc(module.filename);
+const logCallsToLog = true;
 
-const recordLogItem_FunctionName = () => (OPA.getTypedPropertyKeyAsText("recordLogItem", {recordLogItem})); // eslint-disable-line camelcase
-export const recordLogItem = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
+export const getListOfLogItems = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
+  const functionName = OPA.getTypedPropertyKeyAsText("getListOfLogItems", {getListOfLogItems});
   let adminApp = ((null as unknown) as admin.app.App);
   let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
   let authenticationState = ((null as unknown) as OpaDm.IAuthenticationState | null);
-  const getLogMessage = (state: OPA.ExecutionState) => UTL.getFunctionCallLogMessage(moduleName, recordLogItem_FunctionName(), state);
   const shimmedRequest = UTL.getShimmedRequestObject(request);
 
   try {
-    logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
+    if (logCallsToLog) {
+      const logMessage = UTL.getFunctionCallLogMessage(moduleName, functionName, OPA.ExecutionStates.entry);
+      logger.info(logMessage, {structuredData: true});
+    }
+
     adminApp = admin.app();
-    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp);
+    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, moduleName, functionName);
     authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, adminApp);
 
     await UTL.setExternalLogState(dataStorageState, request);
-    // LATER: Consider not logging that is the System is ready to record the log item, as it seems redundant with the actual log item
-    await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, getLogMessage(OPA.ExecutionStates.ready));
+    if (logCallsToLog) {
+      await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, OPA.ExecutionStates.ready);
+    }
+
+    const numberOfLatestItems = (request.data.numberOfLatestItems) ? request.data.numberOfLatestItems : undefined;
+    const groupItemsByRootId = (request.data.groupItemsByRootId) ? request.data.groupItemsByRootId : true;
+    const groupItemsByExternalId = (request.data.groupItemsByExternalId) ? request.data.groupItemsByExternalId : true;
+    const options = {numberOfLatestItems, groupItemsByRootId, groupItemsByExternalId};
+
+    OPA.assertAuthenticationStateIsNotNullish(authenticationState);
+    const authenticationStateNonNull = OPA.convertNonNullish(authenticationState);
+    const logItems = await ActivityLog.getListOfLogItems(dataStorageState, authenticationStateNonNull, options);
+
+    if (logCallsToLog) {
+      await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, OPA.ExecutionStates.complete);
+    }
+    return OPA.getSuccessResult(logItems, "The request was logged successfully.");
+  } catch (error) {
+    await UTL.logFunctionError(dataStorageState, authenticationState, shimmedRequest, error);
+    return OPA.getFailureResult(error);
+  } finally {
+    await UTL.cleanUpStateAfterCall(dataStorageState, authenticationState, adminApp, shimmedRequest);
+  }
+});
+
+export const recordLogItem = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
+  const functionName = OPA.getTypedPropertyKeyAsText("recordLogItem", {recordLogItem});
+  let adminApp = ((null as unknown) as admin.app.App);
+  let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
+  let authenticationState = ((null as unknown) as OpaDm.IAuthenticationState | null);
+  const shimmedRequest = UTL.getShimmedRequestObject(request);
+
+  try {
+    if (logCallsToLog) {
+      const logMessage = UTL.getFunctionCallLogMessage(moduleName, functionName, OPA.ExecutionStates.entry);
+      logger.info(logMessage, {structuredData: true});
+    }
+
+    adminApp = admin.app();
+    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, moduleName, functionName);
+    authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, adminApp);
+
+    await UTL.setExternalLogState(dataStorageState, request);
+    if (logCallsToLog) {
+      await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, OPA.ExecutionStates.ready);
+    }
 
     const activityType = (request.data.activityType) ? request.data.activityType : undefined;
+    const executionState = OPA.ExecutionStates.remote;
     const requestor = shimmedRequest.clientIpAddress;
     const resource = (request.data.resource) ? request.data.resource : undefined;
     const action = (request.data.action) ? request.data.action : undefined;
@@ -34,8 +83,12 @@ export const recordLogItem = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
     const otherState = (request.data.otherState) ? OPA.parseJsonIfNeeded(request.data.otherState) : {};
     otherState.headers = shimmedRequest.headers;
 
-    await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, requestor, resource, action, data, otherState);
-    return OPA.getSuccessResultForMessage("The request was logged successfully.");
+    const logItem = await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, executionState, requestor, resource, action, data, otherState);
+
+    if (logCallsToLog) {
+      await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, OPA.ExecutionStates.complete);
+    }
+    return OPA.getSuccessResult<OPA.IDocument>({id: logItem.id}, "The request was logged successfully.");
   } catch (error) {
     await UTL.logFunctionError(dataStorageState, authenticationState, shimmedRequest, error);
     return OPA.getFailureResult(error);

@@ -8,6 +8,36 @@ import * as TC from "./TypeChecking";
  */
 export const MAX_QUERY_CHAR_VALUE = "\uf8ff"; // eslint-disable-line camelcase
 
+export const TEXT_VALUE_NOT_SET = "[NOT_SET]";
+
+/**
+ * Gets the module name relative to the "src" directory from the filename of the module.
+ * @param {string} filename The filename of the module.
+ * @return {string}
+ */
+export function getModuleNameFromSrc(filename: string): string {
+  TC.assertNonNullishOrWhitespace(filename, "The module filename must not be blank.");
+
+  const filenameNoExt = filename.split(".")[0];
+  const filenamePartsAtSrc = filenameNoExt.split("src");
+  const moduleNameFromSrc = filenamePartsAtSrc[filenamePartsAtSrc.length - 1];
+  return moduleNameFromSrc;
+}
+
+/**
+ * Gets the module name from the filename of the module.
+ * @param {string} filename The filename of the module.
+ * @return {string}
+ */
+export function getModuleName(filename: string): string {
+  TC.assertNonNullishOrWhitespace(filename, "The module filename must not be blank.");
+
+  const moduleNameFromSrc = getModuleNameFromSrc(filename);
+  const moduleNameParts = (moduleNameFromSrc.includes("/")) ? moduleNameFromSrc.split("/") : moduleNameFromSrc.split("\\");
+  const moduleName = moduleNameParts[moduleNameParts.length - 1];
+  return moduleName;
+}
+
 /**
  * Deep-checks if two objects of type T as value-wise equivalent.
  * @param {T | null | undefined} obj1 The first object.

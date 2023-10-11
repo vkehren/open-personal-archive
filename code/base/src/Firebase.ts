@@ -71,6 +71,8 @@ export interface IFirebaseConstructorProvider {
 }
 
 export interface ILogWriteState {
+  readonly entryModuleName: string;
+  readonly entryFunctionName: string;
   rootLogItemId: string | null;
   externalLogItemId: string | null;
 }
@@ -105,6 +107,24 @@ export interface ICallStateBase<DS extends IDataStorageState, ATC extends IAuthe
   readonly systemState?: SYS;
   readonly hasAuthorizationState: boolean;
   readonly authorizationState?: ATZ;
+}
+
+/**
+ * Gets an IAuthenticationState object from the IFirebaseAuthUserData object provided.
+ * @param {IFirebaseAuthUserData} authUserData The IFirebaseAuthUserData object.
+ * @return {IAuthenticationState}
+ */
+export function getAuthenticationStateFromUserData(authUserData: IFirebaseAuthUserData): IAuthenticationState {
+  TC.assertNonNullish(authUserData, "A valid IFirebaseAuthUserData object must be provided.");
+
+  const authState: IAuthenticationState = {
+    firebaseAuthUserId: authUserData.uid,
+    providerId: authUserData.providerId,
+    email: authUserData.email,
+    emailIsVerified: authUserData.emailVerified,
+    displayName: authUserData.displayName,
+  };
+  return authState;
 }
 
 const FieldValue_MethodName_Unrecognized = "[UNRECOGNIZED]"; // eslint-disable-line camelcase

@@ -19,37 +19,37 @@ test("checks that passing string to getSuccessResult<T>(...) works", () => {
   const resultForMsg = MSG.getSuccessResultForMessage(Success_String);
   expect(resultForMsg.success).toBe(true);
   expect(resultForMsg.message).toBe(Success_String);
-  expect(resultForMsg.data).toBe(undefined);
+  expect(resultForMsg.payload).toBe(undefined);
 
   const resultNoObj = MSG.getSuccessResult<unknown>(undefined, Success_String);
   expect(resultNoObj.success).toBe(true);
   expect(resultNoObj.message).toBe(Success_String);
-  expect(resultNoObj.data).toBe(undefined);
+  expect(resultNoObj.payload).toBe(undefined);
 
   const resultWithObj = MSG.getSuccessResult<string>(Success_String, Success_String);
   expect(resultWithObj.success).toBe(true);
   expect(resultWithObj.message).toBe(Success_String);
-  expect(resultWithObj.data).toBe(Success_String);
+  expect(resultWithObj.payload).toBe(Success_String);
 });
 
 test("checks that passing object to getSuccessResult<T>(...) works", () => {
   const resultForMsg = MSG.getSuccessResultForMessage(Success_Object.name);
   expect(resultForMsg.success).toBe(true);
   expect(resultForMsg.message).toBe(Object_Prefix + Success_String);
-  expect(resultForMsg.data).toBe(undefined);
+  expect(resultForMsg.payload).toBe(undefined);
 
   const resultNoObj = MSG.getSuccessResult<unknown>(undefined, Success_Object.name);
   expect(resultNoObj.success).toBe(true);
   expect(resultNoObj.message).toBe(Object_Prefix + Success_String);
-  expect(resultNoObj.data).toBe(undefined);
+  expect(resultNoObj.payload).toBe(undefined);
 
   const resultWithObj = MSG.getSuccessResult<typeof Success_Object>(Success_Object, Success_Object.name,);
   expect(resultWithObj.success).toBe(true);
   expect(resultWithObj.message).toBe(Object_Prefix + Success_String);
-  expect(resultWithObj.data).toBe(Success_Object);
-  expect(resultWithObj.data?.name).toBe(Object_Prefix + Success_String);
-  expect(resultWithObj.data?.wasSuccessful).toBe(true);
-  expect(resultWithObj.data?.state).toBe(ResultStates.good);
+  expect(resultWithObj.payload).toBe(Success_Object);
+  expect(resultWithObj.payload?.name).toBe(Object_Prefix + Success_String);
+  expect(resultWithObj.payload?.wasSuccessful).toBe(true);
+  expect(resultWithObj.payload?.state).toBe(ResultStates.good);
 });
 
 
@@ -58,75 +58,75 @@ test("checks that passing 'undefined' to getFailureResult<T>(...) works", () => 
   const resultNoObj = MSG.getFailureResult(undefined, false);
   expect(resultNoObj.success).toBe(false);
   expect(resultNoObj.message).toBe(MSG.UNRECOGNIZED_ERROR_MESSAGE);
-  expect(resultNoObj.data).toBe(undefined);
+  expect(resultNoObj.payload).toBe(undefined);
 
   const resultWithObj = MSG.getFailureResult(undefined, true);
   expect(resultWithObj.success).toBe(false);
   expect(resultWithObj.message).toBe(MSG.UNRECOGNIZED_ERROR_MESSAGE);
-  expect(resultWithObj.data).toBe(undefined);
+  expect(resultWithObj.payload).toBe(undefined);
 });
 
 test("checks that passing 'null' to getFailureResult<T>(...) works", () => {
   const resultNoObj = MSG.getFailureResult(null, false);
   expect(resultNoObj.success).toBe(false);
   expect(resultNoObj.message).toBe(MSG.UNRECOGNIZED_ERROR_MESSAGE);
-  expect(resultNoObj.data).toBe(undefined);
+  expect(resultNoObj.payload).toBe(undefined);
 
   const resultWithObj = MSG.getFailureResult(null, true);
   expect(resultWithObj.success).toBe(false);
   expect(resultWithObj.message).toBe(MSG.UNRECOGNIZED_ERROR_MESSAGE);
-  expect(resultWithObj.data).toBe(null);
+  expect(resultWithObj.payload).toBe(null);
 });
 
 test("checks that passing '' to getFailureResult<T>(...) works", () => {
   const resultNoObj = MSG.getFailureResult("", false);
   expect(resultNoObj.success).toBe(false);
   expect(resultNoObj.message).toBe(MSG.UNRECOGNIZED_ERROR_MESSAGE);
-  expect(resultNoObj.data).toBe(undefined);
+  expect(resultNoObj.payload).toBe(undefined);
 
   const resultWithObj = MSG.getFailureResult("", true);
   expect(resultWithObj.success).toBe(false);
   expect(resultWithObj.message).toBe(MSG.UNRECOGNIZED_ERROR_MESSAGE);
-  expect(resultWithObj.data).toBe("");
+  expect(resultWithObj.payload).toBe("");
 });
 
 test("checks that passing string to getFailureResult<T>(...) works", () => {
   const resultNoObj = MSG.getFailureResult(Failure_String, false);
   expect(resultNoObj.success).toBe(false);
   expect(resultNoObj.message).toBe(Failure_String);
-  expect(resultNoObj.data).toBe(undefined);
+  expect(resultNoObj.payload).toBe(undefined);
 
   const resultWithObj = MSG.getFailureResult(Failure_String, true);
   expect(resultWithObj.success).toBe(false);
   expect(resultWithObj.message).toBe(Failure_String);
-  expect(resultWithObj.data).toBe(Failure_String);
+  expect(resultWithObj.payload).toBe(Failure_String);
 });
 
 test("checks that passing Error to getFailureResult<T>(...) works", () => {
   const resultNoObj = MSG.getFailureResult(Failure_Error, false);
   expect(resultNoObj.success).toBe(false);
   expect(resultNoObj.message).toBe(Error_Prefix + Failure_String);
-  expect(resultNoObj.data).toBe(undefined);
+  expect(resultNoObj.payload).toBe(undefined);
 
   const resultWithObj = MSG.getFailureResult(Failure_Error, true);
   expect(resultWithObj.success).toBe(false);
   expect(resultWithObj.message).toBe(Error_Prefix + Failure_String);
-  expect(resultWithObj.data).toBe(Failure_Error);
-  expect((resultWithObj.data as Error).message).toBe(Error_Prefix + Failure_String);
-  expect((resultWithObj.data as Error).stack).toContain(" at ");
+  expect(resultWithObj.payload).toBe(Failure_Error);
+  expect((resultWithObj.payload as Error).message).toBe(Error_Prefix + Failure_String);
+  expect((resultWithObj.payload as Error).stack).toContain(" at ");
 });
 
 test("checks that passing object to getFailureResult<T>(...) works", () => {
   const resultNoObj = MSG.getFailureResult(Failure_Object, false);
   expect(resultNoObj.success).toBe(false);
   expect(resultNoObj.message).toBe(MSG.UNRECOGNIZED_ERROR_MESSAGE);
-  expect(resultNoObj.data).toBe(undefined);
+  expect(resultNoObj.payload).toBe(undefined);
 
   const resultWithObj = MSG.getFailureResult(Failure_Object, true);
   expect(resultWithObj.success).toBe(false);
   expect(resultWithObj.message).toBe(MSG.UNRECOGNIZED_ERROR_MESSAGE);
-  expect(resultWithObj.data).toBe(Failure_Object);
-  expect((resultWithObj.data as typeof Failure_Object).name).toBe(Object_Prefix + Failure_String);
-  expect((resultWithObj.data as typeof Failure_Object).wasSuccessful).toBe(false);
-  expect((resultWithObj.data as typeof Failure_Object).state).toBe(ResultStates.bad);
+  expect(resultWithObj.payload).toBe(Failure_Object);
+  expect((resultWithObj.payload as typeof Failure_Object).name).toBe(Object_Prefix + Failure_String);
+  expect((resultWithObj.payload as typeof Failure_Object).wasSuccessful).toBe(false);
+  expect((resultWithObj.payload as typeof Failure_Object).state).toBe(ResultStates.bad);
 });

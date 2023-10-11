@@ -11,7 +11,7 @@ export interface ICallRequest {
 export interface ICallResult<T> {
   readonly success: boolean,
   readonly message: string,
-  readonly data: T | undefined,
+  readonly payload: T | undefined,
 }
 
 /**
@@ -30,15 +30,15 @@ export const DEFAULT_RESULT_INCLUDES_ERROR = false; // eslint-disable-line camel
 
 /**
  * Creates a result object representing a successful call.
- * @param {T | undefined} [data=undefined] The data to return for the call.
+ * @param {T | undefined} [payload=undefined] The payload to return for the call.
  * @param {string} [message=""] A descriptive message about the state of the call.
  * @return {ICallResult<T>} The result of the call.
  */
-export function getSuccessResult<T>(data: T | undefined = undefined, message = ""): ICallResult<T> {
+export function getSuccessResult<T>(payload: T | undefined = undefined, message = ""): ICallResult<T> {
   const result: ICallResult<T> = {
     success: true,
     message: message,
-    data: data,
+    payload: payload,
   };
   return result;
 }
@@ -56,7 +56,7 @@ export function getSuccessResultForMessage(message = ""): ICallResult<unknown> {
 /**
  * Creates a result object representing a failed call.
  * @param {unknown} caught The caught object encountered.
- * @param {boolean} [includeErrorInResult=Default_IncludeErrorInResult] Whether to return the actual error object as data or not.
+ * @param {boolean} [includeErrorInResult=Default_IncludeErrorInResult] Whether to return the actual error object as the payload or not.
  * @return {ICallResult<unknown>} The result of the call.
  */
 export function getFailureResult(caught: unknown, includeErrorInResult: boolean = DEFAULT_RESULT_INCLUDES_ERROR): ICallResult<unknown> {
@@ -64,14 +64,14 @@ export function getFailureResult(caught: unknown, includeErrorInResult: boolean 
     const result: ICallResult<string | null | undefined> = {
       success: false,
       message: UNRECOGNIZED_ERROR_MESSAGE,
-      data: (includeErrorInResult) ? (caught as (string | null | undefined)) : undefined,
+      payload: (includeErrorInResult) ? (caught as (string | null | undefined)) : undefined,
     };
     return result;
   } else if (TC.isString(caught)) {
     const result: ICallResult<string> = {
       success: false,
       message: (caught as string),
-      data: (includeErrorInResult) ? (caught as string) : undefined,
+      payload: (includeErrorInResult) ? (caught as string) : undefined,
     };
     return result;
   } else if (TC.isOf<Error>(caught, (value) => (!TC.isNullishOrWhitespace(value.message)))) {
@@ -81,7 +81,7 @@ export function getFailureResult(caught: unknown, includeErrorInResult: boolean 
     const result: ICallResult<unknown> = {
       success: false,
       message: UNRECOGNIZED_ERROR_MESSAGE,
-      data: (includeErrorInResult) ? caught : undefined,
+      payload: (includeErrorInResult) ? caught : undefined,
     };
     return result;
   }
@@ -90,14 +90,14 @@ export function getFailureResult(caught: unknown, includeErrorInResult: boolean 
 /**
  * Creates a result object representing the error from a failed call.
  * @param {Error} error The error encountered.
- * @param {boolean} [includeErrorInResult=Default_IncludeErrorInResult] Whether to return the actual error object as data or not.
+ * @param {boolean} [includeErrorInResult=Default_IncludeErrorInResult] Whether to return the actual error object as the payload or not.
  * @return {ICallResult<Error>} The result of the call.
  */
 export function getErrorResult(error: Error, includeErrorInResult: boolean = DEFAULT_RESULT_INCLUDES_ERROR): ICallResult<Error> {
   const result: ICallResult<Error> = {
     success: false,
     message: error.message,
-    data: (includeErrorInResult) ? error : undefined,
+    payload: (includeErrorInResult) ? error : undefined,
   };
   return result;
 }

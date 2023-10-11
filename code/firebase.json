@@ -10,32 +10,50 @@
     ],
     "source": "functions"
   },
-  "hosting": {
-    "public": "webapp",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "/app/**",
-        "destination": "/app/index.html"
-      },
-      {
-        "source": "/PerformInstall",
-        "destination": "/PerformInstall.html"
-      },
-      {
-        "source": "/RequestAccess",
-        "destination": "/RequestAccess.html"
-      },
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ]
-  },
+  "hosting": [
+    {
+      "site": "open-personal-archive-dev-0001",
+      "public": "webapp",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "/app/**",
+          "destination": "/app/index.html"
+        },
+        {
+          "source": "/PerformInstall",
+          "destination": "/PerformInstall.html"
+        },
+        {
+          "source": "/RequestAccess",
+          "destination": "/RequestAccess.html"
+        },
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    },
+    {
+      "site": "open-personal-archive-dev-0001-auth-test-app",
+      "public": "webapp_AuthTestApp",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    }
+  ],
   "storage": {
     "rules": "storage.rules"
   },
