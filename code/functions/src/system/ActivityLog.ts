@@ -40,12 +40,12 @@ export const recordLogItem = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
     const otherState = (request.data.otherState) ? OPA.parseJsonIfNeeded(request.data.otherState) : {};
     otherState.headers = shimmedRequest.headers;
 
-    await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, executionState, requestor, resource, action, data, otherState);
+    const logItem = await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, executionState, requestor, resource, action, data, otherState);
 
     if (logCallsToLog) {
       await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, OPA.ExecutionStates.complete);
     }
-    return OPA.getSuccessResultForMessage("The request was logged successfully.");
+    return OPA.getSuccessResult<OPA.IDocument>({id: logItem.id}, "The request was logged successfully.");
   } catch (error) {
     await UTL.logFunctionError(dataStorageState, authenticationState, shimmedRequest, error);
     return OPA.getFailureResult(error);
