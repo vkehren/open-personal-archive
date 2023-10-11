@@ -1,0 +1,433 @@
+const NAME = "open-personal-archive-locales";
+const VERSION = "2.4.3";
+const AUTHOR = "Ryan Stephen Ehrenreich";
+const COPYRIGHT = "Copyright © 2021 Open Personal Archive™";
+
+const supportedLocales = [
+  {
+    "id": "OPA_Locale_ar_SA",
+    "optionName": "ar-SA",
+    "optionBaseName": "ar",
+    "displayName": "Arabic (Saudi Arabia)",
+    "displayOrder": 100,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_bn_BD",
+    "optionName": "bn-BD",
+    "optionBaseName": "bn",
+    "displayName": "Bangla (Bangladesh)",
+    "displayOrder": 200,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_bn_IN",
+    "optionName": "bn-IN",
+    "optionBaseName": "bn",
+    "displayName": "Bangla (India)",
+    "displayOrder": 300,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_cs_CZ",
+    "optionName": "cs-CZ",
+    "optionBaseName": "cs",
+    "displayName": "Czech (Czech Republic)",
+    "displayOrder": 400,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_da_DK",
+    "optionName": "da-DK",
+    "optionBaseName": "da",
+    "displayName": "Danish (Denmark)",
+    "displayOrder": 500,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_de_AT",
+    "optionName": "de-AT",
+    "optionBaseName": "de",
+    "displayName": "Austrian German",
+    "displayOrder": 600,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_de_CH",
+    "optionName": "de-CH",
+    "optionBaseName": "de",
+    "displayName": "Swiss German",
+    "displayOrder": 700,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_de_DE",
+    "optionName": "de-DE",
+    "optionBaseName": "de",
+    "displayName": "Standard German",
+    "displayOrder": 800,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_el_GR",
+    "optionName": "el-GR",
+    "optionBaseName": "el",
+    "displayName": "Modern Greek",
+    "displayOrder": 900,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_en_AU",
+    "optionName": "en-AU",
+    "optionBaseName": "en",
+    "displayName": "Australian English",
+    "displayOrder": 1000,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_en_CA",
+    "optionName": "en-CA",
+    "optionBaseName": "en",
+    "displayName": "Canadian English",
+    "displayOrder": 1100,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_en_GB",
+    "optionName": "en-GB",
+    "optionBaseName": "en",
+    "displayName": "British English",
+    "displayOrder": 1200,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_en_IE",
+    "optionName": "en-IE",
+    "optionBaseName": "en",
+    "displayName": "Irish English",
+    "displayOrder": 1300,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_en_IN",
+    "optionName": "en-IN",
+    "optionBaseName": "en",
+    "displayName": "Indian English",
+    "displayOrder": 1400,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_en_NZ",
+    "optionName": "en-NZ",
+    "optionBaseName": "en",
+    "displayName": "New Zealand English",
+    "displayOrder": 1500,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_en_US",
+    "optionName": "en-US",
+    "optionBaseName": "en",
+    "displayName": "US English",
+    "displayOrder": 1600,
+    "isDefault": true
+  },
+  {
+    "id": "OPA_Locale_en_ZA",
+    "optionName": "en-ZA",
+    "optionBaseName": "en",
+    "displayName": "English (South Africa)",
+    "displayOrder": 1700,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_es_AR",
+    "optionName": "es-AR",
+    "optionBaseName": "es",
+    "displayName": "Argentine Spanish",
+    "displayOrder": 1800,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_es_CL",
+    "optionName": "es-CL",
+    "optionBaseName": "es",
+    "displayName": "Chilean Spanish",
+    "displayOrder": 1900,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_es_CO",
+    "optionName": "es-CO",
+    "optionBaseName": "es",
+    "displayName": "Colombian Spanish",
+    "displayOrder": 2000,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_es_ES",
+    "optionName": "es-ES",
+    "optionBaseName": "es",
+    "displayName": "Castilian Spanish",
+    "displayOrder": 2100,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_es_MX",
+    "optionName": "es-MX",
+    "optionBaseName": "es",
+    "displayName": "Mexican Spanish",
+    "displayOrder": 2200,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_es_US",
+    "optionName": "es-US",
+    "optionBaseName": "es",
+    "displayName": "American Spanish",
+    "displayOrder": 2300,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_fi_FI",
+    "optionName": "fi-FI",
+    "optionBaseName": "fi",
+    "displayName": "Finnish",
+    "displayOrder": 2400,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_fr_BE",
+    "optionName": "fr-BE",
+    "optionBaseName": "fr",
+    "displayName": "Belgian French",
+    "displayOrder": 2500,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_fr_CA",
+    "optionName": "fr-CA",
+    "optionBaseName": "fr",
+    "displayName": "Canadian French",
+    "displayOrder": 2600,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_fr_CH",
+    "optionName": "fr-CH",
+    "optionBaseName": "fr",
+    "displayName": "Swiss French",
+    "displayOrder": 2700,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_fr_FR",
+    "optionName": "fr-FR",
+    "optionBaseName": "fr",
+    "displayName": "Standard French",
+    "displayOrder": 2800,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_he_IL",
+    "optionName": "he-IL",
+    "optionBaseName": "he",
+    "displayName": "Hebrew (Israel)",
+    "displayOrder": 2900,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_hi_IN",
+    "optionName": "hi-IN",
+    "optionBaseName": "hi",
+    "displayName": "Hindi (India)",
+    "displayOrder": 3000,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_hu_HU",
+    "optionName": "hu-HU",
+    "optionBaseName": "hu",
+    "displayName": "Hungarian (Hungary)",
+    "displayOrder": 3100,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_id_ID",
+    "optionName": "id-ID",
+    "optionBaseName": "id",
+    "displayName": "Indonesian (Indonesia)",
+    "displayOrder": 3200,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_it_CH",
+    "optionName": "it-CH",
+    "optionBaseName": "it",
+    "displayName": "Swiss Italian",
+    "displayOrder": 3300,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_it_IT",
+    "optionName": "it-IT",
+    "optionBaseName": "it",
+    "displayName": "Standard Italian",
+    "displayOrder": 3400,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_ja_JP",
+    "optionName": "ja-JP",
+    "optionBaseName": "ja",
+    "displayName": "Japanese (Japan)",
+    "displayOrder": 3500,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_ko_KR",
+    "optionName": "ko-KR",
+    "optionBaseName": "ko",
+    "displayName": "Korean (Republic of Korea)",
+    "displayOrder": 3600,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_nl_BE",
+    "optionName": "nl-BE",
+    "optionBaseName": "nl",
+    "displayName": "Belgian Dutch",
+    "displayOrder": 3700,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_nl_NL",
+    "optionName": "nl-NL",
+    "optionBaseName": "nl",
+    "displayName": "Standard Dutch",
+    "displayOrder": 3800,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_no_NO",
+    "optionName": "no-NO",
+    "optionBaseName": "no",
+    "displayName": "Norwegian (Norway)",
+    "displayOrder": 3900,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_pl_PL",
+    "optionName": "pl-PL",
+    "optionBaseName": "pl",
+    "displayName": "Polish (Poland)",
+    "displayOrder": 4000,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_pt_BR",
+    "optionName": "pt-BR",
+    "optionBaseName": "pt",
+    "displayName": "Brazilian Portuguese",
+    "displayOrder": 4100,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_pt_PT",
+    "optionName": "pt-PT",
+    "optionBaseName": "pt",
+    "displayName": "European Portuguese",
+    "displayOrder": 4200,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_ro_RO",
+    "optionName": "ro-RO",
+    "optionBaseName": "ro",
+    "displayName": "Romanian (Romania)",
+    "displayOrder": 4300,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_ru_RU",
+    "optionName": "ru-RU",
+    "optionBaseName": "ru",
+    "displayName": "Russian (Russian Federation)",
+    "displayOrder": 4400,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_sk_SK",
+    "optionName": "sk-SK",
+    "optionBaseName": "sk",
+    "displayName": "Slovak (Slovakia)",
+    "displayOrder": 4500,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_sv_SE",
+    "optionName": "sv-SE",
+    "optionBaseName": "sv",
+    "displayName": "Swedish (Sweden)",
+    "displayOrder": 4600,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_ta_IN",
+    "optionName": "ta-IN",
+    "optionBaseName": "ta",
+    "displayName": "Indian Tamil",
+    "displayOrder": 4700,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_ta_LK",
+    "optionName": "ta-LK",
+    "optionBaseName": "ta",
+    "displayName": "Sri Lankan Tamil",
+    "displayOrder": 4800,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_th_TH",
+    "optionName": "th-TH",
+    "optionBaseName": "th",
+    "displayName": "Thai (Thailand)",
+    "displayOrder": 4900,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_tr_TR",
+    "optionName": "tr-TR",
+    "optionBaseName": "tr",
+    "displayName": "Turkish (Turkey)",
+    "displayOrder": 5000,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_zh_CN",
+    "optionName": "zh-CN",
+    "optionBaseName": "zh",
+    "displayName": "Mainland China, simplified characters",
+    "displayOrder": 5100,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_zh_HK",
+    "optionName": "zh-HK",
+    "optionBaseName": "zh",
+    "displayName": "Hong Kong, traditional characters",
+    "displayOrder": 5200,
+    "isDefault": false
+  },
+  {
+    "id": "OPA_Locale_zh_TW",
+    "optionName": "zh-TW",
+    "optionBaseName": "zh",
+    "displayName": "Taiwan, traditional characters",
+    "displayOrder": 5300,
+    "isDefault": false
+  }
+];
+
+export {supportedLocales};

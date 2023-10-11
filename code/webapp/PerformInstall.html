@@ -23,6 +23,9 @@
 
   <script type="module">
     import {FIREBASE_CONFIG, FIREBASE_FUNCTIONS_REGION} from "./WebAppConfig.js";
+    import {isNullish} from "./WebBaseLite.js";
+    import {supportedLocales} from "./files/Locales.js";
+    import {supportedTimeZoneGroups} from "./files/TimeZoneGroups.js";
     import {initializeApp} from "https://www.gstatic.com/firebasejs/9.5.0/firebase-app.js";
     import {getAuth, getRedirectResult, signInWithPopup, signInWithRedirect, GoogleAuthProvider} from "https://www.gstatic.com/firebasejs/9.5.0/firebase-auth.js";
     import {getFunctions, httpsCallable} from "https://www.gstatic.com/firebasejs/9.5.0/firebase-functions.js";
@@ -64,21 +67,20 @@
     }
 
     async function loadDefaults(isInstalledData) {
-      const getDisplayModelFunc = httpsCallable(functions, "getInstallationScreenDisplayModel");
-      const getDisplayModelResult = await getDisplayModelFunc({});
-      const displayModel = getDisplayModelResult.data.data;
-
-      $("#archive-name").val(displayModel.archiveName);
-      $("#archive-description").val(displayModel.archiveDescription);
-      $("#path-to-storage-folder").val(displayModel.pathToStorageFolder);
+      $("#archive-name").val("");
+      $("#archive-description").val("");
+      $("#path-to-storage-folder").val("");
       // LATER: Consider showing the User's email as read-only, getting the value from the auth token
       $("#first-name").val(""); // LATER: Consider getting an initial value from the auth token
       $("#last-name").val(""); // LATER: Consider getting an initial value from the auth token
+      $("#installation-notes").val("");
 
-      const selectedLocale = displayModel.selectedLocale;
+      let selectedLocale = supportedLocales.filter((value) => value.isDefault)[0];
+      selectedLocale = (!isNullish(selectedLocale)) ? selectedLocale : supportedLocales[0];
+
       let localesHtml = "";
-      for (let i = 0; i < displayModel.validLocales.length; i++) {
-        const locale = displayModel.validLocales[i];
+      for (let i = 0; i < supportedLocales.length; i++) {
+        const locale = supportedLocales[i];
         const isSelected = (locale.id == selectedLocale.id);
 
         localesHtml += "<li><a id=\"" + locale.id + "\" class=\"dropdown-item locale-item\" href=\"#\">" + locale.displayName + "</a></li>\n";
@@ -93,10 +95,12 @@
         selectDropDownOption(this, $("#locale-button"));
       });
 
-      const selectedTimeZoneGroup = displayModel.selectedTimeZoneGroup;
+      let selectedTimeZoneGroup = supportedTimeZoneGroups.filter((value) => value.isDefault)[0];
+      selectedTimeZoneGroup = (!isNullish(selectedTimeZoneGroup)) ? selectedTimeZoneGroup : supportedTimeZoneGroups[0];
+
       let timeZoneGroupsHtml = "";
-      for (let i = 0; i < displayModel.validTimeZoneGroups.length; i++) {
-        const timeZoneGroup = displayModel.validTimeZoneGroups[i];
+      for (let i = 0; i < supportedTimeZoneGroups.length; i++) {
+        const timeZoneGroup = supportedTimeZoneGroups[i];
         const isSelected = (timeZoneGroup.id == selectedTimeZoneGroup.id);
 
         timeZoneGroupsHtml += "<li><a id=\"" + timeZoneGroup.id + "\" class=\"dropdown-item time-zone-item\" href=\"#\">" + timeZoneGroup.name + "</a></li>\n";
@@ -125,10 +129,11 @@
           console.log("defaultLocaleId = " + defaultLocaleId);
           const defaultTimeZoneGroupId = $(timeZoneButtonDiv).attr("id").replace(buttonIdPrefix, "");
           console.log("defaultTimeZoneGroupId = " + defaultTimeZoneGroupId);
+          const installationNotes = $("#installation-notes").val();
           const ownerFirstName = $("#first-name").val();
           const ownerLastName = $("#last-name").val();
 
-          const data = {query: {archiveName, archiveDescription, pathToStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, ownerFirstName, ownerLastName}};
+          const data = {archiveName, archiveDescription, pathToStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, ownerFirstName, ownerLastName, installationNotes};
           const performInstallFunc = httpsCallable(functions, "performInstall");
           const performInstallResult = await performInstallFunc(data);
           const installSucceeded = performInstallResult.data.success;
@@ -301,6 +306,20 @@
         <div class="row">
           <div class="col">
             <h6>&nbsp;</h6>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+          </div>
+          <div class="col-2">
+            <label>Installation Notes:</label>
+          </div>
+          <div class="col-6">
+            <div class="textarea">
+              <textarea id="installation-notes" rows="5" style="width: 100%;"></textarea>
+            </div>
+          </div>
+          <div class="col">
           </div>
         </div>
       </div>
