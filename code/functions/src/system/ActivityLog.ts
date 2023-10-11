@@ -7,20 +7,19 @@ import {ActivityLog} from "../../../domainlogic/src";
 import * as UTL from "../Utilities";
 
 const moduleName = OPA.getModuleNameFromSrc(module.filename);
-const moduleNameGetter = () => moduleName;
 
-const recordLogItem_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("recordLogItem", {recordLogItem})); // eslint-disable-line camelcase
 export const recordLogItem = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
+  const functionName = OPA.getTypedPropertyKeyAsText("recordLogItem", {recordLogItem});
   let adminApp = ((null as unknown) as admin.app.App);
   let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
   let authenticationState = ((null as unknown) as OpaDm.IAuthenticationState | null);
-  const getLogMessage = (state: OPA.ExecutionState) => UTL.getFunctionCallLogMessage(moduleName, recordLogItem_FunctionNameGetter(), state);
+  const getLogMessage = (state: OPA.ExecutionState) => UTL.getFunctionCallLogMessage(moduleName, functionName, state);
   const shimmedRequest = UTL.getShimmedRequestObject(request);
 
   try {
     logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
-    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, moduleNameGetter, recordLogItem_FunctionNameGetter);
+    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, () => moduleName, () => functionName);
     authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, adminApp);
 
     await UTL.setExternalLogState(dataStorageState, request);

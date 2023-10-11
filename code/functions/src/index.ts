@@ -45,10 +45,9 @@ if (useCorsHandler) {
 }
 
 const moduleName = OPA.getModuleNameFromSrc(module.filename);
-const moduleNameGetter = () => moduleName;
 
-const firebaseAuthSignInHandler_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("firebaseAuthSignInHandler", {firebaseAuthSignInHandler})); // eslint-disable-line camelcase
 export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT_OPTIONS, async (event: AuthBlockingEvent): Promise<void> => {
+  const functionName = OPA.getTypedPropertyKeyAsText("firebaseAuthSignInHandler", {firebaseAuthSignInHandler});
   let adminApp = ((null as unknown) as admin.app.App);
   let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
   const firebaseAuthUserId = () => (event.data.uid);
@@ -63,7 +62,7 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
   try {
     logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
-    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, moduleNameGetter, firebaseAuthSignInHandler_FunctionNameGetter);
+    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, () => moduleName, () => functionName);
     await UTL.logFunctionCall(dataStorageState, null, shimmedRequest, OPA.ExecutionStates.ready);
 
     if (OPA.isNullishOrWhitespace(event.data.email)) {
