@@ -258,6 +258,25 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(serverLogItem4.resourceCanonical).equals(resource4);
     expect(serverLogItem4.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(serverLogItem4.userId).equals(userId);
+
+    config.authenticationState = TestAuthData.owner;
+    const logItems = await ActivityLog.getListOfLogItems(config.dataStorageState, config.authenticationState, {groupItemsByExternalId: true, groupItemsByRootId: true});
+    const logItemsMap = OPA.createMapFromArray(logItems, (logItem) => logItem.id);
+
+    expect(logItems.length).equals(1 + (4 * 2));
+    expect(logItemsMap.get(webLogItem0.id)?.id).equals(webLogItem0.id);
+    expect(logItemsMap.get(webLogItem0.id)?.subItems.length).equals(3);
+    expect(logItemsMap.get(webLogItem0.id)?.subItems[0].subItems.length).equals(0);
+    expect(logItemsMap.get(webLogItem0.id)?.subItems[1].subItems.length).equals(1);
+    expect(logItemsMap.get(webLogItem0.id)?.subItems[2].subItems.length).equals(0);
+    expect(logItemsMap.get(webLogItem1.id)?.id).equals(webLogItem1.id);
+    expect(logItemsMap.get(serverLogItem1.id)?.id).equals(serverLogItem1.id);
+    expect(logItemsMap.get(webLogItem2.id)?.id).equals(webLogItem2.id);
+    expect(logItemsMap.get(serverLogItem2.id)?.id).equals(serverLogItem2.id);
+    expect(logItemsMap.get(webLogItem3.id)?.id).equals(webLogItem3.id);
+    expect(logItemsMap.get(serverLogItem3.id)?.id).equals(serverLogItem3.id);
+    expect(logItemsMap.get(webLogItem4.id)?.id).equals(webLogItem4.id);
+    expect(logItemsMap.get(serverLogItem4.id)?.id).equals(serverLogItem4.id);
   });
   test("checks that recordLogItem(...) succeeds when System is not installed", testFunc1(() => null));
   test("checks that recordLogItem(...) succeeds when System is not installed", testFunc1(() => TestAuthData.owner));
@@ -482,6 +501,25 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(serverLogItem4.resourceCanonical).equals(resource4);
     expect(serverLogItem4.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(serverLogItem4.userId).equals(userId);
+
+    config.authenticationState = TestAuthData.owner;
+    const logItems = await ActivityLog.getListOfLogItems(config.dataStorageState, config.authenticationState, {groupItemsByExternalId: true, groupItemsByRootId: true});
+    const logItemsMap = OPA.createMapFromArray(logItems, (logItem) => logItem.id);
+
+    expect(logItems.length).equals(1 + (4 * 2));
+    expect(logItemsMap.get(webLogItem0.id)?.id).equals(webLogItem0.id);
+    expect(logItemsMap.get(webLogItem0.id)?.subItems.length).equals(3);
+    expect(logItemsMap.get(webLogItem0.id)?.subItems[0].subItems.length).equals(0);
+    expect(logItemsMap.get(webLogItem0.id)?.subItems[1].subItems.length).equals(1);
+    expect(logItemsMap.get(webLogItem0.id)?.subItems[2].subItems.length).equals(0);
+    expect(logItemsMap.get(webLogItem1.id)?.id).equals(webLogItem1.id);
+    expect(logItemsMap.get(serverLogItem1.id)?.id).equals(serverLogItem1.id);
+    expect(logItemsMap.get(webLogItem2.id)?.id).equals(webLogItem2.id);
+    expect(logItemsMap.get(serverLogItem2.id)?.id).equals(serverLogItem2.id);
+    expect(logItemsMap.get(webLogItem3.id)?.id).equals(webLogItem3.id);
+    expect(logItemsMap.get(serverLogItem3.id)?.id).equals(serverLogItem3.id);
+    expect(logItemsMap.get(webLogItem4.id)?.id).equals(webLogItem4.id);
+    expect(logItemsMap.get(serverLogItem4.id)?.id).equals(serverLogItem4.id);
   });
   test("checks that recordLogItem(...) succeeds when System is installed and User is Archive Owner", testFunc2(() => null));
   test("checks that recordLogItem(...) succeeds when System is installed and User is Archive Owner", testFunc2(() => TestAuthData.owner));
@@ -718,6 +756,25 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(serverLogItem4.resourceCanonical).equals(resource4);
     expect(serverLogItem4.firebaseAuthUserId).equals(firebaseAuthUserId);
     expect(serverLogItem4.userId).equals(userId);
+
+    config.authenticationState = TestAuthData.owner;
+    const logItems = await ActivityLog.getListOfLogItems(config.dataStorageState, config.authenticationState, {groupItemsByExternalId: true, groupItemsByRootId: true});
+    const logItemsMap = OPA.createMapFromArray(logItems, (logItem) => logItem.id);
+
+    expect(logItems.length).equals(1 + (4 * 2));
+    expect(logItemsMap.get(webLogItem0.id)?.id).equals(webLogItem0.id);
+    expect(logItemsMap.get(webLogItem0.id)?.subItems.length).equals(3);
+    expect(logItemsMap.get(webLogItem0.id)?.subItems[0].subItems.length).equals(0);
+    expect(logItemsMap.get(webLogItem0.id)?.subItems[1].subItems.length).equals(1);
+    expect(logItemsMap.get(webLogItem0.id)?.subItems[2].subItems.length).equals(0);
+    expect(logItemsMap.get(webLogItem1.id)?.id).equals(webLogItem1.id);
+    expect(logItemsMap.get(serverLogItem1.id)?.id).equals(serverLogItem1.id);
+    expect(logItemsMap.get(webLogItem2.id)?.id).equals(webLogItem2.id);
+    expect(logItemsMap.get(serverLogItem2.id)?.id).equals(serverLogItem2.id);
+    expect(logItemsMap.get(webLogItem3.id)?.id).equals(webLogItem3.id);
+    expect(logItemsMap.get(serverLogItem3.id)?.id).equals(serverLogItem3.id);
+    expect(logItemsMap.get(webLogItem4.id)?.id).equals(webLogItem4.id);
+    expect(logItemsMap.get(serverLogItem4.id)?.id).equals(serverLogItem4.id);
   });
   test("checks that initializeUserAccount(...) succeeds when System is installed and User is not Archive Owner", testFunc3(() => null));
   test("checks that initializeUserAccount(...) succeeds when System is installed and User is not Archive Owner", testFunc3(() => TestAuthData.owner));
