@@ -8,7 +8,7 @@ type IAccessRequestDisplayModel = AccessRequests.IAccessRequestDisplayModel;
 
 export const getListOfAccessRequests = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("getListOfAccessRequests", {getListOfAccessRequests});
-  const result = (await UTL.performAuthenticatedActionWithResult<Array<IAccessRequestDisplayModel>>(request, () => moduleName, () => functionName, async (request, callState) => { // eslint-disable-line max-len
+  const result = (await UTL.performAuthenticatedActionWithResult<Array<IAccessRequestDisplayModel>>(request, moduleName, functionName, async (request, callState) => { // eslint-disable-line max-len
     const data = request.data;
     const approvalState = (data.approvalState) ? data.approvalState : null;
 
@@ -21,7 +21,7 @@ export const getListOfAccessRequests = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, asyn
 
 export const requestUserAccess = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("requestUserAccess", {requestUserAccess});
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const message = (data.message) ? data.message : undefined;
     const citationId = (data.citationId) ? data.citationId : null;
@@ -37,7 +37,7 @@ export const requestUserAccess = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (req
 
 export const updateMessageForAccessRequest = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("updateMessageForAccessRequest", {updateMessageForAccessRequest});
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => { // eslint-disable-line max-len
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleName, functionName, async (request, callState) => { // eslint-disable-line max-len
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
     const message = (data.message) ? data.message : undefined;
@@ -54,7 +54,7 @@ export const updateMessageForAccessRequest = onCall(OPA.FIREBASE_DEFAULT_OPTIONS
 
 export const updateResponseToAccessRequest = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("updateResponseToAccessRequest", {updateResponseToAccessRequest});
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => { // eslint-disable-line max-len
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleName, functionName, async (request, callState) => { // eslint-disable-line max-len
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
     const response = (data.response) ? data.response : undefined;
@@ -71,7 +71,7 @@ export const updateResponseToAccessRequest = onCall(OPA.FIREBASE_DEFAULT_OPTIONS
 
 export const setAccessRequestTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setAccessRequestTags", {setAccessRequestTags});
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
     const tags = (data.tags) ? OPA.parseJsonIfNeeded(data.tags) : undefined;
@@ -90,7 +90,7 @@ export const setAccessRequestTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (
 
 export const addAccessRequestTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("addAccessRequestTags", {addAccessRequestTags});
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
     const tags = (data.tags) ? OPA.parseJsonIfNeeded(data.tags) : undefined;
@@ -107,7 +107,7 @@ export const addAccessRequestTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (
 
 export const removeAccessRequestTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("removeAccessRequestTags", {removeAccessRequestTags});
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
     const tags = (data.tags) ? OPA.parseJsonIfNeeded(data.tags) : undefined;
@@ -124,7 +124,7 @@ export const removeAccessRequestTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, asyn
 
 export const setAccessRequestToArchivalState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setAccessRequestToArchivalState", {setAccessRequestToArchivalState});
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => { // eslint-disable-line max-len
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleName, functionName, async (request, callState) => { // eslint-disable-line max-len
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
     const archivalState = (data.archivalState) ? data.archivalState : undefined;
@@ -141,7 +141,7 @@ export const setAccessRequestToArchivalState = onCall(OPA.FIREBASE_DEFAULT_OPTIO
 
 export const setAccessRequestToArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setAccessRequestToArchived", {setAccessRequestToArchived});
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
@@ -156,7 +156,7 @@ export const setAccessRequestToArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, a
 
 export const setAccessRequestToNotArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setAccessRequestToNotArchived", {setAccessRequestToNotArchived});
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => { // eslint-disable-line max-len
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleName, functionName, async (request, callState) => { // eslint-disable-line max-len
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
@@ -171,7 +171,7 @@ export const setAccessRequestToNotArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS
 
 export const setAccessRequestToViewed = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setAccessRequestToViewed", {setAccessRequestToViewed});
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
@@ -186,7 +186,7 @@ export const setAccessRequestToViewed = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, asy
 
 export const setAccessRequestToApprovalState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setAccessRequestToApprovalState", {setAccessRequestToApprovalState});
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => { // eslint-disable-line max-len
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleName, functionName, async (request, callState) => { // eslint-disable-line max-len
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
     const approvalState = (data.approvalState) ? data.approvalState : undefined;
@@ -203,7 +203,7 @@ export const setAccessRequestToApprovalState = onCall(OPA.FIREBASE_DEFAULT_OPTIO
 
 export const setAccessRequestToApproved = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setAccessRequestToApproved", {setAccessRequestToApproved});
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
@@ -218,7 +218,7 @@ export const setAccessRequestToApproved = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, a
 
 export const setAccessRequestToDenied = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setAccessRequestToDenied", {setAccessRequestToDenied});
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
@@ -233,7 +233,7 @@ export const setAccessRequestToDenied = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, asy
 
 export const markAccessRequestWithDeletionState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("markAccessRequestWithDeletionState", {markAccessRequestWithDeletionState});
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => { // eslint-disable-line max-len
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleName, functionName, async (request, callState) => { // eslint-disable-line max-len
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
     const deletionState = (data.deletionState) ? data.deletionState : undefined;
@@ -250,7 +250,7 @@ export const markAccessRequestWithDeletionState = onCall(OPA.FIREBASE_DEFAULT_OP
 
 export const markAccessRequestAsDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("markAccessRequestAsDeleted", {markAccessRequestAsDeleted});
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 
@@ -265,7 +265,7 @@ export const markAccessRequestAsDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, a
 
 export const markAccessRequestAsUnDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("markAccessRequestAsUnDeleted", {markAccessRequestAsUnDeleted});
-  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IAccessRequestDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const accessRequestId = (data.accessRequestId) ? data.accessRequestId : undefined;
 

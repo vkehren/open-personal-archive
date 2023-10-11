@@ -9,7 +9,7 @@ type IUserAccountDisplayModel = Users.IUserAccountDisplayModel;
 
 export const getListOfUsers = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("getListOfUsers", {getListOfUsers});
-  const result = (await UTL.performAuthenticatedActionWithResult<Array<IUserDisplayModel>>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<Array<IUserDisplayModel>>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const approvalState = (data.approvalState) ? data.approvalState : null;
 
@@ -22,7 +22,7 @@ export const getListOfUsers = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reques
 
 export const getUserAccountDisplayModel = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("getUserAccountDisplayModel", {getUserAccountDisplayModel});
-  const result = (await UTL.performAuthenticatedActionWithResult<IUserAccountDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IUserAccountDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const displayModel = await Users.getUserAccountDisplayModel(callState);
     return displayModel;
   }) as UTL.ActionResult<IUserAccountDisplayModel>);
@@ -31,7 +31,7 @@ export const getUserAccountDisplayModel = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, a
 
 export const initializeUserAccount = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("initializeUserAccount", {initializeUserAccount});
-  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const authProviderId = callState.authenticationState.providerId;
     const authAccountName = callState.authenticationState.email;
 
@@ -44,7 +44,7 @@ export const initializeUserAccount = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async 
 
 export const updateUserProfile = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("updateUserProfile", {updateUserProfile});
-  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const updateObject = (data.updateObject) ? OPA.parseJsonIfNeeded(data.updateObject) : undefined;
 
@@ -59,7 +59,7 @@ export const updateUserProfile = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (req
 
 export const assignUserToRole = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("assignUserToRole", {assignUserToRole});
-  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.userId) ? data.userId : undefined;
     const roleId = (data.roleId) ? data.roleId : undefined;
@@ -76,7 +76,7 @@ export const assignUserToRole = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (requ
 
 export const addRequestedCitationToUser = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("addRequestedCitationToUser", {addRequestedCitationToUser});
-  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.userId) ? data.userId : undefined;
     const citationId = (data.citationId) ? data.citationId : undefined;
@@ -93,7 +93,7 @@ export const addRequestedCitationToUser = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, a
 
 export const addViewableCitationToUser = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("addViewableCitationToUser", {addViewableCitationToUser});
-  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.userId) ? data.userId : undefined;
     const citationId = (data.citationId) ? data.citationId : undefined;
@@ -110,7 +110,7 @@ export const addViewableCitationToUser = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, as
 
 export const setUserToViewed = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setUserToViewed", {setUserToViewed});
-  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.userId) ? data.userId : undefined;
 
@@ -125,7 +125,7 @@ export const setUserToViewed = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reque
 
 export const setUserToApprovalState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setUserToApprovalState", {setUserToApprovalState});
-  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.userId) ? data.userId : undefined;
     const approvalState = (data.approvalState) ? data.approvalState : undefined;
@@ -142,7 +142,7 @@ export const setUserToApprovalState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async
 
 export const setUserToApproved = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setUserToApproved", {setUserToApproved});
-  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.userId) ? data.userId : undefined;
 
@@ -157,7 +157,7 @@ export const setUserToApproved = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (req
 
 export const setUserToDenied = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setUserToDenied", {setUserToDenied});
-  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.userId) ? data.userId : undefined;
 
@@ -172,7 +172,7 @@ export const setUserToDenied = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reque
 
 export const setUserToSuspensionState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setUserToSuspensionState", {setUserToSuspensionState});
-  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.userId) ? data.userId : undefined;
     const suspensionState = (data.suspensionState) ? data.suspensionState : undefined;
@@ -190,7 +190,7 @@ export const setUserToSuspensionState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, asy
 
 export const setUserToSuspended = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setUserToSuspended", {setUserToSuspended});
-  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.userId) ? data.userId : undefined;
     const reason = (data.reason) ? data.reason : "";
@@ -206,7 +206,7 @@ export const setUserToSuspended = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (re
 
 export const setUserToUnSuspended = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setUserToUnSuspended", {setUserToUnSuspended});
-  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.userId) ? data.userId : undefined;
     const reason = (data.reason) ? data.reason : "";
@@ -222,7 +222,7 @@ export const setUserToUnSuspended = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (
 
 export const markUserWithDeletionState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("markUserWithDeletionState", {markUserWithDeletionState});
-  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.userId) ? data.userId : undefined;
     const deletionState = (data.deletionState) ? data.deletionState : undefined;
@@ -239,7 +239,7 @@ export const markUserWithDeletionState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, as
 
 export const markUserAsDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("markUserAsDeleted", {markUserAsDeleted});
-  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.userId) ? data.userId : undefined;
 
@@ -254,7 +254,7 @@ export const markUserAsDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (req
 
 export const markUserAsUnDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("markUserAsUnDeleted", {markUserAsUnDeleted});
-  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IUserDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const userId = (data.userId) ? data.userId : undefined;
 

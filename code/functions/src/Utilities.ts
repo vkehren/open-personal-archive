@@ -12,15 +12,15 @@ import * as ActivityLog from "../../domainlogic/src/system/ActivityLog";
  * Gets the Call State for the Firebase context and app.
  * @param {functions.https.CallableContext} context The Firebase Callable Function context.
  * @param {admin.app.App} app The Firebase app to use.
- * @param {OPA.DefaultFunc<string>} moduleNameGetter Gets the module name.
- * @param {OPA.DefaultFunc<string>} functionNameGetter Gets the function name.
+ * @param {string} moduleName The module name of the Callable Function.
+ * @param {string} functionName The function name of the Callable Function.
  * @return {Promise<OpaDm.ICallState>}
  */
-export async function getCallStateForFirebaseContextAndApp(context: functions.https.CallableContext, app: admin.app.App, moduleNameGetter: OPA.DefaultFunc<string>, functionNameGetter: OPA.DefaultFunc<string>): Promise<OpaDm.ICallState> { // eslint-disable-line max-len
+export async function getCallStateForFirebaseContextAndApp(context: functions.https.CallableContext, app: admin.app.App, moduleName: string, functionName: string): Promise<OpaDm.ICallState> { // eslint-disable-line max-len
   OPA.assertNonNullish(context, "The Firebase Callable Context must not be null.");
   OPA.assertNonNullish(app, "The Firebase Admin App provided must be non-null.");
 
-  const dataStorageState = await getDataStorageStateForFirebaseApp(app, moduleNameGetter, functionNameGetter);
+  const dataStorageState = await getDataStorageStateForFirebaseApp(app, moduleName, functionName);
   const authenticationState = await getAuthenticationStateForContextAndApp(context, app);
 
   OPA.assertNonNullish(dataStorageState, "The data storage state could not be configured.");
@@ -35,11 +35,11 @@ export async function getCallStateForFirebaseContextAndApp(context: functions.ht
 /**
  * Gets the Data Storage State for the Firebase app.
  * @param {admin.app.App} app The Firebase app to use.
- * @param {OPA.DefaultFunc<string>} moduleNameGetter Gets the module name.
- * @param {OPA.DefaultFunc<string>} functionNameGetter Gets the function name.
+ * @param {string} moduleName The module name of the Callable Function.
+ * @param {string} functionName The function name of the Callable Function.
  * @return {Promise<OpaDm.IDataStorageState>}
  */
-export async function getDataStorageStateForFirebaseApp(app: admin.app.App, moduleNameGetter: OPA.DefaultFunc<string>, functionNameGetter: OPA.DefaultFunc<string>): Promise<OpaDm.IDataStorageState> {
+export async function getDataStorageStateForFirebaseApp(app: admin.app.App, moduleName: string, functionName: string): Promise<OpaDm.IDataStorageState> {
   OPA.assertNonNullish(app, "The Firebase Admin App provided must be non-null.");
 
   const appName = app.name;
@@ -73,8 +73,8 @@ export async function getDataStorageStateForFirebaseApp(app: admin.app.App, modu
       writeBatch: () => (dataStorageState.db.batch()),
     },
     logWriteState: {
-      entryModuleName: (!OPA.isNullish(moduleNameGetter)) ? moduleNameGetter() : OPA.TEXT_VALUE_NOT_SET,
-      entryFunctionName: (!OPA.isNullish(functionNameGetter)) ? functionNameGetter() : OPA.TEXT_VALUE_NOT_SET,
+      entryModuleName: (!OPA.isNullish(moduleName)) ? moduleName : OPA.TEXT_VALUE_NOT_SET,
+      entryFunctionName: (!OPA.isNullish(functionName)) ? functionName : OPA.TEXT_VALUE_NOT_SET,
       rootLogItemId: (null as string | null),
       externalLogItemId: (null as string | null),
     },
@@ -354,23 +354,23 @@ export type ActionResult<T> = OPA.ICallResult<T | Error | string | unknown>;
 /**
  * Cleans up resources upon completion of a server function call in the Open Personal Archive™ (OPA) system.
  * @param {CallableRequest} request The Firebase request object.
- * @param {OPA.DefaultFunc<string>} moduleNameGetter Gets the module name.
- * @param {OPA.DefaultFunc<string>} functionNameGetter Gets the function name.
+ * @param {string} moduleName The module name of the Callable Function.
+ * @param {string} functionName The function name of the Callable Function.
  * @param {ActionFunc<T>} doAction The function that performs the action.
  * @return {Promise<ActionResult<T>>}
  */
-export async function performAuthenticatedActionWithResult<T>(request: CallableRequest, moduleNameGetter: OPA.DefaultFunc<string>, functionNameGetter: OPA.DefaultFunc<string>, doAction: ActionFunc<T>): Promise<ActionResult<T>> { // eslint-disable-line max-len
+export async function performAuthenticatedActionWithResult<T>(request: CallableRequest, moduleName: string, functionName: string, doAction: ActionFunc<T>): Promise<ActionResult<T>> { // eslint-disable-line max-len
   let adminApp = ((null as unknown) as admin.app.App);
   let callState = ((null as unknown) as OpaDm.ICallState);
   const shimmedRequest = getShimmedRequestObject(request);
 
   try {
     // LATER: Consider replacing the call to logger.info(...) below with a call to logFunctionCall(...)
-    const message = getFunctionCallLogMessage(moduleNameGetter(), functionNameGetter(), OPA.ExecutionStates.entry);
+    const message = getFunctionCallLogMessage(moduleName, functionName, OPA.ExecutionStates.entry);
     logger.info(message, {structuredData: true});
 
     adminApp = admin.app();
-    callState = await getCallStateForFirebaseContextAndApp(request, adminApp, moduleNameGetter, functionNameGetter);
+    callState = await getCallStateForFirebaseContextAndApp(request, adminApp, moduleName, functionName);
 
     await setExternalLogState(callState.dataStorageState, request);
     await logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, OPA.ExecutionStates.ready);

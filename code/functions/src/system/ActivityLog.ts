@@ -19,7 +19,7 @@ export const recordLogItem = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
   try {
     logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
-    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, () => moduleName, () => functionName);
+    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, moduleName, functionName);
     authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, adminApp);
 
     await UTL.setExternalLogState(dataStorageState, request);

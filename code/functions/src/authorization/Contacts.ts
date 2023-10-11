@@ -14,7 +14,7 @@ type IContactDisplayModel = Contacts.IContactDisplayModel;
 
 export const getListOfContacts = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("getListOfContacts", {getListOfContacts});
-  const result = (await UTL.performAuthenticatedActionWithResult<Array<IContactDisplayModel>>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<Array<IContactDisplayModel>>(request, moduleName, functionName, async (request, callState) => {
     const documents = await Contacts.getListOfContacts(callState);
     const displayModels = await Contacts.convertContactsToDisplayModels(callState, documents);
     return displayModels;
@@ -33,7 +33,7 @@ export const createContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
   try {
     logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
-    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, () => moduleName, () => functionName);
+    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, moduleName, functionName);
     authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, adminApp);
 
     await UTL.setExternalLogState(dataStorageState, request);
@@ -71,7 +71,7 @@ export const createContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
 
 export const updateContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("updateContact", {updateContact});
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
     const updateObject = (data.updateObject) ? OPA.parseJsonIfNeeded(data.updateObject) : undefined;
@@ -87,7 +87,7 @@ export const updateContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
 
 export const setCorrespondingUsersForContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setCorrespondingUsersForContact", {setCorrespondingUsersForContact});
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
     const userIds = (data.userIds) ? OPA.parseJsonIfNeeded(data.userIds) : undefined;
@@ -105,7 +105,7 @@ export const setCorrespondingUsersForContact = onCall(OPA.FIREBASE_DEFAULT_OPTIO
 
 export const addCorrespondingUsersToContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("addCorrespondingUsersToContact", {addCorrespondingUsersToContact});
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
     const userIds = (data.userIds) ? OPA.parseJsonIfNeeded(data.userIds) : undefined;
@@ -122,7 +122,7 @@ export const addCorrespondingUsersToContact = onCall(OPA.FIREBASE_DEFAULT_OPTION
 
 export const removeCorrespondingUsersFromContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("removeCorrespondingUsersFromContact", {removeCorrespondingUsersFromContact});
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => { // eslint-disable-line max-len
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleName, functionName, async (request, callState) => { // eslint-disable-line max-len
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
     const userIds = (data.userIds) ? OPA.parseJsonIfNeeded(data.userIds) : undefined;
@@ -139,7 +139,7 @@ export const removeCorrespondingUsersFromContact = onCall(OPA.FIREBASE_DEFAULT_O
 
 export const setContactTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setContactTags", {setContactTags});
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
     const tags = (data.tags) ? OPA.parseJsonIfNeeded(data.tags) : undefined;
@@ -157,7 +157,7 @@ export const setContactTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reques
 
 export const addContactTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("addContactTags", {addContactTags});
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
     const tags = (data.tags) ? OPA.parseJsonIfNeeded(data.tags) : undefined;
@@ -174,7 +174,7 @@ export const addContactTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reques
 
 export const removeContactTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("removeContactTags", {removeContactTags});
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
     const tags = (data.tags) ? OPA.parseJsonIfNeeded(data.tags) : undefined;
@@ -191,7 +191,7 @@ export const removeContactTags = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (req
 
 export const setContactToArchivalState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setContactToArchivalState", {setContactToArchivalState});
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
     const archivalState = (data.archivalState) ? data.archivalState : undefined;
@@ -208,7 +208,7 @@ export const setContactToArchivalState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, as
 
 export const setContactToArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setContactToArchived", {setContactToArchived});
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
 
@@ -223,7 +223,7 @@ export const setContactToArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (
 
 export const setContactToNotArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setContactToNotArchived", {setContactToNotArchived});
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
 
@@ -238,7 +238,7 @@ export const setContactToNotArchived = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, asyn
 
 export const setContactToViewed = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("setContactToViewed", {setContactToViewed});
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
 
@@ -253,7 +253,7 @@ export const setContactToViewed = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (re
 
 export const markContactWithDeletionState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("markContactWithDeletionState", {markContactWithDeletionState});
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
     const deletionState = (data.deletionState) ? data.deletionState : undefined;
@@ -270,7 +270,7 @@ export const markContactWithDeletionState = onCall(OPA.FIREBASE_DEFAULT_OPTIONS,
 
 export const markContactAsDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("markContactAsDeleted", {markContactAsDeleted});
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
 
@@ -285,7 +285,7 @@ export const markContactAsDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (
 
 export const markContactAsUnDeleted = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   const functionName = OPA.getTypedPropertyKeyAsText("markContactAsUnDeleted", {markContactAsUnDeleted});
-  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, () => moduleName, () => functionName, async (request, callState) => {
+  const result = (await UTL.performAuthenticatedActionWithResult<IContactDisplayModel>(request, moduleName, functionName, async (request, callState) => {
     const data = request.data;
     const contactId = (data.contactId) ? data.contactId : undefined;
 

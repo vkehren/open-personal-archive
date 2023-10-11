@@ -20,7 +20,7 @@ export const isInstalled = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) 
   try {
     logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
-    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, () => moduleName, () => functionName);
+    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, moduleName, functionName);
     authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, adminApp);
 
     await UTL.setExternalLogState(dataStorageState, request);
@@ -106,7 +106,7 @@ export const getInstallationScreenDisplayModel = onCall(OPA.FIREBASE_DEFAULT_OPT
   try {
     logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
-    callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp, () => moduleName, () => functionName);
+    callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp, moduleName, functionName);
 
     await UTL.setExternalLogState(callState.dataStorageState, request);
     await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, OPA.ExecutionStates.ready);
@@ -132,7 +132,7 @@ export const performInstall = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reques
   try {
     logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
-    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, () => moduleName, () => functionName);
+    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, moduleName, functionName);
     authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, adminApp);
     OPA.assertAuthenticationStateIsNotNullish(authenticationState);
     const authenticationStateNonNull = OPA.convertNonNullish(authenticationState);
@@ -180,7 +180,7 @@ export const updateInstallationSettings = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, a
   try {
     logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
-    callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp, () => moduleName, () => functionName);
+    callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp, moduleName, functionName);
 
     await UTL.setExternalLogState(callState.dataStorageState, request);
     await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, OPA.ExecutionStates.ready);
@@ -213,7 +213,7 @@ export const performUpgrade = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reques
   try {
     logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
-    callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp, () => moduleName, () => functionName);
+    callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp, moduleName, functionName);
 
     await UTL.setExternalLogState(callState.dataStorageState, request);
     await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, OPA.ExecutionStates.ready);
@@ -241,7 +241,7 @@ export const performUninstall = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (requ
   try {
     logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
-    callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp, () => moduleName, () => functionName);
+    callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp, moduleName, functionName);
 
     await UTL.setExternalLogState(callState.dataStorageState, request);
     await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, OPA.ExecutionStates.ready);
