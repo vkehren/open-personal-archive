@@ -1,12 +1,12 @@
 import express from "express";
 import cors from "cors";
 // import {getAuth, sendEmailVerification} from "firebase/auth"; // LATER: Figure-out if it is possible to get the current User and send the verifiation email in the beforeUserSignedIn(...) handler
-import {AuthBlockingEvent, beforeUserSignedIn} from "firebase-functions/v2/identity"; // NOTE: Also has "beforeUserCreated"
+import {AuthBlockingEvent, beforeUserSignedIn, HttpsError} from "firebase-functions/v2/identity"; // NOTE: Also has "beforeUserCreated"
 import * as logger from "firebase-functions/logger";
 import * as admin from "firebase-admin";
 import * as OPA from "../../base/src";
 import * as OpaDm from "../../datamodel/src";
-import {authenticationEventHandlerForFirebaseAuth} from "../../domainlogic/src";
+import {Application, authenticationEventHandlerForFirebaseAuth} from "../../domainlogic/src";
 import * as adminCredentialFile from "../open-personal-archive-firebase-adminsdk-credential.json";
 import * as UTL from "./Utilities";
 
@@ -50,6 +50,7 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
   const functionName = OPA.getTypedPropertyKeyAsText("firebaseAuthSignInHandler", {firebaseAuthSignInHandler});
   let adminApp = ((null as unknown) as admin.app.App);
   let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
+  let isInstalled = false;
   const shimmedRequest: OPA.ICallRequest = {
     clientIpAddress: event.ipAddress,
     url: event.eventType,
@@ -63,6 +64,7 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
 
     adminApp = admin.app();
     dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, moduleName, functionName);
+    isInstalled = await Application.isSystemInstalled(dataStorageState);
 
     if (OPA.isNullishOrWhitespace(event.data.email)) {
       throw new Error("Currently, the OPA system requires a valid email address for each User.");
@@ -105,9 +107,25 @@ export const firebaseAuthSignInHandler = beforeUserSignedIn(OPA.FIREBASE_DEFAULT
       throw new Error("A corrsponding User could not be found.");
     }
 
+    const opaUserNonNull = OPA.convertNonNullish(opaUser);
+    if (opaUserNonNull.approvalState != OPA.ApprovalStates.approved) {
+      throw new Error("The corrsponding User account has not yet been approved.");
+    }
+    if (opaUserNonNull.isSuspended) {
+      throw new Error("The corrsponding User account has been suspended.");
+    }
+
     await UTL.logFunctionCall(dataStorageState, authState, shimmedRequest, OPA.ExecutionStates.complete);
   } catch (error) {
     await UTL.logFunctionError(dataStorageState, null, shimmedRequest, error as Error);
+
+    if (isInstalled) {
+      // NOTE: If the OPA System has already been installed, we want to block any Auth User who generates an error,
+      //       but if the OPA System has not been installed, we expect the error, so we must allow the Owner to install the system.
+      const errorRecord = (error as Record<string, unknown>);
+      const message = (!OPA.isNullish(errorRecord) && !OPA.isNullishOrWhitespace(errorRecord.message)) ? errorRecord.message : "Unauthorized account.";
+      throw new HttpsError("invalid-argument", message as string);
+    }
   } finally {
     await UTL.cleanUpStateAfterCall(dataStorageState, null, adminApp, shimmedRequest);
   }
