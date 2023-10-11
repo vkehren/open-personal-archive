@@ -109,12 +109,23 @@ export class AuthorizationState implements IAuthorizationState {
   }
 
   /**
+   * Returns true if the current User's account has been suspended.
+   * @return {boolean} Whether the current User's account has been suspended.
+   */
+  isUserSuspended(): boolean {
+    return this._user.isSuspended;
+  }
+
+  /**
    * Asserts that the current User's account has been approved.
    * @return {void}
    */
   assertUserApproved(): void {
     if (!this.isUserApproved()) {
       throw new Error("The current User's account has NOT been approved.");
+    }
+    if (this.isUserSuspended()) {
+      throw new Error("The current User's account has been suspended.");
     }
   }
 
