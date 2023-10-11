@@ -125,17 +125,21 @@ export const getInstallationScreenDisplayModel = onCall(OPA.FIREBASE_DEFAULT_OPT
 const performInstall_FunctionNameGetter = () => (OPA.getTypedPropertyKeyAsText("performInstall", {performInstall})); // eslint-disable-line camelcase
 export const performInstall = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request) => {
   let adminApp = ((null as unknown) as admin.app.App);
-  let callState = ((null as unknown) as OpaDm.ICallState);
+  let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
+  let authenticationState = ((null as unknown) as OpaDm.IAuthenticationState | null);
   const getLogMessage = (state: OPA.ExecutionState) => UTL.getFunctionCallLogMessage(moduleName, performInstall_FunctionNameGetter(), state);
   const shimmedRequest = UTL.getShimmedRequestObject(request);
 
   try {
     logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
     adminApp = admin.app();
-    callState = await UTL.getCallStateForFirebaseContextAndApp(request, adminApp, moduleNameGetter, performInstall_FunctionNameGetter);
+    dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, moduleNameGetter, isInstalled_FunctionNameGetter);
+    authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, adminApp);
+    OPA.assertAuthenticationStateIsNotNullish(authenticationState);
+    const authenticationStateNonNull = OPA.convertNonNullish(authenticationState);
 
-    await UTL.setExternalLogState(callState.dataStorageState, request);
-    await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, OPA.ExecutionStates.ready);
+    await UTL.setExternalLogState(dataStorageState, request);
+    await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, OPA.ExecutionStates.ready);
 
     const data = request.data;
     const archiveName = (data.archiveName) ? data.archiveName : undefined;
@@ -149,14 +153,14 @@ export const performInstall = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (reques
     const defaultTimeZoneGroupId = (data.defaultTimeZoneGroupId) ? data.defaultTimeZoneGroupId : undefined;
     OPA.assertNonNullishOrWhitespace(defaultTimeZoneGroupId, "The Archive default time zone group must not be blank.");
     const installationNotes = OPA.convertNonNullish(data.installationNotes, "");
-    const installResult = await Application.performInstall(callState.dataStorageState, callState.authenticationState, archiveName, archiveDescription, pathToRootStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, installationNotes); // eslint-disable-line max-len
+    const installResult = await Application.performInstall(dataStorageState, authenticationStateNonNull, archiveName, archiveDescription, pathToRootStorageFolder, defaultLocaleId, defaultTimeZoneGroupId, installationNotes); // eslint-disable-line max-len
 
     return OPA.getSuccessResult(installResult);
   } catch (error) {
-    await UTL.logFunctionError(callState.dataStorageState, callState.authenticationState, shimmedRequest, error);
+    await UTL.logFunctionError(dataStorageState, authenticationState, shimmedRequest, error);
     return OPA.getFailureResult(error);
   } finally {
-    await UTL.cleanUpStateAfterCall(callState.dataStorageState, callState.authenticationState, adminApp, shimmedRequest);
+    await UTL.cleanUpStateAfterCall(dataStorageState, authenticationState, adminApp, shimmedRequest);
   }
 });
 
