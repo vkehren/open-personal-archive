@@ -55,7 +55,7 @@
 
       const isInstalledFunc = httpsCallable(functions, "isInstalled");
       const isInstalledResult = await isInstalledFunc({});
-      const isInstalledData = isInstalledResult.data.data;
+      const isInstalledData = isInstalledResult.data.payload;
 
       if (isInstalledData.isInstalled || !isInstalledData.isAuthenticated) {
         window.location.replace("./index.html");
