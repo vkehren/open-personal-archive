@@ -27,11 +27,12 @@ export const createContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
   let adminApp = ((null as unknown) as admin.app.App);
   let dataStorageState = ((null as unknown) as OpaDm.IDataStorageState);
   let authenticationState = ((null as unknown) as OpaDm.IAuthenticationState | null);
-  const getLogMessage = (state: OPA.ExecutionState) => UTL.getFunctionCallLogMessage(moduleName, functionName, state);
   const shimmedRequest = UTL.getShimmedRequestObject(request);
 
   try {
-    logger.info(getLogMessage(OPA.ExecutionStates.entry), {structuredData: true});
+    const logMessage = UTL.getFunctionCallLogMessage(moduleName, functionName, OPA.ExecutionStates.entry);
+    logger.info(logMessage, {structuredData: true});
+
     adminApp = admin.app();
     dataStorageState = await UTL.getDataStorageStateForFirebaseApp(adminApp, moduleName, functionName);
     authenticationState = await UTL.getAuthenticationStateForContextAndApp(request, adminApp);
@@ -53,12 +54,16 @@ export const createContact = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (request
 
     if (OPA.isNullish(authenticationState)) {
       const minDisplayModel = {id: OPA.getDocumentIdWithAssert(document)};
+
+      await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, OPA.ExecutionStates.complete);
       return OPA.getSuccessResult(minDisplayModel);
     } else {
       const authenticationStateNonNull = OPA.convertNonNullish(authenticationState);
       const callState = await CSU.getCallStateForCurrentUser(dataStorageState, authenticationStateNonNull);
 
       const displayModel = await Contacts.convertContactToDisplayModel(callState, document);
+
+      await UTL.logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, OPA.ExecutionStates.complete);
       return OPA.getSuccessResult(displayModel);
     }
   } catch (error) {

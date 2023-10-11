@@ -264,15 +264,15 @@ export async function setExternalLogState(dataStorageState: OpaDm.IDataStorageSt
 export async function logFunctionCall(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState | null, request: OPA.ICallRequest, executionState: OPA.ExecutionState): Promise<void> { // eslint-disable-line max-len
   try {
     const logState = dataStorageState.logWriteState;
-    const message = getFunctionCallLogMessage(logState.entryModuleName, logState.entryFunctionName, executionState);
+    const logMessage = getFunctionCallLogMessage(logState.entryModuleName, logState.entryFunctionName, executionState);
     const activityType = OpaDm.ActivityTypes.server_function_call;
     const requestor = request.clientIpAddress;
     const resource = request.url;
     const action = (logState.entryModuleName + "/" + logState.entryFunctionName);
     const errorState = {hasError: false};
-    const otherState = {message: message, logWriteState: dataStorageState.logWriteState, errorState: errorState, headers: request.headers};
+    const otherState = {logMessage: logMessage, logWriteState: dataStorageState.logWriteState, errorState: errorState, headers: request.headers};
 
-    logger.info(message, {structuredData: true, activityType, requestor, resource, action, otherState});
+    logger.info(logMessage, {structuredData: true, activityType, requestor, resource, action, otherState});
     const logItem = await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, executionState, requestor, resource, action, request.data, otherState);
 
     if (OPA.isNullishOrWhitespace(dataStorageState.logWriteState.rootLogItemId)) {
@@ -298,15 +298,15 @@ export async function logFunctionError(dataStorageState: OpaDm.IDataStorageState
     const requestor = request.clientIpAddress;
     const resource = request.url;
     const action = (logState.entryModuleName + "/" + logState.entryFunctionName);
-    const otherState = {message: OPA.UNRECOGNIZED_ERROR_MESSAGE, logWriteState: dataStorageState.logWriteState, errorState: caught, headers: request.headers};
+    const otherState = {logMessage: OPA.UNRECOGNIZED_ERROR_MESSAGE, logWriteState: dataStorageState.logWriteState, errorState: caught, headers: request.headers};
 
     if (OPA.isOf<Error>(caught, (value) => (!OPA.isNullishOrWhitespace(value.message)))) {
       const error = (caught as Error);
-      otherState.message = error.message;
+      otherState.logMessage = error.message;
       otherState.errorState = {hasError: true, name: error.name, message: error.message, stack: error.stack};
     }
 
-    logger.error(otherState.message, {structuredData: true, activityType, requestor, resource, action, otherState});
+    logger.error(otherState.logMessage, {structuredData: true, activityType, requestor, resource, action, otherState});
     await ActivityLog.recordLogItem(dataStorageState, authenticationState, activityType, OPA.ExecutionStates.error, requestor, resource, action, request.data, otherState);
   } catch {
     // NOTE: Do nothing, as we are here because an error has already pccurred
@@ -365,9 +365,8 @@ export async function performAuthenticatedActionWithResult<T>(request: CallableR
   const shimmedRequest = getShimmedRequestObject(request);
 
   try {
-    // LATER: Consider replacing the call to logger.info(...) below with a call to logFunctionCall(...)
-    const message = getFunctionCallLogMessage(moduleName, functionName, OPA.ExecutionStates.entry);
-    logger.info(message, {structuredData: true});
+    const logMessage = getFunctionCallLogMessage(moduleName, functionName, OPA.ExecutionStates.entry);
+    logger.info(logMessage, {structuredData: true});
 
     adminApp = admin.app();
     callState = await getCallStateForFirebaseContextAndApp(request, adminApp, moduleName, functionName);
@@ -376,6 +375,8 @@ export async function performAuthenticatedActionWithResult<T>(request: CallableR
     await logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, OPA.ExecutionStates.ready);
 
     const result = await doAction(request, callState);
+
+    await logFunctionCall(callState.dataStorageState, callState.authenticationState, shimmedRequest, OPA.ExecutionStates.complete);
     return OPA.getSuccessResult(result);
   } catch (error) {
     await logFunctionError(callState.dataStorageState, callState.authenticationState, shimmedRequest, error);
