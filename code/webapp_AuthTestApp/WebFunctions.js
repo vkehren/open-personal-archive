@@ -16,20 +16,20 @@ export const ActivityTypes = {
 };
 
 async function recordPageLoad(app, resource = window.location.href, data = {}, otherState = null) {
-  await recordLogItem(app, ActivityTypes.web_page_load, resource, null, data, otherState);
+  return await recordLogItem(app, ActivityTypes.web_page_load, resource, null, data, otherState);
 }
 
 async function recordPageView(app, resource = window.location.href, data = {}, otherState = null) {
-  await recordLogItem(app, ActivityTypes.web_page_view, resource, null, data, otherState);
+  return await recordLogItem(app, ActivityTypes.web_page_view, resource, null, data, otherState);
 }
 
 async function recordPageAction(app, resource = window.location.href, action, data = {}, otherState = null) {
-  await recordLogItem(app, ActivityTypes.web_page_action, resource, action, data, otherState);
+  return await recordLogItem(app, ActivityTypes.web_page_action, resource, action, data, otherState);
 }
 
 async function recordPageError(app, error, resource = window.location.href, otherState = null) {
   const data = {error: JSON.stringify(error)};
-  await recordLogItem(app, ActivityTypes.web_page_error, resource, null, data, otherState, true);
+  return await recordLogItem(app, ActivityTypes.web_page_error, resource, null, data, otherState, true);
 }
 
 async function recordLogItem(app, activityType, resource, action, data, otherState = null, isPageError = false) {
@@ -37,12 +37,12 @@ async function recordLogItem(app, activityType, resource, action, data, otherSta
     const functions = getFunctions(app, FIREBASE_FUNCTIONS_REGION);
     const functionObject = httpsCallable(functions, "recordLogItem");
     const functionArgs = {activityType, resource, action, data, otherState};
-    await functionObject(functionArgs);
+    return await functionObject(functionArgs);
   } catch (error) {
     console.error((!isNullish(error.message)) ? error.message : error);
 
     if (!isPageError) {
-      await recordPageError();
+      return await recordPageError();
     }
   }
 }
@@ -59,12 +59,12 @@ async function submitUserEmail(app, event, contactForm, emailInput, submitButton
     submitButton.style.visibility = "hidden";
 
     const functionName = "createContact";
-    const email = emailInput.value;
-    await recordPageAction(app, window.location.href, functionName, {email});
+    const functionArgs = {email: emailInput.value};
+    logResult = await recordPageAction(app, window.location.href, functionName, functionArgs);
+    functionArgs.externalLogItemId = logResult.data.payload.id;
 
     const functions = getFunctions(app, FIREBASE_FUNCTIONS_REGION);
     const functionObject = httpsCallable(functions, functionName);
-    const functionArgs = {email};
     const functionResult = await functionObject(functionArgs);
     const functionData = (!isNullish(functionResult.data)) ? functionResult.data : {};
     const functionSuccess = (isBoolean(functionData.success) && functionData.success);

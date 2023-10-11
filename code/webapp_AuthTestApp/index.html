@@ -218,10 +218,12 @@
     forceResizeEventIfNeeded(document.getElementById("copyright"), 20, 20);
 
     document.getElementById("google-button").onclick = async () => {
+      let logResult = null;
+
       try {
         document.getElementById("google-label").innerText = "...working...";
 
-        await recordPageAction(app, window.location.href, "signInWithPopup");
+        logResult = await recordPageAction(app, window.location.href, "signInWithPopup");
         const provider = new GoogleAuthProvider();
         const result = await signInWithPopup(auth, provider);
 
@@ -238,6 +240,7 @@
     };
 
     document.getElementById("firebase-button").onclick = async () => {
+      let logResult = null;
       let user = null;
 
       try {
@@ -247,7 +250,7 @@
         const email = document.getElementById("firebase-email-input").value;
         const password = document.getElementById("firebase-password-input").value;
 
-        await recordPageAction(app, window.location.href, "signInWithEmailAndPassword", {email, password: "[hidden]"});
+        logResult = await recordPageAction(app, window.location.href, "signInWithEmailAndPassword", {email, password: "[hidden]"});
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
         document.getElementById("google-label").innerText = "";
@@ -274,8 +277,10 @@
     };
 
     document.getElementById("signout-button").onclick = async () => {
+      let logResult = null;
+
       try {
-        await recordPageAction(app, window.location.href, "signOut");
+        logResult = await recordPageAction(app, window.location.href, "signOut");
         await signOut(auth);
 
         document.getElementById("google-label").innerText = "";
@@ -290,6 +295,8 @@
     };
 
     document.getElementById("function-button").onclick = async () => {
+      let logResult = null;
+
       try {
         document.getElementById("function-label").innerText = "...working...";
 
@@ -322,7 +329,9 @@
             functionArgs[functionArgName] = functionArgValue;
           }
         }
-        await recordPageAction(app, window.location.href, functionName, functionArgs);
+
+        logResult = await recordPageAction(app, window.location.href, functionName, functionArgs);
+        functionArgs.externalLogItemId = logResult.data.payload.id;
 
         const functionObject = httpsCallable(functions, functionName);
         const functionResult = await functionObject(functionArgs)
