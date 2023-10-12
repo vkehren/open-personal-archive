@@ -3,7 +3,7 @@ import {FIREBASE_FUNCTIONS_REGION} from "./WebAppConfig.js";
 import {isNullish, isBoolean} from "./WebBaseLite.js";
 
 const NAME = "open-personal-archive-web-functions";
-const VERSION = "2.4.3";
+const VERSION = "2.4.3.1";
 const AUTHOR = "Ryan Stephen Ehrenreich";
 const COPYRIGHT = "Copyright � 2021 Open Personal Archive�";
 
@@ -48,6 +48,8 @@ async function recordLogItem(app, activityType, resource, action, data, otherSta
 }
 
 async function submitUserEmail(app, event, contactForm, emailInput, submitButton, waitIndicator, contactResult) {
+  let logResult = null;
+
   try {
     event.preventDefault();
 
