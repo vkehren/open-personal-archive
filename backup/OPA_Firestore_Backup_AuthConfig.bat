@@ -1,0 +1,1 @@
+gcloud auth login --cred-file=../code/functions/open-personal-archive-firebase-adminsdk-credential.json & gcloud config set project [YOUR_FIREBASE_PROJECT_NAME_HERE] & pause
