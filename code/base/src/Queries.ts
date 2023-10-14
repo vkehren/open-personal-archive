@@ -7,6 +7,57 @@ import * as ST from "./Storage";
 import * as TC from "./TypeChecking";
 import * as VC from "./ValueChecking";
 
+export interface PagingQueryOptions {
+  limit: number,
+  offset?: number,
+}
+
+export interface DateQueryOptions {
+  dateFieldName: string | firestore.FieldPath,
+  direction?: firestore.OrderByDirection,
+  startDate?: BT.DateToUse,
+  endDate?: BT.DateToUse,
+}
+
+export interface QueryOptions {
+  pagingOptions?: PagingQueryOptions,
+  dateOptions?: DateQueryOptions,
+}
+
+export function applyOptionsToQuery<T>(query: firestore.Query<T>, options: QueryOptions = {}): void {
+  TC.assertNonNullish(query, "The Query must not be null.");
+  TC.assertNonNullish(options, "The Query Options must not be null.");
+
+  const hasDateOptions = (!TC.isNullish(options.dateOptions));
+  const hasPagingOptions = (!TC.isNullish(options.pagingOptions));
+
+  if (hasDateOptions) {
+    const dateOptions = TC.convertNonNullish(options.dateOptions);
+
+    if (!TC.isNullish(dateOptions.direction)) {
+      const direction = TC.convertNonNullish(dateOptions.direction);
+      query = query.orderBy(dateOptions.dateFieldName, direction);
+    } else {
+      query = query.orderBy(dateOptions.dateFieldName);
+    }
+
+    if (!TC.isNullish(dateOptions.startDate)) {
+      query = query.startAt(dateOptions.startDate);
+    }
+    if (!TC.isNullish(dateOptions.endDate)) {
+      query = query.endAt(dateOptions.endDate);
+    }
+  }
+  if (hasPagingOptions) {
+    const pagingOptions = TC.convertNonNullish(options.pagingOptions);
+    query = query.limit(pagingOptions.limit);
+    if (!TC.isNullish(pagingOptions.offset)) {
+      const offset = TC.convertNonNullish(pagingOptions.offset);
+      query = query.offset(offset);
+    }
+  }
+}
+
 export type QuerySetConstructor<Q extends IQuerySet<T>, T extends DT.IDocument> = (collectionDescriptor: ST.ITypedCollectionDescriptor<T>) => Q;
 
 export interface IQuerySet<T extends DT.IDocument> {
