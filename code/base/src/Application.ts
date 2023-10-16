@@ -61,7 +61,7 @@ export function areEqual<T>(obj1: T | null | undefined, obj2: T | null | undefin
  */
 export function copyObject<T>(obj: T): T {
   if (TC.isUndefined(obj)) {
-    return (undefined as T);
+    return ((undefined as unknown) as T);
   }
 
   const objAsString = JSON.stringify(obj);

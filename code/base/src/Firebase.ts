@@ -220,7 +220,7 @@ export function getFieldValueSummary<T extends firestore.FieldValue>(fieldValue:
   } else if (isOfFieldValue_ServerTimestamp<T>(fieldValue)) {
     return getFieldValueSummary_ServerTimestamp<T>(fieldValue);
   } else {
-    const fieldValueAsShim = (fieldValue as FieldValueShim);
+    const fieldValueAsShim = ((fieldValue as unknown) as FieldValueShim);
     const unrecognizedSummary: FieldValueSummary = {
       isFieldValue: true,
       fieldValueTypeName: FieldValue_MethodName_Unrecognized,
