@@ -259,3 +259,26 @@ body {
   gap: 1vw;
   grid-auto-rows: minmax(10vh, auto);
 }
+
+.tab {
+  border: 2px solid linen;
+  border-radius: 8px;
+}
+
+.active-tab {
+  border: 2px solid darkslategray;
+  border-radius: 8px;
+}
+
+/* .tab-page {
+} */
+
+.active-tab-page {
+  display: block;
+  visibility: visible;
+}
+
+.hidden-tab-page {
+  display: none;
+  visibility: hidden;
+}

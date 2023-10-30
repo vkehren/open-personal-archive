@@ -49,145 +49,179 @@
           <label id="firebase-label"></label>
           <label id="firebase-verification-label"></label>
         </p>
-        <hr style="margin: 16px;" />
-        <p style="margin-left: 16px;">
-          <label>Callable Function:</label>
-          <select id="function-select" style="max-width: 98%;">
-            <optgroup label="System">
-              <option value="getListOfLogItems">getListOfLogItems(numberOfLatestItems, groupItemsByRootId, groupItemsByExternalId)</option>
-              <option value="recordLogItem">recordLogItem(activityType, resource, action, data, otherState)</option>
-              <option value="isInstalled">isInstalled()</option>
-              <option value="getInstallationScreenDisplayModel">getInstallationScreenDisplayModel()</option>
-              <option value="performInstall">performInstall(archiveName, archiveDescription, pathToRootStorageFolder,
-                defaultLocaleId, defaultTimeZoneGroupId, installationNotes, [ownerFirstName], [ownerLastName]</i>)</option>
-              <option value="updateInstallationSettings">updateInstallationSettings(archiveName, archiveDescription,
-                defaultLocaleId, defaultTimeZoneGroupId, defaultTimeZoneId)</option>
-              <option value="performUpgrade">performUpgrade(upgradeNotes, doBackupFirst)</option>
-              <option value="performUninstall">performUninstall(doBackupFirst)</option>
-              <option value="firebaseAuthSignInHandler">firebaseAuthSignInHandler(event)</option>
-            </optgroup>
-            <optgroup label="Users">
-              <option value="getListOfUsers">getListOfUsers(approvalState)</option>
-              <option value="getUserAccountDisplayModel">getUserAccountDisplayModel()</option>
-              <option value="initializeUserAccount">initializeUserAccount(authProviderId, authAccountName)</option>
-              <option value="updateUserProfile">updateUserProfile(updateObject)</option>
-              <option value="assignUserToRole">assignUserToRole(userId, roleId)</option>
-              <option value="addRequestedCitationToUser">addRequestedCitationToUser(userId, citationId)</option>
-              <option value="addViewableCitationToUser">addViewableCitationToUser(userId, citationId)</option>
-              <option value="setUserToViewed">setUserToViewed(userId)</option>
-              <option value="setUserToApprovalState">setUserToApprovalState(userId, approvalState)</option>
-              <option value="setUserToApproved">setUserToApproved(userId)</option>
-              <option value="setUserToDenied">setUserToDenied(userId)</option>
-              <option value="setUserToSuspensionState">setUserToSuspensionState(userId, suspensionState, reason)
-              </option>
-              <option value="setUserToSuspended">setUserToSuspended(userId, reason)</option>
-              <option value="setUserToUnSuspended">setUserToUnSuspended(userId, reason)</option>
-              <option value="markUserWithDeletionState">markUserWithDeletionState(userId, deletionState)</option>
-              <option value="markUserAsDeleted">markUserAsDeleted(userId)</option>
-              <option value="markUserAsUnDeleted">markUserAsUnDeleted(userId)</option>
-            </optgroup>
-            <optgroup label="Access Requests">
-              <option value="getListOfAccessRequests">getListOfAccessRequests(approvalState)</option>
-              <option value="requestUserAccess">requestUserAccess(message, citationId)</option>
-              <option value="updateMessageForAccessRequest">updateMessageForAccessRequest(accessRequestId, message)
-              </option>
-              <option value="updateResponseToAccessRequest">updateResponseToAccessRequest(accessRequestId, response)
-              </option>
-              <option value="setAccessRequestTags">setAccessRequestTags(accessRequestId, tags, contentType)</option>
-              <option value="addAccessRequestTags">addAccessRequestTags(accessRequestId, tags)</option>
-              <option value="removeAccessRequestTags">removeAccessRequestTags(accessRequestId, tags)</option>
-              <option value="setAccessRequestToArchivalState">setAccessRequestToArchivalState(accessRequestId,
-                archivalState)
-              </option>
-              <option value="setAccessRequestToArchived">setAccessRequestToArchived(accessRequestId)</option>
-              <option value="setAccessRequestToNotArchived">setAccessRequestToNotArchived(accessRequestId)</option>
-              <option value="setAccessRequestToViewed">setAccessRequestToViewed(accessRequestId)</option>
-              <option value="setAccessRequestToApprovalState">setAccessRequestToApprovalState(accessRequestId,
-                approvalState)
-              </option>
-              <option value="setAccessRequestToApproved">setAccessRequestToApproved(accessRequestId)</option>
-              <option value="setAccessRequestToDenied">setAccessRequestToDenied(accessRequestId)</option>
-              <option value="markAccessRequestWithDeletionState">markAccessRequestWithDeletionState(accessRequestId,
-                deletionState)</option>
-              <option value="markAccessRequestAsDeleted">markAccessRequestAsDeleted(accessRequestId)</option>
-              <option value="markAccessRequestAsUnDeleted">markAccessRequestAsUnDeleted(accessRequestId)</option>
-            </optgroup>
-            <optgroup label="Contacts">
-              <option value="getListOfContacts">getListOfContacts()</option>
-              <option value="createContact">createContact(organizationName, firstName, lastName, email, phoneNumber,
-                address,
-                message, otherInfo)</option>
-              <option value="updateContact">updateContact(updateObject)</option>
-              <option value="setCorrespondingUsersForContact">setCorrespondingUsersForContact(contactId, userIds,
-                contentType)
-              </option>
-              <option value="addCorrespondingUsersToContact">addCorrespondingUsersToContact(contactId, userIds)</option>
-              <option value="removeCorrespondingUsersFromContact">removeCorrespondingUsersFromContact(contactId,
-                userIds)
-              </option>
-              <option value="setContactTags">setContactTags(contactId, tags, contentType)</option>
-              <option value="addContactTags">addContactTags(contactId, tags)</option>
-              <option value="removeContactTags">removeContactTags(contactId, tags)</option>
-              <option value="setContactToArchivalState">setContactToArchivalState(contactId, archivalState)</option>
-              <option value="setContactToArchived">setContactToArchived(contactId)</option>
-              <option value="setContactToNotArchived">setContactToNotArchived(contactId)</option>
-              <option value="setContactToViewed">setContactToViewed(contactId)</option>
-              <option value="markContactWithDeletionState">markContactWithDeletionState(contactId, deletionState)
-              </option>
-              <option value="markContactAsDeleted">markContactAsDeleted(contactId)</option>
-              <option value="markContactAsUnDeleted">markContactAsUnDeleted(contactId)</option>
-            </optgroup>
-          </select>
+        <hr />
+        <nav class="flex-container-row-center-start" style="height: auto;margin-left: 16px;">
+          <a id="function-list-tab" class="tab" style="height: auto;" href="?show-function-list=true">
+            <h3 style="margin: 4px 8px 4px 8px;">
+              Callable Function List
+            </h3>
+          </a>
+          <div style="width: 16px;height: 1px;display: block;"></div>
+          <a id="log-explorer-tab" class="tab" style="height: auto;" href="?show-log-explorer=true">
+            <h3 style="margin: 4px 8px 4px 8px;">
+              Activity Log Explorer
+            </h3>
+          </a>
+        </nav>
+        <div id="function-list" class="hidden-tab-page">
+          <p style="margin-left: 16px;">
+            <label>Callable Function:</label>
+            <select id="function-select" style="max-width: 98%;">
+              <optgroup label="System">
+                <option value="getListOfLogItems">getListOfLogItems(numberOfLatestItems, groupItemsByRootId, groupItemsByExternalId)</option>
+                <option value="recordLogItem">recordLogItem(activityType, resource, action, data, otherState)</option>
+                <option value="isInstalled">isInstalled()</option>
+                <option value="getInstallationScreenDisplayModel">getInstallationScreenDisplayModel()</option>
+                <option value="performInstall">performInstall(archiveName, archiveDescription, pathToRootStorageFolder,
+                  defaultLocaleId, defaultTimeZoneGroupId, installationNotes, [ownerFirstName], [ownerLastName]</i>)</option>
+                <option value="updateInstallationSettings">updateInstallationSettings(archiveName, archiveDescription,
+                  defaultLocaleId, defaultTimeZoneGroupId, defaultTimeZoneId)</option>
+                <option value="performUpgrade">performUpgrade(upgradeNotes, doBackupFirst)</option>
+                <option value="performUninstall">performUninstall(doBackupFirst)</option>
+                <option value="firebaseAuthSignInHandler">firebaseAuthSignInHandler(event)</option>
+              </optgroup>
+              <optgroup label="Users">
+                <option value="getListOfUsers">getListOfUsers(approvalState)</option>
+                <option value="getUserAccountDisplayModel">getUserAccountDisplayModel()</option>
+                <option value="initializeUserAccount">initializeUserAccount(authProviderId, authAccountName)</option>
+                <option value="updateUserProfile">updateUserProfile(updateObject)</option>
+                <option value="assignUserToRole">assignUserToRole(userId, roleId)</option>
+                <option value="addRequestedCitationToUser">addRequestedCitationToUser(userId, citationId)</option>
+                <option value="addViewableCitationToUser">addViewableCitationToUser(userId, citationId)</option>
+                <option value="setUserToViewed">setUserToViewed(userId)</option>
+                <option value="setUserToApprovalState">setUserToApprovalState(userId, approvalState)</option>
+                <option value="setUserToApproved">setUserToApproved(userId)</option>
+                <option value="setUserToDenied">setUserToDenied(userId)</option>
+                <option value="setUserToSuspensionState">setUserToSuspensionState(userId, suspensionState, reason)
+                </option>
+                <option value="setUserToSuspended">setUserToSuspended(userId, reason)</option>
+                <option value="setUserToUnSuspended">setUserToUnSuspended(userId, reason)</option>
+                <option value="markUserWithDeletionState">markUserWithDeletionState(userId, deletionState)</option>
+                <option value="markUserAsDeleted">markUserAsDeleted(userId)</option>
+                <option value="markUserAsUnDeleted">markUserAsUnDeleted(userId)</option>
+              </optgroup>
+              <optgroup label="Access Requests">
+                <option value="getListOfAccessRequests">getListOfAccessRequests(approvalState)</option>
+                <option value="requestUserAccess">requestUserAccess(message, citationId)</option>
+                <option value="updateMessageForAccessRequest">updateMessageForAccessRequest(accessRequestId, message)
+                </option>
+                <option value="updateResponseToAccessRequest">updateResponseToAccessRequest(accessRequestId, response)
+                </option>
+                <option value="setAccessRequestTags">setAccessRequestTags(accessRequestId, tags, contentType)</option>
+                <option value="addAccessRequestTags">addAccessRequestTags(accessRequestId, tags)</option>
+                <option value="removeAccessRequestTags">removeAccessRequestTags(accessRequestId, tags)</option>
+                <option value="setAccessRequestToArchivalState">setAccessRequestToArchivalState(accessRequestId,
+                  archivalState)
+                </option>
+                <option value="setAccessRequestToArchived">setAccessRequestToArchived(accessRequestId)</option>
+                <option value="setAccessRequestToNotArchived">setAccessRequestToNotArchived(accessRequestId)</option>
+                <option value="setAccessRequestToViewed">setAccessRequestToViewed(accessRequestId)</option>
+                <option value="setAccessRequestToApprovalState">setAccessRequestToApprovalState(accessRequestId,
+                  approvalState)
+                </option>
+                <option value="setAccessRequestToApproved">setAccessRequestToApproved(accessRequestId)</option>
+                <option value="setAccessRequestToDenied">setAccessRequestToDenied(accessRequestId)</option>
+                <option value="markAccessRequestWithDeletionState">markAccessRequestWithDeletionState(accessRequestId,
+                  deletionState)</option>
+                <option value="markAccessRequestAsDeleted">markAccessRequestAsDeleted(accessRequestId)</option>
+                <option value="markAccessRequestAsUnDeleted">markAccessRequestAsUnDeleted(accessRequestId)</option>
+              </optgroup>
+              <optgroup label="Contacts">
+                <option value="getListOfContacts">getListOfContacts()</option>
+                <option value="createContact">createContact(organizationName, firstName, lastName, email, phoneNumber,
+                  address,
+                  message, otherInfo)</option>
+                <option value="updateContact">updateContact(updateObject)</option>
+                <option value="setCorrespondingUsersForContact">setCorrespondingUsersForContact(contactId, userIds,
+                  contentType)
+                </option>
+                <option value="addCorrespondingUsersToContact">addCorrespondingUsersToContact(contactId, userIds)</option>
+                <option value="removeCorrespondingUsersFromContact">removeCorrespondingUsersFromContact(contactId,
+                  userIds)
+                </option>
+                <option value="setContactTags">setContactTags(contactId, tags, contentType)</option>
+                <option value="addContactTags">addContactTags(contactId, tags)</option>
+                <option value="removeContactTags">removeContactTags(contactId, tags)</option>
+                <option value="setContactToArchivalState">setContactToArchivalState(contactId, archivalState)</option>
+                <option value="setContactToArchived">setContactToArchived(contactId)</option>
+                <option value="setContactToNotArchived">setContactToNotArchived(contactId)</option>
+                <option value="setContactToViewed">setContactToViewed(contactId)</option>
+                <option value="markContactWithDeletionState">markContactWithDeletionState(contactId, deletionState)
+                </option>
+                <option value="markContactAsDeleted">markContactAsDeleted(contactId)</option>
+                <option value="markContactAsUnDeleted">markContactAsUnDeleted(contactId)</option>
+              </optgroup>
+            </select>
+            <br />
+            <br />
+            <label>
+              <b>ActivityType:</b>"browser_page_load" | "browser_page_view" | "browser_page_action" | "browser_page_error"
+              |
+              "server_function_call" | "server_function_error",
+              <b>ContentType:</b> "exact" | "only_added" | "only_removed",
+              <b>RoleType:</b> "owner" | "administrator" | "editor" | "viewer" | "guest",
+              <b>ApprovalState:</b> "pending" | "approved" | "denied",
+              <b>ArchivalState:</b> "archived" | "not_archived",
+              <b>SuspensionState:</b> "suspended" | "unsuspended",
+              <b>DeletionState:</b> "deleted" | "undeleted",
+              <b>UpdateObject:</b> IUserPartial | IAccessRequestPartial | IContactPartial | ...
+            </label>
+            <br />
+            <br />
+            <label>Argument 0:</label>
+            <input id="function-arg0-input" type="text" />
+            <br />
+            <label>Argument 1:</label>
+            <input id="function-arg1-input" type="text" />
+            <br />
+            <label>Argument 2:</label>
+            <input id="function-arg2-input" type="text" />
+            <br />
+            <label>Argument 3:</label>
+            <input id="function-arg3-input" type="text" />
+            <br />
+            <label>Argument 4:</label>
+            <input id="function-arg4-input" type="text" />
+            <br />
+            <label>Argument 5:</label>
+            <input id="function-arg5-input" type="text" />
+            <br />
+            <label>Argument 6:</label>
+            <input id="function-arg6-input" type="text" />
+            <br />
+            <label>Argument 7:</label>
+            <input id="function-arg7-input" type="text" />
+            <br />
+            <label>Argument 8:</label>
+            <input id="function-arg8-input" type="text" />
+            <br />
+            <label>Argument 9:</label>
+            <input id="function-arg9-input" type="text" />
+            <br />
+            <button id="function-button">Run the selected Callable Function</button>
+            <br />
+            <label id="function-label"></label>
+          </p>
+        </div>
+        <div id="log-explorer" class="hidden-tab-page">
+          <p style="margin-left: 16px;">
+            <label>Activity Log Explorer:</label>
+          <div id="log-contents"></div>
+          <label>Limit:</label>
+          <input id="log-limit-input" type="text" />
           <br />
+          <label>Offset:</label>
+          <input id="log-offset-input" type="text" />
           <br />
-          <label>
-            <b>ActivityType:</b>"browser_page_load" | "browser_page_view" | "browser_page_action" | "browser_page_error"
-            |
-            "server_function_call" | "server_function_error",
-            <b>ContentType:</b> "exact" | "only_added" | "only_removed",
-            <b>RoleType:</b> "owner" | "administrator" | "editor" | "viewer" | "guest",
-            <b>ApprovalState:</b> "pending" | "approved" | "denied",
-            <b>ArchivalState:</b> "archived" | "not_archived",
-            <b>SuspensionState:</b> "suspended" | "unsuspended",
-            <b>DeletionState:</b> "deleted" | "undeleted",
-            <b>UpdateObject:</b> IUserPartial | IAccessRequestPartial | IContactPartial | ...
-          </label>
+          <label>Group By Root Item:</label>
+          <input id="log-group-root-input" type="checkbox" checked />
           <br />
+          <label>Group By External Item:</label>
+          <input id="log-group-external-input" type="checkbox" checked />
           <br />
-          <label>Argument 0:</label>
-          <input id="function-arg0-input" type="text" />
-          <br />
-          <label>Argument 1:</label>
-          <input id="function-arg1-input" type="text" />
-          <br />
-          <label>Argument 2:</label>
-          <input id="function-arg2-input" type="text" />
-          <br />
-          <label>Argument 3:</label>
-          <input id="function-arg3-input" type="text" />
-          <br />
-          <label>Argument 4:</label>
-          <input id="function-arg4-input" type="text" />
-          <br />
-          <label>Argument 5:</label>
-          <input id="function-arg5-input" type="text" />
-          <br />
-          <label>Argument 6:</label>
-          <input id="function-arg6-input" type="text" />
-          <br />
-          <label>Argument 7:</label>
-          <input id="function-arg7-input" type="text" />
-          <br />
-          <label>Argument 8:</label>
-          <input id="function-arg8-input" type="text" />
-          <br />
-          <label>Argument 9:</label>
-          <input id="function-arg9-input" type="text" />
-          <br />
-          <button id="function-button">Run the selected Callable Function</button>
-          <br />
-          <label id="function-label"></label>
-        </p>
+          <button id="refresh-log-button">Refresh Log</button>
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -205,7 +239,7 @@
     import {initializeApp} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
     import {GoogleAuthProvider, getAuth, sendEmailVerification, signInWithEmailAndPassword, signInWithPopup, signOut} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
     import {getFunctions, httpsCallable} from "https://www.gstatic.com/firebasejs/10.4.0/firebase-functions.js";
-    import {isNullish, parseJsonIfNeeded} from "./WebBaseLite.js";
+    import {isNullish, isNullishOrWhitespace, isString, parseJsonIfNeeded} from "./WebBaseLite.js";
     import {recordPageView, recordPageAction, recordPageError} from "./WebFunctions.js";
     import {schedulePageRefreshForInactivity, forceResizeEventIfNeeded} from "./WebRendering.js";
 
@@ -216,6 +250,29 @@
     await recordPageView(app);
     schedulePageRefreshForInactivity();
     forceResizeEventIfNeeded(document.getElementById("copyright"), 20, 20);
+
+    // NOTE: Show the active tab
+    const pageUrl = new URL(window.location.href);
+    const pageParams = new URLSearchParams(pageUrl.search);
+    const functionListTab = document.getElementById("function-list-tab");
+    const functionListDiv = document.getElementById("function-list");
+    const logExplorerTab = document.getElementById("log-explorer-tab");
+    const logExplorerDiv = document.getElementById("log-explorer");
+    if (pageParams.has("show-log-explorer")) {
+      functionListTab.classList.remove("active-tab");
+      functionListDiv.classList.remove("active-tab-page");
+      functionListDiv.classList.add("hidden-tab-page");
+      logExplorerTab.classList.add("active-tab");
+      logExplorerDiv.classList.remove("hidden-tab-page");
+      logExplorerDiv.classList.add("active-tab-page");
+    } else {
+      functionListTab.classList.add("active-tab");
+      functionListDiv.classList.remove("hidden-tab-page");
+      functionListDiv.classList.add("active-tab-page");
+      logExplorerTab.classList.remove("active-tab");
+      logExplorerDiv.classList.remove("active-tab-page");
+      logExplorerDiv.classList.add("hidden-tab-page");
+    }
 
     document.getElementById("google-button").onclick = async () => {
       let logResult = null;
@@ -294,39 +351,46 @@
       }
     };
 
-    document.getElementById("function-button").onclick = async () => {
+    async function callFirebaseFunction(functionName, functionArgs, displayStatusCallback) {
       let logResult = null;
 
       try {
-        document.getElementById("function-label").innerText = "...working...";
+        displayStatusCallback("...working...", false);
 
-        const functionSelect = document.getElementById("function-select");
-        const functionIndex = functionSelect.selectedIndex;
-        const functionOption = functionSelect.options[functionIndex];
-        const functionName = functionOption.value;
-        const functionText = functionOption.text;
-        const arg0 = parseJsonIfNeeded(document.getElementById("function-arg0-input").value);
-        const arg1 = parseJsonIfNeeded(document.getElementById("function-arg1-input").value);
-        const arg2 = parseJsonIfNeeded(document.getElementById("function-arg2-input").value);
-        const arg3 = parseJsonIfNeeded(document.getElementById("function-arg3-input").value);
-        const arg4 = parseJsonIfNeeded(document.getElementById("function-arg4-input").value);
-        const arg5 = parseJsonIfNeeded(document.getElementById("function-arg5-input").value);
-        const arg6 = parseJsonIfNeeded(document.getElementById("function-arg6-input").value);
-        const arg7 = parseJsonIfNeeded(document.getElementById("function-arg7-input").value);
-        const arg8 = parseJsonIfNeeded(document.getElementById("function-arg8-input").value);
-        const arg9 = parseJsonIfNeeded(document.getElementById("function-arg9-input").value);
+        if (isNullish(functionArgs)) {
+          functionArgs = {};
+        }
 
-        const functionArgNames = functionText.split("(")[1].split(")")[0].split(",");
-        const functionArgValues = [arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9]
-        const functionArgs = {};
-        for (let i = 0; i < functionArgNames.length; i++) {
-          const functionArgName = functionArgNames[i].trim();
-          const functionArgValue = functionArgValues[i];
+        if (isNullishOrWhitespace(functionName)) {
+          const functionSelect = document.getElementById("function-select");
+          const functionIndex = functionSelect.selectedIndex;
+          const functionOption = functionSelect.options[functionIndex];
+          functionName = functionOption.value;
+          const functionText = functionOption.text;
 
-          if (functionArgName.length < 1) {
-            continue;
-          } else {
-            functionArgs[functionArgName] = functionArgValue;
+          const arg0 = parseJsonIfNeeded(document.getElementById("function-arg0-input").value);
+          const arg1 = parseJsonIfNeeded(document.getElementById("function-arg1-input").value);
+          const arg2 = parseJsonIfNeeded(document.getElementById("function-arg2-input").value);
+          const arg3 = parseJsonIfNeeded(document.getElementById("function-arg3-input").value);
+          const arg4 = parseJsonIfNeeded(document.getElementById("function-arg4-input").value);
+          const arg5 = parseJsonIfNeeded(document.getElementById("function-arg5-input").value);
+          const arg6 = parseJsonIfNeeded(document.getElementById("function-arg6-input").value);
+          const arg7 = parseJsonIfNeeded(document.getElementById("function-arg7-input").value);
+          const arg8 = parseJsonIfNeeded(document.getElementById("function-arg8-input").value);
+          const arg9 = parseJsonIfNeeded(document.getElementById("function-arg9-input").value);
+
+          const functionArgNames = functionText.split("(")[1].split(")")[0].split(",");
+          const functionArgValues = [arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9]
+          functionArgs = {};
+          for (let i = 0; i < functionArgNames.length; i++) {
+            const functionArgName = functionArgNames[i].trim();
+            const functionArgValue = functionArgValues[i];
+
+            if (functionArgName.length < 1) {
+              continue;
+            } else {
+              functionArgs[functionArgName] = functionArgValue;
+            }
           }
         }
 
@@ -334,12 +398,101 @@
         functionArgs.externalLogItemId = logResult.data.payload.id;
 
         const functionObject = httpsCallable(functions, functionName);
-        const functionResult = await functionObject(functionArgs)
-        document.getElementById("function-label").innerText = JSON.stringify(functionResult);
+        const functionResult = await functionObject(functionArgs);
+        displayStatusCallback(functionResult, false);
       } catch (error) {
-        document.getElementById("function-label").innerText = JSON.stringify(error);
-        await recordPageError(error);
+        displayStatusCallback(error, true);
       }
+    }
+
+    function displayFunctionCallStatus(callResultOrError) {
+      document.getElementById("function-label").innerText = JSON.stringify(callResultOrError);
+    }
+
+    function displayActivityLogContents(callResultOrError, isError) {
+      const logContentsDiv = document.getElementById("log-contents");
+
+      if (isNullish(callResultOrError)) {
+        logContentsDiv.innerText = "";
+        return;
+      }
+      if (isString(callResultOrError)) {
+        logContentsDiv.innerText = callResultOrError;
+        return;
+      }
+      if (isError) {
+        logContentsDiv.innerText = JSON.stringify(callResultOrError);
+        return;
+      }
+
+      const timestampComparer_Ascending = (doc1, doc2) => {
+        const date1 = doc1.dateOfCreation;
+        const date2 = doc2.dateOfCreation;
+
+        if (date1._seconds < date2._seconds) {
+          return -1;
+        }
+        if (date1._seconds > date2._seconds) {
+          return 1;
+        }
+        if (date1._nanoseconds < date2._nanoseconds) {
+          return -1;
+        }
+        if (date1._nanoseconds > date2._nanoseconds) {
+          return 1;
+        }
+        return 0;
+      };
+      const timestampComparer_Descending = (doc1, doc2) => {
+        return (-1 * timestampComparer_Ascending(doc1, doc2));
+      };
+      const timestampComparer = timestampComparer_Descending;
+
+      const rootLogItems = callResultOrError.data.payload;
+      const rootList = document.createElement("ul");
+
+      logContentsDiv.innerHTML = "";
+      logContentsDiv.appendChild(rootList);
+
+      const renderLogItem = (logItem, parentList) => {
+        const listItem = document.createElement("li");
+        const listItemDiv = document.createElement("div");
+        const listItemText = document.createTextNode("id: " + logItem.id + ", resource:" + logItem.resource + ", activityType:" + logItem.activityType + ", executionState:" + logItem.executionState + ", requestor:" + logItem.requestor + ", action:" + logItem.action);
+        const listItemList = document.createElement("ul");
+
+        logItem.subItems.sort(timestampComparer);
+        for (let i = 0; i < logItem.subItems.length; i++) {
+          const subItem = logItem.subItems[i];
+          renderLogItem(subItem, listItemList);
+        }
+
+        listItemDiv.appendChild(listItemText);
+        listItem.appendChild(listItemDiv);
+        listItem.appendChild(listItemList);
+        parentList.appendChild(listItem);
+      };
+
+      rootLogItems.sort(timestampComparer);
+      for (let i = 0; i < rootLogItems.length; i++) {
+        const rootLogItem = rootLogItems[i];
+        renderLogItem(rootLogItem, rootList);
+      }
+    }
+
+    document.getElementById("function-button").onclick = async () => {
+      await callFirebaseFunction(null, null, displayFunctionCallStatus);
+    };
+
+    document.getElementById("refresh-log-button").onclick = async () => {
+      const limit = parseJsonIfNeeded(document.getElementById("log-limit-input").value);
+      const offset = parseJsonIfNeeded(document.getElementById("log-offset-input").value);
+      const groupItemsByRootId = parseJsonIfNeeded(document.getElementById("log-group-root-input").checked);
+      const groupItemsByExternalId = parseJsonIfNeeded(document.getElementById("log-group-external-input").checked);
+
+      const functionName = "getListOfLogItems";
+      const functionArgs = {limit, offset, groupItemsByRootId, groupItemsByExternalId};
+
+      await callFirebaseFunction(functionName, functionArgs, displayActivityLogContents);
     };
   </script>
 </body>
