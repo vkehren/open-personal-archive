@@ -277,6 +277,13 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(logItemsMap.get(serverLogItem3.id)?.id).equals(serverLogItem3.id);
     expect(logItemsMap.get(webLogItem4.id)?.id).equals(webLogItem4.id);
     expect(logItemsMap.get(serverLogItem4.id)?.id).equals(serverLogItem4.id);
+
+    const logItems_FirstPart = await ActivityLog.getListOfLogItems(config.dataStorageState, config.authenticationState, {groupItemsByExternalId: false, groupItemsByRootId: false, pagingOptions: {limit: 2, offset: 0}}); // eslint-disable-line camelcase, max-len
+    const logItems_LastPart = await ActivityLog.getListOfLogItems(config.dataStorageState, config.authenticationState, {groupItemsByExternalId: false, groupItemsByRootId: false, pagingOptions: {limit: 2, offset: (logItems.length - 2)}}); // eslint-disable-line camelcase, max-len
+    expect(logItems_FirstPart.length).equals(2);
+    expect(logItems_LastPart.length).equals(2);
+    expect(logItems_FirstPart[0].id == logItems_LastPart[0].id).equals(false);
+    expect(logItems_FirstPart[1].id == logItems_LastPart[1].id).equals(false);
   });
   test("checks that recordLogItem(...) succeeds when System is not installed", testFunc1(() => null));
   test("checks that recordLogItem(...) succeeds when System is not installed", testFunc1(() => TestAuthData.owner));
@@ -520,6 +527,13 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(logItemsMap.get(serverLogItem3.id)?.id).equals(serverLogItem3.id);
     expect(logItemsMap.get(webLogItem4.id)?.id).equals(webLogItem4.id);
     expect(logItemsMap.get(serverLogItem4.id)?.id).equals(serverLogItem4.id);
+
+    const logItems_FirstPart = await ActivityLog.getListOfLogItems(config.dataStorageState, config.authenticationState, {groupItemsByExternalId: false, groupItemsByRootId: false, pagingOptions: {limit: 2, offset: 0}}); // eslint-disable-line camelcase, max-len
+    const logItems_LastPart = await ActivityLog.getListOfLogItems(config.dataStorageState, config.authenticationState, {groupItemsByExternalId: false, groupItemsByRootId: false, pagingOptions: {limit: 2, offset: (logItems.length - 2)}}); // eslint-disable-line camelcase, max-len
+    expect(logItems_FirstPart.length).equals(2);
+    expect(logItems_LastPart.length).equals(2);
+    expect(logItems_FirstPart[0].id == logItems_LastPart[0].id).equals(false);
+    expect(logItems_FirstPart[1].id == logItems_LastPart[1].id).equals(false);
   });
   test("checks that recordLogItem(...) succeeds when System is installed and User is Archive Owner", testFunc2(() => null));
   test("checks that recordLogItem(...) succeeds when System is installed and User is Archive Owner", testFunc2(() => TestAuthData.owner));
@@ -775,6 +789,13 @@ describe("ActivityLog Tests using Firebase " + config.testEnvironment, function(
     expect(logItemsMap.get(serverLogItem3.id)?.id).equals(serverLogItem3.id);
     expect(logItemsMap.get(webLogItem4.id)?.id).equals(webLogItem4.id);
     expect(logItemsMap.get(serverLogItem4.id)?.id).equals(serverLogItem4.id);
+
+    const logItems_FirstPart = await ActivityLog.getListOfLogItems(config.dataStorageState, config.authenticationState, {groupItemsByExternalId: false, groupItemsByRootId: false, pagingOptions: {limit: 2, offset: 0}}); // eslint-disable-line camelcase, max-len
+    const logItems_LastPart = await ActivityLog.getListOfLogItems(config.dataStorageState, config.authenticationState, {groupItemsByExternalId: false, groupItemsByRootId: false, pagingOptions: {limit: 2, offset: (logItems.length - 2)}}); // eslint-disable-line camelcase, max-len
+    expect(logItems_FirstPart.length).equals(2);
+    expect(logItems_LastPart.length).equals(2);
+    expect(logItems_FirstPart[0].id == logItems_LastPart[0].id).equals(false);
+    expect(logItems_FirstPart[1].id == logItems_LastPart[1].id).equals(false);
   });
   test("checks that initializeUserAccount(...) succeeds when System is installed and User is not Archive Owner", testFunc3(() => null));
   test("checks that initializeUserAccount(...) succeeds when System is installed and User is not Archive Owner", testFunc3(() => TestAuthData.owner));
