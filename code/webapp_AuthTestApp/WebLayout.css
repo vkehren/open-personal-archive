@@ -1,6 +1,6 @@
 /*
  * const NAME = "open-personal-archive-web-layout-css";
- * const VERSION = "2.4.3";
+ * const VERSION = "2.4.4";
  * const AUTHOR = "Ryan Stephen Ehrenreich";
  * const COPYRIGHT = "Copyright © 2021 Open Personal Archive™";
  */
@@ -258,4 +258,27 @@ body {
   grid-template-columns: repeat(5, 1fr);
   gap: 1vw;
   grid-auto-rows: minmax(10vh, auto);
+}
+
+.tab {
+  border: 2px solid linen;
+  border-radius: 8px;
+}
+
+.active-tab {
+  border: 2px solid darkslategray;
+  border-radius: 8px;
+}
+
+/* .tab-page {
+} */
+
+.active-tab-page {
+  display: block;
+  visibility: visible;
+}
+
+.hidden-tab-page {
+  display: none;
+  visibility: hidden;
 }

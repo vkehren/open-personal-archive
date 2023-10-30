@@ -195,7 +195,7 @@ export function getFunctionCallLogMessage(moduleName: string, functionName: stri
  */
 export function getShimmedRequestObject(request: CallableRequest): OPA.ICallRequest {
   const shimmedRequest: OPA.ICallRequest = {
-    clientIpAddress: request.rawRequest.ip,
+    clientIpAddress: OPA.convertNonNullish(request.rawRequest.ip, OPA.UNKNOWN_IP_ADDRESS),
     url: request.rawRequest.originalUrl,
     data: request.data,
     headers: {},

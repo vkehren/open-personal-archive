@@ -31,14 +31,13 @@ export const getListOfLogItems = onCall(OPA.FIREBASE_DEFAULT_OPTIONS, async (req
       await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, OPA.ExecutionStates.ready);
     }
 
-    const numberOfLatestItems = (request.data.numberOfLatestItems) ? request.data.numberOfLatestItems : undefined;
-    const groupItemsByRootId = (request.data.groupItemsByRootId) ? request.data.groupItemsByRootId : true;
-    const groupItemsByExternalId = (request.data.groupItemsByExternalId) ? request.data.groupItemsByExternalId : true;
-    const options = {numberOfLatestItems, groupItemsByRootId, groupItemsByExternalId};
+    const queryOptions = (OPA.extractQueryOptions(request.data) as ActivityLog.ILogItemListQueryOptions);
+    queryOptions.groupItemsByRootId = OPA.convertNonNullish(OPA.getBoolean(request.data.groupItemsByRootId), true);
+    queryOptions.groupItemsByExternalId = OPA.convertNonNullish(OPA.getBoolean(request.data.groupItemsByExternalId), true);
 
     OPA.assertAuthenticationStateIsNotNullish(authenticationState);
     const authenticationStateNonNull = OPA.convertNonNullish(authenticationState);
-    const logItems = await ActivityLog.getListOfLogItems(dataStorageState, authenticationStateNonNull, options);
+    const logItems = await ActivityLog.getListOfLogItems(dataStorageState, authenticationStateNonNull, queryOptions);
 
     if (logCallsToLog) {
       await UTL.logFunctionCall(dataStorageState, authenticationState, shimmedRequest, OPA.ExecutionStates.complete);
