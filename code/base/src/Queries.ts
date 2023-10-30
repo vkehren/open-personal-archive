@@ -11,16 +11,16 @@ export type CollectionSource<T> = (firestore.CollectionGroup<T> | firestore.Coll
 export type QuerySource<T> = (firestore.CollectionGroup<T> | firestore.CollectionReference<T> | firestore.Query<T>);
 
 export const QueryOptions_Paging_Limit_PropertyName = VC.getTypedPropertyKeyAsText<IPagingQueryOptions>("limit"); // eslint-disable-line camelcase
-export const QueryOptions_Paging_Offset_PropertyName = VC.getTypedPropertyKeyAsText<IPagingQueryOptions>("offset"); // eslint-disable-line camelcase   
+export const QueryOptions_Paging_Offset_PropertyName = VC.getTypedPropertyKeyAsText<IPagingQueryOptions>("offset"); // eslint-disable-line camelcase
 export interface IPagingQueryOptions {
   limit: number,
   offset?: number,
 }
 
 export const QueryOptions_Timing_DateField_PropertyName = VC.getTypedPropertyKeyAsText<ITimingQueryOptions>("dateField"); // eslint-disable-line camelcase
-export const QueryOptions_Timing_Direction_PropertyName = VC.getTypedPropertyKeyAsText<ITimingQueryOptions>("direction"); // eslint-disable-line camelcase   
-export const QueryOptions_Timing_StartDate_PropertyName = VC.getTypedPropertyKeyAsText<ITimingQueryOptions>("startDate"); // eslint-disable-line camelcase   
-export const QueryOptions_Timing_EndDate_PropertyName = VC.getTypedPropertyKeyAsText<ITimingQueryOptions>("endDate"); // eslint-disable-line camelcase   
+export const QueryOptions_Timing_Direction_PropertyName = VC.getTypedPropertyKeyAsText<ITimingQueryOptions>("direction"); // eslint-disable-line camelcase
+export const QueryOptions_Timing_StartDate_PropertyName = VC.getTypedPropertyKeyAsText<ITimingQueryOptions>("startDate"); // eslint-disable-line camelcase
+export const QueryOptions_Timing_EndDate_PropertyName = VC.getTypedPropertyKeyAsText<ITimingQueryOptions>("endDate"); // eslint-disable-line camelcase
 export interface ITimingQueryOptions {
   dateField: string | firestore.FieldPath,
   direction?: firestore.OrderByDirection,
@@ -121,7 +121,7 @@ export interface IQuerySet<T extends DT.IDocument> {
   getById(ds: FB.IDataStorageState, id: string): Promise<T | null>;
   getByIdWithAssert(ds: FB.IDataStorageState, id: string, assertionFailureMessage?: string): Promise<T>;
   getForIds(ds: FB.IDataStorageState, ids: Array<string>, pathFromRoot?: Array<ST.INestedCollectionStep> | undefined, queryOptions?: IQueryOptions | undefined): Promise<Array<T>>;
-  getForIdsWithAssert(ds: FB.IDataStorageState, ids: Array<string>, pathFromRoot?: Array<ST.INestedCollectionStep> | undefined, queryOptions?: IQueryOptions | undefined, assertionFailureMessage?: string): Promise<Array<T>>;
+  getForIdsWithAssert(ds: FB.IDataStorageState, ids: Array<string>, pathFromRoot?: Array<ST.INestedCollectionStep> | undefined, queryOptions?: IQueryOptions | undefined, assertionFailureMessage?: string): Promise<Array<T>>; // eslint-disable-line max-len
   getAll(ds: FB.IDataStorageState, pathFromRoot?: Array<ST.INestedCollectionStep> | undefined, queryOptions?: IQueryOptions | undefined): Promise<Array<T>>;
 }
 
@@ -236,7 +236,7 @@ export class QuerySet<T extends DT.IDocument> implements IQuerySet<T> {
     if (TC.isNullish(pathFromRoot) && this.collectionDescriptor.isNestedCollection) {
       collectionSource = this.collectionDescriptor.getTypedCollectionGroup(ds);
     } else {
-      collectionSource = this.collectionDescriptor.getTypedCollection(ds, pathFromRoot);;
+      collectionSource = this.collectionDescriptor.getTypedCollection(ds, pathFromRoot);
     }
 
     let querySource: QuerySource<T>;
@@ -266,7 +266,7 @@ export class QuerySet<T extends DT.IDocument> implements IQuerySet<T> {
    * @param {string} [assertionFailureMessage=default] The message to include in the Error if the assertion fails.
    * @return {Promise<Array<T>>} The Documents corresponding to the IDs.
    */
-  async getForIdsWithAssert(ds: FB.IDataStorageState, ids: Array<string>, pathFromRoot?: Array<ST.INestedCollectionStep> | undefined, queryOptions?: IQueryOptions | undefined, assertionFailureMessage = "The resulting list of documents does not match the requested list of IDs."): Promise<Array<T>> {
+  async getForIdsWithAssert(ds: FB.IDataStorageState, ids: Array<string>, pathFromRoot?: Array<ST.INestedCollectionStep> | undefined, queryOptions?: IQueryOptions | undefined, assertionFailureMessage = "The resulting list of documents does not match the requested list of IDs."): Promise<Array<T>> { // eslint-disable-line max-len
     const documents = await this.getForIds(ds, ids, pathFromRoot, queryOptions);
     TC.assertNonNullish(documents, assertionFailureMessage);
     VC.assertIsTrue((documents.length == ids.length), assertionFailureMessage);
@@ -289,7 +289,7 @@ export class QuerySet<T extends DT.IDocument> implements IQuerySet<T> {
     if (TC.isNullish(pathFromRoot) && this.collectionDescriptor.isNestedCollection) {
       collectionSource = this.collectionDescriptor.getTypedCollectionGroup(ds);
     } else {
-      collectionSource = this.collectionDescriptor.getTypedCollection(ds, pathFromRoot);;
+      collectionSource = this.collectionDescriptor.getTypedCollection(ds, pathFromRoot);
     }
 
     let querySource: QuerySource<T>;
