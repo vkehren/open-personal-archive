@@ -4,11 +4,9 @@ import {OpaDbDescriptor as OpaDb} from "../../../datamodel/src";
 import * as CSU from "../CallStateUtilities";
 import * as Application from "./Application";
 
-export interface ILogItemListOptions {
-  numberOfLatestItems?: number,
+export interface ILogItemListQueryOptions extends OPA.IQueryOptions {
   groupItemsByRootId: boolean,
   groupItemsByExternalId: boolean,
-  // LATER: Add Date-Time constraints
 }
 
 export interface IGroupableActivityLogItem extends OpaDm.IActivityLogItem {
@@ -19,13 +17,14 @@ export interface IGroupableActivityLogItem extends OpaDm.IActivityLogItem {
  * Gets the list of ActivityLogItems in the Open Personal Archive™ (OPA) system.
  * @param {OpaDm.IDataStorageState} dataStorageState A container for the Firebase database and storage objects to read from.
  * @param {OpaDm.IAuthenticationState} authenticationState The Firebase Authentication state for the User.
- * @param {ILogItemListOptions} options The options for the result.
+ * @param {ILogItemListQueryOptions} queryOptions The query options to apply.
  * @return {Promise<Array<IGroupableActivityLogItem>>}
  */
-export async function getListOfLogItems(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState, options: ILogItemListOptions): Promise<Array<IGroupableActivityLogItem>> { // eslint-disable-line max-len
+export async function getListOfLogItems(dataStorageState: OpaDm.IDataStorageState, authenticationState: OpaDm.IAuthenticationState, queryOptions: ILogItemListQueryOptions): Promise<Array<IGroupableActivityLogItem>> { // eslint-disable-line max-len
   OPA.assertDataStorageStateIsNotNullish(dataStorageState);
   OPA.assertFirestoreIsNotNullish(dataStorageState.db);
   OPA.assertAuthenticationStateIsNotNullish(authenticationState);
+  OPA.assertNonNullish(queryOptions, "The Query Options argument must not be null.");
 
   const isSystemInstalled = await Application.isSystemInstalled(dataStorageState);
 
@@ -40,18 +39,18 @@ export async function getListOfLogItems(dataStorageState: OpaDm.IDataStorageStat
     authorizationState.assertRoleAllowed(authorizerIds);
   }
 
-  const colRef = OpaDb.ActivityLogItems.getTypedCollection(dataStorageState);
-  let queryRef = colRef.orderBy(OPA.getTypedPropertyKeyAsText<OpaDm.IActivityLogItem>("dateOfCreation"));
-  if (!OPA.isNullish(options.numberOfLatestItems)) {
-    queryRef = queryRef.limit(OPA.convertNonNullish(options.numberOfLatestItems));
+  // NOTE: Always order results by a date (where the default date is the date of creation)
+  if (OPA.isNullish(queryOptions.timingOptions)) {
+    queryOptions.timingOptions = {
+      dateField: OPA.ICreatable_DateOfCreation_PropertyName,
+    };
   }
-  const querySnap = await queryRef.get();
-  const docSnaps = querySnap.docs;
-  const logItems = docSnaps.map((docSnap) => docSnap.data());
+
+  const logItems = await OpaDb.ActivityLogItems.queries.getAll(dataStorageState, undefined, queryOptions);
   const groupableLogItems = logItems.map((logItem) => (logItem as IGroupableActivityLogItem));
   groupableLogItems.forEach((logItem) => logItem.subItems = []);
 
-  if (!options.groupItemsByExternalId && !options.groupItemsByRootId) {
+  if (!queryOptions.groupItemsByExternalId && !queryOptions.groupItemsByRootId) {
     return groupableLogItems;
   }
 
@@ -61,7 +60,7 @@ export async function getListOfLogItems(dataStorageState: OpaDm.IDataStorageStat
   groupableLogItems.forEach((logItem) => {
     let hasBeenGrouped = false;
 
-    if (!OPA.isNullishOrWhitespace(logItem.rootLogItemId) && options.groupItemsByRootId) {
+    if (!OPA.isNullishOrWhitespace(logItem.rootLogItemId) && queryOptions.groupItemsByRootId) {
       const parentLogItem = logItemsMap.get(OPA.convertNonNullish(logItem.rootLogItemId));
 
       if ((logItem.rootLogItemId != logItem.id) && !OPA.isNullish(parentLogItem)) {
@@ -71,7 +70,7 @@ export async function getListOfLogItems(dataStorageState: OpaDm.IDataStorageStat
       }
     }
 
-    if (!hasBeenGrouped && !OPA.isNullishOrWhitespace(logItem.externalLogItemId) && options.groupItemsByExternalId) {
+    if (!hasBeenGrouped && !OPA.isNullishOrWhitespace(logItem.externalLogItemId) && queryOptions.groupItemsByExternalId) {
       const parentLogItem = logItemsMap.get(OPA.convertNonNullish(logItem.externalLogItemId));
 
       if ((logItem.externalLogItemId != logItem.id) && !OPA.isNullish(parentLogItem)) {
