@@ -24,8 +24,9 @@ export const QueryOptions_Timing_EndDate_PropertyName = VC.getTypedPropertyKeyAs
 export interface ITimingQueryOptions {
   dateField: string | firestore.FieldPath,
   direction?: firestore.OrderByDirection,
-  startDate?: BT.DateToUse,
-  endDate?: BT.DateToUse,
+  // LATER: Consider allowing Timestamps, if doing so proves necessary
+  startDate?: Date,
+  endDate?: Date,
 }
 
 export interface IQueryOptions {
@@ -46,18 +47,28 @@ export function extractQueryOptions(data: Record<string, unknown>): IQueryOption
   }
 
   if (data[QueryOptions_Paging_Limit_PropertyName]) {
+    const limit = Number.parseInt("" + data[QueryOptions_Paging_Limit_PropertyName]);
+    const offset = Number.parseInt("" + data[QueryOptions_Paging_Offset_PropertyName]);
+
+    if (Number.isNaN(limit)) {
+      throw new Error("The specified query limit must be an integer.");
+    }
+
     queryOptions.pagingOptions = {
-      limit: (data[QueryOptions_Paging_Limit_PropertyName] as number),
-      offset: (data[QueryOptions_Paging_Offset_PropertyName] as number | undefined),
+      limit: limit,
+      offset: (!Number.isNaN(offset)) ? offset : undefined,
     };
   }
 
   if (data[QueryOptions_Timing_DateField_PropertyName]) {
+    const startDate = new Date("" + data[QueryOptions_Timing_StartDate_PropertyName]);
+    const endDate = new Date("" + data[QueryOptions_Timing_EndDate_PropertyName]);
+
     queryOptions.timingOptions = {
       dateField: (data[QueryOptions_Timing_DateField_PropertyName] as string | firestore.FieldPath),
       direction: (data[QueryOptions_Timing_Direction_PropertyName] as firestore.OrderByDirection | undefined),
-      startDate: (data[QueryOptions_Timing_StartDate_PropertyName] as BT.DateToUse | undefined),
-      endDate: (data[QueryOptions_Timing_EndDate_PropertyName] as BT.DateToUse | undefined),
+      startDate: (!Number.isNaN(startDate.valueOf())) ? startDate : undefined,
+      endDate: (!Number.isNaN(endDate.valueOf())) ? endDate : undefined,
     };
   }
 
