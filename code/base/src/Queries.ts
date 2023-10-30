@@ -64,9 +64,9 @@ export interface IQuerySet<T extends DT.IDocument> {
   readonly collectionDescriptor: ST.ITypedCollectionDescriptor<T>;
   documentProxyConstructor: BT.ProxyFunc<T>;
   getById(ds: FB.IDataStorageState, id: string): Promise<T | null>;
-  getByIdWithAssert(ds: FB.IDataStorageState, id: string, assertionFailureMessage: string): Promise<T>;
-  getForIds(ds: FB.IDataStorageState, ids: Array<string>): Promise<Array<T>>;
-  getForIdsWithAssert(ds: FB.IDataStorageState, ids: Array<string>, assertionFailureMessage: string): Promise<Array<T>>;
+  getByIdWithAssert(ds: FB.IDataStorageState, id: string, assertionFailureMessage?: string): Promise<T>;
+  getForIds(ds: FB.IDataStorageState, ids: Array<string>, pathFromRoot?: Array<ST.INestedCollectionStep> | undefined): Promise<Array<T>>;
+  getForIdsWithAssert(ds: FB.IDataStorageState, ids: Array<string>, pathFromRoot?: Array<ST.INestedCollectionStep> | undefined, assertionFailureMessage?: string): Promise<Array<T>>;
   getAll(ds: FB.IDataStorageState, pathFromRoot?: Array<ST.INestedCollectionStep> | undefined): Promise<Array<T>>;
 }
 
@@ -163,9 +163,10 @@ export class QuerySet<T extends DT.IDocument> implements IQuerySet<T> {
    * Gets the Documents whose IDs are in the specified list.
    * @param {FB.IDataStorageState} ds The state container for data storage.
    * @param {Array<string>} ids The IDs for the Documents within the OPA system.
+   * @param {Array<ST.INestedCollectionStep> | undefined} [pathFromRoot=undefined] The path to the nested Collection from the root of the database.
    * @return {Promise<Array<T>>} The Documents corresponding to the IDs.
    */
-  async getForIds(ds: FB.IDataStorageState, ids: Array<string>): Promise<Array<T>> {
+  async getForIds(ds: FB.IDataStorageState, ids: Array<string>, pathFromRoot?: Array<ST.INestedCollectionStep> | undefined): Promise<Array<T>> {
     FB.assertDataStorageStateIsNotNullish(ds);
     FB.assertFirestoreIsNotNullish(ds.db);
     TC.assertNonNullish(ids);
@@ -176,12 +177,12 @@ export class QuerySet<T extends DT.IDocument> implements IQuerySet<T> {
     }
 
     let documentSnaps: Array<firestore.QueryDocumentSnapshot<T>> = [];
-    if (this.collectionDescriptor.isNestedCollection) {
+    if (TC.isNullish(pathFromRoot) && this.collectionDescriptor.isNestedCollection) {
       const collectionGroup = this.collectionDescriptor.getTypedCollectionGroup(ds);
       const querySnap = await collectionGroup.where(DT.IDocument_DocumentId_PropertyName, "in", ids).get();
       documentSnaps = querySnap.docs;
     } else {
-      const collectionRef = this.collectionDescriptor.getTypedCollection(ds);
+      const collectionRef = this.collectionDescriptor.getTypedCollection(ds, pathFromRoot);
       const querySnap = await collectionRef.where(DT.IDocument_DocumentId_PropertyName, "in", ids).get();
       documentSnaps = querySnap.docs;
     }
@@ -202,11 +203,12 @@ export class QuerySet<T extends DT.IDocument> implements IQuerySet<T> {
    * and valid (i.e. are non-null and have non-null "id" property).
    * @param {FB.IDataStorageState} ds The state container for data storage.
    * @param {Array<string>} ids The IDs for the Documents within the OPA system.
+   * @param {Array<ST.INestedCollectionStep> | undefined} [pathFromRoot=undefined] The path to the nested Collection from the root of the database.
    * @param {string} [assertionFailureMessage=default] The message to include in the Error if the assertion fails.
    * @return {Promise<Array<T>>} The Documents corresponding to the IDs.
    */
-  async getForIdsWithAssert(ds: FB.IDataStorageState, ids: Array<string>, assertionFailureMessage = "The resulting list of documents does not match the requested list of IDs."): Promise<Array<T>> {
-    const documents = await this.getForIds(ds, ids);
+  async getForIdsWithAssert(ds: FB.IDataStorageState, ids: Array<string>, pathFromRoot?: Array<ST.INestedCollectionStep> | undefined, assertionFailureMessage = "The resulting list of documents does not match the requested list of IDs."): Promise<Array<T>> {
+    const documents = await this.getForIds(ds, ids, pathFromRoot);
     TC.assertNonNullish(documents, assertionFailureMessage);
     VC.assertIsTrue((documents.length == ids.length), assertionFailureMessage);
     documents.forEach((document) => DT.assertDocumentIsValid(document, assertionFailureMessage, assertionFailureMessage));
