@@ -10,13 +10,19 @@ import * as VC from "./ValueChecking";
 export type CollectionSource<T> = (firestore.CollectionGroup<T> | firestore.CollectionReference<T>);
 export type QuerySource<T> = (firestore.CollectionGroup<T> | firestore.CollectionReference<T> | firestore.Query<T>);
 
+export const QueryOptions_Paging_Limit_PropertyName = VC.getTypedPropertyKeyAsText<IPagingQueryOptions>("limit"); // eslint-disable-line camelcase
+export const QueryOptions_Paging_Offset_PropertyName = VC.getTypedPropertyKeyAsText<IPagingQueryOptions>("offset"); // eslint-disable-line camelcase   
 export interface IPagingQueryOptions {
   limit: number,
   offset?: number,
 }
 
-export interface IDateQueryOptions {
-  dateFieldName: string | firestore.FieldPath,
+export const QueryOptions_Timing_DateField_PropertyName = VC.getTypedPropertyKeyAsText<ITimingQueryOptions>("dateField"); // eslint-disable-line camelcase
+export const QueryOptions_Timing_Direction_PropertyName = VC.getTypedPropertyKeyAsText<ITimingQueryOptions>("direction"); // eslint-disable-line camelcase   
+export const QueryOptions_Timing_StartDate_PropertyName = VC.getTypedPropertyKeyAsText<ITimingQueryOptions>("startDate"); // eslint-disable-line camelcase   
+export const QueryOptions_Timing_EndDate_PropertyName = VC.getTypedPropertyKeyAsText<ITimingQueryOptions>("endDate"); // eslint-disable-line camelcase   
+export interface ITimingQueryOptions {
+  dateField: string | firestore.FieldPath,
   direction?: firestore.OrderByDirection,
   startDate?: BT.DateToUse,
   endDate?: BT.DateToUse,
@@ -24,47 +30,80 @@ export interface IDateQueryOptions {
 
 export interface IQueryOptions {
   pagingOptions?: IPagingQueryOptions,
-  dateOptions?: IDateQueryOptions,
+  timingOptions?: ITimingQueryOptions,
+}
+
+/**
+ * Extracts the query options from the data for the current request.
+ * @param {Record<string, unknown>} data The query to which to apply the specified options.
+ * @return {IQueryOptions} The extracted query options.
+ */
+export function extractQueryOptions(data: Record<string, unknown>): IQueryOptions {
+  const queryOptions = ({} as IQueryOptions);
+
+  if (TC.isNullish(data)) {
+    return queryOptions;
+  }
+
+  if (data[QueryOptions_Paging_Limit_PropertyName]) {
+    queryOptions.pagingOptions = {
+      limit: (data[QueryOptions_Paging_Limit_PropertyName] as number),
+      offset: (data[QueryOptions_Paging_Offset_PropertyName] as number | undefined),
+    };
+  }
+
+  if (data[QueryOptions_Timing_DateField_PropertyName]) {
+    queryOptions.timingOptions = {
+      dateField: (data[QueryOptions_Timing_DateField_PropertyName] as string | firestore.FieldPath),
+      direction: (data[QueryOptions_Timing_Direction_PropertyName] as firestore.OrderByDirection | undefined),
+      startDate: (data[QueryOptions_Timing_StartDate_PropertyName] as BT.DateToUse | undefined),
+      endDate: (data[QueryOptions_Timing_EndDate_PropertyName] as BT.DateToUse | undefined),
+    };
+  }
+
+  return queryOptions;
 }
 
 /**
  * Applies query options to a Firestore query.
  * @param {QuerySource<T>} query The query to which to apply the specified options.
  * @param {IQueryOptions | undefined} queryOptions The query options to apply prior to executing the query.
- * @return {Promise<Array<T>>} The list of Documents in the Collection.
+ * @return {QuerySource<T>} The query that results from the query options having been applied.
  */
-export function applyOptionsToQuery<T>(query: QuerySource<T>, options: IQueryOptions | undefined): QuerySource<T> {
+export function applyQueryOptions<T>(query: QuerySource<T>, queryOptions: IQueryOptions | undefined): QuerySource<T> {
   TC.assertNonNullish(query, "The Query must not be null.");
 
-  if (TC.isNullish(options)) {
+  if (TC.isNullish(queryOptions)) {
     return query;
   }
 
-  const optionsNonNull = TC.convertNonNullish(options);
-  const hasDateOptions = (!TC.isNullish(optionsNonNull.dateOptions));
+  const optionsNonNull = TC.convertNonNullish(queryOptions);
+  const hasTimingOptions = (!TC.isNullish(optionsNonNull.timingOptions));
   const hasPagingOptions = (!TC.isNullish(optionsNonNull.pagingOptions));
 
-  if (hasDateOptions) {
-    const dateOptions = TC.convertNonNullish(optionsNonNull.dateOptions);
+  if (hasTimingOptions) {
+    const timingOptions = TC.convertNonNullish(optionsNonNull.timingOptions);
 
-    if (!TC.isNullish(dateOptions.direction)) {
-      const direction = TC.convertNonNullish(dateOptions.direction);
-      query = query.orderBy(dateOptions.dateFieldName, direction);
+    if (!TC.isNullish(timingOptions.direction)) {
+      const direction = TC.convertNonNullish(timingOptions.direction);
+      query = query.orderBy(timingOptions.dateField, direction);
     } else {
-      query = query.orderBy(dateOptions.dateFieldName);
+      query = query.orderBy(timingOptions.dateField);
     }
 
-    if (!TC.isNullish(dateOptions.startDate)) {
-      query = query.startAt(dateOptions.startDate);
+    if (!TC.isNullish(timingOptions.startDate)) {
+      query = query.startAt(timingOptions.startDate);
     }
-    if (!TC.isNullish(dateOptions.endDate)) {
-      query = query.endAt(dateOptions.endDate);
+    if (!TC.isNullish(timingOptions.endDate)) {
+      query = query.endAt(timingOptions.endDate);
     }
   }
 
   if (hasPagingOptions) {
     const pagingOptions = TC.convertNonNullish(optionsNonNull.pagingOptions);
+
     query = query.limit(pagingOptions.limit);
+
     if (!TC.isNullish(pagingOptions.offset)) {
       const offset = TC.convertNonNullish(pagingOptions.offset);
       query = query.offset(offset);
@@ -202,7 +241,7 @@ export class QuerySet<T extends DT.IDocument> implements IQuerySet<T> {
 
     let querySource: QuerySource<T>;
     querySource = collectionSource.where(DT.IDocument_DocumentId_PropertyName, "in", ids);
-    querySource = applyOptionsToQuery(querySource, queryOptions);
+    querySource = applyQueryOptions(querySource, queryOptions);
     const querySnap = await querySource.get();
     const documentSnaps = querySnap.docs;
 
@@ -255,7 +294,7 @@ export class QuerySet<T extends DT.IDocument> implements IQuerySet<T> {
 
     let querySource: QuerySource<T>;
     querySource = collectionSource;
-    querySource = applyOptionsToQuery(querySource, queryOptions);
+    querySource = applyQueryOptions(querySource, queryOptions);
     const querySnap = await querySource.get();
     const documentSnaps = querySnap.docs;
 
